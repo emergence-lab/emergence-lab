@@ -14,18 +14,24 @@ from django.db import models
 class operator( models.Model ):
     id = models.IntegerField( primary_key=True )
     name = models.CharField( max_length=45, blank=True )
+    active = models.BooleanField( default=True )
+
     class Meta:
         db_table = 'operators'
 
 class platter( models.Model ):
     id = models.IntegerField( primary_key=True )
     name = models.CharField( max_length=45, blank=True )
+    active = models.BooleanField( default=True )
+
     class Meta:
         db_table = 'platters'
 
 class project( models.Model ):
     id = models.IntegerField( primary_key=True )
     name = models.CharField( max_length=45, blank=True )
+    active = models.BooleanField( default=True )
+
     class Meta:
         db_table = 'projects'
 
