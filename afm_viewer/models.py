@@ -37,7 +37,7 @@ class project( models.Model ):
 
 class growth( models.Model ):
     id = models.IntegerField( primary_key=True )
-    growth_number = models.CharField( max_length=45, blank=True )
+    growth_number = models.CharField( max_length=45, blank=True, db_index=True )
     date = models.DateField( blank=True, null=True )
     operator = models.CharField( max_length=45, blank=True )
     project = models.CharField( max_length=45, blank=True )
