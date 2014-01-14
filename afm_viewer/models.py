@@ -353,19 +353,19 @@ class growth( models.Model ):
 
 class afm( models.Model ):
     id = models.IntegerField( primary_key=True )
-    growth_number = models.CharField( max_length=45 )
-    pocket = models.IntegerField( blank=True, null=True )
-    scan_number = models.IntegerField( blank=True, null=True )
-    filename = models.CharField( max_length=150, blank=True)
+    growth = models.ForeignKey( growth )
+    growth_number = models.CharField( max_length=20 )
+    pocket = models.IntegerField( default=1 )
+    scan_number = models.IntegerField( default=0 )
+
     rms = models.DecimalField( max_digits=7, decimal_places=3, blank=True, null=True )
     zrange = models.DecimalField( max_digits=7, decimal_places=3, blank=True, null=True )
-    location = models.CharField( max_length=45, blank=True)
+    location = models.CharField( max_length=45, blank=True )
     size = models.DecimalField( max_digits=7, decimal_places=3, blank=True, null=True )
-    has_amplitude = models.IntegerField( blank=True, null=True )
+
+    filename = models.CharField( max_length=150, blank=True)
     amplitude_filename = models.CharField( max_length=150, blank=True )
-    simple_growth_number = models.CharField(max_length=45, blank=True )
-    webdav_hfile = models.CharField( max_length=150, blank=True )
-    webdav_afile = models.CharField( max_length=150, blank=True )
+
     class Meta:
         db_table = 'afm'
 
