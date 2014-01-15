@@ -36,7 +36,7 @@ class Migration(SchemaMigration):
 
 
     models = {
-        u'afm_viewer.afm': {
+        u'core.afm': {
             'Meta': {'object_name': 'afm', 'db_table': "u'afm'"},
             'amplitude_filename': ('django.db.models.fields.CharField', [], {'max_length': '150', 'blank': 'True'}),
             'filename': ('django.db.models.fields.CharField', [], {'max_length': '150', 'blank': 'True'}),
@@ -53,7 +53,7 @@ class Migration(SchemaMigration):
             'webdav_hfile': ('django.db.models.fields.CharField', [], {'max_length': '150', 'blank': 'True'}),
             'zrange': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '3', 'blank': 'True'})
         },
-        u'afm_viewer.growth': {
+        u'core.growth': {
             'Meta': {'object_name': 'growth', 'db_table': "u'growths'"},
             'alk_flow_in_cl_1': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '2', 'blank': 'True'}),
             'alk_flow_in_cl_2': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '2', 'blank': 'True'}),
@@ -361,19 +361,19 @@ class Migration(SchemaMigration):
             'vp_flow_cl_4': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '2', 'blank': 'True'}),
             'vp_flow_cl_5': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '2', 'blank': 'True'})
         },
-        u'afm_viewer.operator': {
+        u'core.operator': {
             'Meta': {'object_name': 'operator', 'db_table': "u'operators'"},
             'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.IntegerField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '45', 'blank': 'True'})
         },
-        u'afm_viewer.platter': {
+        u'core.platter': {
             'Meta': {'object_name': 'platter', 'db_table': "u'platters'"},
             'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.IntegerField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '45', 'blank': 'True'})
         },
-        u'afm_viewer.project': {
+        u'core.project': {
             'Meta': {'object_name': 'project', 'db_table': "u'projects'"},
             'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.IntegerField', [], {'primary_key': 'True'}),
@@ -381,4 +381,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['afm_viewer']
+    complete_apps = ['core']
