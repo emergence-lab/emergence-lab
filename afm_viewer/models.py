@@ -16,6 +16,9 @@ class operator( models.Model ):
     name = models.CharField( max_length=45, blank=True )
     active = models.BooleanField( default=True )
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         db_table = 'operators'
 
@@ -24,16 +27,24 @@ class platter( models.Model ):
     name = models.CharField( max_length=45, blank=True )
     active = models.BooleanField( default=True )
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         db_table = 'platters'
+
 
 class project( models.Model ):
     id = models.IntegerField( primary_key=True )
     name = models.CharField( max_length=45, blank=True )
     active = models.BooleanField( default=True )
 
+    def __unicode__(self):
+        return self.name
+
     class Meta:
         db_table = 'projects'
+
 
 class growth( models.Model ):
     id = models.IntegerField( primary_key=True )
@@ -348,8 +359,13 @@ class growth( models.Model ):
     tmga2_temp = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     tmal1_temp = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     tega1_temp = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.growth_number
+
     class Meta:
         db_table = 'growths'
+
 
 class afm( models.Model ):
     id = models.IntegerField( primary_key=True )
@@ -365,6 +381,10 @@ class afm( models.Model ):
 
     filename = models.CharField( max_length=150, blank=True)
     amplitude_filename = models.CharField( max_length=150, blank=True )
+
+    def __unicode__(self):
+        return '{0}_{1}_{2}.{3}'.format(self.growth_number, self.pocket, self.location.lower()[0],
+                                        str(self.scan_number).zfill(3))
 
     class Meta:
         db_table = 'afm'
