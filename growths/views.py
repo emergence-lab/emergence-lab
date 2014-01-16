@@ -3,6 +3,7 @@ from django.views.generic import DetailView, ListView
 
 from core.models import afm, growth
 
+
 class growth_list(ListView):
     model = growth
     # cascading search location for template
@@ -26,6 +27,7 @@ class growth_detail(DetailView):
     model = growth
     template_name = 'core/growth_detail.html'
     slug_field = 'growth_number'
+
 
 class afm_detail(DetailView):
     model = afm
