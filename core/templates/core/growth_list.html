@@ -1,12 +1,13 @@
 <h1>Growths</h1>
 
-<div>
-    <input type="text" />
-</div>
+<form action="{% url 'afm_filter' %}" method="GET">
+    <input type="text" name="q"/>
+    <button type="submit">search</button>
+</form>
 
 <div>
     {% for growth in object_list %}
-    <a href="{% url 'growth_detail' pk=growth.id %}">{{growth}}</a>
+    <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
     <ul style="{list-style-type:none;}">
         {% for afm in growth.afm_set.all %}
         <li style="{display:inline}">
