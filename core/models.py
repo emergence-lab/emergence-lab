@@ -61,7 +61,6 @@ class investigation(models.Model):
 
 
 class growth(models.Model):
-    id = models.IntegerField(primary_key=True)
     growth_number = models.SlugField(max_length=10)
     date = models.DateField(blank=True, null=True)
     operator = models.CharField(max_length=45, blank=True)
@@ -382,7 +381,6 @@ class growth(models.Model):
 
 
 class afm(models.Model):
-    id = models.IntegerField(primary_key=True)
     growth = models.ForeignKey(growth)
     growth_number = models.CharField(max_length=20)
     pocket = models.IntegerField(default=1)
