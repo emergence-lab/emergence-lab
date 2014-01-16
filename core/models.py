@@ -46,6 +46,18 @@ class project( models.Model ):
         db_table = 'projects'
 
 
+class investigation(models.Model):
+    name = models.CharField(max_length=45)
+    active = models.BooleanField(default=True)
+    projects = models.ManyToManyField(project)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'investigations'
+
+
 class growth( models.Model ):
     id = models.IntegerField( primary_key=True )
     growth_number = models.SlugField( max_length=10, blank=True, db_index=True )
