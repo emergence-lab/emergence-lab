@@ -12,9 +12,8 @@ from __future__ import unicode_literals
 from django.db import models
 
 class operator( models.Model ):
-    id = models.IntegerField( primary_key=True )
-    name = models.CharField( max_length=45, blank=True )
-    active = models.BooleanField( default=True )
+    name = models.CharField(max_length=45)
+    active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
@@ -23,9 +22,11 @@ class operator( models.Model ):
         db_table = 'operators'
 
 class platter( models.Model ):
-    id = models.IntegerField( primary_key=True )
-    name = models.CharField( max_length=45, blank=True )
-    active = models.BooleanField( default=True )
+    name = models.CharField(max_length=45)
+    active = models.BooleanField(default=True)
+    serial = models.SlugField(max_length=20,blank=True)
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -35,9 +36,8 @@ class platter( models.Model ):
 
 
 class project( models.Model ):
-    id = models.IntegerField( primary_key=True )
-    name = models.CharField( max_length=45, blank=True )
-    active = models.BooleanField( default=True )
+    name = models.CharField(max_length=45)
+    active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
