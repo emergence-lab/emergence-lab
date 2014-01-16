@@ -1,7 +1,14 @@
+<body>
 <h1>Growths</h1>
 
 <form action="{% url 'afm_filter' %}" method="GET">
-    <input type="text" name="q"/>
+<!--{% csrf_token %}
+    <p>Operator: </p>
+    <input type="text" name="operator"/>
+    <p>Project: </p>
+    <input type="text" name="project"/>
+-->
+    {{form.as_p}}
     <button type="submit">search</button>
 </form>
 
@@ -17,3 +24,4 @@
     </ul>
     {% endfor %}
 </div>
+</body>
