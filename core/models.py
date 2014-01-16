@@ -24,7 +24,7 @@ class operator( models.Model ):
 class platter( models.Model ):
     name = models.CharField(max_length=45)
     active = models.BooleanField(default=True)
-    serial = models.SlugField(max_length=20,blank=True)
+    serial = models.CharField(max_length=20,blank=True)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField(blank=True, null=True)
 
