@@ -1,40 +1,24 @@
 from django.shortcuts import render
 from django.views.generic import DetailView, ListView, FormView
-from django.views.generic.edit import FormMixin
+from django_filters import FilterSet, CharFilter, NumberFilter
+from django_filters.views import FilterView
+from django.shortcuts import render_to_response
 
 from core.models import afm, growth
-from .forms import afm_search_form
+
+class growth_filter(FilterSet):
+    operator = CharFilter(lookup_type='icontains')
+    project = CharFilter(lookup_type='icontains')
+    afm__rms = NumberFilter(lookup_type='lt', distinct=True)
+    class Meta:
+        model = growth
+        fields = ['growth_number', 'operator', 'project', 'afm__rms']
+        order_by = ['growth_number']
 
 
-class growth_list(FormMixin, ListView):
-    model = growth
-    # cascading search location for template
-    # model-appname = app where model is defined
-    # view-appname = app where view is defined
-    #  1: model-appname/templates/<path>
-    #  2: model-appname/templates/model-appname/<default_name>
-    template_name = 'core/growth_list.html'
-    form_class = afm_search_form
-
-    def get_queryset(self):
-        queryset = super(growth_list, self).get_queryset()
-
-        operator = self.request.GET.get('operator')
-        if operator:
-            queryset = queryset.filter(operator__icontains=operator)
-        project = self.request.GET.get('project')
-        if project:
-            queryset = queryset.filter(project__icontains=project)
-        growth_number = self.request.GET.get('growth_number')
-        if growth_number:
-            queryset = queryset.filter(growth_number__icontains=growth_number)
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super(growth_list, self).get_context_data(**kwargs)
-        context['form'] = afm_search_form
-        return context
+class growth_list(FilterView):
+    filterset_class = growth_filter
+    template_name = 'core/growth_filter.html'
 
 
 class growth_detail(DetailView):
