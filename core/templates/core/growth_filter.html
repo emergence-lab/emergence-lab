@@ -1,3 +1,21 @@
+<!doctype html>
+
+<head lang="en">
+    <meta charset="utf-8">
+    <title>Growth Filter</title>
+    <style>
+        .gallery { list-style-type: none; }
+        .gallery li { display: inline-block; position: relative; z-index: 0; }
+        .thumbnail { height: 100px; }
+        .zoomed { width: 300px; overflow: auto; resize: both; }
+        .gallery span { position: absolute; left: -9999px; }
+        .gallery li:hover { z-index: 50; }
+        .gallery li:hover span { top: -90%; left: -60%; }
+        ul li input[type=checkbox] { visibility: hidden; }
+        ul li input[type=checkbox]:checked ~ label { background: red; }
+    </style>
+</head>
+
 <body>
 <h1>Growths</h1>
 
@@ -7,16 +25,27 @@
 </form>
 
 <div>
+    <form action="" method="GET">
+    {% csrf_token %}
     {% for growth in filter %}
-    <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
-    <ul style="{list-style-type:none;}">
-        {% for afm in growth.afm_filter %}
-        <li style="{display:inline}">
-            <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>
-        </li>
-        {% endfor %}
-    </ul>
+        <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
+        <ul class="gallery">
+            {% for afm in growth.afm_filter %}
+            <li>
+                <input type="checkbox" name="afm" value="{{afm.id}}" id="toggle-{{afm.id}}">
+<!--                <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>-->
+                <label for="toggle-{{afm.id}}">
+                    <img class="thumbnail" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
+                    <span>
+                        <img class="zoomed" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
+                    <span>
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
     {% endfor %}
+    <button type="submit">compare</button>
+    </form>
 </div>
 
 </body>
