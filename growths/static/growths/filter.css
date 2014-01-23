@@ -1,0 +1,18 @@
+/* selecting afms */
+.gallery { list-style-type: none; }
+.gallery li { display: inline-block; position: relative; z-index: 0; }
+.thumbnail { height: 100px; }
+.zoomed { width: 300px; overflow: auto; resize: both; }
+.gallery span { position: absolute; left: -9999px; }
+.gallery li:hover { z-index: 50; }
+.gallery li:hover span { top: -90%; left: -60%; }
+ul li input[type=checkbox] { visibility: hidden; }
+ul li input[type=checkbox]:checked ~ label { background: red; }
+/* details */
+details, summary { display: block; }
+.no-details details > * { display: none; }
+.no-details details summary { display: block; }
+summary { cursor: pointer; }
+.no-details details > summary:before { content: '▶ '; }
+.no-details details.open > summary:before { content: '▼ '; }
+

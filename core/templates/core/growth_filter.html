@@ -1,19 +1,10 @@
 <!doctype html>
 
 <head lang="en">
+    {% load staticfiles %}
     <meta charset="utf-8">
     <title>Growth Filter</title>
-    <style>
-        .gallery { list-style-type: none; }
-        .gallery li { display: inline-block; position: relative; z-index: 0; }
-        .thumbnail { height: 100px; }
-        .zoomed { width: 300px; overflow: auto; resize: both; }
-        .gallery span { position: absolute; left: -9999px; }
-        .gallery li:hover { z-index: 50; }
-        .gallery li:hover span { top: -90%; left: -60%; }
-        ul li input[type=checkbox] { visibility: hidden; }
-        ul li input[type=checkbox]:checked ~ label { background: red; }
-    </style>
+    <link rel="stylesheet" href="{% static 'growths/filter.css' %}">
 </head>
 
 <body>
@@ -28,7 +19,9 @@
     <form action="" method="GET">
     {% csrf_token %}
     {% for growth in filter %}
-        <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
+        <!-- to start open: <details {% if growth.afm_filter %}open{% endif %}> -->
+        <details>
+        <summary><a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a></summary>
         <ul class="gallery">
             {% for afm in growth.afm_filter %}
             <li>
@@ -43,9 +36,21 @@
             </li>
             {% endfor %}
         </ul>
+        </details>
     {% endfor %}
     <button type="submit">compare</button>
     </form>
 </div>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="{% static 'growths/jquery.details.js' %}"></script>
+<script>
+    $(function() {
+        $('html').addClass($.fn.details.support ? 'details' : 'no-details');
+        $('details').details();
+    });
+</script>
+
 </body>
+
+</html>
