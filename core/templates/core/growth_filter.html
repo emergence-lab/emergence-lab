@@ -16,8 +16,7 @@
 </form>
 
 <div>
-    <form action="" method="GET">
-    {% csrf_token %}
+    <form action="{% url "afm_compare" %}" method="GET">
     {% for growth in filter %}
         <!-- to start open: <details {% if growth.afm_filter %}open{% endif %}> -->
         <details>

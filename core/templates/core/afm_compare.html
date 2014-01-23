@@ -1,0 +1,9 @@
+<body>
+
+{% for afm in object_list %}
+    <h5>{{afm.filename}}</h5>
+    <p>rms={{afm.rms}} zrange={{afm.zrange}} size={{afm.size}}</p>
+{% endfor %}
+
+<a href="{% url 'afm_filter' %}">back</a>
+</body>
