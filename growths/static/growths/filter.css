@@ -2,10 +2,10 @@
 .gallery { list-style-type: none; }
 .gallery li { display: inline-block; position: relative; z-index: 0; }
 .thumbnail { height: 100px; }
-.zoomed { width: 300px; overflow: auto; resize: both; }
+/*.zoomed { width: 300px; overflow: auto; resize: both; }*/
 .gallery span { position: absolute; left: -9999px; }
 .gallery li:hover { z-index: 50; }
-.gallery li:hover span { top: -90%; left: -60%; }
+/*.gallery li:hover span { top: -90%; left: -60%; }*/
 ul li input[type=checkbox] { visibility: hidden; }
 ul li input[type=checkbox]:checked ~ label { background: red; }
 /* details */
