@@ -24,7 +24,7 @@ class RelationalFilterView(FilterView):
                 prefix = model + '__'
                 # filter for '<model>__' in GET
                 get_params = list(k for k,v in request.GET.iteritems() if prefix in k)
-                for field in fields:
+                for field in fields:  # <model>__<field>
                     # sort by final character (#)
                     final_params = sorted(list(v for v in get_params if field in v), key=lambda str:str[-1])
                     if final_params:
