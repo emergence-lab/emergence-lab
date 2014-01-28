@@ -1,9 +1,10 @@
 import sys
 
-from django_filters import BooleanFilter, CharFilter, FilterSet, NumberFilter 
+import django_filters as filters
 from django_filters.views import FilterView
+from django import forms
 
-from core.models import afm, growth
+from core.models import afm, growth, operator, project, investigation
 
 
 # TODO: don't hardcode names as <model>__<field>, get name from FilterSet class
@@ -40,13 +41,14 @@ class RelationalFilterView(FilterView):
         return self.render_to_response(context)
 
 
-class growth_filter(FilterSet):
-    operator = CharFilter(lookup_type='icontains')
-    project = CharFilter(lookup_type='icontains')
-    layeris_uid = BooleanFilter()
-    afm__rms = NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    afm__zrange = NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    afm__size = NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+class growth_filter(filters.FilterSet):
+    has_gan = filters.MultipleChoiceFilter(widget=forms.CheckboxSelectMultiple(), choices=[(2,'true'),(3,'false')])
+    operator = filters.ModelMultipleChoiceFilter(queryset=operator.objects.filter(active=True))
+    project = filters.ModelMultipleChoiceFilter(queryset=project.objects.all())
+    investigation = filters.ModelMultipleChoiceFilter(queryset=investigation.objects.all())
+    afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
 
     # TODO: break this out into RelationalFilterSet class
     def __init__(self, *args, **kwargs):
@@ -58,7 +60,7 @@ class growth_filter(FilterSet):
 
     class Meta:
         model = growth
-        fields = ['growth_number', 'operator', 'project','layeris_uid']
+        fields = ['growth_number', 'operator', 'project', 'investigation', 'platter', 'reactor','has_gan','has_algan','has_aln','is_template','has_graded','has_superlattice']
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
         }

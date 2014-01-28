@@ -8,7 +8,8 @@
 </head>
 
 <body>
-<h1>Growths</h1>
+<h3>Growths</h3>
+<p>{{filter.count}} results <a href="{% url 'afm_filter' %}">reset</a></p>
 
 <form action="" method="GET">
     {{filter.form.as_p}}
@@ -16,7 +17,7 @@
 </form>
 
 <div>
-    <form action="{% url "afm_compare" %}" method="GET">
+    <form action="{% url 'afm_compare' %}" method="GET">
     {% for growth in filter %}
         <!-- to start open: <details {% if growth.afm_filter %}open{% endif %}> -->
         <details>

@@ -6,8 +6,8 @@
 .gallery span { position: absolute; left: -9999px; }
 .gallery li:hover { z-index: 50; }
 /*.gallery li:hover span { top: -90%; left: -60%; }*/
-ul li input[type=checkbox] { visibility: hidden; }
-ul li input[type=checkbox]:checked ~ label { background: red; }
+.gallery li input[type=checkbox] { visibility: hidden; }
+.gallery li input[type=checkbox]:checked ~ label { background: red; }
 /* details */
 details, summary { display: block; }
 .no-details details > * { display: none; }
