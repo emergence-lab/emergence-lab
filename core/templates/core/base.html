@@ -22,7 +22,14 @@
             <ul class="nav navbar-nav">
                 <li><a href=""></a></li>
             </ul>
-            <a class="navbar-right" href="{% url 'logout' %}">logout</a>
+            {% if user.is_anonymous %}
+            <a href="{% url 'login' %}?next={{request.get_full_path|urlencode}}" class="navbar-right">Login</a>
+            {% else %}
+            <div class="navbar-right">
+                {{user}}
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+            {% endif %}
         </header>
     </nav>
 
