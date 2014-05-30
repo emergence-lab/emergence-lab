@@ -2,3 +2,5 @@
 *~
 core/migrations/*
 settings.py
+static/*
+
