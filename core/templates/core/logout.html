@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <p>Successfully logged out</p>
+        <a href="{% url 'afm_filter' %}">Home</a>
+    </div>
+{% endblock %}

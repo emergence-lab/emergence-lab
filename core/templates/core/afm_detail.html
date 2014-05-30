@@ -1,8 +1,15 @@
-<h1>{{afm}}</h1>
+{% extends "core/base.html" %}
 
-<p>{{afm.location}}</p>
-<p>{{afm.size}}</p>
-<p>{{afm.rms}}</p>
-<p>{{afm.zrange}}</p>
+{% block title %}{{afm}}{% endblock %}
 
-<a href="{% url 'afm_filter' %}">back</a>
+{% block content %}
+    <div class="container">
+        <h1>{{afm}}</h1>
+
+        <p>Location: {{afm.location}}</p>
+        <p>Size: {{afm.size}}</p>
+        <p>RMS: {{afm.rms}}</p>
+        <p>Z-Range: {{afm.zrange}}</p>
+
+        <a href="{% url 'afm_filter' %}">back</a>
+{% endblock %}

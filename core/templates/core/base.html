@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    {% load staticfiles %}
+    <link href="{% static 'core/css/bootstrap.min.css' %}" rel="stylesheet">
+    {% block header %}
+    {% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-default" role="navigation">
+        <header class="container-fluid">
+            <a href="/" class="logo navbar-left">
+                <img src="{% static 'core/img/logo.png' %}" alt="logo">
+            </a>
+            <ul class="nav navbar-nav">
+                <li><a href=""></a></li>
+            </ul>
+            <a class="navbar-right" href="{% url 'logout' %}">logout</a>
+        </header>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+
+</html>

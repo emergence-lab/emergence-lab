@@ -1,56 +1,52 @@
-<!doctype html>
+{% extends "core/base.html" %}
 
-<head lang="en">
-    {% load staticfiles %}
-    <meta charset="utf-8">
-    <title>Growth Filter</title>
-    <link rel="stylesheet" href="{% static 'growths/filter.css' %}">
-</head>
+{% block title %}Growth Filter{% endblock %}
+{% block header %}
+    <link rel="stylesheet" href="{% static 'growths/css/filter.css' %}">
+{% endblock %}
 
-<body>
-<h3>Growths</h3>
-<p>{{filter.count}} results <a href="{% url 'afm_filter' %}">reset</a></p>
+{% block content %}
+    <div class="container">
+        <h3>Growths</h3>
+        <p>{{filter.count}} results <a href="{% url 'afm_filter' %}">reset</a></p>
 
-<form action="" method="GET">
-    {{filter.form.as_p}}
-    <button type="submit">search</button>
-</form>
+        <form action="" method="GET">
+            {{filter.form.as_p}}
+            <button type="submit">search</button>
+        </form>
 
-<div>
-    <form action="{% url 'afm_compare' %}" method="GET">
-    {% for growth in filter %}
-        <!-- to start open: <details {% if growth.afm_filter %}open{% endif %}> -->
-        <details>
-        <summary><a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a></summary>
-        <ul class="gallery">
-            {% for afm in growth.afm_filter %}
-            <li>
-                <input type="checkbox" name="afm" value="{{afm.id}}" id="toggle-{{afm.id}}">
-<!--                <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>-->
-                <label for="toggle-{{afm.id}}">
-                    <img class="thumbnail" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
-                    <span>
-                        <img class="zoomed" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
-                    <span>
-                </label>
-            </li>
+        <div>
+            <form action="{% url 'afm_compare' %}" method="GET">
+            {% for growth in filter %}
+                <!-- to start open: <details {% if growth.afm_filter %}open{% endif %}> -->
+                <details>
+                <summary><a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a></summary>
+                <ul class="gallery">
+                    {% for afm in growth.afm_filter %}
+                    <li>
+                        <input type="checkbox" name="afm" value="{{afm.id}}" id="toggle-{{afm.id}}">
+        <!--                <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>-->
+                        <label for="toggle-{{afm.id}}">
+                            <img class="thumbnail" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
+                            <span>
+                                <img class="zoomed" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
+                            </span>
+                        </label>
+                    </li>
+                    {% endfor %}
+                </ul>
+                </details>
             {% endfor %}
-        </ul>
-        </details>
-    {% endfor %}
-    <button type="submit">compare</button>
-    </form>
-</div>
+            <button type="submit">compare</button>
+            </form>
+        </div>
+    </div>
+    <script src="{% static 'growths/js/jquery.details.js' %}"></script>
+    <script>
+        $(function() {
+            $('html').addClass($.fn.details.support ? 'details' : 'no-details');
+            $('details').details();
+        });
+    </script>
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script src="{% static 'growths/jquery.details.js' %}"></script>
-<script>
-    $(function() {
-        $('html').addClass($.fn.details.support ? 'details' : 'no-details');
-        $('details').details();
-    });
-</script>
-
-</body>
-
-</html>
+{% endblock %}

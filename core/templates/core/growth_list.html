@@ -1,43 +1,48 @@
-<body>
-<h1>Growths</h1>
+{% extends "core/base.html" %}
 
-<form action="{% url 'afm_filter' %}" method="GET">
-<!--
-    <p>Operator: </p>
-    <input type="text" name="operator"/>
-    <p>Project: </p>
-    <input type="text" name="project"/>
--->
-    {{form.as_p}}
-    <button type="submit">search</button>
-</form>
+{% block title %}Growth List{% endblock %}
 
-<div>
-    {% for growth in object_list %}
-    <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
-    <ul style="{list-style-type:none;}">
-        {% for afm in growth.afm_set.all %}
-        <li style="{display:inline}">
-            <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% endfor %}
-</div>
+{% block content %}
+    <div class="container">
+        <h1>Growths</h1>
 
-<div class="pagination">
-    <span class="step-links">
-    <!-- TODO: does not save GET data -->
-    {% if page_obj.has_previous %}
-        <a href="?page={{page_obj.previous_page_number}}">prev</a>
-    {% endif %}
-        <span class="current">
-            Page {{page_obj.number}} of {{paginator.num_pages}}
-        </span>
-    {% if page_obj.has_next %}
-        <a href="?page={{page_obj.next_page_number}}">next</a>
-    {% endif %}
-    </span>
-</div>
+        <form action="{% url 'afm_filter' %}" method="GET">
+        <!--
+            <p>Operator: </p>
+            <input type="text" name="operator"/>
+            <p>Project: </p>
+            <input type="text" name="project"/>
+        -->
+            {{form.as_p}}
+            <button type="submit">search</button>
+        </form>
 
-</body>
+        <div>
+            {% for growth in object_list %}
+            <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
+            <ul style="{list-style-type:none;}">
+                {% for afm in growth.afm_set.all %}
+                <li style="{display:inline}">
+                    <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </div>
+
+        <div class="pagination">
+            <span class="step-links">
+            <!-- TODO: does not save GET data -->
+            {% if page_obj.has_previous %}
+                <a href="?page={{page_obj.previous_page_number}}">prev</a>
+            {% endif %}
+                <span class="current">
+                    Page {{page_obj.number}} of {{paginator.num_pages}}
+                </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{page_obj.next_page_number}}">next</a>
+            {% endif %}
+            </span>
+        </div>
+    </div>
+{% endblock %}

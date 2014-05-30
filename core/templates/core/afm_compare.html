@@ -1,9 +1,14 @@
-<body>
+{% extends "core/base.html" %}
 
-{% for afm in object_list %}
-    <h5>{{afm.filename}}</h5>
-    <p>rms={{afm.rms}} zrange={{afm.zrange}} size={{afm.size}}</p>
-{% endfor %}
+{% block title %}{{afm}}{% endblock %}
 
-<a href="{% url 'afm_filter' %}">back</a>
-</body>
+{% block content %}
+    <div class="container">
+        {% for afm in object_list %}
+            <h5>{{afm.filename}}</h5>
+            <p>rms={{afm.rms}} zrange={{afm.zrange}} size={{afm.size}}</p>
+        {% endfor %}
+
+        <a href="{% url 'afm_filter' %}">back</a>
+    </div>
+{% endblock %}

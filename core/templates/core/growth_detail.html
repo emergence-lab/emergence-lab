@@ -1,6 +1,16 @@
-<h1>{{growth}}</h1>
+{% extends "core/base.html" %}
 
-<p>{{growth.operator}}</p>
-<p>{{growth.date}}</p>
+{% block title %}{{growth}}{%endblock%}
 
-<a href="{% url 'afm_filter' %}">back</a>
+{% block content %}
+
+<div class="container">
+    <h1>{{growth}}</h1>
+
+    <p>Operator: {{growth.operator}}</p>
+    <p>Date: {{growth.date}}</p>
+
+    <a href="{% url 'afm_filter' %}">back</a>
+</div>
+
+{% endblock %}

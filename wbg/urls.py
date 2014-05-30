@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import login
+from django.contrib.auth.views import login, logout
 import django.contrib
 
 import growths.views
@@ -17,5 +17,6 @@ urlpatterns = patterns(
     url(r'^afm-(?P<pk>\d+)/$', growths.views.afm_detail.as_view(), name='afm_detail'),
     url(r'^afm-compare/$', growths.views.afm_compare.as_view(), name='afm_compare'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^accounts/login/', login, {'template_name': 'core/login.html'})
+    url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
+    url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout')
 )
