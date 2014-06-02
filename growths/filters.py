@@ -42,7 +42,6 @@ class RelationalFilterView(FilterView):
 
 
 class growth_filter(filters.FilterSet):
-    has_gan = filters.MultipleChoiceFilter(widget=forms.CheckboxSelectMultiple(), choices=[(2,'true'),(3,'false')])
     operator = filters.ModelMultipleChoiceFilter(queryset=operator.objects.filter(active=True))
     project = filters.ModelMultipleChoiceFilter(queryset=project.objects.all())
     investigation = filters.ModelMultipleChoiceFilter(queryset=investigation.objects.all())
