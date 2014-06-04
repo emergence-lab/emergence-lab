@@ -3,4 +3,5 @@
 core/migrations/*
 settings.py
 static/*
-
+*.log
+tunnel.sh
