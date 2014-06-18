@@ -166,7 +166,7 @@ class afm(models.Model):
 
     def __unicode__(self):
         return '{0}_{1}.{2}'.format(self.growth_number, self.location,
-                                        str(self.scan_number).zfill(3))
+                                    str(self.scan_number).zfill(3))
 
     class Meta:
         db_table = 'afm'

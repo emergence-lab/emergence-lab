@@ -24,10 +24,10 @@ class RelationalFilterView(FilterView):
                 qs = getattr(obj, model + "_set").all()
                 prefix = model + '__'
                 # filter for '<model>__' in GET
-                get_params = list(k for k,v in request.GET.iteritems() if prefix in k)
+                get_params = list(k for k, v in request.GET.iteritems() if prefix in k)
                 for field in fields:  # <model>__<field>
                     # sort by final character (#)
-                    final_params = sorted(list(v for v in get_params if field in v), key=lambda str:str[-1])
+                    final_params = sorted(list(v for v in get_params if field in v), key=lambda str: str[-1])
                     if final_params:
                         # TODO: break this out into relational_action parameter?
                         # TODO: add relationalfilter to auto-handle naming etc?
@@ -52,14 +52,15 @@ class growth_filter(filters.FilterSet):
     # TODO: break this out into RelationalFilterSet class
     def __init__(self, *args, **kwargs):
         # add relational_fields to fields with <model>__<field>
-        for k,v in self.Meta.relational_fields.iteritems():
+        for k, v in self.Meta.relational_fields.iteritems():
             for r in v:
                 self.Meta.fields.append(k + '__' + r)
         super(growth_filter, self).__init__(*args, **kwargs)
 
     class Meta:
         model = growth
-        fields = ['growth_number', 'operator', 'project', 'investigation', 'platter', 'reactor','has_gan','has_algan','has_aln','is_template','has_graded','has_superlattice']
+        fields = ['growth_number', 'operator', 'project', 'investigation', 'platter', 'reactor',
+                  'has_gan', 'has_algan', 'has_aln', 'is_template', 'has_graded', 'has_superlattice']
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
         }
