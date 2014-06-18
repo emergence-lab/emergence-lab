@@ -89,6 +89,7 @@ class growth(models.Model):
 
     # growth features
     is_template = models.BooleanField(default=False)
+    is_buffer = models.BooleanField(default=False)
     has_superlattice = models.BooleanField(default=False)
     has_mqw = models.BooleanField(default=False)
     has_graded = models.BooleanField(default=False)
