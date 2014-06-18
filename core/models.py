@@ -113,6 +113,7 @@ class sample(models.Model):
         ('si', 'Silicon'),
         ('sic', 'Silicon Carbide'),
         ('bulk', 'Bulk III-N'),
+        ('other', 'Other'),
     ]
     SIZE_CHOICES = [
         ('whole', 'Whole'),
@@ -127,7 +128,7 @@ class sample(models.Model):
     pocket = models.IntegerField(default=1)
     piece = models.CharField(max_length=5, blank=True)  # i.e. abcd...
     size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='whole')
-    location = models.CharField(max_length=50)
+    location = models.CharField(max_length=50) # i.e. lab, w/ collaborator, etc.
     substrate_type = models.CharField(max_length=20, choices=SUBSTRATE_CHOICES, default='sapphire')
     substrate_serial = models.CharField(max_length=20, blank=True)  # wafer serial or growth number
     substrate_orientation = models.CharField(max_length=10, default='0001')
