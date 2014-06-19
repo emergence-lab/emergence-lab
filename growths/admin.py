@@ -1,3 +1,6 @@
 from django.contrib import admin
+import growths.models
 
-# Register your models here.
+
+admin.site.register(growths.models.growth)
+admin.site.register(growths.models.sample)

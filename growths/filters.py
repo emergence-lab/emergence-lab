@@ -4,7 +4,9 @@ import django_filters as filters
 from django_filters.views import FilterView
 from django import forms
 
-from core.models import afm, growth, operator, project, investigation
+from core.models import operator, project, investigation
+from growths.models import growth
+from afm.models import afm 
 
 
 # TODO: don't hardcode names as <model>__<field>, get name from FilterSet class
