@@ -87,3 +87,59 @@ class sample(models.Model):
 
     class Meta:
         db_table = 'samples'
+
+class readings(models.Model):
+    # growth and layer info
+    growth = models.ForeignKey(growth)
+    growth_number = models.CharField(max_length=10)
+    layer = models.IntegerField()
+    layer_desc = models.CharField(max_length=45, blank=True)
+
+    # readings
+    pyro_out = models.DecimalField(max_digits=7, decimal_places=2)
+    pyro_in = models.DecimalField(max_digits=7, decimal_places=2)
+    tc_out = models.DecimalField(max_digits=7, decimal_places=2)
+    tc_in = models.DecimalField(max_digits=7, decimal_places=2)
+    motor_rpm = models.DecimalField(max_digits=7, decimal_places=2)
+    gc_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    gc_position = models.DecimalField(max_digits=7, decimal_places=2)
+    voltage_in = models.DecimalField(max_digits=7, decimal_places=2)
+    voltage_out = models.DecimalField(max_digits=7, decimal_places=2)
+    current_in = models.DecimalField(max_digits=7, decimal_places=2)
+    current_out = models.DecimalField(max_digits=7, decimal_places=2)
+    top_vp_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    hydride_inner = models.DecimalField(max_digits=7, decimal_places=2)
+    hydride_outer = models.DecimalField(max_digits=7, decimal_places=2)
+    alkyl_flow_inner = models.DecimalField(max_digits=7, decimal_places=2)
+    alkyl_push_inner = models.DecimalField(max_digits=7, decimal_places=2)
+    alkyl_flow_middle = models.DecimalField(max_digits=7, decimal_places=2)
+    alkyl_push_middle = models.DecimalField(max_digits=7, decimal_places=2)
+    alkyl_flow_outer = models.DecimalField(max_digits=7, decimal_places=2)
+    alkyl_push_outer = models.DecimalField(max_digits=7, decimal_places=2)
+    n2_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    h2_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    nh3_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    hydride_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    tmga1_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    tmga1_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    tmga2_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    tmga2_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    tega2_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    tega2_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    tmin1_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    tmin1_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    tmal1_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    tmal1_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    cp2mg_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    cp2mg_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+    cp2mg_dilution = models.DecimalField(max_digits=7, decimal_places=2)
+    silane_flow = models.DecimalField(max_digits=7, decimal_places=2)
+    silane_dilution = models.DecimalField(max_digits=7, decimal_places=2)
+    silane_mix = models.DecimalField(max_digits=7, decimal_places=2)
+    silane_pressure = models.DecimalField(max_digits=7, decimal_places=2)
+
+    def __unicode__(self):
+        return self.growth_number
+
+    class Meta:
+        db_table = 'readings'
