@@ -49,10 +49,3 @@ class investigation(models.Model):
 
     class Meta:
         db_table = 'investigations'
-
-
-###########################
-# Characterization Models #
-###########################
-
-

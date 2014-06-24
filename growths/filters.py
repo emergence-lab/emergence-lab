@@ -6,7 +6,7 @@ from django import forms
 
 from core.models import operator, project, investigation
 from growths.models import growth
-from afm.models import afm 
+from afm.models import afm
 
 
 # TODO: don't hardcode names as <model>__<field>, get name from FilterSet class

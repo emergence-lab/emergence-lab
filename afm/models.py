@@ -1,6 +1,7 @@
 from django.db import models
 import growths.models
 
+
 class afm(models.Model):
     LOCATION_CHOICES = [
         ('c', 'Center'),
