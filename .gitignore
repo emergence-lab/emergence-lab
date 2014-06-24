@@ -1,6 +1,6 @@
 *.pyc
 *~
-core/migrations/*
+migrations*
 settings.py
 static/*
 *.log
