@@ -2,6 +2,7 @@ import sys
 
 import django_filters as filters
 from django_filters.views import FilterView
+from datetimewidget.widgets import DateTimeWidget
 from django import forms
 
 from core.models import operator, project, investigation
@@ -47,6 +48,15 @@ class growth_filter(filters.FilterSet):
     operator = filters.ModelMultipleChoiceFilter(queryset=operator.objects.filter(active=True))
     project = filters.ModelMultipleChoiceFilter(queryset=project.objects.all())
     investigation = filters.ModelMultipleChoiceFilter(queryset=investigation.objects.all())
+    date = filters.DateFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                              widget=DateTimeWidget(attrs={'class': 'datetime'},
+                                                    options={'minView': '2',
+                                                             'startView': '3',
+                                                             'todayBtn': 'true',
+                                                             'clearBtn': 'true',
+                                                             'format': 'yyyy-mm-ss'}
+                                                   )
+                             )
     afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
     afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
     afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
@@ -61,7 +71,7 @@ class growth_filter(filters.FilterSet):
 
     class Meta:
         model = growth
-        fields = ['growth_number', 'operator', 'project', 'investigation', 'platter', 'reactor',
+        fields = ['growth_number', 'date', 'operator', 'project', 'investigation', 'platter', 'reactor',
                   'has_gan', 'has_algan', 'has_aln', 'is_template', 'has_graded', 'has_superlattice']
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],

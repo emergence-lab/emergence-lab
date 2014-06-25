@@ -4,6 +4,10 @@
 {% block header %}
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'growths/css/filter.css' %}">
+    <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'growths/js/jquery.details.js' %}"></script>
+    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+    {{filter.form.media}}
 {% endblock %}
 
 {% block content %}
@@ -42,7 +46,6 @@
             </form>
         </div>
     </div>
-    <script src="{% static 'growths/js/jquery.details.js' %}"></script>
     <script>
         $(function() {
             $('html').addClass($.fn.details.support ? 'details' : 'no-details');
