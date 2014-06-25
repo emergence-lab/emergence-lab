@@ -7,8 +7,37 @@
 <div class="container">
     <h1>{{growth}}</h1>
 
-    <p>Operator: {{growth.operator}}</p>
+    <h3>Growth Info</h3>
     <p>Date: {{growth.date}}</p>
+    <p>Operator: {{growth.operator}}</p>
+    <p>Project: {{growth.project}}</p>
+    <p>Investigation: {{growth.investigation}}</p>
+    <p>Platter: {{growth.platter}}</p>
+    <p>Reactor: {{growth.reactor}}</p>
+    <p>{{growth.run_comments}}</p>
+
+    <h3>Materials</h3>
+    <ul>
+        {% if growth.has_gan %}<li>GaN</li>{% endif %}
+        {% if growth.has_aln%}<li>AlN</li>{% endif %}
+        {% if growth.has_inn %}<li>InN</li>{% endif %}
+        {% if growth.has_algan %}<li>AlGaN</li>{% endif %}
+        {% if growth.has_ingan %}<li>InGaN</li>{% endif %}
+        {% if growth.has_alingan %}<li>AlInGaN</li>{% endif %}
+    </ul>
+
+    <h3>Metadata</h3>
+    <ul>
+        {% if growth.is_template %}<li>Template</li>{% endif %}
+        {% if growth.is_buffer %}<li>Buffer</li>{% endif %}
+        {% if growth.has_superlattice %}<li>Has superlattice</li>{% endif %}
+        {% if growth.has_mqw %}<li>Has MQW</li>{% endif %}
+        {% if growth.has_graded %}<li>Has graded layer</li>{% endif %}
+        {% if growth.has_n %}<li>Has n-doped layer</li>{% endif %}
+        {% if growth.has_p %}<li>Has p-doped layer</li>{% endif %}
+        {% if growth.has_u %}<li>Has undoped layer</li>{% endif %}
+    </ul>
+    
 
     <a href="{% url 'afm_filter' %}">back</a>
 </div>
