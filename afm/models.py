@@ -11,7 +11,6 @@ class afm(models.Model):
 
     growth = models.ForeignKey(growths.models.growth)
     sample = models.ForeignKey(growths.models.sample)
-    growth_number = models.CharField(max_length=10)
     scan_number = models.IntegerField(default=0)
 
     rms = models.DecimalField(max_digits=7, decimal_places=3)
