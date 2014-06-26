@@ -22,8 +22,9 @@ class afm(models.Model):
     amplitude_filename = models.CharField(max_length=150, blank=True)
 
     def __unicode__(self):
-        return '{0}_{1}_{2}.{3}'.format(self.growth, self.sample, self.location,
-                                    str(self.scan_number).zfill(3))
+        return '{0}_{1}_{2}.{3}'.format(self.growth.growth_number,
+                                        self.sample.pocket, self.location,
+                                        str(self.scan_number).zfill(3))
 
     class Meta:
         db_table = 'afm'
