@@ -26,7 +26,7 @@ Workflow for adding apps to database:
 
     6. Add migrations to version control::
 
-        dev$ git add APPNAME/migrations
+        dev$ git add APPNAME
 
     7. Push changes to gitlab::
 
@@ -60,6 +60,7 @@ Workflow for editing models:
 
     4. Add migrations to version control and push::
 
+        dev$ git add APPNAME/models.py
         dev$ git add APPNAME/migrations
         dev$ git push
 
