@@ -23,14 +23,12 @@
         <div>
             <form action="{% url 'afm_compare' %}" method="GET">
             {% for growth in filter %}
-                <!-- to start open: <details {% if growth.afm_filter %}open{% endif %}> -->
                 <details>
                 <summary><a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a></summary>
                 <ul class="gallery">
                     {% for afm in growth.afm_filter %}
                     <li>
                         <input type="checkbox" name="afm" value="{{afm.id}}" id="toggle-{{afm.id}}">
-        <!--                <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>-->
                         <label for="toggle-{{afm.id}}">
                             <img class="thumbnail" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
                             <span>
