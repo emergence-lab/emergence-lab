@@ -7,6 +7,7 @@ import django.contrib
 import core.views
 import growths.views
 import afm.views
+import hall.views
 
 
 admin.autodiscover()
@@ -24,6 +25,9 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
     # afm urls
     url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.afm_detail.as_view()), name='afm_detail'),
+    # hall urls
+    url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
+    url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
     # advanced views
     url(r'^afm-compare/$', login_required(growths.views.afm_compare.as_view()), name='afm_compare'),
     url(r'^afm-filter/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),

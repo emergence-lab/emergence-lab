@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{hall}}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Hall Data</h1>
+    <p>Date | {{ object }}</p>
+    <p>Growth id | {{ object.growth }}</p>
+    <p>Sample id | {{ object.sample }}</p>
+    <p>Description | {{ object.description }}</p>
+    <p>Temperature | {{ object.temperature }}</p>
+    <p>Symmetry Factor | {{ object.symmetry_factor }}</p>
+    <p>Sheet Coefficient | {{ object.sheet_coefficient }}</p>
+    <p>Sheet Resistance | {{ object.sheet_resistance }}</p>
+    <p>Sheet Concentration | {{ object.sheet_concentration }}</p>
+    <p>Thickness | {{ object.thickness }}</p>
+    <p>Mobility | {{ object.mobility }}</p>
+    <p>Bulk Coefficient | {{ object.bulk_coefficient }}</p>
+    <p>Bulk Resistance | {{ object.bulk_resistance }}</p>
+    <p>Bulk Concentration | {{ object.bulk_concentration }}</p>
+</div>
+{% endblock %}
+
