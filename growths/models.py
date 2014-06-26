@@ -71,7 +71,6 @@ class sample(models.Model):
     ]
 
     growth = models.ForeignKey(growth)
-    growth_number = models.CharField(max_length=10)
     pocket = models.IntegerField(default=1)
     piece = models.CharField(max_length=5, blank=True)  # i.e. abcd...
     size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='whole')
@@ -83,7 +82,7 @@ class sample(models.Model):
     substrate_comment = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
-        return '{0}_{1}{2}'.format(self.growth_number, self.pocket, self.piece)
+        return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)
 
     class Meta:
         db_table = 'samples'
@@ -92,7 +91,6 @@ class sample(models.Model):
 class readings(models.Model):
     # growth and layer info
     growth = models.ForeignKey(growth)
-    growth_number = models.CharField(max_length=10)
     layer = models.IntegerField()
     layer_desc = models.CharField(max_length=45, blank=True)
 
@@ -140,7 +138,7 @@ class readings(models.Model):
     silane_pressure = models.DecimalField(max_digits=7, decimal_places=2)
 
     def __unicode__(self):
-        return self.growth_number
+        return self.growth.growth_number
 
     class Meta:
         db_table = 'readings'
