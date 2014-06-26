@@ -54,9 +54,7 @@ class growth_filter(filters.FilterSet):
                                                              'startView': '3',
                                                              'todayBtn': 'true',
                                                              'clearBtn': 'true',
-                                                             'format': 'yyyy-mm-dd'}
-                                                   )
-                             )
+                                                             'format': 'yyyy-mm-dd'}))
     afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
     afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
     afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
