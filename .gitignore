@@ -4,4 +4,4 @@ settings.py
 static/*
 *.log
 tunnel.sh
-
+docs/_build/

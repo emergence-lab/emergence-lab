@@ -4,3 +4,5 @@ South==0.8.4
 django-auth-ldap==1.2.0
 git+https://github.com/alex/django-filter.git
 django-datetime-widget==0.6
+sphinx==1.2.2
+sphinx_rtd_theme==0.1.6
