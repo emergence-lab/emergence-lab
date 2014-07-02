@@ -11,6 +11,7 @@
         <li class="data"> <a href="{% url 'hall_detail' pk=data.id %}"> {{ data }} </a> | {{ data.growth }}</li>
     {% endfor %}
     </ul>
+    <a href="{% url 'home' %}">back</a>
 </div>
 {% endblock %}
 
