@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, CreateView
 
 import growths.models
 import afm.models
@@ -24,3 +24,11 @@ class growth_detail(DetailView):
     model = growths.models.growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
+
+
+class create_growth(CreateView):
+    model = growths.models.growth
+    template_name = 'growths/create_growth.html'
+
+    def get_success_url(self):
+        return reverse('home')
