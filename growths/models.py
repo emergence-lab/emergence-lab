@@ -72,6 +72,7 @@ class sample(models.Model):
 
     growth = models.ForeignKey(growth)
     pocket = models.IntegerField(default=1)
+    parent = models.ForeignKey('self', blank=True, null=True)
     piece = models.CharField(max_length=5, blank=True)  # i.e. abcd...
     size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='whole')
     location = models.CharField(max_length=50)  # i.e. lab, w/ collaborator, etc.
