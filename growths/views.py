@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.views.generic import DetailView, ListView, CreateView
-
+import time
 import growths.models
 import afm.models
 from .filters import growth_filter, RelationalFilterView
+import re
 
 
 class growth_list(RelationalFilterView):
@@ -29,6 +30,21 @@ class growth_detail(DetailView):
 class create_growth(CreateView):
     model = growths.models.growth
     template_name = 'growths/create_growth.html'
+
+
+    def get_initial(self):
+        num_items = 0
+        model = growths.models.growth
+        query = model.objects.all()
+        last = str(query[len(query)-1])
+        last_int = ''
+        for i in xrange (1,5):
+            last_int += last[i]
+        last_int = (int(last_int) + 1)
+        last = ('g' + str(last_int))
+
+        return { 'growth_number': last,
+                 'date': time.strftime("%Y-%m-%d") }
 
     def get_success_url(self):
         return reverse('home')
