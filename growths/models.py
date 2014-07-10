@@ -49,6 +49,8 @@ class growth(models.Model):
     def __unicode__(self):
         return self.growth_number
 
+    # def get_absolute_url(self):
+
     class Meta:
         db_table = 'growths'
 

@@ -7,11 +7,19 @@
 <h1>Create Growth</h1>
 
 <form action="{% url 'create_growth' %}" method="POST">
-  {% csrf_token %}
-  <ul>
-    {{ form.as_ul }}
-  </ul>
-  <input id="save_growth" type="submit" value="Save" />
+    {% csrf_token %}
+    <ul>
+        {{ s_form.as_ul }}
+    </ul>
+    <input id="save_growth" type="submit" value="Save" name="s_form"/>
+</form>
+
+<form action="{% url 'create_growth' %}" method="POST">
+    {% csrf_token %}
+    <ul>
+        {{ g_form.as_ul }}
+    </ul>
+    <input id="save_growth" type="submit" value="Save" name="g_form"/>
 </form>
 
 

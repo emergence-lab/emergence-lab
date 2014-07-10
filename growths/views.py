@@ -5,6 +5,8 @@ import growths.models
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
+from growths.forms import growth_form, sample_form
+from django.http import HttpResponseRedirect
 
 
 class growth_list(RelationalFilterView):
@@ -30,16 +32,23 @@ class growth_detail(DetailView):
 class create_growth(CreateView):
     model = growths.models.growth
     template_name = 'growths/create_growth.html'
-#     form_class = Form1
-#     second_form_class = Form2
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(create_growth, self).get_context_data(**kwargs)
-#         if 'form' not in context:
-#             context['form'] = self.form_class(initial={'some_field': context['model'].some_field})
-#         if 'form2' not in context:
-#             context['form2'] = self.second_form_class(initial={'another_field': context['model'].another_field})
+    growth_class = growth_form
+    sample_class = sample_form
+    form_class = growth_form
+
+    def get_context_data(self, **kwargs):
+        context = super(create_growth, self).get_context_data(**kwargs)
+#         if 'growth_form' not in context:
+#             context['growth_form'] = self.growth_class(initial={'some_field': context['model'].some_field})
+#         if 'sample_form' not in context:
+#             context['sample_form'] = self.sample_class(initial={'another_field': context['model'].another_field})
 #         return context
+
+        if 'g_form' not in context:
+            context['g_form'] = self.growth_class() # request=self.request)
+        if 's_form' not in context:
+            context['s_form'] = self.sample_class() # request=self.request)
+        return context
 
     def get_initial(self):
         num_items = 0
@@ -55,27 +64,54 @@ class create_growth(CreateView):
         return { 'growth_number': last,
                  'date': time.strftime("%Y-%m-%d") }
 
-#     def post(self, request, *args, **kwargs):
-#         # get the user instance
-#         self.object = self.get_object()
-#         # determine which form is being submitted
-#         # uses the name of the form's submit button
-#         if 'form' in request.POST:
-#             # get the primary form
-#             form_class = self.get_form_class()
-#             form_name = 'form'
-#         else:
-#             # get the secondary form
-#             form_class = self.second_form_class
-#             form_name = 'form2'
-#          # get the form
-#         form = self.get_form(form_class)
-#          # validate
-#         if form.is_valid():
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(**{form_name: form})
+    def post(self, request, *args, **kwargs):
+        # get the user instance
+        self.growth_object = None
+        self.sample_object = None
+        self.object = None
+        # determine which form is being submitted
+        # uses the name of the form's submit button
+        if 's_form' in request.POST:
+            # get the primary form
+#uncomment
+#             sample_class = self.sample_class
+#             sample_form_name = 's_form'
+            form_class = self.sample_class
+            form = self.get_form(form_class)
+            form_name = 's_form'
+        if 'g_form' in request.POST:
+            # get the secondary form
+#uncomment
+#             growth_class = self.growth_class
+#             growth_form_name = 'g_form'
+            form_class = self.growth_class
+            form = self.get_form(form_class)
+            form_name = 'g_form'
+         # get the form
+#uncomment
+#         growth_form = self.get_form(growth_class)
+#         sample_form = self.get_form(sample_class)
 
+# uncomment        #form = [growth_form, sample_form]
+#uncomment
+#         if sample_form.is_valid():
+#             if growth_form.is_valid():
+#                 return self.form_valid(form)
+#             else:
+#                 return self.form_invalid(**{form_name: growth_form})
+#         else:
+#             return self.form_invalid(**{form_name: sample_form})
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
+# uncomment
+#     def form_valid(self, form):
+#         self.growth_object = form[0].save()
+#         self.sample_object = form[1].save()
+#         return HttpResponseRedirect(self.get_success_url())
+
+#uncomment
     def get_success_url(self):
-        return reverse('home')
+        return ''
