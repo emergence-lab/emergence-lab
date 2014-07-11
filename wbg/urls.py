@@ -29,8 +29,7 @@ urlpatterns = patterns(
     url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
     # creategrowth urls
-    url(r'^creategrowth/$', login_required(growths.views.create_growth.as_view()), name='create_growth'),
-    url(r'^newgrowth/$', login_required(growths.views.new_growth), name='new_growth'),
+    url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
     # advanced views
     url(r'^afm-compare/$', login_required(growths.views.afm_compare.as_view()), name='afm_compare'),
     url(r'^afm-filter/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),

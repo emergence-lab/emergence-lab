@@ -9,20 +9,13 @@
 <form action="{% url 'create_growth' %}" method="POST">
     {% csrf_token %}
     <ul>
-        {{ s_form.as_ul }}
+        {{ gform.as_ul }}
+        {{ sform.as_ul }}
     </ul>
-    <input id="save_growth" type="submit" value="Save" name="s_form"/>
+    <input id="save_growth" type="submit" value="Save" name="gform"/>
 </form>
-
-<form action="{% url 'create_growth' %}" method="POST">
-    {% csrf_token %}
-    <ul>
-        {{ g_form.as_ul }}
-    </ul>
-    <input id="save_growth" type="submit" value="Save" name="g_form"/>
-</form>
-
 
 <a href="{% url 'home' %}">back</a>
 {% endblock %}
+
 

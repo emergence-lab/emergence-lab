@@ -7,8 +7,17 @@ from growths.models import growth, sample
 class sample_form(ModelForm):
     class Meta:
         model = sample
-        fields = ['growth', 'substrate_type', 'substrate_serial', 'substrate_orientation',
+        fields = ['substrate_type', 'substrate_serial', 'substrate_orientation',
                   'substrate_miscut', 'size']
+    def save(self, *args, **kwargs):
+        print("right here")
+        commit = kwargs.pop('commit', True)
+        growthid = kwargs.pop('growthid')
+        instance = super(sample_form, self).save(*args, commit = False, **kwargs)
+        instance.growth = growthid
+        if commit:
+            instance.save()
+        return instance
 
 class growth_form(ModelForm):
     class Meta:
