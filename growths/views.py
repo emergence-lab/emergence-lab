@@ -2,11 +2,13 @@ from django.shortcuts import render
 from django.views.generic import DetailView, ListView, CreateView
 import time
 import growths.models
+from growths.models import growth, sample
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
 from growths.forms import growth_form, sample_form
 from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
 
 
 class growth_list(RelationalFilterView):
@@ -28,6 +30,68 @@ class growth_detail(DetailView):
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
 
+# class new_growth(View):
+#     def post(self, request, *args, **kwargs):
+#         gform = growth_form(request.POST)
+#         sform = sample_form(request.POST)
+#         if gform.is_valid() and sform.is_valid():
+#             new_g = gform.save()
+#             new_s = sform.save()
+#             return HttpResponseRedirect('home')
+#     def get(self, request, *args, **kwargs):
+#         gform = growth_form()
+#         sform = sample_form()
+# #         context = super(new_growth, self).get_context_data(**kwargs)
+#         if 'gform' not in context:
+#             context['gform'] = self.gform() # request=self.request)
+#         if 'sform' not in context:
+#             context['sform'] = self.sform() # request=self.request)
+#         return context
+#
+#     return render_to_response('growths/new_growth.html', {'growth_form': gform, 'sample_form': sform})
+
+def new_growth(request):
+    if request.method == "POST":
+        gform = growth_form(request.POST, prefix="gform")
+        sform = sample_form(request.POST, prefix="sform")
+        if gform.is_valid() and sform.is_valid():
+            new_g = gform.save()
+            sid = sform.cleaned_data['growth']
+            print ('sid')
+            print (sid)
+            gid = gform.cleaned_data['growth_number']
+            print ('gid')
+            print (gid)
+            sform.data['growth'] = gform.data['growth_number']
+#             actgobj = growth.objects.get(growth_number=gid)
+#             print ('actgobj')
+#             print (actgobj)
+#             print (actgobj.id)
+#             actsobj = sample.objects.get(growth=sid)
+#             print (actsobj)
+#             print (actsobj.id)
+            #self.data = self.data.copy()
+            #self.data['phone_number'] = 1234567890
+
+
+#             actualgrowthnumber = gform.cleaned_data['growth_number']
+#             actualgrowthobject = growth.objects.filter(growth_number=actualgrowthnumber)
+#             sform.cleaned_data['id'] = actualgrowthnumber
+#             samplegobj = sample.objects.filter(growth=samplegnum)
+#             samplegobj.id = actualgrowthnumber
+#             objecttoedit = growthobject[0]
+#             objecttoedit.id = actualgrowth.id
+#             (sform.cleaned_data['growth']).update(actualgrowth)
+            new_s = sform.save()
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        print ("TEST")
+        gform = growth_form(prefix="gform")
+        sform = sample_form(prefix="sform")
+
+#    return render_to_response('growths/new_growth.html', {'growth_form': gform, 'sample_form': sform})
+    print ("TEST???????????")
+    return render(request, 'growths/new_growth.html', {'gform': gform, 'sform': sform})
 
 class create_growth(CreateView):
     model = growths.models.growth

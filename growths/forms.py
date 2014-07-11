@@ -7,8 +7,9 @@ from growths.models import growth, sample
 class sample_form(ModelForm):
     class Meta:
         model = sample
-        fields = ['substrate_type', 'substrate_serial', 'substrate_orientation', 'substrate_miscut',
-                  'size']
+        fields = ['growth', 'substrate_type', 'substrate_serial', 'substrate_orientation',
+                  'substrate_miscut', 'size']
+
 class growth_form(ModelForm):
     class Meta:
         model = growth
