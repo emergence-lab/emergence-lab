@@ -2,6 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from growths.models import growth, sample
+import time
 
 # Create the form class.
 class sample_form(ModelForm):
@@ -14,7 +15,9 @@ class sample_form(ModelForm):
         commit = kwargs.pop('commit', True)
         growthid = kwargs.pop('growthid')
         instance = super(sample_form, self).save(*args, commit = False, **kwargs)
+        growthid.date = time.strftime("%Y-%m-%d")
         instance.growth = growthid
+        print (growthid)
         if commit:
             instance.save()
         return instance

@@ -53,17 +53,61 @@ class growth_detail(DetailView):
 
 def create_growth(request):
     if request.method == "POST":
-        gform = growth_form(request.POST, prefix="gform")
-        sform = sample_form(request.POST, prefix="sform")
-        if gform.is_valid() and sform.is_valid():
+        gform = growth_form(request.POST, instance=growth())
+        # sforms = [sample_form(request.POST, prefix=str(x), instnace=sample()) for x in range(0,6)]
+        sform_1 = sample_form(request.POST, instance=sample(), prefix="sform_1")
+        sform_2 = sample_form(request.POST, instance=sample(), prefix="sform_2")
+        sform_3 = sample_form(request.POST, instance=sample(), prefix="sform_3")
+        sform_4 = sample_form(request.POST, instance=sample(), prefix="sform_4")
+        sform_5 = sample_form(request.POST, instance=sample(), prefix="sform_5")
+        sform_6 = sample_form(request.POST, instance=sample(), prefix="sform_6")
+        sforms_list = []
+        sforms = [sform_1, sform_2, sform_3, sform_4, sform_5, sform_6]
+        for form in sforms:
+            if form.has_changed():
+                print("The form has changed!!")
+                sforms_list.append(form)
+        print ("SFORMS_LIST")
+        print (sforms_list)
+        if gform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
             new_g = gform.save()
-            new_s = sform.save(growthid=new_g)
+            print ("NEW_G")
+            print (new_g)
+            for sf in sforms_list:
+                print ("NEW_G")
+                print (new_g)
+                print ("SF")
+                print (sf)
+                new_s = sf.save(growthid=new_g)
+#                 new_s = sf.save(commit=False)
+#                 new_s.growth = new_g
+#                 new_s.save()
+
             return HttpResponseRedirect(reverse('home'))
     else:
-        gform = growth_form(prefix="gform")
-        sform = sample_form(prefix="sform")
+        num_items = 0
+        model = growths.models.growth
+        query = model.objects.all()
+        last = str(query[len(query)-1])
+        last_int = ''
+        for i in xrange (1,5):
+            last_int += last[i]
+        last_int = (int(last_int) + 1)
+        last = ('g' + str(last_int))
+        currenttime = time.strftime("%Y-%m-%d")
+        gform = growth_form(instance=growth(), initial={'growth_number': last, 'date': currenttime })
+        # sform = [sample_form(prefix=str(x), instance=sample()) for x in range(0,6)]
+        sform_1 = sample_form(instance=sample(), prefix="sform_1")
+        sform_2 = sample_form(instance=sample(), prefix="sform_2")
+        sform_3 = sample_form(instance=sample(), prefix="sform_3")
+        sform_4 = sample_form(instance=sample(), prefix="sform_4")
+        sform_5 = sample_form(instance=sample(), prefix="sform_5")
+        sform_6 = sample_form(instance=sample(), prefix="sform_6")
 
-    return render(request, 'growths/create_growth.html', {'gform': gform, 'sform': sform})
+    return render(request, 'growths/create_growth.html', {'gform': gform, 'sform_1': sform_1,
+                                                          'sform_2': sform_2, 'sform_3': sform_3,
+                                                          'sform_4': sform_4, 'sform_5': sform_5,
+                                                          'sform_6': sform_6})
 
 # class create_growth(CreateView):
 #     model = growths.models.growth
