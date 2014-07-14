@@ -60,12 +60,9 @@ def create_growth(request):
             new_s = sform.save(growthid=new_g)
             return HttpResponseRedirect(reverse('home'))
     else:
-        print ("TEST")
         gform = growth_form(prefix="gform")
         sform = sample_form(prefix="sform")
 
-#    return render_to_response('growths/new_growth.html', {'growth_form': gform, 'sample_form': sform})
-    print ("TEST???????????")
     return render(request, 'growths/create_growth.html', {'gform': gform, 'sform': sform})
 
 # class create_growth(CreateView):
