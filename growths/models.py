@@ -1,5 +1,6 @@
 from django.db import models
 import core.models
+import random
 
 
 class growth(models.Model):
@@ -83,6 +84,9 @@ class sample(models.Model):
     substrate_orientation = models.CharField(max_length=10, default='0001')
     substrate_miscut = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     substrate_comment = models.CharField(max_length=100, blank=True)
+
+    def generate_serial():
+        self.substrate_serial = ('wbg_' + str(random.randint(100, 999)))
 
     def __unicode__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)

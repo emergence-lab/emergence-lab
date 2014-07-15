@@ -30,3 +30,6 @@ class growth_form(ModelForm):
                   'has_algan', 'has_ingan', 'has_alingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_superlattice', 'has_mqw', 'has_graded',
                   'has_n', 'has_p', 'has_u']
+class p_form(forms.Form):
+    add_sample = forms.BooleanField()
+    parent = forms.CharField(widget=forms.TextInput)
