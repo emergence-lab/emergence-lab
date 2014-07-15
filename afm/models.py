@@ -1,8 +1,13 @@
 from django.db import models
+from django.core.urlresolvers import reverse
+
 import growths.models
 
 
 class afm(models.Model):
+    """
+    Stores afm characterization information.
+    """
     LOCATION_CHOICES = [
         ('c', 'Center'),
         ('r', 'Round'),
@@ -25,6 +30,10 @@ class afm(models.Model):
         return '{0}_{1}_{2}.{3}'.format(self.growth.growth_number,
                                         self.sample.pocket, self.location,
                                         str(self.scan_number).zfill(3))
+
+
+    def get_absolute_url(self):
+        return reverse('afm_detail', args=(self.id, ))
 
     class Meta:
         db_table = 'afm'
