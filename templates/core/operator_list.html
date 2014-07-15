@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block title %}Operators{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="">Add new</a>
+
+        <h3>Current Operators</h3>
+        <ul>
+        {% for operator in active_list %}
+            <li>{{operator}} <a href="">Retire</a></li>
+        {% endfor %}
+        </ul>
+
+        <h3>Old Operators</h3>
+        <ul>
+        {% for operator in inactive_list %}
+            <li>{{operator}}</li>
+        {% endfor %}
+        </ul>
+
+        <a href="{% url 'home' %}">Back</a>
+    </div>
+
+{% endblock %}

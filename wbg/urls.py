@@ -21,6 +21,7 @@ urlpatterns = patterns(
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
     # core urls
+    url(r'^operators/$', login_required(core.views.operator_list.as_view()), name='operator_list'),
     # growths urls
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
     # afm urls
