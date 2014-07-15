@@ -3,7 +3,7 @@
 {% block title %}create growth{% endblock %}
 
 {% block content %}
-
+<div class="container">
 <h1>Create Growth</h1>
 
 <form action="{% url 'create_growth' %}" method="POST">
@@ -45,6 +45,6 @@
 </form>
 
 <a href="{% url 'home' %}">back</a>
+</div>
 {% endblock %}
-
 

@@ -62,7 +62,6 @@ def create_growth(request):
         pf_4 = p_form(request.POST, prefix="pf_4")
         pf_5 = p_form(request.POST, prefix="pf_5")
         pf_6 = p_form(request.POST, prefix="pf_6")
-        # raise Exception("Look right here")
         sform_1 = sample_form(request.POST, instance=sample(), prefix="sform_1")
         sform_2 = sample_form(request.POST, instance=sample(), prefix="sform_2")
         sform_3 = sample_form(request.POST, instance=sample(), prefix="sform_3")
@@ -118,6 +117,13 @@ def create_growth(request):
                    'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, })
 
 
+def split_sample(request):
+    if request.method == "POST":
+        print ("oops")
+    else:
+        model = growths.models.sample
+        print("split sample page accessed")
+    return render(request, 'growths/split_sample.html')
 # class create_growth(CreateView):
 #     model = growths.models.growth
 #     template_name = 'growths/create_growth.html'

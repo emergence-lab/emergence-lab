@@ -3,15 +3,53 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from growths.models import growth, sample
 import time
+import re
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 # Create the form class.
 class sample_form(ModelForm):
+    parent = forms.CharField()
     class Meta:
         model = sample
-        fields = ['substrate_type', 'substrate_serial', 'substrate_orientation',
+        fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
                   'substrate_miscut', 'size']
+
+    def clean_parent(self):
+        print ("clean sample method running")
+        parent_name = self.cleaned_data['parent']
+
+        # extract information from sample name
+        print ('test 1')
+        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', parent_name)
+        if not m:
+            raise forms.ValidationError('Sample {0} improperly formatted'.format(parent_name))
+        try:
+            growth_object = growth.objects.get(growth_number=m.group(1))
+        except MultipleObjectsReturned as e:
+            raise forms.ValidationError('Possible repeat entry in database (Major Problem! This should never happen. At all.)')
+        except ObjectDoesNotExist as e:
+            raise forms.ValidationError('Growth {0} does not exist'.format(m.group(1)))
+        kwargs = {'growth': growth_object}
+
+        # check if pocket or piece are specified
+        if m.group(2):
+            kwargs['pocket'] = int(m.group(2))
+        if m.group(3):
+            kwargs['piece'] = m.group(3)
+        print(kwargs)
+
+        try:
+            self.cleaned_data['parent'] = sample.objects.get(**kwargs)
+        except MultipleObjectsReturned as e:
+            raise forms.ValidationError('Sample {0} ambiguous, specify the pocket or piece'.format(parent_name))
+        except ObjectDoesNotExist as e:
+            raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
+
+        return self.cleaned_data['parent']
+
+
     def save(self, *args, **kwargs):
-        print("right here")
+        print("save method running")
         commit = kwargs.pop('commit', True)
         growthid = kwargs.pop('growthid')
         instance = super(sample_form, self).save(*args, commit = False, **kwargs)
@@ -32,4 +70,7 @@ class growth_form(ModelForm):
                   'has_n', 'has_p', 'has_u']
 class p_form(forms.Form):
     add_sample = forms.BooleanField()
-    parent = forms.CharField(widget=forms.TextInput)
+
+class split_form(ModelForm):
+    class Meta:
+        model = sample
