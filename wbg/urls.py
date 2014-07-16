@@ -23,6 +23,7 @@ urlpatterns = patterns(
     # core urls
     url(r'^operators/$', login_required(core.views.operator_list.as_view()), name='operator_list'),
     url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
+    url(r'^projects/$', login_required(core.views.project_list.as_view()), name='project_list'),
     # growths urls
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
     # afm urls

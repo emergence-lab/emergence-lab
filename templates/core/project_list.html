@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="">Add new</a>
+
+        <h3>Active Projects</h3>
+        <ul>
+        {% for project in active_list %}
+            <li>{{project.name}} <a href="" class="btn btn-default btn-sm">Make Inactive</a></li>
+            <ul>
+            {% for investigation in project.investigation_set.all %}
+                <li>{{investigation.name}}</li>
+            {% endfor %}
+            </ul>
+        {% endfor %}
+        </ul>
+
+        <h3>Inactive Projects</h3>
+        <ul>
+        {% for project in inactive_list %}
+            <li>{{project.name}} <a href="" class="btn btn-default btn-sm">Make Active</a></li>
+        {% endfor %}
+        </ul>
+
+        <a href="{% url 'home' %}">Back</a>
+    </div>
+
+{% endblock %}
