@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView, ListView
+from django.core.urlresolvers import reverse
+from django.views.generic import CreateView, ListView, TemplateView
 
 from .models import investigation, operator, platter, project
 
@@ -28,6 +29,18 @@ class operator_list(ActiveListView):
     """
     template_name = "core/operator_list.html"
     model = operator
+
+
+class operator_create(CreateView):
+    """
+    View to create operators.
+    """
+    template_name = "core/operator_create.html"
+    model = operator
+    fields = ['name']
+
+    def get_success_url(self):
+        return reverse('operator_list')
 
 
 class platter_list(ActiveListView):

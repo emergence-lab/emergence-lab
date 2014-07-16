@@ -22,6 +22,7 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     # core urls
     url(r'^operators/$', login_required(core.views.operator_list.as_view()), name='operator_list'),
+    url(r'^operators/create/$', login_required(core.views.operator_create.as_view()), name='operator_create'),
     url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
     url(r'^projects/$', login_required(core.views.project_list.as_view()), name='project_list'),
     url(r'^investigations/$', login_required(core.views.investigation_list.as_view()), name='investigation_list'),

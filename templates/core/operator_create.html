@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Create Operator{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form action="{% url 'operator_create' %}" method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Create</button>
+            {% endbuttons %}
+        </form>
+
+        <a href="{% url 'operator_list' %}">Back</a>
+    </div>
+
+{% endblock %}
