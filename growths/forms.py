@@ -52,10 +52,11 @@ class sample_form(ModelForm):
         print("save method running")
         commit = kwargs.pop('commit', True)
         growthid = kwargs.pop('growthid')
+        pocketnum = kwargs.pop('pocketnum')
         instance = super(sample_form, self).save(*args, commit = False, **kwargs)
         growthid.date = time.strftime("%Y-%m-%d")
         instance.growth = growthid
-        print (growthid)
+        instance.pocket = pocketnum
         if commit:
             instance.save()
         return instance

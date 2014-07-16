@@ -77,8 +77,10 @@ def create_growth(request):
                 sforms_list.append(sforms[x])
         if gform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
             new_g = gform.save()
+            pocket = 0
             for sf in sforms_list:
-                new_s = sf.save(growthid=new_g)
+                pocket = pocket + 1
+                new_s = sf.save(growthid=new_g, pocketnum=pocket)
 #                 new_s = sf.save(commit=False)
 #                 new_s.growth = new_g
 #                 new_s.save()
