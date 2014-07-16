@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+
+{% block title %}Investigations{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="">Add new</a>
+
+        <h3>Active Investigations</h3>
+        <ul>
+        {% for investigation in active_list %}
+            <li>
+                {{investigation.name}}
+                <a href="" class="btn btn-default btn-sm">Make Inactive</a>
+                <a href="" class="btn btn-default btn-sm">Add to Project</a>
+            </li>
+            <ul>
+            {% for project in investigation.projects.all %}
+                <li>{{project.name}}</li>
+            {% endfor %}
+            </ul>
+        {% endfor %}
+        </ul>
+
+        <h3>Inactive Investigations</h3>
+        <ul>
+        {% for investigation in inactive_list %}
+            <li>{{investigation.name}} <a href="" class="btn btn-default btn-sm">Make Active</a></li>
+        {% endfor %}
+        </ul>
+
+        <a href="{% url 'home' %}">Back</a>
+    </div>
+
+{% endblock %}

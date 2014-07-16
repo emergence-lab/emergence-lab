@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
 
-from .models import operator, platter, project
+from .models import investigation, operator, platter, project
 
 
 class ActiveListView(ListView):
@@ -37,9 +37,18 @@ class platter_list(ActiveListView):
     template_name = "core/platter_list.html"
     model = platter
 
+
 class project_list(ActiveListView):
     """
     View to list all projects and provide actions.
     """
     template_name = "core/project_list.html"
     model = project
+
+
+class investigation_list(ActiveListView):
+    """
+    View to list all projects and provide actions.
+    """
+    template_name = "core/investigation_list.html"
+    model = investigation

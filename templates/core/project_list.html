@@ -9,7 +9,11 @@
         <h3>Active Projects</h3>
         <ul>
         {% for project in active_list %}
-            <li>{{project.name}} <a href="" class="btn btn-default btn-sm">Make Inactive</a></li>
+            <li>
+                {{project.name}}
+                <a href="" class="btn btn-default btn-sm">Make Inactive</a>
+                <a href="" class="btn btn-default btn-sm">Add Investigation</a>
+            </li>
             <ul>
             {% for investigation in project.investigation_set.all %}
                 <li>{{investigation.name}}</li>
