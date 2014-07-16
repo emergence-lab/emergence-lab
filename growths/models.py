@@ -85,9 +85,6 @@ class sample(models.Model):
     substrate_miscut = models.DecimalField(max_digits=4, decimal_places=1, default=0)
     substrate_comment = models.CharField(max_length=100, blank=True)
 
-    def generate_serial():
-        self.substrate_serial = ('wbg_' + str(random.randint(100, 999)))
-
     def __unicode__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)
 
@@ -149,3 +146,12 @@ class readings(models.Model):
 
     class Meta:
         db_table = 'readings'
+
+class serial_number(models.Model):
+    serial_number = models.IntegerField()
+
+    def __unicode__(self):
+        return self.serial_number
+
+    class Meta:
+        db_table = 'serial_numbers'

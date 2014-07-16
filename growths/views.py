@@ -6,7 +6,7 @@ from growths.models import growth, sample
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
-from growths.forms import growth_form, sample_form, p_form
+from growths.forms import growth_form, sample_form, p_form, split_form
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -121,11 +121,22 @@ def create_growth(request):
 
 def split_sample(request):
     if request.method == "POST":
-        print ("oops")
+        print ("entering POST stage.")
+        sform = split_form(request.POST, prefix='sform')
+        if sform.is_valid():
+            number_of_pieces = sform.cleaned_data['pieces']
+            sample_to_split = sform.cleaned_data['parent']
+            print (number_of_pieces)
+            print (sample_to_split)
+            print (sample_to_split.parent)
+            # find all siblings so the amount of pieces can be determined
+            # return HttpResponseRedirect(reverse('home'))
+
     else:
         model = growths.models.sample
         print("split sample page accessed")
-    return render(request, 'growths/split_sample.html')
+        sform = split_form(prefix='sform')
+    return render(request, 'growths/split_sample.html', {'sform': sform})
 # class create_growth(CreateView):
 #     model = growths.models.growth
 #     template_name = 'growths/create_growth.html'

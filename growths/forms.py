@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 # Create the form class.
 class sample_form(ModelForm):
-    parent = forms.CharField()
+    parent = forms.CharField(label="Parent (leave empty if there is no parent)")
     class Meta:
         model = sample
         fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
@@ -17,9 +17,7 @@ class sample_form(ModelForm):
     def clean_parent(self):
         print ("clean sample method running")
         parent_name = self.cleaned_data['parent']
-
         # extract information from sample name
-        print ('test 1')
         m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', parent_name)
         if not m:
             raise forms.ValidationError('Sample {0} improperly formatted'.format(parent_name))
@@ -30,13 +28,11 @@ class sample_form(ModelForm):
         except ObjectDoesNotExist as e:
             raise forms.ValidationError('Growth {0} does not exist'.format(m.group(1)))
         kwargs = {'growth': growth_object}
-
         # check if pocket or piece are specified
         if m.group(2):
             kwargs['pocket'] = int(m.group(2))
         if m.group(3):
             kwargs['piece'] = m.group(3)
-        print(kwargs)
 
         try:
             self.cleaned_data['parent'] = sample.objects.get(**kwargs)
@@ -46,7 +42,6 @@ class sample_form(ModelForm):
             raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
 
         return self.cleaned_data['parent']
-
 
     def save(self, *args, **kwargs):
         print("save method running")
@@ -61,6 +56,7 @@ class sample_form(ModelForm):
             instance.save()
         return instance
 
+
 class growth_form(ModelForm):
     class Meta:
         model = growth
@@ -69,9 +65,45 @@ class growth_form(ModelForm):
                   'has_algan', 'has_ingan', 'has_alingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_superlattice', 'has_mqw', 'has_graded',
                   'has_n', 'has_p', 'has_u']
+
+
 class p_form(forms.Form):
     add_sample = forms.BooleanField()
 
+
 class split_form(ModelForm):
+    pieces = forms.IntegerField(label="Number of pieces")
+    parent = forms.CharField(label="Sample to split")
     class Meta:
         model = sample
+        fields = ['parent', 'pieces']
+
+    def clean_parent(self):
+        print ("clean sample method running")
+        parent_name = self.cleaned_data['parent']
+        # extract information from sample name
+        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', parent_name)
+        if not m:
+            raise forms.ValidationError('Sample {0} improperly formatted'.format(parent_name))
+        try:
+            growth_object = growth.objects.get(growth_number=m.group(1))
+        except MultipleObjectsReturned as e:
+            raise forms.ValidationError('Possible repeat entry in database (Major Problem! This should never happen. At all.)')
+        except ObjectDoesNotExist as e:
+            raise forms.ValidationError('Growth {0} does not exist'.format(m.group(1)))
+        kwargs = {'growth': growth_object}
+        # check if pocket or piece are specified
+        if m.group(2):
+            kwargs['pocket'] = int(m.group(2))
+        if m.group(3):
+            kwargs['piece'] = m.group(3)
+
+        try:
+            self.cleaned_data['parent'] = sample.objects.get(**kwargs)
+        except MultipleObjectsReturned as e:
+            raise forms.ValidationError('Sample {0} ambiguous, specify the pocket or piece'.format(parent_name))
+        except ObjectDoesNotExist as e:
+            raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
+
+        return self.cleaned_data['parent']
+
