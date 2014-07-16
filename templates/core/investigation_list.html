@@ -7,25 +7,32 @@
         <a href="">Add new</a>
 
         <h3>Active Investigations</h3>
-        <ul>
+        <ul class="list-group">
         {% for investigation in active_list %}
-            <li>
+            <li class="list-group-item">
                 {{investigation.name}}
-                <a href="" class="btn btn-default btn-sm">Make Inactive</a>
-                <a href="" class="btn btn-default btn-sm">Add to Project</a>
+                <div class="pull-right">
+                    <a href="" class="btn btn-default btn-sm">Make Inactive</a>
+                    <a href="" class="btn btn-default btn-sm">Add to Project</a>
+                </div>
+                <ul>
+                {% for project in investigation.projects.all %}
+                    <li>{{project.name}}</li>
+                {% endfor %}
+                </ul>
             </li>
-            <ul>
-            {% for project in investigation.projects.all %}
-                <li>{{project.name}}</li>
-            {% endfor %}
-            </ul>
         {% endfor %}
         </ul>
 
         <h3>Inactive Investigations</h3>
-        <ul>
+        <ul class="list-group">
         {% for investigation in inactive_list %}
-            <li>{{investigation.name}} <a href="" class="btn btn-default btn-sm">Make Active</a></li>
+            <li class="list-group-item">
+                {{investigation.name}}
+                <div class="pull-right">
+                    <a href="" class="btn btn-default btn-sm">Make Active</a>
+                </div>
+            </li>
         {% endfor %}
         </ul>
 
