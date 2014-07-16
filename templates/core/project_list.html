@@ -4,22 +4,22 @@
 
 {% block content %}
     <div class="container">
-        <a href="">Add new</a>
-
-        <h3>Active Projects</h3>
+        <h3>Active Projects <a class="btn btn-primary" href="">Add new</a></h3>
         <ul class="list-group">
         {% for project in active_list %}
             <li class="list-group-item">
-                {{project.name}}
-                <div class="pull-right">
-                    <a href="" class="btn btn-default btn-sm">Make Inactive</a>
-                    <a href="" class="btn btn-default btn-sm">Add Investigation</a>
+                <div class="clearfix">
+                    {{project.name}}
+                    <div class="pull-right">
+                        <a href="" class="btn btn-default btn-sm">Make Inactive</a>
+                        <a href="" class="btn btn-default btn-sm">Add Investigation</a>
+                    </div>
+                    <ul>
+                    {% for investigation in project.investigation_set.all %}
+                        <li>{{investigation.name}}</li>
+                    {% endfor %}
+                    </ul>
                 </div>
-                <ul>
-                {% for investigation in project.investigation_set.all %}
-                    <li>{{investigation.name}}</li>
-                {% endfor %}
-                </ul>
             </li>
         {% endfor %}
         </ul>
@@ -28,9 +28,9 @@
         <ul class="list-group">
         {% for project in inactive_list %}
             <li class="list-group-item">
-                {{project.name}}
-                <div class="pull-right">
-                    <a href="" class="btn btn-default btn-sm">Make Active</a>
+                <div class="clearfix">
+                    {{project.name}}
+                    <a href="" class="pull-right btn btn-default btn-sm">Make Active</a>
                 </div>
             </li>
         {% endfor %}

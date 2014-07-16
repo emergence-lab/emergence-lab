@@ -4,19 +4,19 @@
 
 {% block content %}
     <div class="container">
-        <a href="{% url 'operator_create' %}">Add new</a>
-
-        <h3>Current Operators</h3>
+        <h3>Current Operators <a class="btn btn-primary" href="{% url 'operator_create' %}">Add new</a></h3>
         <ul class="list-group">
         {% for operator in active_list %}
             <li class="list-group-item">
-                {{operator}}
-                <a href="" class="pull-right btn btn-default btn-sm">Retire</a>
+                <div class="clearfix">
+                    {{operator}}
+                    <a class="pull-right btn btn-default btn-sm" href="">Retire</a>
+                </div>
             </li>
         {% endfor %}
         </ul>
 
-        <h3>Old Operators</h3>
+        <h3>Former Operators</h3>
         <ul class="list-group">
         {% for operator in inactive_list %}
             <li class="list-group-item">{{operator}}</li>

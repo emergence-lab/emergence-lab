@@ -4,19 +4,28 @@
 
 {% block content %}
     <div class="container">
-        <a href="">Add new</a>
 
-        <h3>Current Platters</h3>
-        <ul>
+        <h3>Current Platters <a class="btn btn-primary" href="">Add new</a></h3>
+        <ul class="list-group">
         {% for platter in active_list %}
-            <li>{{platter.name}} ({{platter.serial}}) - Started on {{platter.start_date}} <a href="" class="btn btn-default btn-sm">Retire</a></li>
+            <li class="list-group-item">
+                <div class="clearfix">
+                    {{platter.name}} ({{platter.serial}}) - Started on {{platter.start_date}}
+                    <a href="" class="pull-right btn btn-default btn-sm">Retire</a>
+                </div>
+            </li>
         {% endfor %}
         </ul>
 
         <h3>Old Platters</h3>
-        <ul>
+        <ul class="list-group">
         {% for platter in inactive_list %}
-            <li>{{platter.name}} ({{platter.serial}}) - Retired on {{platter.end_date}}</li>
+            <li class="list-group-item">
+                <div class="clearfix">
+                    {{platter.name}} ({{platter.serial}}) - Retired on {{platter.end_date}}
+                    <a href="" class="pull-right btn btn-default btn-sm">Unretire</a>
+                </div>
+            </li>
         {% endfor %}
         </ul>
 
