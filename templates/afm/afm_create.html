@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}Add AFM{% endblock %}
 
@@ -6,12 +7,12 @@
     <div class="container">
         <h1>Add AFM</h1>
 
-        <form action="{% url 'afm_create' %}" method="POST">
+        <form action="{% url 'afm_create' %}" method="post" class="form">
             {% csrf_token %}
-            <ul>
-                {{form.as_ul}}
-            </ul>
-            <input id="save_afm" type="submit" value="Save" name="form">
+            {% bootstrap_form form layout='horizontal' %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Create</button>
+            {% endbuttons %}
         </form>
     </div>
 {% endblock %}
