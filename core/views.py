@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
 
-from .models import operator
+from .models import operator, platter
 
 
 class ActiveListView(ListView):
@@ -28,3 +28,11 @@ class operator_list(ActiveListView):
     """
     template_name = "core/operator_list.html"
     model = operator
+
+
+class platter_list(ActiveListView):
+    """
+    View to list all operators and provide actions.
+    """
+    template_name = "core/platter_list.html"
+    model = platter

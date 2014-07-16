@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block title %}Platters{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <a href="">Add new</a>
+
+        <h3>Current Platters</h3>
+        <ul>
+        {% for platter in active_list %}
+            <li>{{platter.name}} ({{platter.serial}}) - Started on {{platter.start_date}} <a href="" class="btn btn-default btn-sm">Retire</a></li>
+        {% endfor %}
+        </ul>
+
+        <h3>Old Platters</h3>
+        <ul>
+        {% for platter in inactive_list %}
+            <li>{{platter.name}} ({{platter.serial}}) - Retired on {{platter.end_date}}</li>
+        {% endfor %}
+        </ul>
+
+        <a href="{% url 'home' %}">Back</a>
+    </div>
+
+{% endblock %}

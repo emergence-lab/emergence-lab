@@ -22,6 +22,7 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     # core urls
     url(r'^operators/$', login_required(core.views.operator_list.as_view()), name='operator_list'),
+    url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
     # growths urls
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
     # afm urls
