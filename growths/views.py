@@ -76,15 +76,18 @@ def create_growth(request):
                 print("The form has changed!!")
                 sforms_list.append(sforms[x])
         if gform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
+            print ("validation success")
             new_g = gform.save()
             pocket = 0
             for sf in sforms_list:
                 pocket = pocket + 1
                 new_s = sf.save(growthid=new_g, pocketnum=pocket)
+                new_s.save()
 #                 new_s = sf.save(commit=False)
 #                 new_s.growth = new_g
 #                 new_s.save()
             return HttpResponseRedirect(reverse('home'))
+            # return HttpResponseRedirect(reverse('growth_detail', (new_g.id)))
     else:
         num_items = 0
         model = growths.models.growth
@@ -130,7 +133,7 @@ def split_sample(request):
             print (sample_to_split)
             print (sample_to_split.parent)
             # find all siblings so the amount of pieces can be determined
-            # return HttpResponseRedirect(reverse('home'))
+            # return HttpResponseRedirect(reverse(''))
 
     else:
         model = growths.models.sample

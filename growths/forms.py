@@ -5,10 +5,11 @@ from growths.models import growth, sample
 import time
 import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from core.validators import*
 
 # Create the form class.
 class sample_form(ModelForm):
-    parent = forms.CharField(label="Parent (leave empty if there is no parent)")
+    parent = forms.CharField(label="Parent (leave empty if there is no parent)", required=False)
     class Meta:
         model = sample
         fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
@@ -17,7 +18,13 @@ class sample_form(ModelForm):
     def clean_parent(self):
         print ("clean sample method running")
         parent_name = self.cleaned_data['parent']
-        # extract information from sample name
+        # check to see if empty (this means that parent is itself). Set a temporary parent value
+        if (re.match('', parent_name)):
+            print('attempting to set parent null')
+            return None
+            # return self.cleaned_data['parent']
+
+        # extract information from parent name
         m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', parent_name)
         if not m:
             raise forms.ValidationError('Sample {0} improperly formatted'.format(parent_name))
@@ -54,6 +61,9 @@ class sample_form(ModelForm):
         instance.pocket = pocketnum
         if commit:
             instance.save()
+        if instance.parent == None:
+            instance.parent = instance
+            instance.save
         return instance
 
 
@@ -72,7 +82,7 @@ class p_form(forms.Form):
 
 
 class split_form(ModelForm):
-    pieces = forms.IntegerField(label="Number of pieces")
+    pieces = forms.IntegerField(label="Number of pieces", validators=[validate_not_zero])
     parent = forms.CharField(label="Sample to split")
     class Meta:
         model = sample
