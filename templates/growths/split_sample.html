@@ -1,0 +1,18 @@
+{% extends "core/base.html" %}
+
+{% block title %}split sample{% endblock %}
+
+{% block content %}
+<div class="container">
+<h1>Split Sample</h1>
+
+<form action="{% url 'split_sample' %}" method="POST">
+    {% csrf_token %}
+    <ul>
+        {{ sform.as_ul }}
+    </ul>
+<input id="split_growth" type="submit" value="Save" name="splitform"/>
+</form>
+<a href="{% url 'home' %}">back</a>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@ from core.validators import*
 
 # Create the form class.
 class sample_form(ModelForm):
-    parent = forms.CharField(label="Parent (leave empty if there is no parent)", required=False)
+    parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
     class Meta:
         model = sample
         fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
@@ -20,7 +20,7 @@ class sample_form(ModelForm):
         parent_name = self.cleaned_data['parent']
         # check to see if empty (this means that parent is itself). Set a temporary parent value
         if (re.match('', parent_name)):
-            print('attempting to set parent null')
+            print('attempting to set parent to None')
             return None
             # return self.cleaned_data['parent']
 

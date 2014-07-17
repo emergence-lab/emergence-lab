@@ -86,8 +86,8 @@ def create_growth(request):
 #                 new_s = sf.save(commit=False)
 #                 new_s.growth = new_g
 #                 new_s.save()
-            return HttpResponseRedirect(reverse('home'))
-            # return HttpResponseRedirect(reverse('growth_detail', (new_g.id)))
+            # return HttpResponseRedirect(reverse('home'))
+            return HttpResponseRedirect(reverse('growth_detail', args=[new_g.growth_number]))
     else:
         num_items = 0
         model = growths.models.growth
