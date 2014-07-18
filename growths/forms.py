@@ -67,7 +67,8 @@ class sample_form(ModelForm):
         if instance.parent == None:
             print ("setting parent to self")
             instance.parent = instance
-            instance.save
+        instance.substrate_serial = instance.parent.substrate_serial
+        instance.save
         return instance
 
 

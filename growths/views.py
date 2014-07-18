@@ -129,35 +129,57 @@ def split_sample(request):
         if sform.is_valid():
             numberofpieces = sform.cleaned_data['pieces']
             sampletosplit = sform.cleaned_data['parent']
-            sampleserial = sform.cleaned_data['substrate_serial']
-            allobjects = growth.objects.filter(substrate_serial=sampleserial)
-
-
-
-
-            tempparent = sampletosplit
-            firstparent = sampletosplit.parent
-            numberofparents = 0
-            print ('beginning')
-            print (numberofpieces)
-            print (tempparent)
-            print (firstparent)
-            if tempparent.id == firstparent.id:
-                print ('No Parent!')
+            print (sampletosplit)
+            serialnumber = sampletosplit.substrate_serial
+            print ("serial number: " + serialnumber)
+            allsamples = sample.objects.filter(substrate_serial=serialnumber)
+            dictionarylist = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q',
+                              'r','s','t','u','v','w','x','y','z']
+            numberofsamples = len(allsamples)
+            # raise Exception("I don't know what you did, but you sure screwed something up.")
+            if numberofsamples == 1:
+                print ("This is the first sample to split")
+                sample.objects.filter(substrate_serial=serialnumber).update(piece=dictionarylist[numberofsamples-1])
             else:
-                print ("try something else. this loop isn't working")
-                while firstparent.id is not tempparent.id:
-                    print ('in loop')
-                    numberofparents = numberofparents + 1
-                    firstparent = firstparent.parent
-                    print (numberofparents)
-                    print (firstparent)
-                    if numberofparents >= 10:
-                        break
-            print (numberofparents)
-            print (tempparent)
-            print (firstparent)
-            print ('end')
+                print ('There are ' + str(numberofsamples) + ' samples that already exist')
+            for i in range (0, numberofpieces-1):
+                newsplit = sample(growth=sampletosplit.growth, pocket=sampletosplit.pocket,
+                                  parent=sampletosplit.parent, size=sampletosplit.size,
+                                  location=sampletosplit.location,
+                                  substrate_type=sampletosplit.substrate_type,
+                                  substrate_serial=sampletosplit.substrate_serial,
+                                  substrate_orientation=sampletosplit.substrate_orientation,
+                                  substrate_miscut=sampletosplit.substrate_miscut,
+                                  substrate_comment=sampletosplit.substrate_comment)
+                newsplit.piece = dictionarylist[i + numberofsamples]
+                print (newsplit)
+                print (newsplit.piece)
+                newsplit.save()
+
+            return HttpResponseRedirect(reverse('growth_detail', args=[sampletosplit.growth]))
+
+#             tempparent = sampletosplit
+#             firstparent = sampletosplit.parent
+#             numberofparents = 0
+#             print ('beginning')
+#             print (numberofpieces)
+#             print (tempparent)
+#             print (firstparent)
+#             if tempparent.id == firstparent.id:
+#                 print ('No Parent!')
+#             else:
+#                 print ("try something else. this loop isn't working")
+#                 while firstparent.id is not tempparent.id:
+#                     print ('in loop')
+#                     numberofparents = numberofparents + 1
+#                     firstparent = firstparent.parent
+#                     print (numberofparents)
+#                     print (firstparent)
+#                     if numberofparents >= 10:
+#                         break
+#             print (numberofparents)
+#             print (tempparent)
+#             print (firstparent)
 
             # find all siblings so the amount of pieces can be determined
             # return HttpResponseRedirect(reverse(''))
