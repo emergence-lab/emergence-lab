@@ -127,11 +127,38 @@ def split_sample(request):
         print ("entering POST stage.")
         sform = split_form(request.POST, prefix='sform')
         if sform.is_valid():
-            number_of_pieces = sform.cleaned_data['pieces']
-            sample_to_split = sform.cleaned_data['parent']
-            print (number_of_pieces)
-            print (sample_to_split)
-            print (sample_to_split.parent)
+            numberofpieces = sform.cleaned_data['pieces']
+            sampletosplit = sform.cleaned_data['parent']
+            sampleserial = sform.cleaned_data['substrate_serial']
+            allobjects = growth.objects.filter(substrate_serial=sampleserial)
+
+
+
+
+            tempparent = sampletosplit
+            firstparent = sampletosplit.parent
+            numberofparents = 0
+            print ('beginning')
+            print (numberofpieces)
+            print (tempparent)
+            print (firstparent)
+            if tempparent.id == firstparent.id:
+                print ('No Parent!')
+            else:
+                print ("try something else. this loop isn't working")
+                while firstparent.id is not tempparent.id:
+                    print ('in loop')
+                    numberofparents = numberofparents + 1
+                    firstparent = firstparent.parent
+                    print (numberofparents)
+                    print (firstparent)
+                    if numberofparents >= 10:
+                        break
+            print (numberofparents)
+            print (tempparent)
+            print (firstparent)
+            print ('end')
+
             # find all siblings so the amount of pieces can be determined
             # return HttpResponseRedirect(reverse(''))
 

@@ -19,9 +19,11 @@ class sample_form(ModelForm):
         print ("clean sample method running")
         parent_name = self.cleaned_data['parent']
         # check to see if empty (this means that parent is itself). Set a temporary parent value
-        if (re.match('', parent_name)):
-            print('attempting to set parent to None')
+
+        if parent_name == '':
+            print('setting parent to None')
             return None
+
             # return self.cleaned_data['parent']
 
         # extract information from parent name
@@ -60,8 +62,10 @@ class sample_form(ModelForm):
         instance.growth = growthid
         instance.pocket = pocketnum
         if commit:
+            print ("saving")
             instance.save()
         if instance.parent == None:
+            print ("setting parent to self")
             instance.parent = instance
             instance.save
         return instance
