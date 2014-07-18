@@ -1,5 +1,6 @@
 from django.db import models
 import core.models
+import random
 
 
 class growth(models.Model):
@@ -48,6 +49,8 @@ class growth(models.Model):
 
     def __unicode__(self):
         return self.growth_number
+
+    # def get_absolute_url(self):
 
     class Meta:
         db_table = 'growths'
@@ -143,3 +146,12 @@ class readings(models.Model):
 
     class Meta:
         db_table = 'readings'
+
+class serial_number(models.Model):
+    serial_number = models.IntegerField()
+
+    def __unicode__(self):
+        return self.serial_number
+
+    class Meta:
+        db_table = 'serial_numbers'
