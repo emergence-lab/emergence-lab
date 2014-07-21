@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, ListView, TemplateView
 
 from .models import investigation, operator, platter, project
@@ -21,6 +22,10 @@ class homepage(TemplateView):
     View for the homepage of the application.
     """
     template_name = "core/index.html"
+
+
+@login_required
+def protected_media(request, filename):
 
 
 class operator_list(ActiveListView):
