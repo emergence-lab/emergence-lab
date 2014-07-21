@@ -32,6 +32,9 @@ class growth_detail(DetailView):
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
 
+class sample_detail(DetailView):
+    model = growths.models.sample
+    template_name = 'growths/sample_detail.html'
 # class new_growth(View):
 #     def post(self, request, *args, **kwargs):
 #         gform = growth_form(request.POST)
