@@ -16,7 +16,7 @@ urlpatterns = patterns(
     'django.contrib.auth.views',
     # urls, add login_required() around the as_view() call for security
     # misc urls
-    url(r'^/media/(?P<filename>.*)$', core.views.protected_media)
+    url(r'^/media/(?P<filename>.*)$', login_required(core.views.protected_media)),
     url(r'^$', core.views.homepage.as_view(), name='home'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
