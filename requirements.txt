@@ -6,3 +6,5 @@ git+https://github.com/alex/django-filter.git
 django-datetime-widget==0.6
 sphinx==1.2.2
 sphinx_rtd_theme==0.1.6
+django-storages==1.1.8
+paramiko==1.14.0

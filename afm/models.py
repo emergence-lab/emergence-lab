@@ -1,7 +1,12 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.core.files.storage import default_storage as labshare
 
 import growths.models
+
+
+def get_afm_path(instance, filename):
+    return '/'.join(['growths' + instance.growth.growth_number[1], instance.growth.growth_number, 'afm', filename])
 
 
 class afm(models.Model):
@@ -23,8 +28,10 @@ class afm(models.Model):
     location = models.CharField(max_length=45, choices=LOCATION_CHOICES, default='c')
     size = models.DecimalField(max_digits=7, decimal_places=3)
 
-    filename = models.CharField(max_length=150, blank=True)
-    amplitude_filename = models.CharField(max_length=150, blank=True)
+    filename = models.ImageField(upload_to=get_afm_path, storage=labshare,
+                                 max_length=150, blank=True)
+    amplitude_filename = models.ImageField(upload_to=get_afm_path, storage=labshare,
+                                           max_length=150, blank=True)
 
     def __unicode__(self):
         return '{0}_{1}_{2}.{3}'.format(self.growth.growth_number,
