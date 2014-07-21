@@ -35,6 +35,11 @@ class growth_detail(DetailView):
 class sample_detail(DetailView):
     model = growths.models.sample
     template_name = 'growths/sample_detail.html'
+    context_object_name = 'growthobject'
+
+    def get_context_data(self, **kwargs):
+        context = super(sample_detail, self).get_context_data(**kwargs)
+        context["samples"] = sample.objects.get(substrate_serial=(sample.objects.get(growth=growthobject)).substrate_serial)
 # class new_growth(View):
 #     def post(self, request, *args, **kwargs):
 #         gform = growth_form(request.POST)
