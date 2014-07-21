@@ -68,6 +68,12 @@ class sample_form(ModelForm):
             print ("setting parent to self")
             instance.parent = instance
         instance.substrate_serial = instance.parent.substrate_serial
+        allsamples = sample.objects.filter(substrate_serial=instance.substrate_serial)
+        dictionarylist = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q',
+                          'r','s','t','u','v','w','x','y','z']
+        numberofsamples = len(allsamples)
+        if numberofsamples > 1:
+            instance.piece = dictionarylist[numberofsamples]
         instance.save
         return instance
 

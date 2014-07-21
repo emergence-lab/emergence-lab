@@ -155,6 +155,9 @@ def split_sample(request):
                 print (newsplit)
                 print (newsplit.piece)
                 newsplit.save()
+                if sampletosplit.parent == sampletosplit:
+                    newsplit.parent = newsplit
+                    newsplit.save()
 
             return HttpResponseRedirect(reverse('growth_detail', args=[sampletosplit.growth]))
 
