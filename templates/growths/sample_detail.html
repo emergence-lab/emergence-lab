@@ -1,0 +1,25 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{sample}}{%endblock%}
+
+{% block content %}
+
+<div class="container">
+    <h1>{{sample}}</h1>
+
+    <h3>Sample Info</h3>
+    <p>Growth: {{sample.growth}}</p>
+    <p>Pocket: {{sample.pocket}}</p>
+    <p>Piece: {{sample.piece}}</p>
+    <p>Size: {{sample.size}}</p>
+    <p>Location: {{sample.location}}</p>
+    <p>Substrate Type: {{sample.substrate_type}}</p>
+    <p>Serial Number: {{sample.substrate_serial}}</p>
+    <p>Orientation: {{sample.substrate_orientation}}</p>
+    <p>Miscut: {{sample.substrate_miscut}}</p>
+    <p>Comments: {{sample.substrate_comment}}</p>
+    
+<a href="{% url 'growth_detail' sample.growth %}">back to {{sample.growth}}</a>
+</div>
+
+{% endblock %}

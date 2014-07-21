@@ -29,6 +29,7 @@ urlpatterns = patterns(
     url(r'^investigations/$', login_required(core.views.investigation_list.as_view()), name='investigation_list'),
     # growths urls
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
+    url(r'^sample/(?P<pk>\d+)/$', login_required(growths.views.sample_detail.as_view()), name='sample_detail'),
     # afm urls
     url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.afm_detail.as_view()), name='afm_detail'),
     url(r'^afm/create/$', login_required(afm.views.afm_create.as_view()), name='afm_create'),

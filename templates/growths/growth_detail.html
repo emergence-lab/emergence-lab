@@ -37,7 +37,13 @@
         {% if growth.has_p %}<li>Has p-doped layer</li>{% endif %}
         {% if growth.has_u %}<li>Has undoped layer</li>{% endif %}
     </ul>
-    
+
+    <h3>Samples</h3>
+
+        {% for sample in samples %}
+        <p> Sample: {{sample.id}}</p>
+        {% endfor %}
+
 
     <a href="{% url 'afm_filter' %}">back</a>
 </div>
