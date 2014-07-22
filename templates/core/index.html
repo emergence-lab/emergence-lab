@@ -4,10 +4,18 @@
 
 {% block content %}
     <div class="container">
-        <p><a href="{% url 'afm_filter' %}">AFM Filter</a></p>
-        <p><a href="{% url 'hall_list' %}">Hall Data</a></p>
+        <h4>Growth Management</h4>
+        <p><a href="{% url 'afm_filter' %}">Search Growths</a></p>
         <p><a href="{% url 'create_growth' %}">Create Growth</a></p>
         <p><a href="{% url 'split_sample' %}">Split Sample</a><p>
+        <h4>Characterization</h4>
+        <p><a href="{% url 'hall_list' %}">Hall</a></p>
+        <p><a href="{% url 'afm_list' %}">AFM</a></p>
+        <h4>Administration</h4>
+        <p><a href="{% url 'operator_list' %}">Operators</a></p>
+        <p><a href="{% url 'platter_list' %}">Platters</a></p>
+        <p><a href="{% url 'project_list' %}">Projects</a></p>
+        <p><a href="{% url 'investigation_list' %}">Investigations</a></p>
     </div>
 
 {% endblock %}
