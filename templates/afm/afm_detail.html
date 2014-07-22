@@ -18,6 +18,10 @@
         <img src="{{afm.amplitude.url}}" alt="height">
         {% endif %}
 
-        <a href="{% url 'afm_list' %}">back</a>
+        <div>
+            <a class="btn btn-default" href="{% url 'afm_list' %}">Back</a>
+            <a class="btn btn-primary" href="{% url 'afm_update' pk=afm.id %}">Update</a>
+            <a class="btn btn-danger" href="{% url 'afm_delete' pk=afm.id %}">Delete</a>
+        </div>
     </div>
 {% endblock %}
