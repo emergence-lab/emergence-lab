@@ -5,45 +5,45 @@
 {% block content %}
 
 <div class="container">
-    <h1>{{growth}}</h1>
+    <h1>{{growthobject}}</h1>
 
     <h3>Growth Info</h3>
-    <p>Date: {{growth.date}}</p>
-    <p>Operator: {{growth.operator}}</p>
-    <p>Project: {{growth.project}}</p>
-    <p>Investigation: {{growth.investigation}}</p>
-    <p>Platter: {{growth.platter}}</p>
-    <p>Reactor: {{growth.reactor}}</p>
-    <p>{{growth.run_comments}}</p>
+    <p>Date: {{growthobject.date}}</p>
+    <p>Operator: {{growthobject.operator}}</p>
+    <p>Project: {{growthobject.project}}</p>
+    <p>Investigation: {{growthobject.investigation}}</p>
+    <p>Platter: {{growthobject.platter}}</p>
+    <p>Reactor: {{growthobject.reactor}}</p>
+    <p>{{growthobject.run_comments}}</p>
 
     <h3>Materials</h3>
     <ul>
-        {% if growth.has_gan %}<li>GaN</li>{% endif %}
-        {% if growth.has_aln%}<li>AlN</li>{% endif %}
-        {% if growth.has_inn %}<li>InN</li>{% endif %}
-        {% if growth.has_algan %}<li>AlGaN</li>{% endif %}
-        {% if growth.has_ingan %}<li>InGaN</li>{% endif %}
-        {% if growth.has_alingan %}<li>AlInGaN</li>{% endif %}
+        {% if growthobject.has_gan %}<li>GaN</li>{% endif %}
+        {% if growthobject.has_aln%}<li>AlN</li>{% endif %}
+        {% if growthobject.has_inn %}<li>InN</li>{% endif %}
+        {% if growthobject.has_algan %}<li>AlGaN</li>{% endif %}
+        {% if growthobject.has_ingan %}<li>InGaN</li>{% endif %}
+        {% if growthobject.has_alingan %}<li>AlInGaN</li>{% endif %}
     </ul>
 
     <h3>Metadata</h3>
     <ul>
-        {% if growth.is_template %}<li>Template</li>{% endif %}
-        {% if growth.is_buffer %}<li>Buffer</li>{% endif %}
-        {% if growth.has_superlattice %}<li>Has superlattice</li>{% endif %}
-        {% if growth.has_mqw %}<li>Has MQW</li>{% endif %}
-        {% if growth.has_graded %}<li>Has graded layer</li>{% endif %}
-        {% if growth.has_n %}<li>Has n-doped layer</li>{% endif %}
-        {% if growth.has_p %}<li>Has p-doped layer</li>{% endif %}
-        {% if growth.has_u %}<li>Has undoped layer</li>{% endif %}
+        {% if growthobject.is_template %}<li>Template</li>{% endif %}
+        {% if growthobject.is_buffer %}<li>Buffer</li>{% endif %}
+        {% if growthobject.has_superlattice %}<li>Has superlattice</li>{% endif %}
+        {% if growthobject.has_mqw %}<li>Has MQW</li>{% endif %}
+        {% if growthobject.has_graded %}<li>Has graded layer</li>{% endif %}
+        {% if growthobject.has_n %}<li>Has n-doped layer</li>{% endif %}
+        {% if growthobject.has_p %}<li>Has p-doped layer</li>{% endif %}
+        {% if growthobject.has_u %}<li>Has undoped layer</li>{% endif %}
     </ul>
 
     <h3>Samples</h3>
-
         {% for sample in samples %}
-        <p> Sample: {{sample.id}}</p>
+        <a href="{% url 'sample_detail' sample.id %}">Sample: {{sample.id}}</a>
+        <p>Growth: {{sample.growth}} | Pocket: {{sample.pocket}} | Piece: {{sample.piece}} | Size: {{sample.size}} | Substrate Type: {{sample.substrate_type}} | Serial Number: {{sample.substrate_serial}} | Location: {{sample.location}} | Orientation: {{sample.substrate_orientation}} | Miscut: {{sample.substrate_miscut}}</p>
         {% endfor %}
-
+    
 
     <a href="{% url 'afm_filter' %}">back</a>
 </div>

@@ -8,6 +8,7 @@
     <h1>{{sample}}</h1>
 
     <h3>Sample Info</h3>
+    <p>Sample id: {{sample.id}}</p>
     <p>Growth: {{sample.growth}}</p>
     <p>Pocket: {{sample.pocket}}</p>
     <p>Piece: {{sample.piece}}</p>
@@ -19,7 +20,22 @@
     <p>Miscut: {{sample.substrate_miscut}}</p>
     <p>Comments: {{sample.substrate_comment}}</p>
     
-<a href="{% url 'growth_detail' sample.growth %}">back to {{sample.growth}}</a>
+    <h3>Parents</h3>
+    {% for parent in parents %}
+    | <a href="{% url 'sample_detail' parent.id %}">{{parent}}</a> |
+    {% endfor %}
+    <h3>Siblings</h3>
+    {% for sibling in siblings %}
+    | <a href="{% url 'sample_detail' sibling.id %}">{{sibling}}</a> |
+    {% endfor %}
+    <h3>Children</h3>
+    {% for child in children %}
+    | <a href="{% url 'sample_detail' child.id %}">{{child}}</a> | 
+    {% endfor %}
+    
+<h5>~~~~~~~~~~~~~</h5>
+
+<p><a href="{% url 'growth_detail' sample.growth %}">back to growth {{sample.growth}}</a></p>
 </div>
 
 {% endblock %}
