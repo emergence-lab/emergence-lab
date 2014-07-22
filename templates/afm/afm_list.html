@@ -3,17 +3,17 @@
 {% block title %}AFM{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h3>Recent AFMs</h3>
+<div class="container">
+    <h3>Recent AFM Scans <a class="btn btn-primary" href="{% url 'afm_create' %}">New</a></h3>
 
-        <ul>
-        {% for afm in object_list %}
-            <li>
-                <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>
-            </li>
-        {% endfor %}
-        </ul>
+    <ul>
+    {% for object in object_list %}
+        <li>
+            <a href="{% url 'afm_detail' pk=object.id %}">{{object}}</a>
+        </li>
+    {% endfor %}
+    </ul>
 
-        <a href="{% url 'home' %}">back</a>
-    </div>
+    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
+</div>
 {% endblock %}
