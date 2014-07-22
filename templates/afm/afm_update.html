@@ -1,17 +1,17 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-{% block title %}Add AFM{% endblock %}
+{% block title %}Update AFM{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h1>Add AFM</h1>
+        <h1>Update {{afm}}</h1>
 
         <form action="" method="post" class="form">
             {% csrf_token %}
-            {% bootstrap_form form layout='inline' %}
+            {% bootstrap_form form layout='inlinne' %}
             {% buttons %}
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">Update</button>
             {% endbuttons %}
         </form>
     </div>
