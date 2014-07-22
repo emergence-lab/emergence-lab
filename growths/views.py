@@ -31,15 +31,49 @@ class growth_detail(DetailView):
     model = growths.models.growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
+    context_object_name = 'growthobject'
+
+    def get_context_data(self, **kwargs):
+        context = super(growth_detail, self).get_context_data(**kwargs)
+        context["samples"] = sample.objects.filter(growth=self.get_object())
+        return context
+
 
 class sample_detail(DetailView):
     model = growths.models.sample
     template_name = 'growths/sample_detail.html'
-    context_object_name = 'growthobject'
+    context_object_name = 'sample'
 
     def get_context_data(self, **kwargs):
         context = super(sample_detail, self).get_context_data(**kwargs)
-        context["samples"] = sample.objects.get(substrate_serial=(sample.objects.get(growth=growthobject)).substrate_serial)
+        context["sample"] = self.get_object()
+        parentlist = []
+        nextobject = self.get_object()
+        loopcounter = 0
+        while nextobject.parent != nextobject:
+            print (nextobject.parent)
+            print (nextobject)
+            parentlist.append(nextobject.parent)
+            nextobject = nextobject.parent
+            loopcounter = loopcounter + 1
+            if loopcounter > 5:
+                raise Exception("Whoa there pal. Hold your horses.")
+        context["parents"] = parentlist
+        siblings = sample.objects.filter(growth=(self.get_object()).growth)
+        siblinglist = []
+        for sibling in siblings:
+            if sibling != self.get_object():
+                siblinglist.append(sibling)
+        context["siblings"] = siblinglist
+        children = sample.objects.filter(parent=self.get_object())
+        childlist = []
+        for child in children:
+            if child.parent != child:
+                childlist.append(child)
+        context["children"] = childlist
+        return context
+
+
 # class new_growth(View):
 #     def post(self, request, *args, **kwargs):
 #         gform = growth_form(request.POST)
