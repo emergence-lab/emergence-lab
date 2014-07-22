@@ -4,22 +4,30 @@
 
 {% block content %}
 <div class="container">
-    <h1>Hall Data</h1>
-    <p>Date | {{ object }}</p>
-    <p>Growth id | {{ object.growth }}</p>
-    <p>Sample id | {{ object.sample }}</p>
-    <p>Description | {{ object.description }}</p>
-    <p>Temperature | {{ object.temperature }}</p>
-    <p>Symmetry Factor | {{ object.symmetry_factor }}</p>
-    <p>Sheet Coefficient | {{ object.sheet_coefficient }}</p>
-    <p>Sheet Resistance | {{ object.sheet_resistance }}</p>
-    <p>Sheet Concentration | {{ object.sheet_concentration }}</p>
-    <p>Thickness | {{ object.thickness }}</p>
-    <p>Mobility | {{ object.mobility }}</p>
-    <p>Bulk Coefficient | {{ object.bulk_coefficient }}</p>
-    <p>Bulk Resistance | {{ object.bulk_resistance }}</p>
-    <p>Bulk Concentration | {{ object.bulk_concentration }}</p>
-    <a href="{% url 'hall_list' %}">back</a>
+    <h3>
+        Hall Data: {{object}}
+        <a class="btn btn-primary" href="">Update</a>
+        <a class="btn btn-danger" href="">Delete</a>
+    </h3>
+
+    <p>Date: {{object.date}}</p>
+    <p>Growth: {{object.growth}}</p>
+    <p>Sample: {{object.sample}}</p>
+    <p>Description: {{object.description}}</p>
+    <p>Temperature: {{object.temperature}} &deg;C</p>
+    <p>Symmetry Factor: {{object.symmetry_factor}}</p>
+    <p>Sheet Coefficient: {{object.sheet_coefficient}} m&sup2;/C</p>
+    <p>Sheet Resistance: {{object.sheet_resistance}} &Omega;/&#9633;</p>
+    <p>Sheet Concentration: {{object.sheet_concentration}} cm&#x207b;&sup2;</p>
+    <p>Thickness: {{object.thickness}} &mu;m</p>
+    <p>Mobility: {{object.mobility}} cm&sup2;/Vs</p>
+    <p>Bulk Coefficient: {{object.bulk_coefficient}} m&sup3;/C</p>
+    <p>Bulk Resistance: {{object.bulk_resistance}} ohm-cm</p>
+    <p>Bulk Concentration: {{object.bulk_concentration}} cm&#x207b;&sup3;</p>
+
+    <div>
+        <a class="btn btn-default" href="{% url 'hall_list' %}">Back</a>
+        
+    </div>
 </div>
 {% endblock %}
-

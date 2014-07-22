@@ -1,17 +1,21 @@
 {% extends "core/base.html" %}
 
-{% block title %}hall data{% endblock %}
+{% block title %}Hall{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Hall Data</h1>
+    <h3>Recent Hall Data <a class="btn btn-primary" href="">New</a></h3>
 
     <ul>
-    {% for data in object_list %}
-        <li class="data"> <a href="{% url 'hall_detail' pk=data.id %}"> {{ data }} </a> | {{ data.growth }}</li>
+    {% for object in object_list %}
+        <li>
+            <a href="{% url 'hall_detail' pk=object.id %}">{{object}}</a>
+            ({{object.sample}})
+        </li>
     {% endfor %}
     </ul>
-    <a href="{% url 'home' %}">back</a>
+
+    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
 </div>
 {% endblock %}
 
