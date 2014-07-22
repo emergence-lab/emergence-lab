@@ -1,5 +1,9 @@
+import os
+
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.http import HttpResponse
 from django.views.generic import CreateView, ListView, TemplateView
 
 from .models import investigation, operator, platter, project
@@ -24,7 +28,10 @@ class homepage(TemplateView):
 
 
 def protected_media(request, filename):
-    pass
+    fullpath = os.path.join(settings.MEDIA_ROOT, filename)
+    response = HttpResponse(mimetype='image/jpeg')
+    response['X-Sendfile'] = fullpath
+    return response
 
 
 class operator_list(ActiveListView):

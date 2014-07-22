@@ -70,4 +70,4 @@ class afm_form(forms.ModelForm):
     class Meta:
         model = afm
         fields = ['growth', 'sample', 'scan_number', 'rms', 'zrange',
-                  'location', 'size', 'filename', 'amplitude_filename', ]
+                  'location', 'size', 'height', 'amplitude', ]

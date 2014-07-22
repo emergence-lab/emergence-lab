@@ -11,5 +11,12 @@
         <p>RMS: {{afm.rms}}</p>
         <p>Z-Range: {{afm.zrange}}</p>
 
+        {% if afm.height %}
+        <img src="{{afm.height.url}}" alt="height">
+        {% endif %}
+        {% if afm.amplitude %}
+        <img src="{{afm.amplitude.url}}" alt="height">
+        {% endif %}
+
         <a href="{% url 'afm_filter' %}">back</a>
 {% endblock %}
