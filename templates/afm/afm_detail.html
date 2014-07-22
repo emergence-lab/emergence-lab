@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="container">
-        <h1>{{afm}}</h1>
+        <h3>{{afm}}</h3>
 
         <p>Location: {{afm.location}}</p>
         <p>Size: {{afm.size}}</p>
@@ -18,6 +18,6 @@
         <img src="{{afm.amplitude.url}}" alt="height">
         {% endif %}
 
-        <a href="{% url 'afm_filter' %}">back</a>
+        <a href="{% url 'afm_list' %}">back</a>
     </div>
 {% endblock %}

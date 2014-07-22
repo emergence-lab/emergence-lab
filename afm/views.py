@@ -6,6 +6,15 @@ from .models import afm
 from .forms import afm_form
 
 
+class AFMList(ListView):
+    """
+    List the most recent afm data
+    """
+    model = afm
+    template_name = 'afm/afm_list.html'
+    paginate_by = 25
+
+
 class AFMDetail(DetailView):
     """
     Detail view of the afm model.
@@ -43,4 +52,4 @@ class AFMDelete(DeleteView):
     template_name = 'afm/afm_delete.html'
 
     def get_success_url(self):
-        return reverse('home')
+        return reverse('afm_list')

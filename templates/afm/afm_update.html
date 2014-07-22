@@ -14,5 +14,7 @@
                 <button type="submit" class="btn btn-primary">Update</button>
             {% endbuttons %}
         </form>
+
+        <a href="{% url 'afm_detail' pk=afm.id %}">back</a>
     </div>
 {% endblock %}

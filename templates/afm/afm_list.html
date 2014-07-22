@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+
+{% block title %}AFM{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h3>Recent AFMs</h3>
+
+        <ul>
+        {% for afm in object_list %}
+            <li>
+                <a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a>
+            </li>
+        {% endfor %}
+        </ul>
+
+        <a href="{% url 'home' %}">back</a>
+    </div>
+{% endblock %}
