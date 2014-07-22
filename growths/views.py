@@ -113,7 +113,7 @@ def create_growth(request):
         sforms_list = []
         sforms = [sform_1, sform_2, sform_3, sform_4, sform_5, sform_6]
         pforms = [pf_1, pf_2, pf_3, pf_4, pf_5, pf_6]
-        for x in range(0,6):
+        for x in range(0, 6):
             if (pforms[x]).has_changed():
                 print("The form has changed!!")
                 sforms_list.append(sforms[x])
@@ -134,14 +134,15 @@ def create_growth(request):
         num_items = 0
         model = growths.models.growth
         query = model.objects.all()
-        last = str(query[len(query)-1])
+        last = str(query[len(query) - 1])
         last_int = ''
-        for i in xrange (1,5):
+        for i in xrange(1, 5):
             last_int += last[i]
         last_int = (int(last_int) + 1)
         last = ('g' + str(last_int))
         currenttime = time.strftime("%Y-%m-%d")
-        gform = growth_form(instance=growth(), initial={'growth_number': last, 'date': currenttime })
+        gform = growth_form(instance=growth(), initial={'growth_number': last, 'date': currenttime})
+
         # sform = [sample_form(prefix=str(x), instance=sample()) for x in range(0,6)]
         def generate_serial():
             return ('wbg_' + str(random.randint(100, 999)))
@@ -175,16 +176,16 @@ def split_sample(request):
             serialnumber = sampletosplit.substrate_serial
             print ("serial number: " + serialnumber)
             allsamples = sample.objects.filter(substrate_serial=serialnumber)
-            dictionarylist = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q',
-                              'r','s','t','u','v','w','x','y','z']
+            dictionarylist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                              'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
             numberofsamples = len(allsamples)
             # raise Exception("I don't know what you did, but you sure screwed something up.")
             if numberofsamples == 1:
                 print ("This is the first sample to split")
-                sample.objects.filter(substrate_serial=serialnumber).update(piece=dictionarylist[numberofsamples-1])
+                sample.objects.filter(substrate_serial=serialnumber).update(piece=dictionarylist[numberofsamples - 1])
             else:
                 print ('There are ' + str(numberofsamples) + ' samples that already exist')
-            for i in range (0, numberofpieces-1):
+            for i in range(0, numberofpieces - 1):
                 newsplit = sample(growth=sampletosplit.growth, pocket=sampletosplit.pocket,
                                   parent=sampletosplit.parent, size=sampletosplit.size,
                                   location=sampletosplit.location,

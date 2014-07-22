@@ -7,9 +7,11 @@ import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from core.validators import*
 
+
 # Create the form class.
 class sample_form(ModelForm):
     parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
+
     class Meta:
         model = sample
         fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
@@ -57,20 +59,20 @@ class sample_form(ModelForm):
         commit = kwargs.pop('commit', True)
         growthid = kwargs.pop('growthid')
         pocketnum = kwargs.pop('pocketnum')
-        instance = super(sample_form, self).save(*args, commit = False, **kwargs)
+        instance = super(sample_form, self).save(*args, commit=False, **kwargs)
         growthid.date = time.strftime("%Y-%m-%d")
         instance.growth = growthid
         instance.pocket = pocketnum
         if commit:
             print ("saving")
             instance.save()
-        if instance.parent == None:
+        if instance.parent is None:
             print ("setting parent to self")
             instance.parent = instance
         instance.substrate_serial = instance.parent.substrate_serial
         allsamples = sample.objects.filter(substrate_serial=instance.substrate_serial)
-        dictionarylist = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q',
-                          'r','s','t','u','v','w','x','y','z']
+        dictionarylist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                          'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
         numberofsamples = len(allsamples)
         if numberofsamples > 1:
             instance.piece = dictionarylist[numberofsamples]
@@ -95,6 +97,7 @@ class p_form(forms.Form):
 class split_form(ModelForm):
     pieces = forms.IntegerField(label="Number of pieces", validators=[validate_not_zero])
     parent = forms.CharField(label="Sample to split")
+
     class Meta:
         model = sample
         fields = ['parent', 'pieces']
@@ -127,4 +130,3 @@ class split_form(ModelForm):
             raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
 
         return self.cleaned_data['parent']
-
