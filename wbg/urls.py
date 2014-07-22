@@ -34,6 +34,7 @@ urlpatterns = patterns(
     url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.AFMDetail.as_view()), name='afm_detail'),
     url(r'^afm/create/$', login_required(afm.views.AFMCreate.as_view()), name='afm_create'),
     url(r'^afm/(?P<pk>\d+)/update/$', login_required(afm.views.AFMUpdate.as_view()), name='afm_update'),
+    url(r'^afm/(?P<pk>\d+)/delete/$', login_required(afm.views.AFMDelete.as_view()), name='afm_delete'),
     # hall urls
     url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),

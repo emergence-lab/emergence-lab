@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.core.urlresolvers import reverse
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .models import afm
 from .forms import afm_form
@@ -32,3 +33,14 @@ class AFMUpdate(UpdateView):
 
     def get_initial(self):
         return {'growth': self.object.growth, 'sample': self.object.sample }
+
+
+class AFMDelete(DeleteView):
+    """
+    View for deleting afm data
+    """
+    model = afm
+    template_name = 'afm/afm_delete.html'
+
+    def get_success_url(self):
+        return reverse('home')
