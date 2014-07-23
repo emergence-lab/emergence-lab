@@ -1,11 +1,21 @@
 from django.shortcuts import render
-from django.views.generic import CreateView, DetailView, ListView
+from django.core.urlresolvers import reverse
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .models import afm
 from .forms import afm_form
 
 
-class afm_detail(DetailView):
+class AFMList(ListView):
+    """
+    List the most recent afm data
+    """
+    model = afm
+    template_name = 'afm/afm_list.html'
+    paginate_by = 25
+
+
+class AFMDetail(DetailView):
     """
     Detail view of the afm model.
     """
@@ -13,10 +23,33 @@ class afm_detail(DetailView):
     template_name = 'afm/afm_detail.html'
 
 
-class afm_create(CreateView):
+class AFMCreate(CreateView):
     """
     View for creation of new afm data.
     """
     model = afm
     template_name = 'afm/afm_create.html'
     form_class = afm_form
+
+
+class AFMUpdate(UpdateView):
+    """
+    View for updating afm data.
+    """
+    model = afm
+    template_name = 'afm/afm_update.html'
+    form_class = afm_form
+
+    def get_initial(self):
+        return {'growth': self.object.growth, 'sample': self.object.sample }
+
+
+class AFMDelete(DeleteView):
+    """
+    View for deleting afm data
+    """
+    model = afm
+    template_name = 'afm/afm_delete.html'
+
+    def get_success_url(self):
+        return reverse('afm_list')

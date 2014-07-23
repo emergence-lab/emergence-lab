@@ -3,20 +3,27 @@
 {% block title %}{{afm}}{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>{{afm}}</h1>
+<div class="container">
+    <h3>
+        {{afm}}
+        <a class="btn btn-primary" href="{% url 'afm_update' pk=afm.id %}">Update</a>
+        <a class="btn btn-danger" href="{% url 'afm_delete' pk=afm.id %}">Delete</a>
+    </h3>
 
-        <p>Location: {{afm.location}}</p>
-        <p>Size: {{afm.size}}</p>
-        <p>RMS: {{afm.rms}}</p>
-        <p>Z-Range: {{afm.zrange}}</p>
+    <p>Location: {{afm.get_location_display}}</p>
+    <p>Size: {{afm.size}} &mu;m</p>
+    <p>RMS: {{afm.rms}} nm</p>
+    <p>Z-Range: {{afm.zrange}} nm</p>
 
-        {% if afm.height %}
-        <img src="{{afm.height.url}}" alt="height">
-        {% endif %}
-        {% if afm.amplitude %}
-        <img src="{{afm.amplitude.url}}" alt="height">
-        {% endif %}
+    {% if afm.height %}
+    <img src="{{afm.height.url}}" alt="height">
+    {% endif %}
+    {% if afm.amplitude %}
+    <img src="{{afm.amplitude.url}}" alt="height">
+    {% endif %}
 
-        <a href="{% url 'afm_filter' %}">back</a>
+    <div>
+        <a class="btn btn-default" href="{% url 'afm_list' %}">Back</a>
+    </div>
+</div>
 {% endblock %}

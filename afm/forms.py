@@ -10,7 +10,7 @@ import growths.models
 
 class afm_form(forms.ModelForm):
     """
-    Form for afm creation.
+    Form for creating or updating afm data.
     """
     growth = forms.CharField()
     sample = forms.CharField()

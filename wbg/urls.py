@@ -31,8 +31,11 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
     url(r'^sample/(?P<pk>\d+)/$', login_required(growths.views.sample_detail.as_view()), name='sample_detail'),
     # afm urls
-    url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.afm_detail.as_view()), name='afm_detail'),
-    url(r'^afm/create/$', login_required(afm.views.afm_create.as_view()), name='afm_create'),
+    url(r'^afm/$', login_required(afm.views.AFMList.as_view()), name='afm_list'),
+    url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.AFMDetail.as_view()), name='afm_detail'),
+    url(r'^afm/create/$', login_required(afm.views.AFMCreate.as_view()), name='afm_create'),
+    url(r'^afm/(?P<pk>\d+)/update/$', login_required(afm.views.AFMUpdate.as_view()), name='afm_update'),
+    url(r'^afm/(?P<pk>\d+)/delete/$', login_required(afm.views.AFMDelete.as_view()), name='afm_delete'),
     # hall urls
     url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
