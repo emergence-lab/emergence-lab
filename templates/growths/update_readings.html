@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Update Readings{%endblock%}
+
+{% block content %}
+
+<div class="container">
+{% csrf_token %}
+    <div class="row">
+        {{ growth }}
+        {% for reading in readings %}
+        {{ reading.layer }}
+        {% endfor %}
+        {% for reading in readingslist %}
+        <div class="col-xs-2">
+
+        {% bootstrap_form reading %}
+
+        </div>
+        {% endfor %}
+    </div>
+<a href="{% url 'home' %}">home</a>
+
+</div>
+
+{% endblock %}
