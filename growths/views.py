@@ -1,12 +1,15 @@
 from django.shortcuts import render
-from django.views.generic import DetailView, ListView, CreateView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView
+from django.views.generic.edit import ProcessFormView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import TemplateView
 import time
 import growths.models
-from growths.models import growth, sample
+from growths.models import growth, sample, readings
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
-from growths.forms import growth_form, sample_form, p_form, split_form
+from growths.forms import growth_form, sample_form, p_form, split_form, readings_form
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -73,26 +76,6 @@ class sample_detail(DetailView):
         context["children"] = childlist
         return context
 
-
-# class new_growth(View):
-#     def post(self, request, *args, **kwargs):
-#         gform = growth_form(request.POST)
-#         sform = sample_form(request.POST)
-#         if gform.is_valid() and sform.is_valid():
-#             new_g = gform.save()
-#             new_s = sform.save()
-#             return HttpResponseRedirect('home')
-#     def get(self, request, *args, **kwargs):
-#         gform = growth_form()
-#         sform = sample_form()
-# #         context = super(new_growth, self).get_context_data(**kwargs)
-#         if 'gform' not in context:
-#             context['gform'] = self.gform() # request=self.request)
-#         if 'sform' not in context:
-#             context['sform'] = self.sform() # request=self.request)
-#         return context
-#
-#     return render_to_response('growths/new_growth.html', {'growth_form': gform, 'sample_form': sform})
 
 def create_growth(request):
     if request.method == "POST":
@@ -204,120 +187,73 @@ def split_sample(request):
 
             return HttpResponseRedirect(reverse('growth_detail', args=[sampletosplit.growth]))
 
-#             tempparent = sampletosplit
-#             firstparent = sampletosplit.parent
-#             numberofparents = 0
-#             print ('beginning')
-#             print (numberofpieces)
-#             print (tempparent)
-#             print (firstparent)
-#             if tempparent.id == firstparent.id:
-#                 print ('No Parent!')
-#             else:
-#                 print ("try something else. this loop isn't working")
-#                 while firstparent.id is not tempparent.id:
-#                     print ('in loop')
-#                     numberofparents = numberofparents + 1
-#                     firstparent = firstparent.parent
-#                     print (numberofparents)
-#                     print (firstparent)
-#                     if numberofparents >= 10:
-#                         break
-#             print (numberofparents)
-#             print (tempparent)
-#             print (firstparent)
-
-            # find all siblings so the amount of pieces can be determined
-            # return HttpResponseRedirect(reverse(''))
-
     else:
         model = growths.models.sample
         print("split sample page accessed")
         sform = split_form(prefix='sform')
     return render(request, 'growths/split_sample.html', {'sform': sform})
-# class create_growth(CreateView):
-#     model = growths.models.growth
-#     template_name = 'growths/create_growth.html'
-#     growth_class = growth_form
-#     sample_class = sample_form
-#     form_class = growth_form
+
+
+class update_readings(TemplateView, SingleObjectMixin):
+    context_object_name = 'growth'
+    queryset = growth.objects.all()
+    slug_field = 'growth_number'
+    template_name = 'growths/update_readings.html'
+
+    def get_context_data(self, **kwargs):
+        self.object = None
+        context = super(update_readings, self).get_context_data(**kwargs)
+        context["growth"] = self.get_object()
+        allreadings = readings.objects.filter(growth=self.get_object())
+        context["readings"] = allreadings
+        formlist = []
+        for reading in allreadings:
+            rform = readings_form(instance=readings(), initial={'growth': reading.growth,
+                'layer': reading.layer, 'layer_desc': reading.layer_desc,
+                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'tc_out': reading.tc_out,
+                'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm, 'gc_pressure': reading.gc_pressure,
+                'gc_position': reading.gc_position, 'voltage_in': reading.voltage_in,
+                'voltage_out': reading.voltage_out, 'current_in': reading.current_in,
+                'current_out': reading.current_out, 'top_vp_flow': reading.top_vp_flow,
+                'hydride_inner': reading.hydride_inner, 'hydride_outer': reading.hydride_outer,
+                'alkyl_flow_inner': reading.alkyl_flow_inner, 'alkyl_push_inner': reading.alkyl_push_inner,
+                'alkyl_flow_middle': reading.alkyl_flow_middle, 'alkyl_push_middle': reading.alkyl_push_middle,
+                'alkyl_flow_outer': reading.alkyl_flow_outer, 'alkyl_push_outer': reading.alkyl_push_outer,
+                'n2_flow': reading.n2_flow, 'h2_flow': reading.h2_flow, 'nh3_flow': reading.nh3_flow,
+                'hydride_pressure': reading.hydride_pressure, 'tmga1_flow': reading.tmga1_flow,
+                'tmga1_pressure': reading.tmga1_pressure, 'tmga2_flow': reading.tmga2_flow,
+                'tmga2_pressure': reading.tmga2_pressure, 'tega2_flow': reading.tega2_flow,
+                'tega2_pressure': reading.tega2_pressure, 'tmin1_flow': reading.tmin1_flow,
+                'tmin1_pressure': reading.tmin1_pressure, 'tmal1_flow': reading.tmal1_flow,
+                'tmal1_pressure': reading.tmal1_pressure, 'cp2mg_flow': reading.cp2mg_flow,
+                'cp2mg_pressure': reading.cp2mg_pressure, 'cp2mg_dilution': reading.cp2mg_dilution,
+                'silane_flow': reading.silane_flow, 'silane_dilution': reading.silane_dilution,
+                'silane_mix': reading.silane_mix, 'silane_pressure': reading.silane_pressure})
+            formlist.append(rform)
+        context["readingslist"] = formlist
+        return context
+
+
+#     def post(request):
+#         print ("POST")
+#     def get(request, self, *args, **kwargs):
+#         print ("GET")
+#         model = growths.models.readings
+#         rform = readings_form(prefix='rform')
+#         return render(request, 'growths/update_readings.html', {'rform': rform})
+# , initial={'growth_number': self.get_object()}
+
+
+
+
+# class update_readings(UpdateView):
+#     model = growths.models.readings
+#     template_name = 'growths/update_readings.html'
+#     form_class = readings_form
 #
 #     def get_context_data(self, **kwargs):
-#         context = super(create_growth, self).get_context_data(**kwargs)
-# #         if 'growth_form' not in context:
-# #             context['growth_form'] = self.growth_class(initial={'some_field': context['model'].some_field})
-# #         if 'sample_form' not in context:
-# #             context['sample_form'] = self.sample_class(initial={'another_field': context['model'].another_field})
-# #         return context
-#
-#         if 'g_form' not in context:
-#             context['g_form'] = self.growth_class() # request=self.request)
-#         if 's_form' not in context:
-#             context['s_form'] = self.sample_class() # request=self.request)
-#         return context
-#
-#     def get_initial(self):
-#         num_items = 0
-#         model = growths.models.growth
-#         query = model.objects.all()
-#         last = str(query[len(query)-1])
-#         last_int = ''
-#         for i in xrange (1,5):
-#             last_int += last[i]
-#         last_int = (int(last_int) + 1)
-#         last = ('g' + str(last_int))
-#
-#         return { 'growth_number': last,
-#                  'date': time.strftime("%Y-%m-%d") }
-#
-#     def post(self, request, *args, **kwargs):
-#         # get the user instance
-#         self.growth_object = None
-#         self.sample_object = None
-#         self.object = None
-#         # determine which form is being submitted
-#         # uses the name of the form's submit button
-#         if 's_form' in request.POST:
-#             # get the primary form
-# #uncomment
-# #             sample_class = self.sample_class
-# #             sample_form_name = 's_form'
-#             form_class = self.sample_class
-#             form = self.get_form(form_class)
-#             form_name = 's_form'
-#         if 'g_form' in request.POST:
-#             # get the secondary form
-# #uncomment
-# #             growth_class = self.growth_class
-# #             growth_form_name = 'g_form'
-#             form_class = self.growth_class
-#             form = self.get_form(form_class)
-#             form_name = 'g_form'
-#          # get the form
-# #uncomment
-# #         growth_form = self.get_form(growth_class)
-# #         sample_form = self.get_form(sample_class)
-#
-# # uncomment        #form = [growth_form, sample_form]
-# #uncomment
-# #         if sample_form.is_valid():
-# #             if growth_form.is_valid():
-# #                 return self.form_valid(form)
-# #             else:
-# #                 return self.form_invalid(**{form_name: growth_form})
-# #         else:
-# #             return self.form_invalid(**{form_name: sample_form})
-#         if form.is_valid():
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(form)
-#
-# # uncomment
-# #     def form_valid(self, form):
-# #         self.growth_object = form[0].save()
-# #         self.sample_object = form[1].save()
-# #         return HttpResponseRedirect(self.get_success_url())
-#
-# #uncomment
-#     def get_success_url(self):
-#         return ''
+#         context = super(sample_detail, self).get_context_data(**kwargs)
+#         readingobjects = readings.objects.all()
+#         lastreading = readingobjects[len(readingobjects)]
+#         lastreadings = readings.objects.filter(growth=lastreading.growth)
+#         context["readings"] = lastreadings

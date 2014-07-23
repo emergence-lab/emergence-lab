@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
-from growths.models import growth, sample
+from growths.models import growth, sample, readings
 import time
 import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -130,3 +130,7 @@ class split_form(ModelForm):
             raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
 
         return self.cleaned_data['parent']
+
+class readings_form(ModelForm):
+    class Meta:
+        model = readings
