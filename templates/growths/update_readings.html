@@ -6,12 +6,11 @@
 {% block content %}
 
 <div class="container">
+<h2>Update {{growth}} readings</h2>
+<form action="" method="POST">
 {% csrf_token %}
     <div class="row">
-        {{ growth }}
-        {% for reading in readings %}
-        {{ reading.layer }}
-        {% endfor %}
+
         {% for reading in readingslist %}
         <div class="col-xs-2">
 
@@ -20,6 +19,9 @@
         </div>
         {% endfor %}
     </div>
+<input id="update_readings" type="submit" value="Update" name="readingsform"/>
+</form>
+
 <a href="{% url 'home' %}">home</a>
 
 </div>
