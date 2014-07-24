@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}create growth{% endblock %}
 
@@ -8,40 +9,58 @@
 
 <form action="{% url 'create_growth' %}" method="POST">
     {% csrf_token %}
-    <ul>
-        {{ gform.as_ul }}
-    </ul>
     <div class="row">
+    <div class="col-xs-5">
+    <ul>
+        {% bootstrap_form gform %}
+    </ul>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col-xs-4">
     <h2> Sample 1 </h2>
     <ul>
-        {{ pf_1.as_ul }}
-        {{ sform_1.as_ul }}
+        {% bootstrap_form pf_1 %}
+        {% bootstrap_form sform_1 %}
     </ul>
+    </div>
+    <div class="col-xs-4">
     <h2> Sample 2 </h2>
     <ul>
-        {{ pf_2.as_ul }}
-        {{ sform_2.as_ul }}
+        {% bootstrap_form pf_2 %}
+        {% bootstrap_form sform_2 %}
     </ul>
+    </div>
+    <div class="col-xs-4">
     <h2> Sample 3 </h2>
     <ul>
-        {{ pf_3.as_ul }}
-        {{ sform_3.as_ul }}
+        {% bootstrap_form pf_3 %}
+        {% bootstrap_form sform_3 %}
     </ul>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col-xs-4">
     <h2> Sample 4 </h2>
     <ul>
-        {{ pf_4.as_ul }}
-        {{ sform_4.as_ul }}
+        {% bootstrap_form pf_4 %}
+        {% bootstrap_form sform_4 %}
     </ul>
+    </div>
+    <div class="col-xs-4">
     <h2> Sample 5 </h2>
     <ul>
-        {{ pf_5.as_ul }}
-        {{ sform_5.as_ul }}
+        {% bootstrap_form pf_5 %}
+        {% bootstrap_form sform_5 %}
     </ul>
+    </div>
+    <div class="col-xs-4">
     <h2> Sample 6 </h2>
     <ul>
-        {{ pf_6.as_ul }}
-        {{ sform_6.as_ul }}
+        {% bootstrap_form pf_6 %}
+        {% bootstrap_form sform_6 %}
     </ul>
+    </div>
     </div>
     <input id="save_growth" type="submit" value="Create" name="gform"/>
 </form>

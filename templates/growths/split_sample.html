@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}split sample{% endblock %}
 
@@ -8,9 +9,13 @@
 
 <form action="{% url 'split_sample' %}" method="POST">
     {% csrf_token %}
+    <div class="row">
+    <div class="col-xs-4">
     <ul>
-        {{ sform.as_ul }}
+        {% bootstrap_form sform %}
     </ul>
+    </div>
+    </div>
 <input id="split_growth" type="submit" value="Split" name="splitform"/>
 </form>
 <a href="{% url 'home' %}">back</a>
