@@ -42,7 +42,7 @@ urlpatterns = patterns(
     # creategrowth urls
     url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
     url(r'^splitsample/$', login_required(growths.views.split_sample), name='split_sample'),
-    url(r'^updatereadings/(?P<slug>[gt][1-9][0-9]{3,})$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
+    url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
     # advanced views
     url(r'^afm-compare/$', login_required(growths.views.afm_compare.as_view()), name='afm_compare'),
     url(r'^afm-filter/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
