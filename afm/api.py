@@ -12,6 +12,7 @@ class AFMListAPI(generics.ListAPIView):
     serializer_class = AFMSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
+
 class AFMDetailAPI(generics.RetrieveUpdateAPIView):
     """
     Show details, update or delete afm scan.

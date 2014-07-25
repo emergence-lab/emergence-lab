@@ -4,12 +4,19 @@ from rest_framework import serializers
 from .models import afm
 import growths.models
 
+
 class FilePathField(serializers.FileField):
     type_name = "FilePathField"
     widget = forms.TextInput
 
+    def __init__(self, *args, **kwargs):
+        kwargs['required'] = False
+        kwargs['allow_empty_file'] = True
+        super(FilePathField, self).__init__(*args, **kwargs)
+
     def from_native(self, data):
         return data
+
 
 class AFMSerializer(serializers.ModelSerializer):
     """
@@ -18,7 +25,8 @@ class AFMSerializer(serializers.ModelSerializer):
     """
     growth = serializers.CharField(max_length=50)
     sample = serializers.CharField(max_length=50)
-    height = FilePathField(max_length=150, required=False, allow_empty_file=True)
+    height = FilePathField(max_length=150)
+    amplitude = FilePathField(max_length=150)
 
     def transform_growth(self, obj, value):
         return value
@@ -47,15 +55,7 @@ class AFMSerializer(serializers.ModelSerializer):
         attrs[source] = sample
         return attrs
 
-    # def transform_height(self, obj, value):
-    #     return 'testing'
-
-    def validate_height(self, attrs, source):
-        print(attrs)
-        # raise serializers.ValidationError('forced image')
-        return attrs
-
     class Meta:
         model = afm
         fields = ('id', 'growth', 'sample', 'scan_number', 'rms', 'zrange',
-                  'location', 'size', 'height')
+                  'location', 'size', 'height', 'amplitude')
