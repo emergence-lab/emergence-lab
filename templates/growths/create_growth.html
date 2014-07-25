@@ -62,10 +62,15 @@
     </ul>
     </div>
     </div>
-    <input id="save_growth" type="submit" value="Create" name="gform"/>
+
+
+    <button class="btn btn-primary pull-right" id="create_growth" type="submit" name="creategrowthform">Create Growth</button>
+
+
 </form>
 
-<a href="{% url 'home' %}">back</a>
+<a class="btn btn-default" href="{% url 'home' %}">back</a>
 </div>
+<p> </p>
 {% endblock %}
 
