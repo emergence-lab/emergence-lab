@@ -30,15 +30,15 @@
 
     <h3>Parents</h3>
     {% for parent in parents %}
-    | <a href="{% url 'sample_detail' parent.id %}">{{parent}}</a> |
+    <p><a class="btn btn-primary" href="{% url 'sample_detail' parent.id %}">{{parent}}</a></p>
     {% endfor %}
     <h3>Siblings</h3>
     {% for sibling in siblings %}
-    | <a href="{% url 'sample_detail' sibling.id %}">{{sibling}}</a> |
+    <p><a class="btn btn-primary" href="{% url 'sample_detail' sibling.id %}">{{sibling}}</a></p>
     {% endfor %}
     <h3>Children</h3>
     {% for child in children %}
-    | <a href="{% url 'sample_detail' child.id %}">{{child}}</a> | 
+    <p><a class="btn btn-primary" href="{% url 'sample_detail' child.id %}">{{child}}</a></p>
     {% endfor %}
 
     </div>

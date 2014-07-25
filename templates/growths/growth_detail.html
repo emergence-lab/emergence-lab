@@ -7,7 +7,10 @@
 <div class="container">
     <h1>{{growthobject}}</h1>
 
+    
+
     <h3>Growth Info</h3>
+    <p><a class="btn btn-primary" href="{% url 'recipe_detail' growthobject %}">Recipe Info</a></p>
     <p>Date: {{growthobject.date}}</p>
     <p>Operator: {{growthobject.operator}}</p>
     <p>Project: {{growthobject.project}}</p>
@@ -37,10 +40,10 @@
         {% if growthobject.has_p %}<li>Has p-doped layer</li>{% endif %}
         {% if growthobject.has_u %}<li>Has undoped layer</li>{% endif %}
     </ul>
-
+    
     <h3>Samples</h3>
         {% for sample in samples %}
-        <a href="{% url 'sample_detail' sample.id %}">Sample: {{sample.id}}</a>
+        <a class="btn btn-primary" href="{% url 'sample_detail' sample.id %}">Sample: {{sample.id}}</a>
         <p>Growth: {{sample.growth}} | Pocket: {{sample.pocket}} | Piece: {{sample.piece}} | Size: {{sample.size}} | Substrate Type: {{sample.substrate_type}} | Serial Number: {{sample.substrate_serial}} | Location: {{sample.location}} | Orientation: {{sample.substrate_orientation}} | Miscut: {{sample.substrate_miscut}}</p>
         {% endfor %}
     
