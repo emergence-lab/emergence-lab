@@ -1,6 +1,9 @@
+import re
+
 from django.db import models
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+
 import core.models
-import random
 
 
 class growth(models.Model):
@@ -54,7 +57,23 @@ class growth(models.Model):
     def __unicode__(self):
         return self.growth_number
 
-    # def get_absolute_url(self):
+    @staticmethod
+    def get_growth(growth_number):
+        """
+        Returns the growth associated with the growth number or raises the
+        specified exception on errors
+        """
+        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', growth_number)
+        if not m:
+            raise Exception('Growth {0} improperly formatted'.format(growth_number))
+
+        try:
+            obj = growth.objects.get(growth_number=growth_number)
+        except MultipleObjectsReturned:
+            raise Exception('Growth {0} ambiguous'.format(growth_number))
+        except ObjectDoesNotExist:
+            raise Exception('Growth {0} does not exist'.format(growth_number))
+        return obj
 
     class Meta:
         db_table = 'growths'
@@ -95,6 +114,41 @@ class sample(models.Model):
 
     def __unicode__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)
+
+    @staticmethod
+    def get_sample(sample_name, growth_object=None):
+        """
+        Returns the sample associated with the name or raises the
+        specified exception on errors.
+
+        growth_object may optionally be specified with a growth instance to
+        prevent duplicate queries.
+        """
+        # extract information from sample name
+        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', sample_name)
+        if not m:
+            raise Exception('Sample {0} improperly formatted'.format(sample_name))
+
+        # query for the growth if it wasn't specified
+        if growth_object is None:
+            growth_object = growths.get_growth(m.group(1))
+        elif growth_object.growth_number != m.group(1):
+            raise Exception('Sample {0} does not match the growth {1}'.format(sample_name, growth_object.growth_number))
+        filter_params = {'growth': growth_object}
+
+        # check if pocket or piece are specified
+        if m.group(2):
+            filter_params['pocket'] = int(m.group(2))
+        if m.group(3):
+            filter_params['piece'] = m.group(3)
+
+        try:
+            obj = sample.objects.get(**filter_params)
+        except MultipleObjectsReturned:
+            raise Exception('Sample {0} ambiguous'.format(sample_name))
+        except ObjectDoesNotExist:
+            raise Exception('Sample {0} does not exist'.format(sample_name))
+        return obj
 
     class Meta:
         db_table = 'samples'
