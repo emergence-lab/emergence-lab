@@ -9,3 +9,4 @@ sphinx_rtd_theme==0.1.6
 django-storages==1.1.8
 paramiko==1.14.0
 django-bootstrap3==4.8.2
+djangorestframework>=2.3,<3

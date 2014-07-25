@@ -3,10 +3,12 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login, logout
 import django.contrib
+from rest_framework.urlpatterns import format_suffix_patterns
 
 import core.views
 import growths.views
 import afm.views
+import afm.api
 import hall.views
 
 
@@ -36,6 +38,9 @@ urlpatterns = patterns(
     url(r'^afm/create/$', login_required(afm.views.AFMCreate.as_view()), name='afm_create'),
     url(r'^afm/(?P<pk>\d+)/update/$', login_required(afm.views.AFMUpdate.as_view()), name='afm_update'),
     url(r'^afm/(?P<pk>\d+)/delete/$', login_required(afm.views.AFMDelete.as_view()), name='afm_delete'),
+    # afm rest framework
+    url(r'^api/afm/$', afm.api.AFMListAPI.as_view()),
+    url(r'^api/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
     # hall urls
     url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
@@ -47,3 +52,5 @@ urlpatterns = patterns(
     url(r'^afm-compare/$', login_required(growths.views.afm_compare.as_view()), name='afm_compare'),
     url(r'^afm-filter/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
 )
+
+urlpatterns = format_suffix_patterns(urlpatterns)
