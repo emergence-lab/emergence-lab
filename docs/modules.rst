@@ -11,5 +11,12 @@ growths
 .. automodule:: growths.models
     :members:
 
-.. automodule:: growths.filters
+afm
+---
+.. automodule:: afm.models
+    :members:
+
+hall
+----
+.. automodule:: hall.models
     :members:
