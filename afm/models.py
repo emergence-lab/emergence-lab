@@ -30,9 +30,9 @@ class afm(models.Model):
     size = models.DecimalField(max_digits=7, decimal_places=3)
 
     height = models.ImageField(upload_to=get_afm_path, storage=labshare,
-                               max_length=150, blank=True)
+                               max_length=150, blank=True, null=True)
     amplitude = models.ImageField(upload_to=get_afm_path, storage=labshare,
-                                  max_length=150, blank=True)
+                                  max_length=150, blank=True, null=True)
 
     def __unicode__(self):
         return '{0}_{1}_{2}.{3}'.format(self.growth.growth_number,
@@ -45,3 +45,4 @@ class afm(models.Model):
 
     class Meta:
         db_table = 'afm'
+        unique_together = ('growth', 'sample', 'scan_number', 'location')
