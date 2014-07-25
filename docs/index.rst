@@ -13,6 +13,7 @@ Contents:
 
    deployment
    migrations
+   modules
 
 
 Indices and tables
