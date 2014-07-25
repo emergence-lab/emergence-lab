@@ -5,7 +5,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import TemplateView
 import time
 import growths.models
-from growths.models import growth, sample, readings, serial_number
+from growths.models import growth, sample, readings, serial_number, recipe_layer
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
@@ -330,35 +330,13 @@ class update_readings(SingleObjectMixin, TemplateView):
         return HttpResponseRedirect(reverse('update_readings', args=[self.get_object()]))
 
 
+class recipe_detail(DetailView):
+    model = growths.models.growth
+    template_name = 'growths/recipe_detail.html'
+    slug_field = 'growth_number'
+    context_object_name = 'growthobject'
 
-
-
-
-
-
-
-
-
-#     def post(request):
-#         print ("POST")
-#     def get(request, self, *args, **kwargs):
-#         print ("GET")
-#         model = growths.models.readings
-#         rform = readings_form(prefix='rform')
-#         return render(request, 'growths/update_readings.html', {'rform': rform})
-# , initial={'growth_number': self.get_object()}
-
-
-
-
-# class update_readings(UpdateView):
-#     model = growths.models.readings
-#     template_name = 'growths/update_readings.html'
-#     form_class = readings_form
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(sample_detail, self).get_context_data(**kwargs)
-#         readingobjects = readings.objects.all()
-#         lastreading = readingobjects[len(readingobjects)]
-#         lastreadings = readings.objects.filter(growth=lastreading.growth)
-#         context["readings"] = lastreadings
+    def get_context_data(self, **kwargs):
+        context = super(recipe_detail, self).get_context_data(**kwargs)
+        context["recipes"] = recipe_layer.objects.filter(growth=self.get_object())
+        return context
