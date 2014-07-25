@@ -4,6 +4,9 @@ import growths.models
 
 
 class hall(models.Model):
+    """
+    Stores hall characterization information.
+    """
     growth = models.ForeignKey(growths.models.growth)
     sample = models.ForeignKey(growths.models.sample)
     description = models.TextField(blank=True)
