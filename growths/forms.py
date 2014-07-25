@@ -91,7 +91,7 @@ class growth_form(ModelForm):
 
 
 class p_form(forms.Form):
-    add_sample = forms.BooleanField()
+    add_sample = forms.BooleanField(required=False)
 
 
 class split_form(ModelForm):

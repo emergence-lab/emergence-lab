@@ -5,7 +5,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import TemplateView
 import time
 import growths.models
-from growths.models import growth, sample, readings
+from growths.models import growth, sample, readings, serial_number
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
@@ -108,6 +108,16 @@ def create_growth(request):
                 pocket = pocket + 1
                 new_s = sf.save(growthid=new_g, pocketnum=pocket)
                 new_s.save()
+                print ("Here goes nothing")
+                if new_s.substrate_serial.startswith('wbg_'):
+                    print ("Success! It does start with 'wbg_'")
+                    entireserial = new_s.substrate_serial
+                    newserialnumber = ''
+                    for x in range(4, len(entireserial)):
+                        newserialnumber = newserialnumber + entireserial[x]
+                    newserialnumber = int(newserialnumber)
+                    sn = serial_number.objects.create(serial_number = newserialnumber)
+                    sn.save
 #                 new_s = sf.save(commit=False)
 #                 new_s.growth = new_g
 #                 new_s.save()
@@ -127,20 +137,29 @@ def create_growth(request):
         gform = growth_form(instance=growth(), initial={'growth_number': last, 'date': currenttime})
 
         # sform = [sample_form(prefix=str(x), instance=sample()) for x in range(0,6)]
-        def generate_serial():
-            return ('wbg_' + str(random.randint(100, 999)))
+
+        serialnumber = serial_number.objects.all()
+        last = serialnumber[len(serialnumber) - 1]
+        print (serial_number)
+        lastnumber = last.serial_number
+        print (lastnumber)
+        nextserial = lastnumber + 1
+
+        def generate_serial(sn):
+            return ('wbg_' + str(sn))
+
         pf_1 = p_form(prefix="pf_1")
         pf_2 = p_form(prefix="pf_2")
         pf_3 = p_form(prefix="pf_3")
         pf_4 = p_form(prefix="pf_4")
         pf_5 = p_form(prefix="pf_5")
         pf_6 = p_form(prefix="pf_6")
-        sform_1 = sample_form(instance=sample(), prefix="sform_1", initial={'substrate_serial': generate_serial})
-        sform_2 = sample_form(instance=sample(), prefix="sform_2", initial={'substrate_serial': generate_serial})
-        sform_3 = sample_form(instance=sample(), prefix="sform_3", initial={'substrate_serial': generate_serial})
-        sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial})
-        sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial})
-        sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial})
+        sform_1 = sample_form(instance=sample(), prefix="sform_1", initial={'substrate_serial': generate_serial(nextserial)})
+        sform_2 = sample_form(instance=sample(), prefix="sform_2", initial={'substrate_serial': generate_serial(nextserial + 1)})
+        sform_3 = sample_form(instance=sample(), prefix="sform_3", initial={'substrate_serial': generate_serial(nextserial + 2)})
+        sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3)})
+        sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4)})
+        sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5)})
 
     return render(request, 'growths/create_growth.html',
                   {'gform': gform, 'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
