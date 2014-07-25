@@ -15,8 +15,17 @@ class AFMListAPI(generics.ListAPIView):
 
 class AFMDetailAPI(generics.RetrieveUpdateAPIView):
     """
-    Show details, update or delete afm scan.
+    Show details or update an afm scan.
     """
     queryset = afm.objects.all()
     serializer_class = AFMSerializer
     permission_classes = (permissions.IsAuthenticated, )
+
+
+class AFMDestroyAPI(generics.DestroyAPIView):
+    """
+    Remove an afm scan
+    """
+    queryset = afm.objects.all()
+    serializer_class = AFMSerializer
+    permission_classes = (permissions.IsAdminUser, )

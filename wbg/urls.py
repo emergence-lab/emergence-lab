@@ -39,8 +39,9 @@ urlpatterns = patterns(
     url(r'^afm/(?P<pk>\d+)/update/$', login_required(afm.views.AFMUpdate.as_view()), name='afm_update'),
     url(r'^afm/(?P<pk>\d+)/delete/$', login_required(afm.views.AFMDelete.as_view()), name='afm_delete'),
     # afm rest framework
-    url(r'^api/afm/$', afm.api.AFMListAPI.as_view()),
-    url(r'^api/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
+    url(r'^api/v0/afm/$', afm.api.AFMListAPI.as_view()),
+    url(r'^api/v0/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
+    url(r'^api/v0/afm/(?P<pk>\d+)/destroy$', afm.api.AFMDestroyAPI.as_view()),
     # hall urls
     url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
