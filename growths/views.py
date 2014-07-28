@@ -213,6 +213,20 @@ def split_sample(request):
     return render(request, 'growths/split_sample.html', {'sform': sform})
 
 
+class readings_detail(DetailView):
+    model = growths.models.growth
+    template_name = 'growths/readings_detail.html'
+    slug_field = 'growth_number'
+    context_object_name = 'growth'
+
+    def get_context_data(self, **kwargs):
+        self.object = None
+        context = super(readings_detail, self).get_context_data(**kwargs)
+        context["growth"] = self.get_object()
+        context["readingslist"] = readings.objects.filter(growth=self.get_object())
+        return context
+
+
 class update_readings(SingleObjectMixin, TemplateView):
     context_object_name = 'growth'
     queryset = growth.objects.all()

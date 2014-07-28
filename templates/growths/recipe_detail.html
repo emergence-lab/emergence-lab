@@ -1,0 +1,59 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{growthobject}} recipe{%endblock%}
+
+{% block content %}
+
+<div class="container">
+    <h1><a href="{% url 'growth_detail' growthobject %}">{{growthobject}}</a> recipe</h1>
+        <div class="row">
+            {% for recipe in recipes %}
+            <div class="col-xs-2">
+            <h3>Layer: {{recipe.layer_num}}</h3>
+            <p>Loop Number: {{recipe.loop_num}}</p>
+            <p>Loop Repeats: {{recipe.loop_repeats}}</p>
+            <p>Time: {{recipe.time}}</p>
+            <p>cp2mg flow: {{recipe.cp2mg_flow}}</p>
+            <p>tmin flow 1/2: {{tmin1_flow}}/{{tmin2_flow}}</p>
+            <p>tmga flow 1/2: {{tmga1_flow}}/{{tmga2_flow}}</p>
+            <p>tmal flow: {{tmal1_flow}}</p>
+            <p>tega flow: {{tega1_flow}}</p>
+            <p>cp2mg press: {{cp2mg_press}}</p>
+            <p>tmin press 1/2: {{tmin_press}}/{{tmin2_press}}</p>
+            <p>tmga press 1/2: {{tmga1_press}}/{{tmga2_press}}</p>
+            <p>tmal press: {{tmal1_press}}</p>
+            <p>tega press: {{tmga1_press}}</p>
+            <p>cp2mg push: {{cp2mg_push}}</p>
+            <p>hyd outer/inner: {{hyd_outer}}/{{hyd_inner}}</p>
+            <p>top vp: {{top_vp}}</p>
+            <p>ring purge: {{ring_purge}}</p>
+            <p>alk inj press: {{alk_inj_press}}</p>
+            <p>alk diff press: {{alk_diff_press}}</p>
+            <p>alk inj push: {{alk_inj_push}}</p>
+            <p>alk vent push: {{alk_vent_push}}</p>
+            <p>motor rpm: {{motor_rpm}}</p>
+            <p>sub_temp_outer: {{sub_temp_outer}}</p>
+            <p>sub_temp_inner: {{sub_temp_inner}}</p>
+            <p>n2_flow: {{n2_flow}}</p>
+            <p>gc_press: {{gc_press}}</p>
+            <p>h2_flow: {{h2_flow}}</p>
+            <p>nh3_flow: {{nh3_flow}}</p>
+            <p>sih4_flow: {{sih4_flow}}</p>
+            <p>spare_1: {{spare_1}}</p>
+            <p>sih4_push: {{sih4_push}}</p>
+            <p>sih4_dd: {{sih4_dd}}</p>
+            <p>sih4_press: {{sih4_press}}</p>
+            <p>gc_purge: {{gc_purge}}</p>
+            <p>alk outer/middle/inner: {{alk_outer}}/{{alk_middle}}/{{alk_inner}}</p>
+            <p>hyd line press: {{hyd_line_press}}</p>
+            <p>tmin mol frac 1/2: {{tmin1_mol_frac}}/{{tmin2_mol_frac}}</p>
+            <p>nh3 cond: {{nh3_cond}}</p>
+            <p>h2n2 switch: {{h2n2_switch}}</p>
+            <p>Alk Push inner/middle/outer: {{recipe.alk_push_inner}}/{{recipe.alk_push_middle}}/{{recipe.alk_push_outer}}</p>
+            </div>
+            {% endfor %}
+        </div>
+    <a class="btn btn-default" href="{% url 'growth_detail' growthobject %}">Back to {{growthobject}}</a>
+</div>
+<p> </p>
+{% endblock %}
