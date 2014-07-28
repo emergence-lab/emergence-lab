@@ -11,6 +11,7 @@
 
     <h3>Growth Info</h3>
     <p><a class="btn btn-primary" href="{% url 'recipe_detail' growthobject %}">Recipe Info</a></p>
+    <p><a class="btn btn-primary" href="{%url 'readings_detail' growthobject %}">Readings Info</a></p>
     <p>Date: {{growthobject.date}}</p>
     <p>Operator: {{growthobject.operator}}</p>
     <p>Project: {{growthobject.project}}</p>
@@ -50,5 +51,6 @@
 
     <a class="btn btn-default" href="{% url 'afm_filter' %}">Back</a>
 </div>
-
+<p> </p>
 {% endblock %}
+

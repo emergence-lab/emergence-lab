@@ -19,11 +19,12 @@
         </div>
         {% endfor %}
     </div>
-<input id="update_readings" type="submit" value="Update" name="readingsform"/>
+<button class="btn btn-warning pull-right" id="update_readings" type="submit" name="updatereadingsform">Update Readings</button>
 </form>
 
-<a href="{% url 'home' %}">home</a>
+<a class="btn btn-default" href="{% url 'home' %}">home</a>
 
 </div>
-
+<p> </p>
 {% endblock %}
+
