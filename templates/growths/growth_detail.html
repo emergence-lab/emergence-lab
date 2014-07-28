@@ -13,13 +13,13 @@
     <h3>Growth Info</h3>
     <p><a class="btn btn-primary" href="{% url 'recipe_detail' growthobject %}">Recipe Info</a></p>
     <p><a class="btn btn-primary" href="{%url 'readings_detail' growthobject %}">Readings Info</a></p>
-    <p>Date: {{growthobject.date}}</p>
-    <p>Operator: {{growthobject.operator}}</p>
-    <p>Project: {{growthobject.project}}</p>
-    <p>Investigation: {{growthobject.investigation}}</p>
-    <p>Platter: {{growthobject.platter}}</p>
-    <p>Reactor: {{growthobject.reactor}}</p>
-    <p>Comments: {{growthobject.run_comments}}</p>
+    <p><strong>Date: </strong>{{growthobject.date}}</p>
+    <p><strong>Operator: </strong>{{growthobject.operator}}</p>
+    <p><strong>Project: </strong>{{growthobject.project}}</p>
+    <p><strong>Investigation: </strong>{{growthobject.investigation}}</p>
+    <p><strong>Platter: </strong>{{growthobject.platter}}</p>
+    <p><strong>Reactor: </strong>{{growthobject.reactor}}</p>
+    <p><strong>Comments: </strong>{{growthobject.run_comments}}</p>
 
     <h3>Materials</h3>
     <ul>
@@ -46,7 +46,7 @@
     <h3>Samples</h3>
         {% for sample in samples %}
         <a class="btn btn-primary" href="{% url 'sample_detail' sample.id %}">Sample: {{sample.id}}</a>
-        <p>Growth: {{sample.growth}} | Pocket: {{sample.pocket}} | Piece: {{sample.piece}} | Size: {{sample.size}} | Substrate Type: {{sample.substrate_type}} | Serial Number: {{sample.substrate_serial}} | Location: {{sample.location}} | Orientation: {{sample.substrate_orientation}} | Miscut: {{sample.substrate_miscut}}</p>
+        <p><strong>Growth:</strong> {{sample.growth}} | <strong>Pocket:</strong> {{sample.pocket}} | <strong>Piece:</strong> {{sample.piece}} | <strong>Size:</strong> {{sample.size}} | <strong>Substrate Type:</strong> {{sample.substrate_type}} | <strong>Serial Number:</strong> {{sample.substrate_serial}} | <strong>Location:</strong> {{sample.location}} | <strong>Orientation:</strong> {{sample.substrate_orientation}} | <strong>Miscut:</strong> {{sample.substrate_miscut}}</p>
         {% endfor %}
     
 
