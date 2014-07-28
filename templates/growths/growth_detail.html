@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
-{% block title %}{{growthobject}}{%endblock%}
+{% block title %}{{growthobject}} Info{%endblock%}
 
 {% block content %}
 
@@ -49,7 +50,7 @@
         {% endfor %}
     
 
-    <a class="btn btn-default" href="{% url 'afm_filter' %}">Back</a>
+<a class="btn btn-default" href="{% url 'afm_filter' %}">Back</a>
 </div>
 <p> </p>
 {% endblock %}
