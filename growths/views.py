@@ -138,11 +138,8 @@ def create_growth(request):
 
         # sform = [sample_form(prefix=str(x), instance=sample()) for x in range(0,6)]
 
-        serialnumber = serial_number.objects.all()
-        last = serialnumber[len(serialnumber) - 1]
-        print (serial_number)
+        last = serial_number.objects.latest('id')
         lastnumber = last.serial_number
-        print (lastnumber)
         nextserial = lastnumber + 1
 
         def generate_serial(sn):
