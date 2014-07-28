@@ -9,7 +9,7 @@ from growths.models import growth, sample, readings, serial_number, recipe_layer
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
-from growths.forms import growth_form, sample_form, p_form, split_form, readings_form
+from growths.forms import growth_form, sample_form, p_form, split_form, readings_form, prerun_checklist_form
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -351,3 +351,62 @@ class recipe_detail(DetailView):
         context = super(recipe_detail, self).get_context_data(**kwargs)
         context["recipes"] = recipe_layer.objects.filter(growth=self.get_object())
         return context
+
+
+def create_growth_prerun(request):
+    if request.method == "POST":
+        print ("Now entering... The POST STAGE!!!")
+        pcform = prerun_checklist_form(request.POST, prefix='pcform')
+        if pcform.is_valid():
+            print ("WAHOOOOOOOO")
+    else:
+        print ("You are requesting information from this page (fyi).")
+        pcform = prerun_checklist_form(prefix='pcform')
+    return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform})
+
+
+
+def split_sample(request):
+    if request.method == "POST":
+        print ("entering POST stage.")
+        sform = split_form(request.POST, prefix='sform')
+        if sform.is_valid():
+            numberofpieces = sform.cleaned_data['pieces']
+            sampletosplit = sform.cleaned_data['parent']
+            print (sampletosplit)
+            serialnumber = sampletosplit.substrate_serial
+            print ("serial number: " + serialnumber)
+            allsamples = sample.objects.filter(substrate_serial=serialnumber)
+            dictionarylist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                              'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+            numberofsamples = len(allsamples)
+            # raise Exception("I don't know what you did, but you sure screwed something up.")
+            if numberofsamples == 1:
+                print ("This is the first sample to split")
+                sample.objects.filter(substrate_serial=serialnumber).update(piece=dictionarylist[numberofsamples - 1])
+            else:
+                print ('There are ' + str(numberofsamples) + ' samples that already exist')
+            for i in range(0, numberofpieces - 1):
+                newsplit = sample(growth=sampletosplit.growth, pocket=sampletosplit.pocket,
+                                  parent=sampletosplit.parent, size=sampletosplit.size,
+                                  location=sampletosplit.location,
+                                  substrate_type=sampletosplit.substrate_type,
+                                  substrate_serial=sampletosplit.substrate_serial,
+                                  substrate_orientation=sampletosplit.substrate_orientation,
+                                  substrate_miscut=sampletosplit.substrate_miscut,
+                                  substrate_comment=sampletosplit.substrate_comment)
+                newsplit.piece = dictionarylist[i + numberofsamples]
+                print (newsplit)
+                print (newsplit.piece)
+                newsplit.save()
+                if sampletosplit.parent == sampletosplit:
+                    newsplit.parent = newsplit
+                    newsplit.save()
+
+            return HttpResponseRedirect(reverse('growth_detail', args=[sampletosplit.growth]))
+
+    else:
+        model = growths.models.sample
+        print("split sample page accessed")
+        sform = split_form(prefix='sform')
+    return render(request, 'growths/split_sample.html', {'sform': sform})

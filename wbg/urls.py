@@ -45,7 +45,12 @@ urlpatterns = patterns(
     url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
     url(r'^splitsample/$', login_required(growths.views.split_sample), name='split_sample'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
+
+#     url(r'^creategrowth/start/$', login_required(growths.views.create_growth_start), name='create_growthstart'),
+    url(r'^creategrowth/prerun/$', login_required(growths.views.create_growth_prerun), name='create_growth_prerun'),
+#     url(r'^creategrowth/readings/$', login_required(growths.views.create_growth_readings), name='create_growth_readings'),
+#     url(r'^creategrowth/postrun/$', login_required(growths.view.create_growth_postrun), name='create_growth_postrun'),
     # advanced views
     url(r'^afm-compare/$', login_required(growths.views.afm_compare.as_view()), name='afm_compare'),
     url(r'^afm-filter/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
-)
+    )

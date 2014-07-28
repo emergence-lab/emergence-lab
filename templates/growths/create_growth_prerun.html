@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Create Growth Prerun{% endblock %}
+
+{% block content %}
+
+<div class="container">
+<h1>Prerun Checklist</h1>
+
+<form action="{% url 'create_growth_prerun' %}" method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-5">
+    <ul>
+        {% bootstrap_form pcform %}
+    </ul>
+        </div>
+    </div>
+
+<button class="btn btn-success pull-right" id="create_growth" type="submit" name="creategrowthform">Submit and Continue to Readings</button>
+
+
+</form>
+
+<a class="btn btn-default" href="{% url 'home' %}">back</a>
+
+</div>
+<p> </p>
+{% endblock %}
+
