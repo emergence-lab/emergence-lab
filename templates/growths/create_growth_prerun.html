@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="container">
-<h1>Pre-run Checklist</h1>
+<h1>Pre-run Growth Info & Checklist</h1>
 
 <form action="{% url 'create_growth_prerun' %}" method="POST">
     {% csrf_token %}
@@ -21,7 +21,11 @@
         <ul>
         {% bootstrap_form pcform %}
         </ul>
-        </div>        
+        <h3>Source Consumption</h3>
+        <ul>
+            {% bootstrap_form sourceform %}
+        </ul>
+        </div>
     </div>
     <div class="row">
     <div class="col-xs-4">
@@ -69,6 +73,7 @@
     </ul>
     </div>
     </div>
+
 
 <button class="btn btn-success pull-right" id="create_growth" type="submit" name="creategrowthform">Submit and Continue to Readings</button>
 
