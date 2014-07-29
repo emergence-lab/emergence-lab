@@ -41,7 +41,6 @@ urlpatterns = patterns(
     # afm rest framework
     url(r'^api/v0/afm/$', afm.api.AFMListAPI.as_view()),
     url(r'^api/v0/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
-    url(r'^api/v0/afm/(?P<pk>\d+)/destroy$', afm.api.AFMDestroyAPI.as_view()),
     # hall urls
     url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
