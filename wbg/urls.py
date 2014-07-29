@@ -33,7 +33,8 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.growth_detail.as_view()), name='growth_detail'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/recipe/$', login_required(growths.views.recipe_detail.as_view()), name='recipe_detail'),
     url(r'^sample/(?P<pk>\d+)/$', login_required(growths.views.SampleDetailView.as_view()), name='sample_detail'),
-    url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/view/$', login_required(growths.views.readings_detail.as_view()), name='readings_detail'),
+    url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/$', login_required(growths.views.readings_detail.as_view()), name='readings_detail'),
+    url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
     # afm urls
     url(r'^afm/$', login_required(afm.views.AFMList.as_view()), name='afm_list'),
     url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.AFMDetail.as_view()), name='afm_detail'),
@@ -49,7 +50,6 @@ urlpatterns = patterns(
     # creategrowth urls
     url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
     url(r'^splitsample/$', login_required(growths.views.split_sample), name='split_sample'),
-    url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
 
     url(r'^creategrowth/start/$', login_required(growths.views.create_growth_start), name='create_growth_start'),
     url(r'^creategrowth/prerun/$', login_required(growths.views.create_growth_prerun), name='create_growth_prerun'),

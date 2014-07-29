@@ -6,7 +6,13 @@
 {% block content %}
 
 <div class="container">
-<h2><a href="{% url 'growth_detail' growth %}">{{growth}}</a> readings</h2>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
+        <li class="active">Readings</li>
+    </ol>
+
+    <a href="{% url 'update_readings' growth %}" class="btn btn-warning">Edit</a>
+
     <div class="row">
 
         {% for reading in readingslist %}
@@ -60,9 +66,6 @@
         {% endfor %}
     </div>
 
-<p><a class="btn btn-default" href="{% url 'growth_detail' growth %}">Back to {{growth}}</a></p>
-
 </div>
-<p> </p>
-{% endblock %}
 
+{% endblock %}

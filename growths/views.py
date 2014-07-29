@@ -333,7 +333,7 @@ class recipe_detail(DetailView):
     model = growths.models.growth
     template_name = 'growths/recipe_detail.html'
     slug_field = 'growth_number'
-    context_object_name = 'growthobject'
+    context_object_name = 'growth'
 
     def get_context_data(self, **kwargs):
         context = super(recipe_detail, self).get_context_data(**kwargs)
