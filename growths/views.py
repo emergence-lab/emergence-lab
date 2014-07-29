@@ -1,20 +1,17 @@
-from django.shortcuts import render
-from django.views.generic import DetailView, ListView, CreateView, UpdateView
+import time
+
+from django.shortcuts import render, render_to_response
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView
 from django.views.generic.edit import ProcessFormView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic import TemplateView
-import time
-import growths.models
-from growths.models import growth, sample, readings, serial_number, recipe_layer
-import afm.models
-from .filters import growth_filter, RelationalFilterView
-import re
-from growths.forms import growth_form, sample_form, p_form, split_form, readings_form
-from growths.forms import prerun_checklist_form, start_growth_form, prerun_growth_form
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
-import random
+
+from .models import growth, sample, readings, serial_number, recipe_layer
+from .filters import growth_filter, RelationalFilterView
+from .forms import growth_form, sample_form, p_form, split_form, readings_form
+from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form
+import afm.models
 
 
 class growth_list(RelationalFilterView):
@@ -32,7 +29,7 @@ class afm_compare(ListView):
 
 
 class growth_detail(DetailView):
-    model = growths.models.growth
+    model = growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
     context_object_name = 'growth'
@@ -44,7 +41,7 @@ class growth_detail(DetailView):
 
 
 class SampleDetailView(DetailView):
-    model = growths.models.sample
+    model = sample
     template_name = 'growths/sample_detail.html'
     context_object_name = 'sample'
 
@@ -113,7 +110,7 @@ def create_growth(request):
             return HttpResponseRedirect(reverse('growth_detail', args=[new_g.growth_number]))
     else:
         num_items = 0
-        model = growths.models.growth
+        model = growth
         query = model.objects.all()
         last = str(query[len(query) - 1])
         last_int = ''
@@ -192,14 +189,14 @@ def split_sample(request):
             return HttpResponseRedirect(reverse('growth_detail', args=[sampletosplit.growth]))
 
     else:
-        model = growths.models.sample
+        model = sample
         print("split sample page accessed")
         sform = split_form(prefix='sform')
     return render(request, 'growths/split_sample.html', {'sform': sform})
 
 
 class readings_detail(DetailView):
-    model = growths.models.growth
+    model = growth
     template_name = 'growths/readings_detail.html'
     slug_field = 'growth_number'
     context_object_name = 'growth'
@@ -330,7 +327,7 @@ class update_readings(SingleObjectMixin, TemplateView):
 
 
 class recipe_detail(DetailView):
-    model = growths.models.growth
+    model = growth
     template_name = 'growths/recipe_detail.html'
     slug_field = 'growth_number'
     context_object_name = 'growth'
@@ -352,7 +349,7 @@ def create_growth_start(request):
     else:
         print ("GET request incoming")
         num_items = 0
-        model = growths.models.growth
+        model = growth
         query = model.objects.all()
         last = str(query[len(query) - 1])
         last_int = ''
