@@ -94,6 +94,40 @@ class p_form(forms.Form):
     add_sample = forms.BooleanField(required=False)
 
 
+class start_growth_form(ModelForm):
+    class Meta:
+        model = growth
+        fields = ['growth_number', 'date', 'operator', 'project', 'investigation',
+                  'platter', 'reactor']
+
+
+class prerun_growth_form(ModelForm):
+    class Meta:
+        model = growth
+        exclude = ['growth_number', 'date', 'operator']
+
+
+class prerun_checklist_form(forms.Form):
+    field_1 = forms.BooleanField(required=True, label="Is Run Ready? Comments Updated?")
+    field_2 = forms.BooleanField(required=True, label="Engage Load Lock Routine?")
+    field_3 = forms.BooleanField(required=True, label="Load the wafers (Note Substrate number / Run number / Single side / Double side in space provided below)?")
+    field_4 = forms.BooleanField(required=True, label="Close LL?")
+    field_5 = forms.BooleanField(required=True, label="Check from recipe the required Alkyl Sources and make sure they are open?")
+    field_6 = forms.BooleanField(required=True, label="Check from recipe the required Hydrides(including Silane) and make sure they are open?")
+    field_7 = forms.BooleanField(required=True, label="Check and note LL Pressure (must be < 1E-5)?")
+    field_8 = forms.BooleanField(required=True, label="Engage Gate Valve Routing? Open Front VP and Shutter?")
+    field_9 = forms.BooleanField(required=True, label="Transfer wafer carrier to the reactor?")
+    field_10 = forms.BooleanField(required=True, label="Check for Rotation?")
+    field_11 = forms.BooleanField(required=True, label="Close Gate Valve, Front VP and Shutter?")
+    field_12 = forms.BooleanField(required=True, label="System IDLE? Correct Recipe Loaded? Power Supply On? Motor on Auto? GC Pressure Remote?")
+    field_13 = forms.BooleanField(required=True, label="Start the Run?")
+    field_14 = forms.BooleanField(required=True, label="Start the Epimetric?")
+
+
+class prerun_sources_form(forms.Form):
+    field_1 = forms.BooleanField(required=True, label="Need to figure out sources")
+
+
 class split_form(ModelForm):
     pieces = forms.IntegerField(label="Number of pieces", validators=[validate_not_zero])
     parent = forms.CharField(label="Sample to split")
