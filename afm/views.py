@@ -22,6 +22,12 @@ class AFMDetail(DetailView):
     model = afm
     template_name = 'afm/afm_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(AFMDetail, self).get_context_data(**kwargs)
+        context['sample_siblings'] = [a for a in afm.objects.filter(sample=self.get_object().sample).exclude(id=self.get_object().id)]
+        context['growth_siblings'] = [a for a in afm.objects.filter(growth=self.get_object().growth).exclude(sample=self.get_object().sample).order_by('sample')]
+        return context
+
 
 class AFMCreate(CreateView):
     """
