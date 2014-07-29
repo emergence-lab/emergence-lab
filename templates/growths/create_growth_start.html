@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Start Growth{%endblock%}
+
+{% block content %}
+
+<div class="container">
+<h1>Start Growth</h1>
+<form action="" method="POST">
+{% csrf_token %}
+    <div class="row">
+        <div class="col-xs-5">
+        <ul>
+        {% bootstrap_form cgsform %}
+        </ul>
+        </div>
+    </div>
+    <div class="row">
+
+<button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+</form>
+<a class="btn btn-default" href="{% url 'home' %}">back</a>
+    </div>
+</div>
+<p> </p>
+{% endblock %}
+

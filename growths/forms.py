@@ -94,6 +94,19 @@ class p_form(forms.Form):
     add_sample = forms.BooleanField(required=False)
 
 
+class start_growth_form(ModelForm):
+    class Meta:
+        model = growth
+        fields = ['growth_number', 'date', 'operator', 'project', 'investigation',
+                  'platter', 'reactor']
+
+
+class prerun_growth_form(ModelForm):
+    class Meta:
+        model = growth
+        exclude = ['growth_number', 'date', 'operator']
+
+
 class prerun_checklist_form(forms.Form):
     field_1 = forms.BooleanField(required=True, label="Is Run Ready? Comments Updated?")
     field_2 = forms.BooleanField(required=True, label="Engage Load Lock Routine?")
@@ -109,6 +122,10 @@ class prerun_checklist_form(forms.Form):
     field_12 = forms.BooleanField(required=True, label="System IDLE? Correct Recipe Loaded? Power Supply On? Motor on Auto? GC Pressure Remote?")
     field_13 = forms.BooleanField(required=True, label="Start the Run?")
     field_14 = forms.BooleanField(required=True, label="Start the Epimetric?")
+
+
+class prerun_sources_form(forms.Form):
+    field_1 = forms.BooleanField(required=True, label="Need to figure out sources")
 
 
 class split_form(ModelForm):
