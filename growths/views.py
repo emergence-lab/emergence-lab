@@ -35,7 +35,7 @@ class growth_detail(DetailView):
     model = growths.models.growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
-    context_object_name = 'growthobject'
+    context_object_name = 'growth'
 
     def get_context_data(self, **kwargs):
         context = super(growth_detail, self).get_context_data(**kwargs)
@@ -43,38 +43,25 @@ class growth_detail(DetailView):
         return context
 
 
-class sample_detail(DetailView):
+class SampleDetailView(DetailView):
     model = growths.models.sample
     template_name = 'growths/sample_detail.html'
     context_object_name = 'sample'
 
     def get_context_data(self, **kwargs):
-        context = super(sample_detail, self).get_context_data(**kwargs)
-        context["sample"] = self.get_object()
-        parentlist = []
-        nextobject = self.get_object()
-        loopcounter = 0
-        while nextobject.parent != nextobject:
-            print (nextobject.parent)
-            print (nextobject)
-            parentlist.append(nextobject.parent)
-            nextobject = nextobject.parent
-            loopcounter = loopcounter + 1
-            if loopcounter > 5:
-                raise Exception("Whoa there pal. Hold your horses.")
-        context["parents"] = parentlist
-        siblings = sample.objects.filter(growth=(self.get_object()).growth)
-        siblinglist = []
-        for sibling in siblings:
-            if sibling != self.get_object():
-                siblinglist.append(sibling)
-        context["siblings"] = siblinglist
-        children = sample.objects.filter(parent=self.get_object())
-        childlist = []
-        for child in children:
-            if child.parent != child:
-                childlist.append(child)
-        context["children"] = childlist
+        context = super(SampleDetailView, self).get_context_data(**kwargs)
+
+        parents = []
+        obj = context['sample']
+        while obj.parent != obj:
+            parents.append(obj.parent)
+            obj = obj.parent
+        obj = context['sample']
+        
+        context['parents'] = parents[::-1]  # show in reverse order
+        context['siblings'] = sample.objects.filter(growth=obj.growth).exclude(pk=obj.id)
+        context['children'] = sample.objects.filter(parent=obj).exclude(pk=obj.id)
+
         return context
 
 

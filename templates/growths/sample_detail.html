@@ -11,43 +11,37 @@
         <li class="active">{{sample}}</li>
     </ol>
 
-    <h1>{{sample}}</h1>
+    <div class="row">
+        <h1>{{sample}}</h1>
+        <div class="col-xs-2">
+            <h3>Sample Info</h3>
+            <p><strong>Growth: </strong>{{sample.growth}}</p>
+            <p><strong>Pocket: </strong>{{sample.pocket}}</p>
+            <p><strong>Piece: </strong>{{sample.piece}}</p>
+            <p><strong>Size: </strong>{{sample.get_size_display}}</p>
+            <p><strong>Location: </strong>{{sample.location}}</p>
+            <p><strong>Substrate Type: </strong>{{sample.get_substrate_type_display}}</p>
+            <p><strong>Serial Number: </strong>{{sample.substrate_serial}}</p>
+            <p><strong>Orientation: </strong>{{sample.substrate_orientation}}</p>
+            <p><strong>Miscut: </strong>{{sample.substrate_miscut}}</p>
+            <p><strong>Comments: </strong>{{sample.substrate_comment}}</p>
+        </div>
 
-    <div class="col-xs-2">
-
-    <h3>Sample Info</h3>
-    <p><strong>Sample id: </strong>{{sample.id}}</p>
-    <p><strong>Growth: </strong>{{sample.growth}}</p>
-    <p><strong>Pocket: </strong>{{sample.pocket}}</p>
-    <p><strong>Piece: </strong>{{sample.piece}}</p>
-    <p><strong>Size: </strong>{{sample.size}}</p>
-    <p><strong>Location: </strong>{{sample.location}}</p>
-    <p><strong>Substrate Type: </strong>{{sample.substrate_type}}</p>
-    <p><strong>Serial Number: </strong>{{sample.substrate_serial}}</p>
-    <p><strong>Orientation: </strong>{{sample.substrate_orientation}}</p>
-    <p><strong>Miscut: </strong>{{sample.substrate_miscut}}</p>
-    <p><strong>Comments: </strong>{{sample.substrate_comment}}</p>
-    <p><a class="btn btn-default" href="{% url 'growth_detail' sample.growth %}">Back to {{sample.growth}}</a></p>
-
+        <div class="col-xs-2">
+            <h3>Parents</h3>
+            {% for parent in parents %}
+            <p><a class="btn btn-primary" href="{% url 'sample_detail' parent.id %}">{{parent}}</a></p>
+            {% endfor %}
+            <h3>Siblings</h3>
+            {% for sibling in siblings %}
+            <p><a class="btn btn-primary" href="{% url 'sample_detail' sibling.id %}">{{sibling}}</a></p>
+            {% endfor %}
+            <h3>Children</h3>
+            {% for child in children %}
+            <p><a class="btn btn-primary" href="{% url 'sample_detail' child.id %}">{{child}}</a></p>
+            {% endfor %}
+        </div>
     </div>
-
-    <div class="col-xs-2">
-
-    <h3>Parents</h3>
-    {% for parent in parents %}
-    <p><a class="btn btn-primary" href="{% url 'sample_detail' parent.id %}">{{parent}}</a></p>
-    {% endfor %}
-    <h3>Siblings</h3>
-    {% for sibling in siblings %}
-    <p><a class="btn btn-primary" href="{% url 'sample_detail' sibling.id %}">{{sibling}}</a></p>
-    {% endfor %}
-    <h3>Children</h3>
-    {% for child in children %}
-    <p><a class="btn btn-primary" href="{% url 'sample_detail' child.id %}">{{child}}</a></p>
-    {% endfor %}
-
-    </div>
-
 </div>
 
 {% endblock %}
