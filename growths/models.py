@@ -288,3 +288,24 @@ class recipe_layer(models.Model):
 
     class Meta:
         db_table = 'recipe_layers'
+
+class source(models.Model):
+    """
+    Stores information on source consumption
+    """
+    cp2mg = models.DecimalField(max_digits=7, decimal_places=2)
+    tmin1 = models.DecimalField(max_digits=7, decimal_places=2)
+    tmin2 = models.DecimalField(max_digits=7, decimal_places=2)
+    tmga1 = models.DecimalField(max_digits=7, decimal_places=2)
+    tmga2 = models.DecimalField(max_digits=7, decimal_places=2)
+    tmal1 = models.DecimalField(max_digits=7, decimal_places=2)
+    tega1 = models.DecimalField(max_digits=7, decimal_places=2)
+    nh3 = models.DecimalField(max_digits=9, decimal_places=2)
+    sih4 = models.DecimalField(max_digits=9, decimal_places=2)
+    date_time = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return self.date_time
+
+    class Meta:
+        db_table = 'sources'
