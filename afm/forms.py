@@ -12,8 +12,10 @@ class afm_form(forms.ModelForm):
     """
     Form for creating or updating afm data.
     """
-    growth = forms.CharField()
-    sample = forms.CharField()
+    growth = forms.CharField(max_length=10)
+    sample = forms.CharField(max_length=20)
+    height = forms.CharField(max_length=150, required=False)
+    amplitude = forms.CharField(max_length=150, required=False)
 
     def clean_growth(self):
         """

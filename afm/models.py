@@ -39,7 +39,6 @@ class afm(models.Model):
                                         self.sample.pocket, self.location,
                                         str(self.scan_number).zfill(3))
 
-
     def get_absolute_url(self):
         return reverse('afm_detail', args=(self.id, ))
 
