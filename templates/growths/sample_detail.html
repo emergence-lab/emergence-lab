@@ -6,6 +6,11 @@
 {% block content %}
 
 <div class="container">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'growth_detail' slug=sample.growth.growth_number %}">{{sample.growth}}</a></li>
+        <li class="active">{{sample}}</li>
+    </ol>
+
     <h1>{{sample}}</h1>
 
     <div class="col-xs-2">
