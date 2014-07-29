@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
-from growths.models import growth, sample, readings
+from growths.models import growth, sample, readings, source
 import time
 import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -124,8 +124,21 @@ class prerun_checklist_form(forms.Form):
     field_14 = forms.BooleanField(required=True, label="Start the Epimetric?")
 
 
-class prerun_sources_form(forms.Form):
-    field_1 = forms.BooleanField(required=True, label="Need to figure out sources")
+class prerun_sources_form(ModelForm):
+    class Meta:
+        model = source
+
+
+class postrun_checklist_form(forms.Form):
+    field_1 = forms.BooleanField(required=True, label="Wait for system to IDLE?")
+    field_2 = forms.BooleanField(required=True, label="Save Epimetric data?")
+    field_3 = forms.BooleanField(required=True, label="Engage Gate Valve Routine? Open Front VP and Shutter?")
+    field_4 = forms.BooleanField(required=True, label="Transfer Wafer carrier from the Reactor to LL?")
+    field_5 = forms.BooleanField(required=True, label="Close Gate Valve?")
+    field_6 = forms.BooleanField(required=True, label="Check and note LL Pressure(must be < 1E-5)?")
+    field_7 = forms.BooleanField(required=True, label="Engage LL Routine?")
+    field_8 = forms.BooleanField(required=True, label="Unload the wafers and updated comments and observations in the space provided below? Close LL?")
+    field_9 = forms.BooleanField(required=True, label="Close Bubblers if done using them?")
 
 
 class split_form(ModelForm):

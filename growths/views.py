@@ -5,12 +5,12 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import TemplateView
 import time
 import growths.models
-from growths.models import growth, sample, readings, serial_number, recipe_layer
+from growths.models import growth, sample, readings, serial_number, recipe_layer, source
 import afm.models
 from .filters import growth_filter, RelationalFilterView
 import re
 from growths.forms import growth_form, sample_form, p_form, split_form, readings_form
-from growths.forms import prerun_checklist_form, start_growth_form, prerun_growth_form
+from growths.forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -383,6 +383,7 @@ def create_growth_prerun(request):
         print ("Now entering... The POST STAGE!!!")
         pcform = prerun_checklist_form(request.POST, prefix='pcform')
         pgform = prerun_growth_form(request.POST, prefix='pgform')
+        sourceform = prerun_sources_form(request.POST, prefix="sourceform")
         pf_1 = p_form(request.POST, prefix="pf_1")
         pf_2 = p_form(request.POST, prefix="pf_2")
         pf_3 = p_form(request.POST, prefix="pf_3")
@@ -402,7 +403,7 @@ def create_growth_prerun(request):
             if (pforms[x]).has_changed():
                 print("The form has changed!!")
                 sforms_list.append(sforms[x])
-        if pcform.is_valid() and pgform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
+        if pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
             print ("PRERUN SUCCESS")
             newproject = pgform.cleaned_data['project']
             newinvestigation = pgform.cleaned_data['investigation']
@@ -449,7 +450,8 @@ def create_growth_prerun(request):
                         newserialnumber = newserialnumber + entireserial[x]
                     newserialnumber = int(newserialnumber)
                     sn = serial_number.objects.create(serial_number = newserialnumber)
-                    sn.save
+                    sn.save()
+            sourceform.save()
         return HttpResponseRedirect(reverse('create_growth_readings'))
 
 
@@ -479,10 +481,11 @@ def create_growth_prerun(request):
         sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3)})
         sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4)})
         sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5)})
+        sourceform = prerun_sources_form(prefix="sourceform")
     return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
                     'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
                    'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
-                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6 })
+                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, 'sourceform': sourceform})
 
 
 class create_growth_readings(SingleObjectMixin, TemplateView):
@@ -605,3 +608,12 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
                                    cp2mg_dilution=newcp2mg_dilution, silane_flow=newsilane_flow, silane_dilution=newsilane_dilution,
                                    silane_mix=newsilane_mix, silane_pressure=newsilane_pressure)
         return HttpResponseRedirect(reverse('create_growth_readings'))
+
+
+def create_growth_postrun(request):
+    if request.method == "POST":
+        print ("post request")
+    else:
+        print ("get request")
+        prcform = postrun_checklist_form(prefix='prcform')
+    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform})

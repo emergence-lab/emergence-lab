@@ -54,7 +54,7 @@ urlpatterns = patterns(
     url(r'^creategrowth/start/$', login_required(growths.views.create_growth_start), name='create_growth_start'),
     url(r'^creategrowth/prerun/$', login_required(growths.views.create_growth_prerun), name='create_growth_prerun'),
     url(r'^creategrowth/readings/$', login_required(growths.views.create_growth_readings.as_view()), name='create_growth_readings'),
-#     url(r'^creategrowth/postrun/$', login_required(growths.view.create_growth_postrun), name='create_growth_postrun'),
+    url(r'^creategrowth/postrun/$', login_required(growths.view.create_growth_postrun), name='create_growth_postrun'),
     # advanced views
     url(r'^afm-compare/$', login_required(growths.views.afm_compare.as_view()), name='afm_compare'),
     url(r'^afm-filter/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),

@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Create Growth Postrun{% endblock %}
+
+{% block content %}
+
+<div class="container">
+<h1>Post-run Growth Info & Checklist</h1>
+
+<form action="{% url 'create_growth_prerun' %}" method="POST">
+    {% csrf_token %}
+        <ul>
+        {% bootstrap_form pgform %}
+        </ul>
+</form>
+<a class="btn btn-default" href="{% url 'home' %}">Home</a>
+<p> </p>
+</div>
+{% endblock %}
+
