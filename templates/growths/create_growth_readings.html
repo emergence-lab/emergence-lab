@@ -6,29 +6,22 @@
 {% block content %}
 
 <div class="container">
-<h2>Create Growth Readings {{growth}}</h2>
-<form action="" method="POST">
-{% csrf_token %}
+    <h2>Create Growth Readings {{growth}} <button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button></h2>
+    <form action="" method="POST">
+    {% csrf_token %}
     <div class="row">
-
         {% for reading in readingslist %}
         <div class="col-xs-2">
-        {% bootstrap_form reading %}
+            {% bootstrap_form reading %}
         </div>
         {% endfor %}
     </div>
-
-<button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button>
-
-</form>
-
-<a class="btn btn-default" href="{% url 'home' %}">Home</a>
-<p> </p>
-<div class="col-xs-12">
-<a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
+    </form>
+    <div class="row">
+        <a class="btn btn-danger" href="{% url 'home' %}">Home</a>
+        <a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
+    </div>
 </div>
-
-</div>
-<p> </p>
+<br>
 {% endblock %}
 

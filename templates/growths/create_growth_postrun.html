@@ -3,24 +3,47 @@
 
 {% block title %}Create Growth Postrun{% endblock %}
 
+{% block header %}
+    {% load staticfiles %}
+    <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
-<h1>Post-run Growth Info & Checklist</h1>
-
-<form action="{% url 'create_growth_postrun' %}" method="POST">
-    {% csrf_token %}
-        <ul>
-        {% bootstrap_form prcform %}
+    <h1>Post-run Growth Info & Checklist</h1>
+    
+    <div id="content">
+        <ul id="tabs" class="nav nav-tabs" role="tablist">
+            <li class="active"><a role="tab" data-toggle="tab" href="#checklist">Checklist</a></li>
+            <li><a role="tab" data-toggle="tab" href="#source">Source Info</a></li>
         </ul>
-        <ul>
-        {% bootstrap_form prsform %}
-        </ul>
-<button class="btn btn-success pull-right" id="create_growth_postrun" type="submit" name="creategrowthpostrunform">Submit and Complete Growth</button>
+    
+        <form class="tab-content" action="{% url 'create_growth_postrun' %}" method="POST">
+        {% csrf_token %}
+            <div class="tab-pane fade in active" id="checklist">
+                <h2>Growth Information</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form prcform %}
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="source">
+                <h2>Source Consumption</h2>
+                <div class="row">
+                    <div class="col-xs-4">
+                        {% bootstrap_form prsform %}
+                    </div>
+                </div>
+            </div>
+        <button class="btn btn-success pull-right" id="create_growth_postrun" type="submit" name="creategrowthpostrunform">Submit and Complete Growth</button>
 
-</form>
-<a class="btn btn-default" href="{% url 'home' %}">Home</a>
-<p> </p>
+        </form>
+        <a class="btn btn-danger" href="{% url 'home' %}">Home</a>
+    </div>
 </div>
+<br>
 {% endblock %}
 
