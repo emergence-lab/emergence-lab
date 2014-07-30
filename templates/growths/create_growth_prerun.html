@@ -12,127 +12,94 @@
 {% block content %}
 
 <div class="container">
-<h1>Pre-run Growth Info & Checklist</h1>
+    <h1>Pre-run Growth Info &amp; Checklist</h1>
 
     <div id="content">
         <ul id="tabs" class="nav nav-tabs" role="tablist">
-          <li class="active"><a role="tab" data-toggle="tab" href="#growth">Growth Info</a></li>
-          <li><a role="tab" data-toggle="tab" href="#sample">Sample Info</a></li>
-          <li><a role="tab" data-toggle="tab" href="#checklist">Checklist</a></li>
-          <li><a role="tab" data-toggle="tab" href="#source">Source Info</a></li>
+            <li class="active"><a role="tab" data-toggle="tab" href="#growth">Growth Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#sample">Sample Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#checklist">Checklist</a></li>
+            <li><a role="tab" data-toggle="tab" href="#source">Source Info</a></li>
         </ul>
 
-        <div id="my-tab-content" class="tab-content">
-        <form action="{% url 'create_growth_prerun' %}" method="POST">
-            {% csrf_token %}
+        <form class="tab-content" action="{% url 'create_growth_prerun' %}" method="POST">
+        {% csrf_token %}
 
-            <div class="tab-pane active" id="growth">
+            <div class="tab-pane fade in active" id="growth">
                 <h2>Growth Information</h2>
                 <div class="row">
                     <div class="col-xs-5">
-                <ul>
-                {% bootstrap_form pgform %}
-                </ul>
+                        {% bootstrap_form pgform %}
                     </div>
                 </div>
-
             </div>
 
-            <div class="tab-pane" id="sample">
+            <div class="tab-pane fade" id="sample">
                 <h2>Sample Information</h2>
                 <div class="row">
                     <div class="col-xs-4">
-                    <h3> Sample 1 </h3>
-                    <ul>
+                        <h3>Sample 1</h3>
                         {% bootstrap_form pf_1 %}
                         {% bootstrap_form sform_1 %}
-                    </ul>
                     </div>
 
                     <div class="col-xs-4">
-                    <h3> Sample 2 </h3>
-                    <ul>
+                        <h3>Sample 2</h3>
                         {% bootstrap_form pf_2 %}
                         {% bootstrap_form sform_2 %}
-                    </ul>
                     </div>
 
                     <div class="col-xs-4">
-                    <h3> Sample 3 </h3>
-                    <ul>
+                        <h3>Sample 3</h3>
                         {% bootstrap_form pf_3 %}
                         {% bootstrap_form sform_3 %}
-                    </ul>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-xs-4">
-                    <h3> Sample 4 </h3>
-                    <ul>
+                        <h3>Sample 4</h3>
                         {% bootstrap_form pf_4 %}
                         {% bootstrap_form sform_4 %}
-                    </ul>
                     </div>
 
                     <div class="col-xs-4">
-                    <h3> Sample 5 </h3>
-                    <ul>
+                        <h3>Sample 5</h3>
                         {% bootstrap_form pf_5 %}
                         {% bootstrap_form sform_5 %}
-                    </ul>
                     </div>
 
                     <div class="col-xs-4">
-                    <h3> Sample 6 </h3>
-                    <ul>
+                        <h3>Sample 6</h3>
                         {% bootstrap_form pf_6 %}
                         {% bootstrap_form sform_6 %}
-                    </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="tab-pane" id="checklist">
+            <div class="tab-pane fade" id="checklist">
                 <h2>Pre-run Checklist</h2>
-                <ul>
                 <div class="row">
                     <div class="col-xs-5">
                     {% bootstrap_form pcform %}
-                </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="tab-pane" id="source">
-
+            <div class="tab-pane fade" id="source">
                 <h2>Source Consumption</h2>
-                <ul>
                 <div class="row">
                     <div class="col-xs-5">
-                    {% bootstrap_form sourceform %}
-                </ul>
+                        {% bootstrap_form sourceform %}
                     </div>
                 </div>
-
             </div>
 
+            <button class="btn btn-success pull-right" id="create_growth" type="submit" name="creategrowthform">Submit and Continue to Readings</button>
+        </form>
 
-        </div>
-
-    <button class="btn btn-success pull-right" id="create_growth" type="submit" name="creategrowthform">Submit and Continue to Readings</button>
-
-    </form>
-    <a class="btn btn-danger" href="{% url 'create_growth_start' %}">Don't Click This</a>
+        <a class="btn btn-danger" href="{% url 'create_growth_start' %}">Don't Click This</a>
     </div>
-<script type="text/javascript">
-    $('#tabs a').click(function (e) {
-      e.preventDefault()
-      $(this).tab('show')
-    })
-</script>
-
 </div>
-<p> </p>
-{% endblock %}
 
+{% endblock %}
