@@ -12,6 +12,7 @@ from .filters import growth_filter, RelationalFilterView
 from .forms import growth_form, sample_form, p_form, split_form, readings_form
 from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 import afm.models
+import hall.models
 from core.views import SessionHistoryMixin
 
 
@@ -29,15 +30,17 @@ class afm_compare(ListView):
         return objects
 
 
-class growth_detail(SessionHistoryMixin, DetailView):
+class GrowthDetailView(SessionHistoryMixin, DetailView):
     model = growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
     context_object_name = 'growth'
 
     def get_context_data(self, **kwargs):
-        context = super(growth_detail, self).get_context_data(**kwargs)
-        context["samples"] = sample.objects.filter(growth=self.get_object())
+        context = super(GrowthDetailView, self).get_context_data(**kwargs)
+        context['samples'] = sample.objects.filter(growth=context['object'])
+        context['char_afm'] = afm.models.afm.objects.filter(growth=context['object'])
+        context['char_hall'] = hall.models.hall.objects.filter(growth=context['object'])
         return context
 
 
@@ -59,6 +62,9 @@ class SampleDetailView(SessionHistoryMixin, DetailView):
         context['parents'] = parents[::-1]  # show in reverse order
         context['siblings'] = sample.objects.filter(growth=obj.growth).exclude(pk=obj.id)
         context['children'] = sample.objects.filter(parent=obj).exclude(pk=obj.id)
+
+        context['char_afm'] = afm.models.afm.objects.filter(sample=context['object'])
+        context['char_hall'] = hall.models.hall.objects.filter(sample=context['object'])
 
         return context
 
