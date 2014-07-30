@@ -8,11 +8,16 @@
 <div class="container">
 <h1>Post-run Growth Info & Checklist</h1>
 
-<form action="{% url 'create_growth_prerun' %}" method="POST">
+<form action="{% url 'create_growth_postrun' %}" method="POST">
     {% csrf_token %}
         <ul>
-        {% bootstrap_form pgform %}
+        {% bootstrap_form prcform %}
         </ul>
+        <ul>
+        {% bootstrap_form prsform %}
+        </ul>
+<button class="btn btn-success pull-right" id="create_growth_postrun" type="submit" name="creategrowthpostrunform">Submit and Complete Growth</button>
+
 </form>
 <a class="btn btn-default" href="{% url 'home' %}">Home</a>
 <p> </p>

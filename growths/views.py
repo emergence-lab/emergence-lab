@@ -7,10 +7,10 @@ from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
-from .models import growth, sample, readings, serial_number, recipe_layer
+from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
 from .forms import growth_form, sample_form, p_form, split_form, readings_form
-from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form
+from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 import afm.models
 from core.views import SessionHistoryMixin
 
@@ -55,7 +55,7 @@ class SampleDetailView(SessionHistoryMixin, DetailView):
             parents.append(obj.parent)
             obj = obj.parent
         obj = context['sample']
-        
+
         context['parents'] = parents[::-1]  # show in reverse order
         context['siblings'] = sample.objects.filter(growth=obj.growth).exclude(pk=obj.id)
         context['children'] = sample.objects.filter(parent=obj).exclude(pk=obj.id)
@@ -460,12 +460,12 @@ def create_growth_prerun(request):
         pf_4 = p_form(prefix="pf_4")
         pf_5 = p_form(prefix="pf_5")
         pf_6 = p_form(prefix="pf_6")
-        sform_1 = sample_form(instance=sample(), prefix="sform_1", initial={'substrate_serial': generate_serial(nextserial)})
-        sform_2 = sample_form(instance=sample(), prefix="sform_2", initial={'substrate_serial': generate_serial(nextserial + 1)})
-        sform_3 = sample_form(instance=sample(), prefix="sform_3", initial={'substrate_serial': generate_serial(nextserial + 2)})
-        sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3)})
-        sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4)})
-        sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5)})
+        sform_1 = sample_form(instance=sample(), prefix="sform_1", initial={'substrate_serial': generate_serial(nextserial), 'location': ('Lab')})
+        sform_2 = sample_form(instance=sample(), prefix="sform_2", initial={'substrate_serial': generate_serial(nextserial + 1), 'location': ('Lab')})
+        sform_3 = sample_form(instance=sample(), prefix="sform_3", initial={'substrate_serial': generate_serial(nextserial + 2), 'location': ('Lab')})
+        sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3), 'location': ('Lab')})
+        sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4), 'location': ('Lab')})
+        sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5), 'location': ('Lab')})
         sourceform = prerun_sources_form(prefix="sourceform")
     return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
                     'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
@@ -598,7 +598,32 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
 def create_growth_postrun(request):
     if request.method == "POST":
         print ("post request")
+        prcform = postrun_checklist_form(request.POST, prefix='prcform')
+        prsform = prerun_sources_form(request.POST, prefix='prsform')
+        if prcform.is_valid() and prsform.is_valid():
+            print ("successful validation. Now let's do something.")
+            lastgrowth = growth.objects.latest('id')
+            lastgrowth = growth.objects.filter(id=lastgrowth.id)
+            lastgrowth = lastgrowth[0]
+            return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
         print ("get request")
+        lastsource = source.objects.latest('id')
+        lastsource = source.objects.filter(id=lastsource.id)
+        lastsource = lastsource[0]
+        newcp2mg = lastsource.cp2mg
+        newtmin1 = lastsource.tmin1
+        newtmin2 = lastsource.tmin2
+        newtmga1 = lastsource.tmga1
+        newtmga2 = lastsource.tmga2
+        newtmal1 = lastsource.tmal1
+        newtega1 = lastsource.tega1
+        newnh3 = lastsource.nh3
+        newsih4 = lastsource.sih4
+        newdate_time = lastsource.date_time
         prcform = postrun_checklist_form(prefix='prcform')
-    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform})
+        prsform = prerun_sources_form(prefix='prsform', initial={'cp2mg': newcp2mg, 'tmin1': newtmin1,
+                        'tmin2': newtmin2, 'tmga1': newtmga1, 'tmga2': newtmga2, 'tmal1': newtmal1,
+                        'tega1': newtega1, 'nh3': newnh3, 'sih4': newsih4, 'date_time': newdate_time})
+    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform})
+
