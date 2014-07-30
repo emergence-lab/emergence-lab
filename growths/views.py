@@ -12,9 +12,10 @@ from .filters import growth_filter, RelationalFilterView
 from .forms import growth_form, sample_form, p_form, split_form, readings_form
 from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form
 import afm.models
+from core.views import SessionHistoryMixin
 
 
-class growth_list(RelationalFilterView):
+class growth_list(SessionHistoryMixin, RelationalFilterView):
     filterset_class = growth_filter
     template_name = 'growths/growth_filter.html'
 
@@ -28,7 +29,7 @@ class afm_compare(ListView):
         return objects
 
 
-class growth_detail(DetailView):
+class growth_detail(SessionHistoryMixin, DetailView):
     model = growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
@@ -40,7 +41,7 @@ class growth_detail(DetailView):
         return context
 
 
-class SampleDetailView(DetailView):
+class SampleDetailView(SessionHistoryMixin, DetailView):
     model = sample
     template_name = 'growths/sample_detail.html'
     context_object_name = 'sample'
@@ -195,7 +196,7 @@ def split_sample(request):
     return render(request, 'growths/split_sample.html', {'sform': sform})
 
 
-class readings_detail(DetailView):
+class readings_detail(SessionHistoryMixin, DetailView):
     model = growth
     template_name = 'growths/readings_detail.html'
     slug_field = 'growth_number'
@@ -326,7 +327,7 @@ class update_readings(SingleObjectMixin, TemplateView):
         return HttpResponseRedirect(reverse('update_readings', args=[self.get_object()]))
 
 
-class recipe_detail(DetailView):
+class recipe_detail(SessionHistoryMixin, DetailView):
     model = growth
     template_name = 'growths/recipe_detail.html'
     slug_field = 'growth_number'

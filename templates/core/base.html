@@ -34,6 +34,15 @@
         </header>
     </nav>
 
+    {% if breadcrumb %}
+        <ol class="breadcrumb">
+            <li>History</li>
+        {% for page in breadcrumb %}
+            <li><a href="{{page}}">{{page}}</a></li>
+        {% endfor %}
+        </ol>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 

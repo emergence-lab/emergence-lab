@@ -9,6 +9,31 @@ from django.views.generic import CreateView, ListView, TemplateView
 from .models import investigation, operator, platter, project
 
 
+class SessionHistoryMixin(object):
+    max_history = 5
+    request = None
+
+    def add_breadcrumb_history(self, request):
+        history = request.session.get('breadcrumb_history', [])
+
+        if not history or history[-1] != request.path:
+            history.append(request.path)
+
+        if len(history) > self.max_history:
+            history.pop(0)
+
+        request.session['breadcrumb_history'] = history
+        return history
+
+    def get_context_data(self, **kwargs):
+        kwargs['breadcrumb'] = self.add_breadcrumb_history(self.request)
+        return super(SessionHistoryMixin, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        return super(SessionHistoryMixin, self).dispatch(request, *args, **kwargs)
+        
+
 class ActiveListView(ListView):
     """
     View to handle models using the active and inactive manager.
