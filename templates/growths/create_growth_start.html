@@ -28,10 +28,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Are You Sure?</h4>
+                    <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
                 </div>
                 <div class="modal-body">
-                    If you start a new growth you will NOT be able to return to this page!!
+                    WARNING: If you start a new growth now you will NOT be able to return to this page!!
+                    (If this form is not complete you will not be able to continue to the next page)
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -42,11 +43,11 @@
     </div>
 
         
-</form>
-        <button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal">
-        Start New Growth
-        </button>
-        <a class="btn btn-default" href="{% url 'home' %}">Back</a>
+    </form>
+    <button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal">
+    Start New Growth
+    </button>
+    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
 
 </div>
 <br>
