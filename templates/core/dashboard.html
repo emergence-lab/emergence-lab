@@ -9,7 +9,16 @@
         <div class="col-xs-6">
             <h4 class="page-header">Quick Links</h4>
             <ul>
-                <li><a class="btn btn-primary" href="#">My Projects</a></li>
+                {% if projects %}
+                <li>
+                    My Projects
+                    <ul>
+                    {% for project in projects %}
+                        <li><a class="btn btn-sm btn-default" href="#">{{project}}</a></li>
+                    {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
                 <li><a class="btn btn-primary" href="{% url 'create_growth_start' %}">Growth Wizard</a></li>
                 <li><a class="btn btn-primary" href="{% url 'afm_filter' %}">Sample Lookup</a></li>
             </ul>

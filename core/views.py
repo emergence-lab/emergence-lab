@@ -64,6 +64,8 @@ class Dashboard(DetailView):
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
         context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
+        projects = growth.objects.filter(operator=self.object).values_list('project', flat=True).distinct()
+        context['projects'] = project.objects.filter(id__in=projects)
         return context
 
     def get_object(self, queryset=None):
