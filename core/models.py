@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 
@@ -18,24 +19,6 @@ class inactive_manager(models.Manager):
     """
     def get_queryset(self):
         return super(inactive_manager, self).get_queryset().filter(active=False)
-
-
-class operator(models.Model):
-    """
-    Stores operator information.
-    """
-    name = models.CharField(max_length=45)
-    active = models.BooleanField(default=True)
-
-    objects = models.Manager()
-    current = active_manager()
-    retired = inactive_manager()
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'operators'
 
 
 class platter(models.Model):
@@ -95,3 +78,23 @@ class investigation(models.Model):
 
     class Meta:
         db_table = 'investigations'
+
+
+class operator(models.Model):
+    """
+    Stores operator information.
+    """
+    name = models.CharField(max_length=45)
+    active = models.BooleanField(default=True)
+    user = models.OneToOneField(User)
+    projects = models.ManyToManyField(project)
+
+    objects = models.Manager()
+    current = active_manager()
+    retired = inactive_manager()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'operators'

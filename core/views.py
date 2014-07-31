@@ -52,6 +52,13 @@ class homepage(TemplateView):
     template_name = "core/index.html"
 
 
+class Dashboard(TemplateView):
+    """
+    Main dashboard for the user with commonly used actions.
+    """
+    template_name = 'core/dashboard.html'
+
+
 def protected_media(request, filename):
     fullpath = os.path.join(settings.MEDIA_ROOT, filename)
     response = HttpResponse(mimetype='image/jpeg')
