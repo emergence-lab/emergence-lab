@@ -447,6 +447,21 @@ def create_growth_prerun(request):
         pgform = prerun_growth_form(prefix='pgform', initial={'project': gentered.project,
                 'investigation': gentered.investigation, 'platter': gentered.platter,
                 'reactor': gentered.reactor})
+
+        lastsource = source.objects.latest('id')
+        lastsource = source.objects.filter(id=lastsource.id)
+        lastsource = lastsource[0]
+        newcp2mg = lastsource.cp2mg
+        newtmin1 = lastsource.tmin1
+        newtmin2 = lastsource.tmin2
+        newtmga1 = lastsource.tmga1
+        newtmga2 = lastsource.tmga2
+        newtmal1 = lastsource.tmal1
+        newtega1 = lastsource.tega1
+        newnh3 = lastsource.nh3
+        newsih4 = lastsource.sih4
+        newdate_time = lastsource.date_time
+
         last = serial_number.objects.latest('id')
         lastnumber = last.serial_number
         nextserial = lastnumber + 1
@@ -466,7 +481,9 @@ def create_growth_prerun(request):
         sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3), 'location': ('Lab')})
         sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4), 'location': ('Lab')})
         sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5), 'location': ('Lab')})
-        sourceform = prerun_sources_form(prefix="sourceform")
+        sourceform = prerun_sources_form(prefix='sourceform', initial={'cp2mg': newcp2mg, 'tmin1': newtmin1,
+                        'tmin2': newtmin2, 'tmga1': newtmga1, 'tmga2': newtmga2, 'tmal1': newtmal1,
+                        'tega1': newtega1, 'nh3': newnh3, 'sih4': newsih4, 'date_time': newdate_time})
     return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
                     'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
                    'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
