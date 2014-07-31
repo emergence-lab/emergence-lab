@@ -42,6 +42,26 @@
             {% endfor %}
         </div>
     </div>
+
+    <h3>Characterization</h3>
+    {% if char_afm %}
+    <h4>AFM</h4>
+    <ul>
+    {% for afm in char_afm %}
+        <li><a href="{% url 'afm_detail' afm.id %}">{{afm}}</a></li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if char_hall %}
+    <h4>Hall</h4>
+    <ul>
+    {% for hall in char_hall %}
+        <li><a href="{% url 'hall_detail' hall.id %}">{{hall}}</a></li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
 </div>
 
 {% endblock %}

@@ -77,6 +77,21 @@
         {% endfor %}
     </table>
 
+    <h3>Characterization</h3>
+    <h4>AFM</h4>
+    <ul>
+    {% for afm in char_afm %}
+        <li><a href="{% url 'afm_detail' afm.id %}">{{afm}}</a></li>
+    {% endfor %}
+    </ul>
+
+    <h4>Hall</h4>
+    <ul>
+    {% for hall in char_hall %}
+        <li><a href="{% url 'hall_detail' hall.id %}">{{hall}}</a></li>
+    {% endfor %}
+    </ul>
+
     <a class="btn btn-default" href="{% url 'afm_filter' %}">Growth List</a>
 
 </div>

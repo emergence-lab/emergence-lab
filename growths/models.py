@@ -101,7 +101,7 @@ class sample(models.Model):
     ]
 
     growth = models.ForeignKey(growth)
-    pocket = models.IntegerField(default=1)
+    pocket = models.CharField(max_length=10, default='1')
     parent = models.ForeignKey('self', blank=True, null=True)
     piece = models.CharField(max_length=5, blank=True)  # i.e. abcd...
     size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='whole')
@@ -110,7 +110,7 @@ class sample(models.Model):
     substrate_serial = models.CharField(max_length=20, blank=True)  # wafer serial or growth number
     substrate_orientation = models.CharField(max_length=10, default='0001')
     substrate_miscut = models.DecimalField(max_digits=4, decimal_places=1, default=0)
-    substrate_comment = models.CharField(max_length=100, blank=True)
+    comment = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)

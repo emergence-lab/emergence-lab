@@ -4,9 +4,15 @@
 
 {% block content %}
 <div class="container">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'growth_detail' slug=hall.growth.growth_number %}">{{hall.growth}}</a></li>
+        <li><a href="{% url 'sample_detail' pk=hall.sample.id %}">{{hall.sample}}</a></li>
+        <li class="active">{{hall}}</li>
+    </ol>
+
     <h3>
         Hall Data: {{object}}
-        <a class="btn btn-primary" href="">Update</a>
+        <a class="btn btn-warning" href="">Update</a>
         <a class="btn btn-danger" href="">Delete</a>
     </h3>
 

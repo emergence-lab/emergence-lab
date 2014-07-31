@@ -35,9 +35,9 @@ class afm(models.Model):
                                   max_length=150, blank=True, null=True)
 
     def __unicode__(self):
-        return '{0}_{1}_{2}.{3}'.format(self.growth.growth_number,
-                                        self.sample.pocket, self.location,
-                                        str(self.scan_number).zfill(3))
+        return '{0}_{1}{2}_{3}.{4}'.format(self.growth.growth_number,
+                                        self.sample.pocket, self.sample.piece,
+                                        self.location, str(self.scan_number).zfill(3))
 
     def get_absolute_url(self):
         return reverse('afm_detail', args=(self.id, ))
