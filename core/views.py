@@ -4,9 +4,10 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse
-from django.views.generic import CreateView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 
 from .models import investigation, operator, platter, project
+from growths.models import growth
 
 
 class SessionHistoryMixin(object):
@@ -52,11 +53,25 @@ class homepage(TemplateView):
     template_name = "core/index.html"
 
 
-class Dashboard(TemplateView):
+class Dashboard(DetailView):
     """
     Main dashboard for the user with commonly used actions.
     """
     template_name = 'core/dashboard.html'
+    model = operator
+    object = None
+
+    def get_context_data(self, **kwargs):
+        context = super(Dashboard, self).get_context_data(**kwargs)
+        context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
+        return context
+
+    def get_object(self, queryset=None):
+        return self.object
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = operator.objects.get(user=request.user)
+        return super(Dashboard, self).dispatch(request, *args, **kwargs)
 
 
 def protected_media(request, filename):

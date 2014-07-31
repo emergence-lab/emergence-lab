@@ -22,6 +22,7 @@
             </a>
             <ul class="nav navbar-nav">
                 <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
             </ul>
             {% if user.is_anonymous %}
             <a href="{% url 'login' %}?next={{request.get_full_path|urlencode}}" class="navbar-right">Login</a>
