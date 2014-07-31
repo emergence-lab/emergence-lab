@@ -38,9 +38,9 @@ class GrowthDetailView(SessionHistoryMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(GrowthDetailView, self).get_context_data(**kwargs)
-        context['samples'] = sample.objects.filter(growth=context['object'])
-        context['char_afm'] = afm.models.afm.objects.filter(growth=context['object'])
-        context['char_hall'] = hall.models.hall.objects.filter(growth=context['object'])
+        context['samples'] = sample.objects.filter(growth=context['object']).order_by('pocket')
+        context['char_afm'] = afm.models.afm.objects.filter(growth=context['object']).order_by('sample__pocket', 'sample__piece', 'location', 'scan_number')
+        context['char_hall'] = hall.models.hall.objects.filter(growth=context['object']).order_by('sample__pocket', 'sample__piece', 'date')
         return context
 
 
@@ -60,11 +60,11 @@ class SampleDetailView(SessionHistoryMixin, DetailView):
         obj = context['sample']
 
         context['parents'] = parents[::-1]  # show in reverse order
-        context['siblings'] = sample.objects.filter(growth=obj.growth).exclude(pk=obj.id)
-        context['children'] = sample.objects.filter(parent=obj).exclude(pk=obj.id)
+        context['siblings'] = sample.objects.filter(growth=obj.growth).exclude(pk=obj.id).order_by('-growth__growth_number', 'pocket', 'piece')
+        context['children'] = sample.objects.filter(parent=obj).exclude(pk=obj.id).order_by('-growth__growth_number', 'pocket', 'piece')
 
-        context['char_afm'] = afm.models.afm.objects.filter(sample=context['object'])
-        context['char_hall'] = hall.models.hall.objects.filter(sample=context['object'])
+        context['char_afm'] = afm.models.afm.objects.filter(sample=context['object']).order_by('sample__pocket', 'sample__piece', 'location', 'scan_number')
+        context['char_hall'] = hall.models.hall.objects.filter(sample=context['object']).order_by('sample__pocket', 'sample__piece', 'date')
 
         return context
 
