@@ -65,6 +65,7 @@ class project(models.Model):
     """
     name = models.CharField(max_length=45)
     active = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
 
     objects = models.Manager()
     current = active_manager()
