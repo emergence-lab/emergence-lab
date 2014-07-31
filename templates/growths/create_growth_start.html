@@ -2,11 +2,18 @@
 {% load bootstrap3 %}
 
 {% block title %}Start Growth{%endblock%}
+{% block header %}
+    {% load staticfiles %}
+    <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+
+{% endblock %}
 
 {% block content %}
 
 <div class="container">
 <h1>Start Growth</h1>
+
 <form action="" method="POST">
 {% csrf_token %}
     <div class="row">
@@ -15,13 +22,32 @@
         {% bootstrap_form cgsform %}
         </ul>
         </div>
+    </div>       
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Are You Sure?</h4>
+                </div>
+                <div class="modal-body">
+                    If you start a new growth you will NOT be able to return to this page!!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="row">
 
-<button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+        
 </form>
-<a class="btn btn-default" href="{% url 'home' %}">Back</a>
-    </div>
+        <button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal">
+        Start New Growth
+        </button>
+        <a class="btn btn-default" href="{% url 'home' %}">Back</a>
+
 </div>
 <br>
 {% endblock %}
