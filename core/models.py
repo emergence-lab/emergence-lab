@@ -87,7 +87,6 @@ class operator(models.Model):
     name = models.CharField(max_length=45)
     active = models.BooleanField(default=True)
     user = models.OneToOneField(User)
-    projects = models.ManyToManyField(project)
 
     objects = models.Manager()
     current = active_manager()
