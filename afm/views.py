@@ -25,8 +25,9 @@ class AFMDetail(SessionHistoryMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AFMDetail, self).get_context_data(**kwargs)
-        context['sample_siblings'] = [a for a in afm.objects.filter(sample=self.get_object().sample).exclude(id=self.get_object().id)]
-        context['growth_siblings'] = [a for a in afm.objects.filter(growth=self.get_object().growth).exclude(sample=self.get_object().sample).order_by('sample')]
+        context['sample_siblings'] = [a for a in afm.objects.filter(sample=self.get_object().sample).exclude(id=self.get_object().id).order_by('location', 'scan_number')]
+        context['pocket_siblings'] = [a for a in afm.objects.filter(growth=self.get_object().growth, sample__pocket=self.get_object().sample.pocket).exclude(id=self.get_object().id).exclude(sample=self.get_object().sample).order_by('sample__piece', 'location', 'scan_number')]
+        context['growth_siblings'] = [a for a in afm.objects.filter(growth=self.get_object().growth).exclude(sample__pocket=self.get_object().sample.pocket).exclude(sample=self.get_object().sample).order_by('sample').order_by('sample__growth', 'sample__piece', 'location', 'scan_number')]
         return context
 
 

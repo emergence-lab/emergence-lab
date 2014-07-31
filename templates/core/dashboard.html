@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="page-header">Welcome {{operator.name}}</h3>
+    <div class="row">
+        <div class="col-xs-6">
+            <h4 class="page-header">Quick Links</h4>
+            <ul>
+                <li><a class="btn btn-primary" href="#">My Projects</a></li>
+                <li><a class="btn btn-primary" href="{% url 'create_growth_start' %}">Growth Wizard</a></li>
+                <li><a class="btn btn-primary" href="{% url 'afm_filter' %}">Sample Lookup</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-6">
+            <h4 class="page-header">Recent Growths</h4>
+            <ul>
+            {% for growth in growths %}
+                <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

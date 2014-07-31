@@ -29,23 +29,32 @@
     {% endif %}
 
     <div>
-        {% if growth_siblings %}
-        <h4>
-            Scans for {{afm.growth}}
-            <a class="btn btn-primary" href="{% url 'growth_detail' slug=afm.growth.growth_number %}">Growth Details</a>
-        </h4>
-        {% for sibling in growth_siblings %}
-        <a class="btn btn-default" href="{% url 'afm_detail' pk=sibling.id %}">{{sibling}}</a>
-        {% endfor %}
-        {% endif %}
-
         {% if sample_siblings %}
         <h4>
             Scans for {{afm.sample}}
             <a class="btn btn-primary" href="{% url 'sample_detail' pk=afm.sample.id %}">Sample Details</a>
         </h4>
         {% for sibling in sample_siblings %}
-        <a class="btn btn-default" href="{% url 'afm_detail' pk=sibling.id %}">{{sibling}}</a>
+        <a class="btn btn-sm btn-default" href="{% url 'afm_detail' pk=sibling.id %}">{{sibling}}</a>
+        {% endfor %}
+        {% endif %}
+
+        {% if pocket_siblings %}
+        <h4>
+            Scans for {{afm.growth}}_{{afm.sample.pocket}}
+        </h4>
+        {% for sibling in pocket_siblings %}
+        <a class="btn btn-sm btn-default" href="{% url 'afm_detail' pk=sibling.id %}">{{sibling}}</a>
+        {% endfor %}
+        {% endif %}
+
+        {% if growth_siblings %}
+        <h4>
+            Scans for {{afm.growth}}
+            <a class="btn btn-primary" href="{% url 'growth_detail' slug=afm.growth.growth_number %}">Growth Details</a>
+        </h4>
+        {% for sibling in growth_siblings %}
+        <a class="btn btn-sm btn-default" href="{% url 'afm_detail' pk=sibling.id %}">{{sibling}}</a>
         {% endfor %}
         {% endif %}
     </div>

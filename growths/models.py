@@ -125,7 +125,7 @@ class sample(models.Model):
         prevent duplicate queries.
         """
         # extract information from sample name
-        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', sample_name)
+        m = re.match('([gt][1-9][0-9]{3,})(?:\_([0-9]+(?:\-[0-9]+))([a-z]*))?', sample_name)
         if not m:
             raise Exception('Sample {0} improperly formatted'.format(sample_name))
 
