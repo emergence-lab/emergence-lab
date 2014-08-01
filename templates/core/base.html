@@ -13,6 +13,12 @@
     {% block header %}
     {% endblock %}
     <title>{% block title %}{% endblock %}</title>
+
+    <!-- HTML5/CSS3 support on older IE -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.msxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.msxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 
 <body>
