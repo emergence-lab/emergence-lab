@@ -16,23 +16,40 @@
 <body>
 
     <nav class="navbar navbar-default" role="navigation">
-        <header class="container-fluid">
-            <a href="/" class="logo navbar-left">
-                <img src="{% static 'core/img/logo.png' %}" alt="logo">
-            </a>
-            <ul class="nav navbar-nav">
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
-            </ul>
-            {% if user.is_anonymous %}
-            <a href="{% url 'login' %}?next={{request.get_full_path|urlencode}}" class="navbar-right">Login</a>
-            {% else %}
-            <div class="navbar-right">
-                {{user}}
-                <a href="{% url 'logout' %}">Logout</a>
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#wbg-navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/" class="logo navbar-left">
+                    <img src="{% static 'core/img/logo.png' %}" alt="WBG">
+                </a>
             </div>
-            {% endif %}
-        </header>
+
+            <div id="wbg-navbar-collapse" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+                </ul>
+                {% if user.is_anonymous %}
+                <a class="navbar-right navbar-link" href="{% url 'login' %}?next={{request.get_full_path|urlencode}}">Login</a>
+                {% else %}
+                <p class="navbar-right navbar-text">{{user}}
+                <a class="navbar-link" href="{% url 'logout' %}">Logout</a>
+                </p>
+                <form class="navbar-form navbar-right" role="search" action="{% url 'quicksearch' %}">
+                    <div class="input-group">
+                        <input type="text" name="growth" class="form-control" placeholder="Search Growth Number">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                        </span>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
     </nav>
 
     {% if breadcrumb %}
