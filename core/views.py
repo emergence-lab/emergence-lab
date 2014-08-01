@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse
-from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView
 
 from .models import investigation, operator, platter, project
 from growths.models import growth
@@ -33,7 +33,7 @@ class SessionHistoryMixin(object):
     def dispatch(self, request, *args, **kwargs):
         self.request = request
         return super(SessionHistoryMixin, self).dispatch(request, *args, **kwargs)
-        
+
 
 class ActiveListView(ListView):
     """
@@ -44,6 +44,18 @@ class ActiveListView(ListView):
         context['active_list'] = self.model.current.all()
         context['inactive_list'] = self.model.retired.all()
         return context
+
+
+class QuickSearchRedirect(RedirectView):
+    pattern_name = 'growth_detail'
+
+    def get_redirect_url(self, *args, **kwargs):
+        growth_number = self.request.GET.get('growth', None)
+        try:
+            growth.objects.get(growth_number=growth_number)
+        except:
+            return reverse('afm_filter')
+        return reverse(self.pattern_name, args=(growth_number,))
 
 
 class homepage(TemplateView):
@@ -64,6 +76,8 @@ class Dashboard(DetailView):
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
         context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
+        projects = growth.objects.filter(operator=self.object).values_list('project', flat=True).distinct()
+        context['projects'] = project.objects.filter(id__in=projects)
         return context
 
     def get_object(self, queryset=None):
