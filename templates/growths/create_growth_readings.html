@@ -2,13 +2,25 @@
 {% load bootstrap3 %}
 
 {% block title %}Create Growth Readings{%endblock%}
+{% block header %}
+    {% load staticfiles %}
+    <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
+    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+
+{% endblock %}
 
 {% block content %}
 
 <div class="container">
     <form action="" method="POST">
-    <h2>Create Growth Readings {{growth}} <button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button></h2>
+    <h1>Create Growth Readings {{growth}} <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button></h1>
     {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-12">
+            <button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button>
+        </div>
+    </div>
+    <br>
     <div class="row">
         {% for reading in readingslist %}
         <div class="col-xs-2">
@@ -16,30 +28,53 @@
         </div>
         {% endfor %}
     </div>
-    </form>
-    <div class="row">
-        <button class="btn btn-success pull-right" type="button" data-toggle="modal" data-target="#myModal">
-        Submit go to post-run
-        </button>
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
-                    </div>
-                    <div class="modal-body">
-                        WARNING: If you leave this page you will not be able to go back!!
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
-                    </div>
+
+     <button class="btn btn-success pull-right" data-toggle="modal" type="button" data-target="#myModal">
+    Submit and go to post-run
+    </button>
+        
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
+                </div>
+                <div class="modal-body">
+                    WARNING: Any unsubmitted changes will NOT be saved!!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Update Readings and Comments</button>
+                    <a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="commentsmodal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="commentsModalLabel">Edit comments</h4>
+                </div>
+                <div class="modal-body">
+                    {% bootstrap_form commentscontext %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </form>
+   
+    
 </div>
+
+</script>
 <br>
 {% endblock %}
 

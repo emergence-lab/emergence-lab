@@ -99,12 +99,24 @@ class start_growth_form(ModelForm):
         model = growth
         fields = ['growth_number', 'date', 'operator', 'project', 'investigation',
                   'platter', 'reactor']
+    def save(self, *args, **kwargs):
+        print("save method running")
+        commit = kwargs.pop('commit', True)
+        comments = kwargs.pop('runcomments')
+        instance = super(start_growth_form, self).save(*args, commit=False, **kwargs)
+        if commit:
+            instance.save()
+        instance.run_comments = comments
+        print (instance)
+        print (instance.run_comments)
+        instance.save()
+        return instance
 
 
 class prerun_growth_form(ModelForm):
     class Meta:
         model = growth
-        exclude = ['growth_number', 'date', 'operator']
+        exclude = ['growth_number', 'date', 'operator', 'run_comments']
 
 
 class prerun_checklist_form(forms.Form):
@@ -182,3 +194,7 @@ class readings_form(ModelForm):
     class Meta:
         model = readings
         exclude = ['growth']
+
+
+class comments_form(forms.Form):
+    comment_field = forms.CharField(widget=forms.Textarea, label="Run Comments")

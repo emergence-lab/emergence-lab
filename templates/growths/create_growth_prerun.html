@@ -12,7 +12,7 @@
 {% block content %}
 
 <div class="container">
-    <h1>Pre-run Growth Info &amp; Checklist</h1>
+    <h1>Pre-run Growth Info &amp; Checklist <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button></h1>
 
     <div class="tabbable">
         <ul id ="maintablist" class="nav nav-tabs">
@@ -144,6 +144,7 @@
                 <button class="btn btn-success pull-right" type="button" data-toggle="modal" data-target="#myModal">
                 Submit and Continue on to readings
                 </button>
+
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -153,7 +154,7 @@
                             </div>
                             <div class="modal-body">
                                 WARNING: If you start a new growth now you will NOT be able to return to this page!!
-                                (If no samples are added and/or the checklist is not completed you will not be able to continue to the next page)
+                                (If any form is incomplete you will not be able to continue)
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -163,10 +164,24 @@
                     </div>
                 </div>
             </div>
-        </div>
-            
+        </div> 
+        <div class="modal fade" id="commentsmodal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="commentsModalLabel">Edit comments</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% bootstrap_form commentsform %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>           
         </form>
-
     </div>
 </div>
 <script>

@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
-from .forms import growth_form, sample_form, p_form, split_form, readings_form
+from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form
 from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 import afm.models
 import hall.models
@@ -349,9 +349,11 @@ def create_growth_start(request):
     if request.method =="POST":
         print ("Now entering... The POST STAGE!!!")
         cgsform = start_growth_form(request.POST, prefix='cgsform')
-        if cgsform.is_valid():
+        commentsform = comments_form(request.POST, prefix='commentsform')
+        if cgsform.is_valid() and commentsform.is_valid():
             print ("It's valid!")
-            cgsform.save()
+            comments = commentsform.cleaned_data['comment_field']
+            cgsform.save(runcomments=comments)
             return HttpResponseRedirect(reverse('create_growth_prerun'))
     else:
         print ("GET request incoming")
@@ -366,7 +368,8 @@ def create_growth_start(request):
         last = ('g' + str(last_int))
         currenttime = time.strftime("%Y-%m-%d")
         cgsform = start_growth_form(prefix='cgsform', initial={'growth_number': last, 'date': currenttime})
-    return render(request, 'growths/create_growth_start.html', {'cgsform': cgsform})
+        commentsform = comments_form(prefix='commentsform')
+    return render(request, 'growths/create_growth_start.html', {'cgsform': cgsform, 'commentsform': commentsform})
 
 
 def create_growth_prerun(request):
@@ -375,6 +378,7 @@ def create_growth_prerun(request):
         pcform = prerun_checklist_form(request.POST, prefix='pcform')
         pgform = prerun_growth_form(request.POST, prefix='pgform')
         sourceform = prerun_sources_form(request.POST, prefix="sourceform")
+        commentsform = comments_form(request.POST, prefix='commentsform')
         pf_1 = p_form(request.POST, prefix="pf_1")
         pf_2 = p_form(request.POST, prefix="pf_2")
         pf_3 = p_form(request.POST, prefix="pf_3")
@@ -397,13 +401,12 @@ def create_growth_prerun(request):
                 print("The form has changed!!")
                 sforms_list.append(sforms[x])
         print ("FILLED OUT FORMS RIGHT HERE " + str(filledoutforms))
-        if  filledoutforms != 0 and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
+        if  filledoutforms != 0 and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sforms_list]) and commentsform.is_valid():
             print ("PRERUN SUCCESS")
             newproject = pgform.cleaned_data['project']
             newinvestigation = pgform.cleaned_data['investigation']
             newplatter = pgform.cleaned_data['platter']
             newreactor = pgform.cleaned_data['reactor']
-            newrun_comments = pgform.cleaned_data['run_comments']
             newhas_gan = pgform.cleaned_data['has_gan']
             newhas_aln = pgform.cleaned_data['has_aln']
             newhas_inn = pgform.cleaned_data['has_inn']
@@ -423,11 +426,12 @@ def create_growth_prerun(request):
             lastgrowth = growth.objects.latest('id')
             lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
             lastgrowth.update(project=newproject, platter=newplatter, reactor=newreactor,
-                              run_comments=newrun_comments, has_gan=newhas_gan, has_aln=newhas_aln, has_inn=newhas_inn,
+                              run_comments=commentsform.cleaned_data['comment_field'],
+                              has_gan=newhas_gan, has_aln=newhas_aln, has_inn=newhas_inn,
                               has_algan=newhas_algan, has_ingan=newhas_ingan, has_alingan=newhas_alingan,
                               other_material=newother_material, orientation=neworientation, is_template=newis_template,
                               is_buffer=newis_buffer, has_superlattice=newhas_superlattice, has_mqw=newhas_mqw,
-                              has_graded=newhas_graded, has_n=newhas_n, has_p=newhas_p, has_u=newhas_u)
+                              has_graded=newhas_graded, has_n=newhas_n, has_p=newhas_p, has_u=newhas_u,)
             lastgrowth = growth.objects.latest('id')
             lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
             pocket = 0
@@ -497,10 +501,11 @@ def create_growth_prerun(request):
         sourceform = prerun_sources_form(prefix='sourceform', initial={'cp2mg': newcp2mg, 'tmin1': newtmin1,
                         'tmin2': newtmin2, 'tmga1': newtmga1, 'tmga2': newtmga2, 'tmal1': newtmal1,
                         'tega1': newtega1, 'nh3': newnh3, 'sih4': newsih4, 'date_time': newdate_time})
+        commentsform = comments_form(prefix='commentsform', initial={'comment_field': gentered.run_comments})
     return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
                     'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
                    'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
-                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, 'sourceform': sourceform})
+                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, 'sourceform': sourceform, 'commentsform': commentsform})
 
 
 class create_growth_readings(SingleObjectMixin, TemplateView):
@@ -514,6 +519,8 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
         lastgrowth = growth.objects.latest('id')
         lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
         lastgrowth = lastgrowth[0]
+        commentsform = comments_form(prefix='commentsform', initial={'comment_field': lastgrowth.run_comments})
+        context["commentscontext"] = commentsform
         context["growth"] = lastgrowth
         allreadings = readings.objects.filter(growth=lastgrowth)
         context["readings"] = allreadings
@@ -550,6 +557,10 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
         print ("IS THIS POST TEST WORKING? YES. YES IT IS.")
         lastgrowth = growth.objects.latest('id')
         lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
+        commentsform = comments_form(request.POST, prefix='commentsform')
+        if commentsform.is_valid():
+            newcomments = commentsform.cleaned_data['comment_field']
+            lastgrowth.update(run_comments=newcomments)
         lastgrowth = lastgrowth[0]
         numberofreadings = len(readings.objects.filter(growth=lastgrowth))
         print (numberofreadings)
@@ -605,7 +616,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
                 print("LAYER DESCRIPTION:")
                 print (newlayer_desc)
                 thisreading = readings.objects.filter(growth=lastgrowth, layer=newlayer)
-                thisreading.update(layer = newlayer, layer_desc=newlayer_desc,
+                thisreading.update(layer=newlayer, layer_desc=newlayer_desc,
                                    pyro_out=newpyro_out, pyro_in=newpyro_in, tc_out=newtc_out,
                                    tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
                                    gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
@@ -629,10 +640,13 @@ def create_growth_postrun(request):
         print ("post request")
         prcform = postrun_checklist_form(request.POST, prefix='prcform')
         prsform = prerun_sources_form(request.POST, prefix='prsform')
-        if prcform.is_valid() and prsform.is_valid():
+        commentsform = comments_form(request.POST, prefix='commentsform')
+        if prcform.is_valid() and prsform.is_valid() and commentsform.is_valid():
             print ("successful validation. Now let's do something.")
             lastgrowth = growth.objects.latest('id')
             lastgrowth = growth.objects.filter(id=lastgrowth.id)
+            lastgrowth.update(run_comments=commentsform.cleaned_data['comment_field'])
+            prsform.save()
             lastgrowth = lastgrowth[0]
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
@@ -640,6 +654,9 @@ def create_growth_postrun(request):
         lastsource = source.objects.latest('id')
         lastsource = source.objects.filter(id=lastsource.id)
         lastsource = lastsource[0]
+        lastgrowth = growth.objects.latest('id')
+        lastgrowth = growth.objects.filter(id=lastgrowth.id)
+        lastgrowth = lastgrowth[0]
         newcp2mg = lastsource.cp2mg
         newtmin1 = lastsource.tmin1
         newtmin2 = lastsource.tmin2
@@ -651,8 +668,9 @@ def create_growth_postrun(request):
         newsih4 = lastsource.sih4
         newdate_time = lastsource.date_time
         prcform = postrun_checklist_form(prefix='prcform')
+        commentsform = comments_form(prefix='commentsform', initial={'comment_field': lastgrowth.run_comments})
         prsform = prerun_sources_form(prefix='prsform', initial={'cp2mg': newcp2mg, 'tmin1': newtmin1,
                         'tmin2': newtmin2, 'tmga1': newtmga1, 'tmga2': newtmga2, 'tmal1': newtmal1,
                         'tega1': newtega1, 'nh3': newnh3, 'sih4': newsih4, 'date_time': newdate_time})
-    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform})
+    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform})
 
