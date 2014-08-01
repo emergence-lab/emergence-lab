@@ -58,6 +58,11 @@ class growth_filter(filters.FilterSet):
     afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
     afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
     afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    hall__sheet_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    hall__sheet_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    hall__mobility = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    hall__bulk_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    hall__bulk_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
 
     # TODO: break this out into RelationalFilterSet class
     def __init__(self, *args, **kwargs):
@@ -69,9 +74,11 @@ class growth_filter(filters.FilterSet):
 
     class Meta:
         model = growth
-        fields = ['growth_number', 'date', 'operator', 'project', 'investigation', 'platter', 'reactor',
-                  'has_gan', 'has_algan', 'has_aln', 'is_template', 'has_graded', 'has_superlattice']
+        fields = ['growth_number', 'date', 'operator', 'project', 'investigation', 'platter',
+                  'reactor', 'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan', 'has_aln',
+                  'is_template', 'is_buffer', 'has_graded', 'has_superlattice', 'has_mqw', ]
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
+            'hall': ['sheet_concentration', 'sheet_resistance', 'mobility', 'bulk_concentration', 'bulk_resistance']
         }
         order_by = ['growth_number']

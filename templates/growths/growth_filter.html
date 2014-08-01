@@ -1,54 +1,40 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}Growth Filter{% endblock %}
 {% block header %}
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'growths/css/filter.css' %}">
-    <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
-    <script src="{% static 'growths/js/jquery.details.js' %}"></script>
-    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
     {{filter.form.media}}
 {% endblock %}
 
 {% block content %}
     <div class="container">
-        <h3>Growths</h3>
-        <p>{{filter.count}} results <a href="{% url 'afm_filter' %}">reset</a></p>
+        <h3 class="page-header">Growths</h3>
 
-        <form action="" method="GET">
-            {{filter.form.as_p}}
-            <button type="submit">search</button>
-        </form>
-
-        <div>
-            <form action="{% url 'afm_compare' %}" method="GET">
-            {% for growth in filter %}
-                <details>
-                <summary><a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a></summary>
-                <ul class="gallery">
-                    {% for afm in growth.afm_filter %}
-                    <li>
-                        <input type="checkbox" name="afm" value="{{afm.id}}" id="toggle-{{afm.id}}">
-                        <label for="toggle-{{afm.id}}">
-                            <img class="thumbnail" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
-                            <span>
-                                <img class="zoomed" src="http://www.emsdiasum.com/microscopy/gallery/diamond_knife/afm/afm_muscle.jpg">
-                            </span>
-                        </label>
+        <div class="row">
+            <div class="col-sm-6">
+                <form action="" method="GET">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    {% bootstrap_form filter.form %}
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <h4 class="page-header">
+                    Results
+                    <span class="badge">{{filter.count}}</span>
+                    <small class="pull-right"><a href="{% url 'afm_filter' %}">Reset</a></small>
+                </h4>
+                <ul class="list-group">
+                {% for growth in filter %}
+                    <li class="list-group-item">
+                        <a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a>
+                        <p class="pull-right">{{growth.date}}</p>
                     </li>
-                    {% endfor %}
+                {% endfor %}
                 </ul>
-                </details>
-            {% endfor %}
-            <button type="submit">compare</button>
-            </form>
+            </div>
         </div>
     </div>
-    <script>
-        $(function() {
-            $('html').addClass($.fn.details.support ? 'details' : 'no-details');
-            $('details').details();
-        });
-    </script>
 
 {% endblock %}
