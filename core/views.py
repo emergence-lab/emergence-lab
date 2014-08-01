@@ -54,7 +54,7 @@ class QuickSearchRedirect(RedirectView):
         try:
             growth.objects.get(growth_number=growth_number)
         except:
-            return reverse('afm-filter')
+            return reverse('afm_filter')
         return reverse(self.pattern_name, args=(growth_number,))
 
 
