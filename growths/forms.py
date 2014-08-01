@@ -181,4 +181,4 @@ class split_form(ModelForm):
 class readings_form(ModelForm):
     class Meta:
         model = readings
-
+        exclude = ['growth']

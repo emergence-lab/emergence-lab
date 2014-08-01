@@ -6,8 +6,8 @@
 {% block content %}
 
 <div class="container">
-    <h2>Create Growth Readings {{growth}} <button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button></h2>
     <form action="" method="POST">
+    <h2>Create Growth Readings {{growth}} <button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button></h2>
     {% csrf_token %}
     <div class="row">
         {% for reading in readingslist %}
@@ -18,8 +18,26 @@
     </div>
     </form>
     <div class="row">
-        <a class="btn btn-danger" href="{% url 'home' %}">Home</a>
-        <a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
+        <button class="btn btn-success pull-right" type="button" data-toggle="modal" data-target="#myModal">
+        Submit go to post-run
+        </button>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
+                    </div>
+                    <div class="modal-body">
+                        WARNING: If you leave this page you will not be able to go back!!
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <br>

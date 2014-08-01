@@ -29,6 +29,7 @@
                         {% bootstrap_form prcform %}
                     </div>
                 </div>
+                <a class="btn btn-success pull-right" role="tab" data-toggle="tab" href="#source">Continue to Source Info</a>
             </div>
             <div class="tab-pane fade" id="source">
                 <h2>Source Consumption</h2>
@@ -37,11 +38,12 @@
                         {% bootstrap_form prsform %}
                     </div>
                 </div>
+                <button class="btn btn-success pull-right" id="create_growth_postrun" type="submit" name="creategrowthpostrunform">Submit and Complete Growth</button>
             </div>
-        <button class="btn btn-success pull-right" id="create_growth_postrun" type="submit" name="creategrowthpostrunform">Submit and Complete Growth</button>
+        
 
         </form>
-        <a class="btn btn-danger" href="{% url 'home' %}">Home</a>
+
     </div>
 </div>
 <br>

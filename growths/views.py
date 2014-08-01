@@ -390,11 +390,14 @@ def create_growth_prerun(request):
         sforms_list = []
         sforms = [sform_1, sform_2, sform_3, sform_4, sform_5, sform_6]
         pforms = [pf_1, pf_2, pf_3, pf_4, pf_5, pf_6]
+        filledoutforms = 0
         for x in range(0, 6):
             if (pforms[x]).has_changed():
+                filledoutforms = filledoutforms + 1
                 print("The form has changed!!")
                 sforms_list.append(sforms[x])
-        if pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
+        print ("FILLED OUT FORMS RIGHT HERE " + str(filledoutforms))
+        if  filledoutforms != 0 and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
             print ("PRERUN SUCCESS")
             newproject = pgform.cleaned_data['project']
             newinvestigation = pgform.cleaned_data['investigation']
@@ -443,8 +446,12 @@ def create_growth_prerun(request):
                     sn = serial_number.objects.create(serial_number = newserialnumber)
                     sn.save()
             sourceform.save()
-        return HttpResponseRedirect(reverse('create_growth_readings'))
-
+            return HttpResponseRedirect(reverse('create_growth_readings'))
+        else:
+            return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
+                    'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
+                   'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
+                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, 'sourceform': sourceform})
 
     else:
         print ("You are requesting information from this page (just so you know).")
@@ -552,7 +559,6 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
             rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
             if rform.is_valid():
                 print ("rform is valid")
-                newgrowth = rform.cleaned_data['growth']
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
@@ -598,8 +604,8 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
                 print("LAYER DESCRIPTION:")
                 print (newlayer_desc)
-                thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
-                thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
+                thisreading = readings.objects.filter(growth=lastgrowth, layer=newlayer)
+                thisreading.update(layer = newlayer, layer_desc=newlayer_desc,
                                    pyro_out=newpyro_out, pyro_in=newpyro_in, tc_out=newtc_out,
                                    tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
                                    gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
