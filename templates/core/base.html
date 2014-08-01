@@ -77,10 +77,15 @@
                 </ul>
                 <form class="navbar-form navbar-right" role="search" action="{% url 'quicksearch' %}">
                     <div class="input-group">
-                        <input type="text" name="growth" class="form-control" placeholder="Growth Number">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                        </span>
+                        <div class="form-group">
+                            <input type="text" name="growth" class="form-control" placeholder="Growth Number">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                   
                     </div>
                 </form>
             </div>
