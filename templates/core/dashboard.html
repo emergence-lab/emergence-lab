@@ -9,12 +9,15 @@
         <div class="col-xs-6">
             <h4 class="page-header">Quick Links</h4>
             <ul>
-                {% if projects %}
+                {% if active_projects or inactive_projects %}
                 <li>
                     My Projects
                     <ul>
-                    {% for project in projects %}
-                        <li><a class="btn btn-sm btn-default" href="#">{{project}}</a></li>
+                    {% for project in active_projects %}
+                        <li><a class="btn btn-sm btn-primary" href="{% url 'project_detail' project.slug %}">{{project}}</a></li>
+                    {% endfor %}
+                    {% for project in inactive_projects %}
+                        <li><a class="btn btn-sm btn-default" href="{% url 'project_detail' project.slug %}">{{project}}</a></li>
                     {% endfor %}
                     </ul>
                 </li>

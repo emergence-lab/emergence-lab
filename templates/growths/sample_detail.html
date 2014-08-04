@@ -7,6 +7,7 @@
 
 <div class="container">
     <ol class="breadcrumb">
+        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'growth_detail' slug=sample.growth.growth_number %}">{{sample.growth}}</a></li>
         <li class="active">{{sample}}</li>
     </ol>
@@ -43,7 +44,10 @@
         </div>
     </div>
 
+    {% if char_afm or char_hall %}
     <h3>Characterization</h3>
+    {% endif %}
+
     {% if char_afm %}
     <h4>AFM</h4>
     <ul>

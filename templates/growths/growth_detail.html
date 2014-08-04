@@ -7,6 +7,7 @@
 
 <div class="container">
     <ol class="breadcrumb">
+        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
         <li class='active'>{{growth}}</li>
     </ol>
 
@@ -77,20 +78,27 @@
         {% endfor %}
     </table>
 
+    {% if char_afm or char_hall %}
     <h3>Characterization</h3>
+    {% endif %}
+
+    {% if char_afm %}
     <h4>AFM</h4>
     <ul>
     {% for afm in char_afm %}
         <li><a href="{% url 'afm_detail' afm.id %}">{{afm}}</a></li>
     {% endfor %}
     </ul>
+    {% endif %}
 
+    {% if char_hall %}
     <h4>Hall</h4>
     <ul>
     {% for hall in char_hall %}
         <li><a href="{% url 'hall_detail' hall.id %}">{{hall}}</a></li>
     {% endfor %}
     </ul>
+    {% endif %}
 
     <a class="btn btn-default" href="{% url 'afm_filter' %}">Growth List</a>
 

@@ -3,11 +3,42 @@
 {% block title %}{{project}}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <ol class="breadcrumb">
-        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
-        <li class='active'>{{project}}</li>
-    </ol>
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+            <li class='active'>{{project}}</li>
+        </ol>
+    </nav>
 
-</div>
+    <section class="row">
+        <div class="col-md-6">
+            <header><h3>{{project}}</h3></header>
+            <article>
+                <p>{{project.description}}</p>
+            </article>
+
+            <aside>
+                <header><h4>Investigations</h4></header>
+                <ul>
+                {% for investigation in project.investigation_set.all %}
+                    <li><a href="#">{{investigation}}</a></li>
+                {% endfor %}
+                </ul>
+            </aside>
+        </div>
+
+        <aside class="col-md-6">
+            <header><h4>Recent Growths</h4></header>
+            <ul>
+            {% for growth in growths %}
+                <li><a href="{% url 'growth_detail' growth.growth_number %}">{{growth}}</a></li>
+            {% endfor %}
+            </ul>
+        </aside>
+
+
+    </section>
+
+</main>
 {% endblock %}
