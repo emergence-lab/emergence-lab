@@ -1,81 +1,84 @@
 Migrations
 ==========
+
 Migrations are tracked with git. Make any changes to models on the development db and later make the changes to production.
 
 Workflow for adding apps to database:
 -------------------------------------
-1. Make sure the database is synced and git is up to date::
 
-    dev$ git pull
-    dev$ ./manage.py syncdb
+    #) Make sure the database is synced and git is up to date::
 
-2. Create app and add models::
+        dev$ git pull
+        dev$ ./manage.py syncdb
 
-    dev$ ./manage.py startapp APPNAME
-    dev$ gedit APPNAME/models.py
+    #) Create app and add models::
 
-3. Add to installed apps in settings.py::
+        dev$ ./manage.py startapp APPNAME
+        dev$ gedit APPNAME/models.py
 
-    dev$ gedit wbg/settings.py
+    #) Add to installed apps in settings.py::
 
-4. Add app to south tracking::
+        dev$ gedit wbg/settings.py
 
-    dev$ ./manage.py convert_to_south APPNAME
+    #) Add app to south tracking::
 
-5. Migrate app with south to add table to database::
+        dev$ ./manage.py convert_to_south APPNAME
 
-    dev$ ./manage.py migrate APPNAME
+    #) Migrate app with south to add table to database::
 
-6. Add app and migrations to version control::
+        dev$ ./manage.py migrate APPNAME
 
-    dev$ git add APPNAME
+    #) Add app and migrations to version control::
 
-7. Push changes to gitlab (assuming master branch)::
+        dev$ git add APPNAME
 
-    dev$ git push origin master
+    #) Push changes to gitlab (assuming master branch)::
 
-8. Pull in changes on production server::
+        dev$ git push origin master
 
-    prod$ sudo -i
-    prod$ cd /var/wsgi/
-    prod$ git pull
+    #) Pull in changes on production server::
 
-9. Migrate app to make changes to database::
+        prod$ sudo -i
+        prod$ cd /var/wsgi/
+        prod$ git pull
 
-    prod$ ./manage.py migrate APPNAME
+    #) Migrate app to make changes to database::
 
-10. Your production environment is now in sync
+        prod$ ./manage.py migrate APPNAME
+
+    #) Your production environment is now in sync
 
 Workflow for editing models:
 ----------------------------
-1. Make sure the database is synced and git is up to date::
 
-    dev$ git pull
-    dev$ ./manage.py syncdb
+    #) Make sure the database is synced and git is up to date::
 
-2. Make changes to models::
+        dev$ git pull
+        dev$ ./manage.py syncdb
 
-    dev$ gedit APPNAME/models.py
+    #) Make changes to models::
 
-3. Create migration and migrate app::
+        dev$ gedit APPNAME/models.py
 
-    dev$ ./manage.py schemamigration APPNAME --auto
-    dev$ ./manage.py migrate APPNAME
+    #) Create migration and migrate app::
 
-4. Add migrations to version control and push (assuming master branch)::
+        dev$ ./manage.py schemamigration APPNAME --auto
+        dev$ ./manage.py migrate APPNAME
 
-    dev$ git add APPNAME/models.py
-    dev$ git add APPNAME/migrations
-    dev$ git push origin master
+    #) Add migrations to version control and push (assuming master branch)::
 
-5. Pull in changes on production server::
+        dev$ git add APPNAME/models.py
+        dev$ git add APPNAME/migrations
+        dev$ git push origin master
 
-    prod$ sudo -i
-    prod$ cd /var/wsgi/
-    prod$ git pull
+    #) Pull in changes on production server::
 
-6. Migrate app to make changes to database::
+        prod$ sudo -i
+        prod$ cd /var/wsgi/
+        prod$ git pull
 
-    prod$ ./manage.py migrate APPNAME
+    #) Migrate app to make changes to database::
 
-7. Your production environment is now in sync
+        prod$ ./manage.py migrate APPNAME
+
+    #) Your production environment is now in sync

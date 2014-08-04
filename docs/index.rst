@@ -13,6 +13,7 @@ Contents:
 
    deployment
    migrations
+   design
    modules
 
 
