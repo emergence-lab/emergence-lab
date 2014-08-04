@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{project}}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+        <li class='active'>{{project}}</li>
+    </ol>
+
+</div>
+{% endblock %}

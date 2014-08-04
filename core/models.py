@@ -47,6 +47,7 @@ class project(models.Model):
     Stores information on a project, which is a higher level organizational tool.
     """
     name = models.CharField(max_length=45)
+    slug = models.SlugField(max_length=45)
     active = models.BooleanField(default=True)
     description = models.TextField(blank=True)
 

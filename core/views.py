@@ -123,6 +123,14 @@ class platter_list(ActiveListView):
     model = platter
 
 
+class ProjectDetailView(DetailView):
+    """
+    View for details of a project.
+    """
+    template_name = 'core/project_detail.html'
+    model = project
+
+
 class project_list(ActiveListView):
     """
     View to list all projects and provide actions.
