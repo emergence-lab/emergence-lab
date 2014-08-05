@@ -125,13 +125,13 @@ class sample(models.Model):
         prevent duplicate queries.
         """
         # extract information from sample name
-        m = re.match('([gt][1-9][0-9]{3,})(?:\_([0-9]+(?:\-[0-9]+))([a-z]*))?', sample_name)
+        m = re.match('([gt][1-9][0-9]{3,})(?:\_([0-9]+\-?[0-9]*)([a-z]*))?', sample_name)
         if not m:
             raise Exception('Sample {0} improperly formatted'.format(sample_name))
 
         # query for the growth if it wasn't specified
         if growth_object is None:
-            growth_object = growths.get_growth(m.group(1))
+            growth_object = growth.get_growth(m.group(1))
         elif growth_object.growth_number != m.group(1):
             raise Exception('Sample {0} does not match the growth {1}'.format(sample_name, growth_object.growth_number))
         filter_params = {'growth': growth_object}
