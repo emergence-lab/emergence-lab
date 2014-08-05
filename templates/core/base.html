@@ -101,6 +101,27 @@
     {% block content %}
     {% endblock %}
 
+    {% if not user.is_anonymous %}
+    <section class="footer">
+        <footer class="container">
+            <header><h3>Exception Handler</h3></header>
+            <section class="form-group">
+                <form action="{% url 'exception' %}" method="post" role="form">
+                    {% csrf_token %}
+                    <input type="hidden" name="path" value="{{request.path}}">
+                    <input type="hidden" name="user" value="{{user.username}}">
+                    <div class="col-sm-11">
+                        <textarea name="complaint" id="exception-text" cols="30" rows="3" class="form-control" placeholder="Type problem here (WARNING: This will erase all currently entered information)"></textarea>
+                    </div>
+                    <div class="col-sm-1">
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </div>
+                </form>
+            </section>
+        </footer>
+    </section>
+    {% endif %}
+
 </body>
 
 </html>

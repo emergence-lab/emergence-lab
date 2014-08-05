@@ -3,8 +3,9 @@ import os
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.http import HttpResponse
-from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView
+from django.http import HttpResponse, HttpResponseRedirect
+from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View
+import gitlab
 
 from .models import investigation, operator, platter, project
 from growths.models import growth
@@ -151,3 +152,20 @@ class investigation_list(ActiveListView):
     """
     template_name = "core/investigation_list.html"
     model = investigation
+
+
+class ExceptionHandlerView(View):
+
+    def post(self, request, *args, **kwargs):
+        path = request.POST.get('path', '')
+        user = request.POST.get('user', 0)
+        complaint = request.POST.get('complaint', '')
+        if complaint:
+            git = gitlab.Gitlab(settings.GITLAB_HOST,
+                                token=settings.GITLAB_PRIVATE_TOKEN, verify_ssl=False)
+            success = git.createissue(8, title='Exception Form Issue',
+                                      description='User: {0}\nPage: {1}\nProblem: {2}'.format(user, path, complaint),
+                                      labels='exception-form')
+            if not success:
+                raise Exception('Error submitting issue')
+        return HttpResponseRedirect(path)

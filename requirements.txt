@@ -11,3 +11,4 @@ paramiko==1.14.0
 django-bootstrap3==4.8.2
 djangorestframework>=2.3,<3
 django-autoslug==1.7.2
+pyapi-gitlab==6.2.3

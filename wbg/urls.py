@@ -21,6 +21,7 @@ urlpatterns = patterns(
     url(r'^media/(?P<filename>.*)$', login_required(core.views.protected_media)),
     url(r'^$', core.views.homepage.as_view(), name='home'),
     url(r'^quicksearch/', login_required(core.views.QuickSearchRedirect.as_view()), name='quicksearch'),
+    url(r'^exception/', login_required(core.views.ExceptionHandlerView.as_view()), name='exception'),
     url(r'^profile/', login_required(core.views.Dashboard.as_view()), name='profile_dashboard'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
