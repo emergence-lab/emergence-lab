@@ -8,7 +8,7 @@ from django.views.generic import CreateView, DetailView, ListView, RedirectView,
 import gitlab
 
 from .models import investigation, operator, platter, project
-from growths.models import growth
+from growths.models import growth, sample
 
 
 class SessionHistoryMixin(object):
@@ -48,15 +48,19 @@ class ActiveListView(ListView):
 
 
 class QuickSearchRedirect(RedirectView):
-    pattern_name = 'growth_detail'
 
     def get_redirect_url(self, *args, **kwargs):
         growth_number = self.request.GET.get('growth', None)
         try:
-            growth.objects.get(growth_number=growth_number)
+            obj = sample.get_sample(growth_number)
+            return reverse('sample_detail', args=(obj.id,))
         except:
-            return reverse('afm_filter')
-        return reverse(self.pattern_name, args=(growth_number,))
+            try:
+                growth.get_growth(growth_number)
+                return reverse('growth_detail', args=(growth_number,))
+            except:
+                pass
+        return reverse('afm_filter')
 
 
 class homepage(TemplateView):
