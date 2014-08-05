@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Split Sample{% endblock %}
+
+{% block content %}
+<div class="container">
+<h1>Split Sample</h1>
+
+<form action="{% url 'split_sample' %}" method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-xs-4">
+    <ul>
+        {% bootstrap_form sform %}
+    </ul>
+
+            <div class="row">
+                <div class="col-xs-12">
+<button class="btn btn-warning pull-right" id="split_growth" type="submit" name="splitform">Split</button>
+</form>
+<a class="btn btn-default" href="{% url 'home' %}">back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
