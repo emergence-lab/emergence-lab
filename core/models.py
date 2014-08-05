@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from autoslug import AutoSlugField
 
 
 class active_manager(models.Manager):
@@ -47,7 +48,7 @@ class project(models.Model):
     Stores information on a project, which is a higher level organizational tool.
     """
     name = models.CharField(max_length=45)
-    slug = models.SlugField(max_length=45)
+    slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
     description = models.TextField(blank=True)
 
@@ -67,6 +68,7 @@ class investigation(models.Model):
     Stores information on an individual investigation related to one or more projects.
     """
     name = models.CharField(max_length=45)
+    slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
     projects = models.ManyToManyField(project)
 
