@@ -1,0 +1,68 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}{{growth}} Readings{%endblock%}
+
+{% block content %}
+
+<div class="container">
+<h2><a href="{% url 'growth_detail' growth %}">{{growth}}</a> readings</h2>
+    <div class="row">
+
+        {% for reading in readingslist %}
+        <div class="col-xs-2">
+                
+                <h3>Layer: {{reading.layer}}</h3>
+                <p><strong>Description: </strong>{{reading.layer_desc}}</p>
+                <p>Pyro out: {{reading.reapyro_out}}</p>
+                <p>Pyro in: {{reading.pyro_in}}</p>
+                <p>tc out: {{reading.tc_out}}</p>
+                <p>tc in: {{reading.tc_in}}</p>
+                <p>motor rpm: {{reading.motor_rpm}}</p>
+                <p>gc pressure: {{reading.gc_pressure}}</p>
+                <p>gc position: {{reading.gc_position}}</p>
+                <p>Voltage in: {{reading.voltage_in}}</p>
+                <p>Voltage out: {{reading.voltage_out}}</p>
+                <p>current in: {{reading.current_in}}</p>
+                <p>current out: {{reading.current_out}}</p>
+                <p>top vp flow: {{reading.top_vp_flow}}</p>
+                <p>hydride inner: {{reading.hydride_inner}}</p>
+                <p>hydrideouter: {{reading.hydride_outer}}</p>
+                <p>alkyl flow inner: {{reading.alkyl_flow_inner}}</p>
+                <p>alkyl push inner {{reading.alkyl_push_inner}}</p>
+                <p>alkyl flow middle {{reading.alkyl_flow_middle}}</p>
+                <p>alkyl push middle: {{reading.alkyl_push_middle}}</p>
+                <p>alkyl flow outer: {{reading.alkyl_flow_outer}}</p>
+                <p>alkyl push outer: {{reading.alkyl_push_outer}}</p>
+                <p>N2 flow: {{reading.n2_flow}}</p>
+                <p>H2 flow: {{reading.h2_flow}}</p>
+                <p>NH3 flow: {{reading.nh3_flow}}</p>
+                <p>Hydride pressure: {{reading.hydride_pressure}}</p>
+                <p>tmga1 flow: {{reading.tmga1_flow}}</p>
+                <p>tmga1 pressure: {{reading.tmga1_pressure}}</p>
+                <p>tmga2 flow: {{reading.tmga2_flow}}</p>
+                <p>tmga2 pressure: {{reading.tmga2_pressure}}</p>
+                <p>tega2 flow: {{reading.tega2_flow}}</p>
+                <p>tega2 pressure: {{reading.tega2_pressure}}</p>
+                <p>tmin1 flow: {{reading.tmin1_flow}}</p>
+                <p>tmin1 pressure: {{reading.tmin1_pressure}}</p>
+                <p>tmal1 flow: {{reading.tmal1_flow}}</p>
+                <p>tmal1 pressure: {{reading.tmal1_pressure}}</p>
+                <p>cp2mg flow: {{reading.cp2mg_flow}}</p>
+                <p>cp2mg pressure: {{reading.cp2mg_pressure}}</p>
+                <p>cp2mg dilution: {{reading.cp2mg_dilution}}</p>
+                <p>silane flow: {{reading.silane_flow}}</p>
+                <p>silane dilution: {{reading.silane_dilution}}</p>
+                <p>silane mix: {{reading.silane_mix}}</p>
+                <p>silane pressure: {{reading.silane_pressure}}</p>
+
+        </div>
+        {% endfor %}
+    </div>
+
+<p><a class="btn btn-default" href="{% url 'growth_detail' growth %}">Back to {{growth}}</a></p>
+
+</div>
+<p> </p>
+{% endblock %}
+

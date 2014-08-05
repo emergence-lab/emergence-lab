@@ -1,10 +1,10 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-{% block title %}Create Growth Readings{%endblock%}
+{% block title %}Start Growth{%endblock%}
 {% block header %}
     {% load staticfiles %}
-
+    
 
 {% endblock %}
 
@@ -12,31 +12,21 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-xs-6 col-xs-offset-3">
-            <img style="width:100%;" src="{% static 'growths/img/readings-progress.png' %}"></img>
+        <div class="col-xs-4 col-xs-offset-4">
+            <img style="width:100%;" src="{% static 'growths/img/start-progress.png' %}"></img>
         </div>
     </div>
+    <h1>Start Growth <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button></h1>
+
     <form action="" method="POST">
-    <h1>Create Growth Readings {{growth}} <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button></h1>
     {% csrf_token %}
     <div class="row">
-        <div class="col-xs-12">
-            <button class="btn btn-warning pull-right" id="create_growth_readings" type="submit" name="creategrowthreadingsform">Update Readings</button>
+        <div class="col-xs-5">
+        <ul>
+        {% bootstrap_form cgsform %}
+        </ul>
         </div>
-    </div>
-    <br>
-    <div class="row">
-        {% for reading in readingslist %}
-        <div class="col-xs-2">
-            {% bootstrap_form reading %}
-        </div>
-        {% endfor %}
-    </div>
-
-     <button class="btn btn-success pull-right" data-toggle="modal" type="button" data-target="#myModal">
-    Submit and go to post-run
-    </button>
-        
+    </div>       
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -45,12 +35,11 @@
                     <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
                 </div>
                 <div class="modal-body">
-                    WARNING: Any unsubmitted changes will NOT be saved!!
+                    WARNING: If you start a new growth now you will NOT be able to return to this page!!
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning">Update Readings and Comments</button>
-                    <a class="btn btn-success pull-right" href="{% url 'create_growth_postrun' %}">Go to Post-run</a>
+                    <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
                 </div>
             </div>
         </div>
@@ -64,7 +53,7 @@
                     <h4 class="modal-title" id="commentsModalLabel">Edit comments</h4>
                 </div>
                 <div class="modal-body">
-                    {% bootstrap_form commentscontext %}
+                    {% bootstrap_form commentsform %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
@@ -73,12 +62,15 @@
         </div>
     </div>
 
+        
     </form>
-   
-    
-</div>
 
-</script>
+    <button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal">
+    Start New Growth
+    </button>
+    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
+
+</div>
 <br>
 {% endblock %}
 
