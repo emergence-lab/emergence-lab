@@ -267,7 +267,7 @@ class update_readings(SingleObjectMixin, TemplateView):
             rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
             if rform.is_valid():
                 print ("rform is valid")
-                newgrowth = rform.cleaned_data['growth']
+                newgrowth = growth=self.get_object()
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
