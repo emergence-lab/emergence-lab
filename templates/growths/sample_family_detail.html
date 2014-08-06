@@ -7,8 +7,9 @@
 
 <div class="container">
     <ol class="breadcrumb">
+        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'growth_detail' slug=growth.growth_number %}">{{growth}}</a></li>
-        <li class="active">{{pocket}}</li>
+        <li class="active">Pocket {{pocket}}</li>
     </ol>
 
     <table class="table table-striped table-bordered">

@@ -69,6 +69,21 @@ class SampleDetailView(SessionHistoryMixin, DetailView):
         return context
 
 
+class SampleFamilyDetailView(ListView):
+    model = sample
+    template_name = 'growths/sample_family_detail.html'
+    context_object_name = 'samples'
+
+    def get_context_data(self, **kwargs):
+        growth_number = self.kwargs.get('growth', None)
+        pocket = self.kwargs.get('pocket', None)
+        context = super(SampleFamilyDetailView, self).get_context_data(**kwargs)
+        context['samples'] = sample.objects.filter(growth__growth_number=growth_number)
+        context['growth'] = growth.get_growth(growth_number)
+        context['pocket'] = pocket
+        return context
+
+
 def create_growth(request):
     if request.method == "POST":
         gform = growth_form(request.POST, instance=growth())
