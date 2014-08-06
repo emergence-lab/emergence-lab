@@ -163,13 +163,15 @@ class ExceptionHandlerView(View):
     def post(self, request, *args, **kwargs):
         path = request.POST.get('path', '')
         user = request.POST.get('user', 0)
+        tags = request.POST.getlist('tag')
+        tags.append('exception-form')
         complaint = request.POST.get('complaint', '')
         if complaint:
             git = gitlab.Gitlab(settings.GITLAB_HOST,
                                 token=settings.GITLAB_PRIVATE_TOKEN, verify_ssl=False)
             success = git.createissue(8, title='Exception Form Issue',
                                       description='User: {0}\nPage: {1}\nProblem: {2}'.format(user, path, complaint),
-                                      labels='exception-form')
+                                      labels=', '.join(tags))
             if not success:
                 raise Exception('Error submitting issue')
         return HttpResponseRedirect(path)

@@ -121,6 +121,16 @@
                         <input type="hidden" name="path" value="{{request.path}}">
                         <input type="hidden" name="user" value="{{user.username}}">
                         <textarea name="complaint" id="exception-text" cols="30" rows="3" class="form-control" placeholder="Type problem here (WARNING: This will erase all currently entered information)"></textarea>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="tag" value="bug-report"> Bug Report
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="tag" value="feature-request"> Feature Request
+                            </label>
+                        </div>
                     </section>
                     <footer class="modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
