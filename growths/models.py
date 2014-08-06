@@ -150,6 +150,33 @@ class sample(models.Model):
             raise Exception('Sample {0} does not exist'.format(sample_name))
         return obj
 
+    @staticmethod
+    def get_siblings(sample_obj):
+        """
+        Return a queryset of samples that are siblings of the specified sample.
+
+        A sibling is defined as a sample that was in the same growth.
+        """
+        return sample.objects.filter(growth=sample_obj.growth).exclude(pk=sample_obj.id)
+
+    @staticmethod
+    def get_children(sample_obj):
+        """
+        Return a queryset of samples that are children of the specified sample.
+
+        A child is defined as a sample that has the current sample marked as a parent.
+        """
+        return sample.objects.filter(parent=sample_obj).exclude(pk=sample_obj.id)
+
+    @staticmethod
+    def get_piece_siblings(sample_obj):
+        """
+        Return a queryset of samples that are piece siblings of the specified sample.
+
+        A piece sibling is defined as samples that were split from the same piece.
+        """
+        return sample.objects.filter(growth=sample_obj.growth, pocket=sample_obj.pocket).exclude(pk=sample_obj.id)
+
     class Meta:
         db_table = 'samples'
 
