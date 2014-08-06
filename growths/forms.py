@@ -162,33 +162,12 @@ class split_form(ModelForm):
         fields = ['parent', 'pieces']
 
     def clean_parent(self):
-        print ("clean sample method running")
-        parent_name = self.cleaned_data['parent']
-        # extract information from sample name
-        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', parent_name)
-        if not m:
-            raise forms.ValidationError('Sample {0} improperly formatted'.format(parent_name))
         try:
-            growth_object = growth.objects.get(growth_number=m.group(1))
-        except MultipleObjectsReturned as e:
-            raise forms.ValidationError('Possible repeat entry in database (Major Problem! This should never happen. At all.)')
-        except ObjectDoesNotExist as e:
-            raise forms.ValidationError('Growth {0} does not exist'.format(m.group(1)))
-        kwargs = {'growth': growth_object}
-        # check if pocket or piece are specified
-        if m.group(2):
-            kwargs['pocket'] = int(m.group(2))
-        if m.group(3):
-            kwargs['piece'] = m.group(3)
+            obj = sample.get_sample(self.cleaned_data['parent'])
+            return obj
+        except Exception as e:
+            raise forms.ValidationError(str(e))
 
-        try:
-            self.cleaned_data['parent'] = sample.objects.get(**kwargs)
-        except MultipleObjectsReturned as e:
-            raise forms.ValidationError('Sample {0} ambiguous, specify the pocket or piece'.format(parent_name))
-        except ObjectDoesNotExist as e:
-            raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
-
-        return self.cleaned_data['parent']
 
 class readings_form(ModelForm):
     class Meta:

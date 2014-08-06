@@ -54,7 +54,7 @@ urlpatterns = patterns(
     url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
     # creategrowth urls
     url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
-    url(r'^splitsample/$', login_required(growths.views.split_sample), name='split_sample'),
+    url(r'^splitsample/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
 
     url(r'^creategrowth/start/$', login_required(growths.views.create_growth_start), name='create_growth_start'),
     url(r'^creategrowth/prerun/$', login_required(growths.views.create_growth_prerun), name='create_growth_prerun'),

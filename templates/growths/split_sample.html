@@ -4,26 +4,26 @@
 {% block title %}Split Sample{% endblock %}
 
 {% block content %}
-<div class="container">
-<h1>Split Sample</h1>
 
-<form action="{% url 'split_sample' %}" method="POST">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-xs-4">
-    <ul>
-        {% bootstrap_form sform %}
-    </ul>
+<section class="container">
+    <header>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+            <li class="active">Split Sample</li>
+        </ol>
+        <h1 class="page-header">Split Sample</h1>
+    </header>
 
+    <form action="{% url 'split_sample' %}" method="post">
+        {% csrf_token %}
             <div class="row">
-                <div class="col-xs-12">
-<button class="btn btn-warning pull-right" id="split_growth" type="submit" name="splitform">Split</button>
-</form>
-<a class="btn btn-default" href="{% url 'home' %}">back</a>
+                <div class="col-xs-4">
+                    {% bootstrap_form form %}
+                    <button class="btn btn-warning pull-right" type="submit" name="splitform">Split</button>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+    </form>
 
+</section>
+
+{% endblock %}

@@ -1,7 +1,7 @@
 import time
 
 from django.shortcuts import render, render_to_response
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView
 from django.views.generic.edit import ProcessFormView
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
@@ -171,50 +171,26 @@ def create_growth(request):
                    'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, })
 
 
-def split_sample(request):
-    if request.method == "POST":
-        print ("entering POST stage.")
-        sform = split_form(request.POST, prefix='sform')
-        if sform.is_valid():
-            numberofpieces = sform.cleaned_data['pieces']
-            sampletosplit = sform.cleaned_data['parent']
-            print (sampletosplit)
-            serialnumber = sampletosplit.substrate_serial
-            print ("serial number: " + serialnumber)
-            allsamples = sample.objects.filter(substrate_serial=serialnumber)
-            dictionarylist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-                              'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-            numberofsamples = len(allsamples)
-            # raise Exception("I don't know what you did, but you sure screwed something up.")
-            if numberofsamples == 1:
-                print ("This is the first sample to split")
-                sample.objects.filter(substrate_serial=serialnumber).update(piece=dictionarylist[numberofsamples - 1])
-            else:
-                print ('There are ' + str(numberofsamples) + ' samples that already exist')
-            for i in range(0, numberofpieces - 1):
-                newsplit = sample(growth=sampletosplit.growth, pocket=sampletosplit.pocket,
-                                  parent=sampletosplit.parent, size=sampletosplit.size,
-                                  location=sampletosplit.location,
-                                  substrate_type=sampletosplit.substrate_type,
-                                  substrate_serial=sampletosplit.substrate_serial,
-                                  substrate_orientation=sampletosplit.substrate_orientation,
-                                  substrate_miscut=sampletosplit.substrate_miscut,
-                                  substrate_comment=sampletosplit.substrate_comment)
-                newsplit.piece = dictionarylist[i + numberofsamples]
-                print (newsplit)
-                print (newsplit.piece)
-                newsplit.save()
-                if sampletosplit.parent == sampletosplit:
-                    newsplit.parent = newsplit
-                    newsplit.save()
+class SplitSampleView(FormView):
+    form_class = split_form
+    template_name = 'growths/split_sample.html'
 
-            return HttpResponseRedirect(reverse('growth_detail', args=[sampletosplit.growth]))
-
-    else:
-        model = sample
-        print("split sample page accessed")
-        sform = split_form(prefix='sform')
-    return render(request, 'growths/split_sample.html', {'sform': sform})
+    def form_valid(self, form):
+        num_pieces = form.cleaned_data['pieces']
+        parent = form.cleaned_data['parent']
+        piece_siblings = sample.get_piece_siblings(parent).order_by('-piece')
+        if piece_siblings:
+            last_letter = piece_siblings.first().piece
+        else:
+            last_letter = 'a'
+            parent.piece = 'a'
+            parent.save()
+        for i in range(num_pieces - 1):
+            last_letter = unichr(ord(last_letter) + 1)
+            parent.pk = None
+            parent.piece = last_letter
+            parent.save()
+        return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
 class readings_detail(SessionHistoryMixin, DetailView):
