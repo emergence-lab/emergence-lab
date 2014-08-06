@@ -175,6 +175,14 @@ class SplitSampleView(FormView):
     form_class = split_form
     template_name = 'growths/split_sample.html'
 
+    def get_form_kwargs(self):
+        kwargs = super(SplitSampleView, self).get_form_kwargs()
+        if self.request.method == 'GET' and 'sample' in self.request.GET:
+            kwargs.update({
+                'initial': {'parent': self.request.GET.get('sample')},
+            })
+        return kwargs
+
     def form_valid(self, form):
         num_pieces = form.cleaned_data['pieces']
         parent = form.cleaned_data['parent']
