@@ -39,6 +39,9 @@ class sample_form(ModelForm):
         instance.growth = growth_obj
         instance.pocket = pocket
 
+        if commit:
+            instance.save()
+
         if instance.parent is None:
             instance.parent = instance
         else:
