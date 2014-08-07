@@ -251,9 +251,12 @@ class serial_number(models.Model):
 
     @staticmethod
     def generate_serial():
-        obj = serial_number.objects.latest('serial_number')
-        obj.pk = None
-        obj.serial_number += 1
+        try:
+            obj = serial_number.objects.latest('serial_number')
+            obj.pk = None
+            obj.serial_number += 1
+        except:
+            obj = serial_number(serial_number=1)
         obj.save()
         return obj.serial_number
 
