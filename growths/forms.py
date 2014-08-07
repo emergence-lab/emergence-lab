@@ -151,4 +151,4 @@ class readings_form(ModelForm):
 
 
 class comments_form(forms.Form):
-    comment_field = forms.CharField(widget=forms.Textarea, label="Run Comments")
+    comment_field = forms.CharField(widget=forms.Textarea, label="Run Comments", required=False)
