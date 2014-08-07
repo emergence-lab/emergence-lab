@@ -79,7 +79,7 @@ class SampleFamilyDetailView(ListView):
         growth_number = self.kwargs.get('growth', None)
         pocket = self.kwargs.get('pocket', None)
         context = super(SampleFamilyDetailView, self).get_context_data(**kwargs)
-        context['samples'] = sample.objects.filter(growth__growth_number=growth_number)
+        context['samples'] = sample.objects.filter(growth__growth_number=growth_number, pocket=pocket).order_by('pocket', 'piece')
         context['growth'] = growth.get_growth(growth_number)
         context['pocket'] = pocket
         return context
