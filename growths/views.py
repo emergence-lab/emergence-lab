@@ -371,9 +371,65 @@ def create_growth_start(request):
     return render(request, 'growths/create_growth_start.html', {'cgsform': cgsform, 'commentsform': commentsform})
 
 
+class CreateGrowthPrerunView(TemplateView):
+    template_name = 'growths/create_growth_prerun.html'
+
+    def post(self, request, *args, **kwargs):
+        lastgrowth = growth.objects.latest('id')
+        pcform = prerun_checklist_form(request.POST, prefix='pcform')
+        pgform = prerun_growth_form(request.POST, prefix='pgform', instance=lastgrowth)
+        sourceform = prerun_sources_form(request.POST, prefix="sourceform")
+        commentsform = comments_form(request.POST, prefix='commentsform')
+        saved_forms = {}
+        sample_forms = []
+        for i in range(1, 7):
+            pf = p_form(request.POST, prefix='pf_{0}'.format(i))
+            saved_forms['pf_{0}'.format(i)] = pf
+            sf = sample_form(request.POST, instance=sample(), prefix='sform_{0}'.format(i))
+            saved_forms['sform_{0}'.format(i)] = sf
+            if pf.has_changed():
+                sample_forms.append(sf)
+        if sample_forms and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sample_forms]) and commentsform.is_valid():
+            
+            lastgrowth = pgform.save()
+            for i, sform in enumerate(sample_forms):
+                pocket = i + 1
+                new_sample = sform.save(growth=lastgrowth, pocket=pocket)
+            return HttpResponseRedirect(reverse('create_growth_readings'))
+        else:  # form did not validate
+            saved_forms.update({
+                'pcform': pcform,
+                'pgform': pgform,
+                'sourceform': sourceform,
+                'commentsform': commentsform
+            })
+            return render(request, self.template_name, saved_forms)
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateGrowthPrerunView, self).get_context_data(**kwargs)
+        last_growth = growth.objects.latest('growth_number')
+        context['pcform'] = prerun_checklist_form(prefix='pcform')
+        context['pgform'] = prerun_growth_form(prefix='pgform',
+                                               initial={
+                                                   'project': last_growth.project,
+                                                   'investigation': last_growth.investigation,
+                                                   'platter': last_growth.platter,
+                                                   'reactor': last_growth.reactor,
+                                               })
+        last_sources = source.objects.latest('date_time')
+        context['sourceform'] = prerun_sources_form(instance=last_sources, prefix='sourceform')
+        context['commentsform'] = comments_form(prefix='commentsform',
+                                                initial={'comment_field': last_growth.run_comments})
+        for i in range(1, 7):
+            context['pf_{0}'.format(i)] = p_form(prefix='pf_{0}'.format(i))
+            context['sform_{0}'.format(i)] = sample_form(prefix='sform_{0}'.format(i), instance=sample(),
+                                                         initial={'substrate_serial': 'wbg_{0}'.format(serial_number.generate_serial()),
+                                                                  'location': 'Lab'})
+        return context
+
+
 def create_growth_prerun(request):
     if request.method == "POST":
-        print ("Now entering... The POST STAGE!!!")
         pcform = prerun_checklist_form(request.POST, prefix='pcform')
         pgform = prerun_growth_form(request.POST, prefix='pgform')
         sourceform = prerun_sources_form(request.POST, prefix="sourceform")

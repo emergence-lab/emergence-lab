@@ -18,65 +18,37 @@ class sample_form(ModelForm):
                   'substrate_miscut', 'size', 'location']
 
     def clean_parent(self):
-        print ("clean sample method running")
         parent_name = self.cleaned_data['parent']
-        # check to see if empty (this means that parent is itself). Set a temporary parent value
 
-        if parent_name == '':
-            print('setting parent to None')
+        if parent_name == '':  # no parent specified, on substrate
             return None
 
-            # return self.cleaned_data['parent']
-
-        # extract information from parent name
-        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', parent_name)
-        if not m:
-            raise forms.ValidationError('Sample {0} improperly formatted'.format(parent_name))
         try:
-            growth_object = growth.objects.get(growth_number=m.group(1))
-        except MultipleObjectsReturned as e:
-            raise forms.ValidationError('Possible repeat entry in database (Major Problem! This should never happen. At all.)')
-        except ObjectDoesNotExist as e:
-            raise forms.ValidationError('Growth {0} does not exist'.format(m.group(1)))
-        kwargs = {'growth': growth_object}
-        # check if pocket or piece are specified
-        if m.group(2):
-            kwargs['pocket'] = int(m.group(2))
-        if m.group(3):
-            kwargs['piece'] = m.group(3)
+            parent_sample = sample.get_sample(parent_name)
+        except Exception as e:
+            raise forms.ValidationError(str(e))
 
-        try:
-            self.cleaned_data['parent'] = sample.objects.get(**kwargs)
-        except MultipleObjectsReturned as e:
-            raise forms.ValidationError('Sample {0} ambiguous, specify the pocket or piece'.format(parent_name))
-        except ObjectDoesNotExist as e:
-            raise forms.ValidationError('Sample {0} does not exist'.format(parent_name))
+        return parent_sample
 
-        return self.cleaned_data['parent']
-
-    def save(self, *args, **kwargs):
-        print("save method running")
+    def save(self, **kwargs):
         commit = kwargs.pop('commit', True)
-        growthid = kwargs.pop('growthid')
-        pocketnum = kwargs.pop('pocketnum')
-        instance = super(sample_form, self).save(*args, commit=False, **kwargs)
-        growthid.date = time.strftime("%Y-%m-%d")
-        instance.growth = growthid
-        instance.pocket = pocketnum
-        if commit:
-            print ("saving")
-            instance.save()
+        growth_obj = kwargs.pop('growth')
+        pocket = kwargs.pop('pocket')
+
+        instance = super(sample_form, self).save(commit=False)
+        instance.growth = growth_obj
+        instance.pocket = pocket
+
         if instance.parent is None:
-            print ("setting parent to self")
             instance.parent = instance
-        instance.substrate_serial = instance.parent.substrate_serial
-        allsamples = sample.objects.filter(substrate_serial=instance.substrate_serial)
-        dictionarylist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-                          'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        numberofsamples = len(allsamples)
-        if numberofsamples > 1:
-            instance.piece = dictionarylist[numberofsamples]
-        instance.save
+        else:
+            instance.substrate_type = 'growth'
+            instance.substrate_serial = instance.parent.substrate_serial
+            instance.substrate_orientation = instance.parent.substrate_orientation
+            instance.substrate_miscut = instance.parent.substrate_miscut
+
+        if commit:
+            instance.save()
         return instance
 
 
