@@ -66,7 +66,7 @@
             <td>{{sample.get_size_display}}</td>
             <td>
             {% if sample.substrate_type == 'growth' and sample.parent != sample %}
-                <a class="btn btn-sm btn-default" href="{% url 'sample_detail' sample.parent.id %}">{{sample.parent}}</a>
+                <a class="btn btn-sm btn-default" href="{% url 'sample_detail' sample.parent_id %}">{{sample.parent}}</a>
             {% else %}
                 {{sample.get_substrate_type_display}}
             {% endif %}
