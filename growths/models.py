@@ -249,6 +249,14 @@ class serial_number(models.Model):
     def __unicode__(self):
         return self.serial_number
 
+    @staticmethod
+    def generate_serial():
+        obj = serial_number.objects.latest('serial_number')
+        obj.pk = None
+        obj.serial_number += 1
+        obj.save()
+        return obj.serial_number
+
     class Meta:
         db_table = 'serial_numbers'
 
