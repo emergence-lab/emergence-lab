@@ -7,6 +7,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
+from core.models import operator
 from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
 from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form
@@ -346,7 +347,6 @@ class recipe_detail(SessionHistoryMixin, DetailView):
 
 def create_growth_start(request):
     if request.method =="POST":
-        print ("Now entering... The POST STAGE!!!")
         cgsform = start_growth_form(request.POST, prefix='cgsform')
         commentsform = comments_form(request.POST, prefix='commentsform')
         if cgsform.is_valid() and commentsform.is_valid():
@@ -366,7 +366,13 @@ def create_growth_start(request):
         last_int = (int(last_int) + 1)
         last = ('g' + str(last_int))
         currenttime = time.strftime("%Y-%m-%d")
-        cgsform = start_growth_form(prefix='cgsform', initial={'growth_number': last, 'date': currenttime})
+        cgsform = start_growth_form(prefix='cgsform',
+                                    initial={
+                                        'growth_number': last,
+                                        'date': currenttime,
+                                        'reactor': 'd180',
+                                        'operator': operator.objects.get(user=request.user),
+                                    })
         commentsform = comments_form(prefix='commentsform')
     return render(request, 'growths/create_growth_start.html', {'cgsform': cgsform, 'commentsform': commentsform})
 
