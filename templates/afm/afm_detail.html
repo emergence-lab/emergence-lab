@@ -44,6 +44,7 @@
         {% if pocket_siblings %}
         <h4>
             Scans for {{afm.growth}}_{{afm.sample.pocket}}
+            <a class="btn btn-primary" href="{% url 'sample_family_detail' growth=afm.growth.growth_number pocket=afm.sample.pocket %}">Pocket Details</a>
         </h4>
         {% for sibling in pocket_siblings %}
         <a class="btn btn-sm btn-default" href="{% url 'afm_detail' pk=sibling.id %}">{{sibling}}</a>
