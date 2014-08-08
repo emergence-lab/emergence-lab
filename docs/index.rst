@@ -15,6 +15,7 @@ Contents:
    migrations
    design
    modules
+   organization
 
 
 Indices and tables
