@@ -17,3 +17,11 @@
 .navbar-form .input-group .input-group-btn {
     float: left;
 }
+
+.spacer {
+    height: 200px;
+}
+
+.link-pointer {
+    cursor: pointer;
+}

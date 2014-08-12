@@ -137,8 +137,16 @@ class ProjectDetailView(DetailView):
     model = project
 
     def get_context_data(self, **kwargs):
+        print(self.kwargs)
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
-        context['growths'] = growth.objects.filter(project=self.object).order_by('-growth_number')[:25]
+        if 'username' in self.kwargs:
+            userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
+            context['growths'] = (growth.objects.filter(project=self.object,
+                                                        operator_id=userid)
+                                                .order_by('-growth_number')[:25])
+        else:
+            context['growths'] = (growth.objects.filter(project=self.object)
+                                                .order_by('-growth_number')[:25])
         return context
 
 

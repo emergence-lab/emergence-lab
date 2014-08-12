@@ -4,36 +4,41 @@
 
 {% block content %}
 <div class="container">
-    <h3 class="page-header">Welcome {{operator.name}}</h3>
+    <ul class="nav nav-pills">
+        <li><a href="{% url 'create_growth_start' %}"><span class="glyphicon glyphicon-plus"></span> Create Growth</a></li>
+        <li><a href="{% url 'afm_filter' %}"><span class="glyphicon glyphicon-search"></span> Sample Lookup</a></li>
+    </ul>
     <div class="row">
-        <div class="col-xs-6">
-            <h4 class="page-header">Quick Links</h4>
-            <ul>
-                {% if active_projects or inactive_projects %}
-                <li>
-                    My Projects
-                    <ul>
-                    {% for project in active_projects %}
-                        <li><a class="btn btn-sm btn-primary" href="{% url 'project_detail' project.slug %}">{{project}}</a></li>
-                    {% endfor %}
+        <nav class="col-md-3">
+            <h4 class="page-header">My Projects</h4>
+            <ul class="nav nav-pills nav-stacked">
+            {% for project in active_projects %}
+                <li><a href="{% url 'project_detail_user' username=request.user slug=project.slug %}">{{project}}</a></li>
+            {% endfor %}
+            <li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add Project</a></li>
+            {% if inactive_projects %}
+                <li class="dropdown">
+                    <a class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
                     {% for project in inactive_projects %}
-                        <li><a class="btn btn-sm btn-default" href="{% url 'project_detail' project.slug %}">{{project}}</a></li>
+                        <li><a href="{% url 'project_detail_user' username=request.user slug=project.slug %}">{{project}}</a></li>
                     {% endfor %}
                     </ul>
                 </li>
-                {% endif %}
-                <li><a class="btn btn-primary" href="{% url 'create_growth_start' %}">Growth Wizard</a></li>
-                <li><a class="btn btn-primary" href="{% url 'afm_filter' %}">Sample Lookup</a></li>
+            {% endif %}
             </ul>
-        </div>
-        <div class="col-xs-6">
+        </nav>
+        <div class="col-md-3 col-md-offset-6">
             <h4 class="page-header">Recent Growths</h4>
-            <ul>
+            <div class="list-group">
             {% for growth in growths %}
-                <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
+                <a class="list-group-item" href="{% url 'growth_detail' growth %}">{{growth}} <p class="pull-right">{{growth.date}}</p></a>
             {% endfor %}
             </ul>
         </div>
     </div>
 </div>
+
+<div class="spacer"></div>
+
 {% endblock %}
