@@ -74,16 +74,14 @@ class start_growth_form(ModelForm):
         model = growth
         fields = ['growth_number', 'date', 'operator', 'project', 'investigation',
                   'platter', 'reactor']
+
     def save(self, *args, **kwargs):
-        print("save method running")
         commit = kwargs.pop('commit', True)
         comments = kwargs.pop('runcomments')
         instance = super(start_growth_form, self).save(*args, commit=False, **kwargs)
         if commit:
             instance.save()
         instance.run_comments = comments
-        print (instance)
-        print (instance.run_comments)
         instance.save()
         return instance
 
@@ -91,7 +89,22 @@ class start_growth_form(ModelForm):
 class prerun_growth_form(ModelForm):
     class Meta:
         model = growth
-        exclude = ['growth_number', 'date', 'operator', 'run_comments']
+        exclude = ['growth_number', 'date', 'operator', 'run_comments',
+                   'has_inn', 'has_ingan', 'has_alingan']
+
+    def clean(self):
+        cleaned_data = super(prerun_growth_form, self).clean()
+        material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
+        materials = [field for field in material_fields if cleaned_data[field]]
+        if not materials:
+            raise ValidationError('At least one material must be specified')
+
+        doping_fields = ['has_n', 'has_p', 'has_u']
+        doping = [field for field in doping_fields if cleaned_data[field]]
+        if not doping:
+            raise ValidationError('At least one doping type must be specified')
+
+        return cleaned_data
 
 
 class prerun_checklist_form(forms.Form):
