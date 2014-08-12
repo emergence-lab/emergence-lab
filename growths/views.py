@@ -345,36 +345,37 @@ class recipe_detail(SessionHistoryMixin, DetailView):
         return context
 
 
-def create_growth_start(request):
-    if request.method =="POST":
+class CreateGrowthStartView(TemplateView):
+    template_name = 'growths/create_growth_start.html'
+
+    def post(self, request, *args, **kwargs):
         cgsform = start_growth_form(request.POST, prefix='cgsform')
         commentsform = comments_form(request.POST, prefix='commentsform')
         if cgsform.is_valid() and commentsform.is_valid():
-            print ("It's valid!")
             comments = commentsform.cleaned_data['comment_field']
             cgsform.save(runcomments=comments)
             return HttpResponseRedirect(reverse('create_growth_prerun'))
-    else:
-        print ("GET request incoming")
-        num_items = 0
-        model = growth
-        query = model.objects.all()
-        last = str(query[len(query) - 1])
-        last_int = ''
-        for i in xrange(1, 5):
-            last_int += last[i]
-        last_int = (int(last_int) + 1)
-        last = ('g' + str(last_int))
-        currenttime = time.strftime("%Y-%m-%d")
-        cgsform = start_growth_form(prefix='cgsform',
-                                    initial={
-                                        'growth_number': last,
-                                        'date': currenttime,
-                                        'reactor': 'd180',
-                                        'operator': operator.objects.get(user=request.user),
-                                    })
-        commentsform = comments_form(prefix='commentsform')
-    return render(request, 'growths/create_growth_start.html', {'cgsform': cgsform, 'commentsform': commentsform})
+        else:
+            return render(request, self.template_name,
+                          {'cgsform': cgsform, 'commentsform': commentsform})
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateGrowthStartView, self).get_context_data(**kwargs)
+        try:
+            last_growth = growth.objects.latest('growth_number').growth_number
+            next_growth = 'g{0}'.format(int(last_growth[1:]) + 1)
+        except:
+            next_growth = 'g1000'
+        currenttime = time.strftime('%Y-%m-%d')
+        context['cgsform'] = start_growth_form(prefix='cgsform',
+                                               initial={
+                                                   'growth_number': next_growth,
+                                                   'date': currenttime,
+                                                   'reactor': 'd180',
+                                                   'operator': operator.objects.get(user=self.request.user),
+                                               })
+        context['commentsform'] = comments_form(prefix='commentsform')
+        return context
 
 
 class CreateGrowthPrerunView(TemplateView):
@@ -435,141 +436,6 @@ class CreateGrowthPrerunView(TemplateView):
                                                          initial={'substrate_serial': 'wbg_{0}'.format(serial_number.generate_serial()),
                                                                   'location': 'Lab'})
         return context
-
-
-def create_growth_prerun(request):
-    if request.method == "POST":
-        pcform = prerun_checklist_form(request.POST, prefix='pcform')
-        pgform = prerun_growth_form(request.POST, prefix='pgform')
-        sourceform = prerun_sources_form(request.POST, prefix="sourceform")
-        commentsform = comments_form(request.POST, prefix='commentsform')
-        pf_1 = p_form(request.POST, prefix="pf_1")
-        pf_2 = p_form(request.POST, prefix="pf_2")
-        pf_3 = p_form(request.POST, prefix="pf_3")
-        pf_4 = p_form(request.POST, prefix="pf_4")
-        pf_5 = p_form(request.POST, prefix="pf_5")
-        pf_6 = p_form(request.POST, prefix="pf_6")
-        sform_1 = sample_form(request.POST, instance=sample(), prefix="sform_1")
-        sform_2 = sample_form(request.POST, instance=sample(), prefix="sform_2")
-        sform_3 = sample_form(request.POST, instance=sample(), prefix="sform_3")
-        sform_4 = sample_form(request.POST, instance=sample(), prefix="sform_4")
-        sform_5 = sample_form(request.POST, instance=sample(), prefix="sform_5")
-        sform_6 = sample_form(request.POST, instance=sample(), prefix="sform_6")
-        sforms_list = []
-        sforms = [sform_1, sform_2, sform_3, sform_4, sform_5, sform_6]
-        pforms = [pf_1, pf_2, pf_3, pf_4, pf_5, pf_6]
-        filledoutforms = 0
-        for x in range(0, 6):
-            if (pforms[x]).has_changed():
-                filledoutforms = filledoutforms + 1
-                print("The form has changed!!")
-                sforms_list.append(sforms[x])
-        print ("FILLED OUT FORMS RIGHT HERE " + str(filledoutforms))
-        if  filledoutforms != 0 and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sforms_list]) and commentsform.is_valid():
-            print ("PRERUN SUCCESS")
-            newproject = pgform.cleaned_data['project']
-            newinvestigation = pgform.cleaned_data['investigation']
-            newplatter = pgform.cleaned_data['platter']
-            newreactor = pgform.cleaned_data['reactor']
-            newhas_gan = pgform.cleaned_data['has_gan']
-            newhas_aln = pgform.cleaned_data['has_aln']
-            newhas_inn = pgform.cleaned_data['has_inn']
-            newhas_algan = pgform.cleaned_data['has_algan']
-            newhas_ingan = pgform.cleaned_data['has_ingan']
-            newhas_alingan = pgform.cleaned_data['has_alingan']
-            newother_material = pgform.cleaned_data['other_material']
-            neworientation = pgform.cleaned_data['orientation']
-            newis_buffer = pgform.cleaned_data['is_buffer']
-            newis_template = pgform.cleaned_data['is_template']
-            newhas_superlattice = pgform.cleaned_data['has_superlattice']
-            newhas_mqw = pgform.cleaned_data['has_mqw']
-            newhas_graded = pgform.cleaned_data['has_graded']
-            newhas_u = pgform.cleaned_data['has_u']
-            newhas_p = pgform.cleaned_data['has_p']
-            newhas_n = pgform.cleaned_data['has_n']
-            lastgrowth = growth.objects.latest('id')
-            lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
-            lastgrowth.update(project=newproject, platter=newplatter, reactor=newreactor,
-                              run_comments=commentsform.cleaned_data['comment_field'],
-                              has_gan=newhas_gan, has_aln=newhas_aln, has_inn=newhas_inn,
-                              has_algan=newhas_algan, has_ingan=newhas_ingan, has_alingan=newhas_alingan,
-                              other_material=newother_material, orientation=neworientation, is_template=newis_template,
-                              is_buffer=newis_buffer, has_superlattice=newhas_superlattice, has_mqw=newhas_mqw,
-                              has_graded=newhas_graded, has_n=newhas_n, has_p=newhas_p, has_u=newhas_u,)
-            lastgrowth = growth.objects.latest('id')
-            lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
-            pocket = 0
-            for sf in sforms_list:
-                pocket = pocket + 1
-                new_s = sf.save(growthid=lastgrowth[0], pocketnum=pocket)
-                new_s.save()
-                print ("working on serial numbers")
-                if new_s.substrate_serial.startswith('wbg_'):
-                    print ("Success! It does start with 'wbg_'")
-                    entireserial = new_s.substrate_serial
-                    newserialnumber = ''
-                    for x in range(4, len(entireserial)):
-                        newserialnumber = newserialnumber + entireserial[x]
-                    newserialnumber = int(newserialnumber)
-                    sn = serial_number.objects.create(serial_number = newserialnumber)
-                    sn.save()
-            sourceform.save()
-            return HttpResponseRedirect(reverse('create_growth_readings'))
-        else:
-            return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
-                    'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
-                   'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
-                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, 'sourceform': sourceform})
-
-    else:
-        print ("You are requesting information from this page (just so you know).")
-        gentered= growth.objects.latest('id')
-        pcform = prerun_checklist_form(prefix='pcform')
-        pgform = prerun_growth_form(prefix='pgform', initial={'project': gentered.project,
-                'investigation': gentered.investigation, 'platter': gentered.platter,
-                'reactor': gentered.reactor})
-
-        lastsource = source.objects.latest('id')
-        lastsource = source.objects.filter(id=lastsource.id)
-        lastsource = lastsource[0]
-        newcp2mg = lastsource.cp2mg
-        newtmin1 = lastsource.tmin1
-        newtmin2 = lastsource.tmin2
-        newtmga1 = lastsource.tmga1
-        newtmga2 = lastsource.tmga2
-        newtmal1 = lastsource.tmal1
-        newtega1 = lastsource.tega1
-        newnh3 = lastsource.nh3
-        newsih4 = lastsource.sih4
-        newdate_time = lastsource.date_time
-
-        last = serial_number.objects.latest('id')
-        lastnumber = last.serial_number
-        nextserial = lastnumber + 1
-
-        def generate_serial(sn):
-            return ('wbg_' + str(sn))
-
-        pf_1 = p_form(prefix="pf_1")
-        pf_2 = p_form(prefix="pf_2")
-        pf_3 = p_form(prefix="pf_3")
-        pf_4 = p_form(prefix="pf_4")
-        pf_5 = p_form(prefix="pf_5")
-        pf_6 = p_form(prefix="pf_6")
-        sform_1 = sample_form(instance=sample(), prefix="sform_1", initial={'substrate_serial': generate_serial(nextserial), 'location': ('Lab')})
-        sform_2 = sample_form(instance=sample(), prefix="sform_2", initial={'substrate_serial': generate_serial(nextserial + 1), 'location': ('Lab')})
-        sform_3 = sample_form(instance=sample(), prefix="sform_3", initial={'substrate_serial': generate_serial(nextserial + 2), 'location': ('Lab')})
-        sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3), 'location': ('Lab')})
-        sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4), 'location': ('Lab')})
-        sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5), 'location': ('Lab')})
-        sourceform = prerun_sources_form(prefix='sourceform', initial={'cp2mg': newcp2mg, 'tmin1': newtmin1,
-                        'tmin2': newtmin2, 'tmga1': newtmga1, 'tmga2': newtmga2, 'tmal1': newtmal1,
-                        'tega1': newtega1, 'nh3': newnh3, 'sih4': newsih4, 'date_time': newdate_time})
-        commentsform = comments_form(prefix='commentsform', initial={'comment_field': gentered.run_comments})
-    return render(request, 'growths/create_growth_prerun.html', {'pcform': pcform, 'pgform': pgform,
-                    'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
-                   'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
-                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, 'sourceform': sourceform, 'commentsform': commentsform})
 
 
 class create_growth_readings(SingleObjectMixin, TemplateView):

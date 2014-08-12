@@ -56,7 +56,7 @@ urlpatterns = patterns(
     url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
     url(r'^splitsample/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
 
-    url(r'^creategrowth/start/$', login_required(growths.views.create_growth_start), name='create_growth_start'),
+    url(r'^creategrowth/start/$', login_required(growths.views.CreateGrowthStartView.as_view()), name='create_growth_start'),
     # url(r'^creategrowth/prerun/$', login_required(growths.views.create_growth_prerun), name='create_growth_prerun'),
     url(r'^creategrowth/prerun/$', login_required(growths.views.CreateGrowthPrerunView.as_view()), name='create_growth_prerun'),
     url(r'^creategrowth/readings/$', login_required(growths.views.create_growth_readings.as_view()), name='create_growth_readings'),
