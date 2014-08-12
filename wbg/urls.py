@@ -25,7 +25,7 @@ urlpatterns = patterns(
     url(r'^dashboard/$', login_required(core.views.Dashboard.as_view()), name='profile_dashboard'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^wbg-admin/', include(admin.site.urls)),
     # core urls
     url(r'^operators/$', login_required(core.views.operator_list.as_view()), name='operator_list'),
     url(r'^operators/create/$', login_required(core.views.operator_create.as_view()), name='operator_create'),
