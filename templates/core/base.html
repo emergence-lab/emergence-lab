@@ -128,7 +128,7 @@
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea name="complaint" id="exception-text" cols="30" rows="3" class="form-control" placeholder="Type problem here (WARNING: This will erase all currently entered information)"></textarea>
+                            <textarea name="complaint" id="exception-text" cols="30" rows="3" class="form-control" placeholder="Type problem here"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Tags</label>
@@ -145,7 +145,7 @@
                         </div>
                     </section>
                     <footer class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button id="ajax-submit" type="button" class="btn btn-primary">Submit</button>
                         <button class="btn btn-default" type="button" data-dismiss="modal">Cancel</button>
                     </footer>
                 </form>
@@ -153,6 +153,38 @@
         </div>
     </section>
     {% endif %}
+
+    <script type="text/javascript">
+        function exception_handler() {
+            allvals = []
+            $('input:checked[type="checkbox"][name="tag"]').each(function(){allvals.push($(this).val())})
+            $.ajax({
+                url: '{% url "exception" %}',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                    'path': '{{request.path}}',
+                    'user': '{{user.username}}',
+                    'title': $('input[name="title"]').val(),
+                    'complaint': $('#exception-text').val(),
+                    'tag': allvals
+                },
+                success: function() {
+                    $('#exception-modal').modal('hide');
+                    $('input[name="title"]').val('Exception Form Issue');
+                    $('#exception-text').val('');
+                    $('input:checked[type="checkbox"][name="tag"]').each(function(){$(this).prop('checked', false)});
+                    console.log('sucessfully submitted');
+                },
+                error: function(response) {
+                    console.error(response.message);
+                }
+            });
+            return false
+        }
+
+        $('#ajax-submit').click(exception_handler);
+    </script>
 
     {% block scripts %}
     {% endblock %}

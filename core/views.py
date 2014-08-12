@@ -164,7 +164,7 @@ class ExceptionHandlerView(View):
         path = request.POST.get('path', '')
         user = request.POST.get('user', 0)
         title = request.POST.get('title', 'Exception Form Issue')
-        tags = request.POST.getlist('tag')
+        tags = request.POST.getlist('tag[]')
         tags.append('exception-form')
         complaint = request.POST.get('complaint', '')
         if complaint:
