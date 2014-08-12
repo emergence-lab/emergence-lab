@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from autoslug import AutoSlugField
+from markupfield.fields import MarkupField
 
 
 class active_manager(models.Manager):
@@ -50,7 +51,8 @@ class project(models.Model):
     name = models.CharField(max_length=45)
     slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
-    description = models.TextField(blank=True)
+    description = MarkupField(blank=True, markup_type='markdown')
+    start_date = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
     current = active_manager()
@@ -70,7 +72,9 @@ class investigation(models.Model):
     name = models.CharField(max_length=45)
     slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
-    projects = models.ManyToManyField(project)
+    description = MarkupField(blank=True, markup_type='markdown')
+    start_date = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey(project)
 
     objects = models.Manager()
     current = active_manager()
