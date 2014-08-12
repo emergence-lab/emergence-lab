@@ -422,8 +422,11 @@ class CreateGrowthPrerunView(TemplateView):
                                                    'platter': last_growth.platter,
                                                    'reactor': last_growth.reactor,
                                                })
-        last_sources = source.objects.latest('date_time')
-        context['sourceform'] = prerun_sources_form(instance=last_sources, prefix='sourceform')
+        try:
+            last_sources = source.objects.latest('date_time')
+            context['sourceform'] = prerun_sources_form(instance=last_sources, prefix='sourceform')
+        except:
+            context['sourceform'] = prerun_sources_form(prefix='sourceform')
         context['commentsform'] = comments_form(prefix='commentsform',
                                                 initial={'comment_field': last_growth.run_comments})
         for i in range(1, 7):
