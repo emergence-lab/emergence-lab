@@ -8,7 +8,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 import core.views
 import growths.views
 import afm.api
-import hall.views
 
 
 admin.autodiscover()
@@ -45,8 +44,7 @@ urlpatterns = patterns(
     url(r'^api/v0/afm/$', afm.api.AFMListAPI.as_view()),
     url(r'^api/v0/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
     # hall urls
-    url(r'^hall/$', login_required(hall.views.hall_list.as_view()), name='hall_list'),
-    url(r'^hall/(?P<pk>\d+)/$', login_required(hall.views.hall_detail.as_view()), name='hall_detail'),
+    url(r'^hall/$', include('hall.urls')),
     # creategrowth urls
     url(r'^creategrowth/$', login_required(growths.views.create_growth), name='create_growth'),
     url(r'^splitsample/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
