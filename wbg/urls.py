@@ -32,6 +32,7 @@ urlpatterns = patterns(
     url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
     url(r'^projects/$', login_required(core.views.project_list.as_view()), name='project_list'),
     url(r'^projects/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_all'),
+    url(r'^dashboard/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailDashboardView.as_view()), name='project_detail_dashboard'),
     url(r'^investigations/$', login_required(core.views.investigation_list.as_view()), name='investigation_list'),
     # growths urls
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.GrowthDetailView.as_view()), name='growth_detail'),

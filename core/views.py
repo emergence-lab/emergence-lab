@@ -70,6 +70,15 @@ class homepage(TemplateView):
     template_name = "core/index.html"
 
 
+class DashboardMixin(object):
+
+    def get_context_data(self, **kwargs):
+        projects = growth.objects.filter(operator=self.request.user.operator).values_list('project', flat=True).distinct()
+        kwargs['active_projects'] = project.current.filter(id__in=projects)
+        kwargs['inactive_projects'] = project.retired.filter(id__in=projects)
+        return super(DashboardMixin, self).get_context_data(**kwargs)
+
+
 class Dashboard(DetailView):
     """
     Main dashboard for the user with commonly used actions.
@@ -129,6 +138,22 @@ class platter_list(ActiveListView):
     model = platter
 
 
+class ProjectDetailDashboardView(DashboardMixin, DetailView):
+    """
+    View for details of a project in the dashboard.
+    """
+    template_name = 'core/project_detail_dashboard.html'
+    model = project
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectDetailDashboardView, self).get_context_data(**kwargs)
+        userid = operator.objects.filter(user__username=self.request.user.username).values('id')
+        context['growths'] = (growth.objects.filter(project=self.object,
+                                                    operator_id=userid)
+                                            .order_by('-growth_number')[:25])
+        return context
+
+
 class ProjectDetailView(DetailView):
     """
     View for details of a project.
@@ -137,7 +162,6 @@ class ProjectDetailView(DetailView):
     model = project
 
     def get_context_data(self, **kwargs):
-        print(self.kwargs)
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         if 'username' in self.kwargs:
             userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
