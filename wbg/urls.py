@@ -7,7 +7,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 import core.views
 import growths.views
-import afm.views
 import afm.api
 import hall.views
 
@@ -41,11 +40,7 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/$', login_required(growths.views.readings_detail.as_view()), name='readings_detail'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
     # afm urls
-    url(r'^afm/$', login_required(afm.views.AFMList.as_view()), name='afm_list'),
-    url(r'^afm/(?P<pk>\d+)/$', login_required(afm.views.AFMDetail.as_view()), name='afm_detail'),
-    url(r'^afm/create/$', login_required(afm.views.AFMCreate.as_view()), name='afm_create'),
-    url(r'^afm/(?P<pk>\d+)/update/$', login_required(afm.views.AFMUpdate.as_view()), name='afm_update'),
-    url(r'^afm/(?P<pk>\d+)/delete/$', login_required(afm.views.AFMDelete.as_view()), name='afm_delete'),
+    url(r'^afm/', include('afm.urls')),
     # afm rest framework
     url(r'^api/v0/afm/$', afm.api.AFMListAPI.as_view()),
     url(r'^api/v0/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
