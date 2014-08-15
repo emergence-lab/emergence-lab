@@ -2,13 +2,15 @@
 
 {% block dashboard_content %}
 
-<aside class="col-sm-3 col-sm-offset-7">
-    <header><h4>Recent Growths</h4></header>
-    <div class="list-group">
-    {% for growth in growths %}
-        <a class="list-group-item" href="{% url 'growth_detail' growth.growth_number %}">{{growth}} <p class="pull-right">{{growth.date}}</p></a>
-    {% endfor %}
-    </div>
-</aside>
+<div class="row">
+    <aside class="col-sm-3 col-sm-offset-9">
+        <header><h4>Recent Growths</h4></header>
+        <div class="list-group">
+        {% for growth in growths %}
+            <a class="list-group-item" href="{% url 'growth_detail' growth.growth_number %}">{{growth}} <p class="pull-right">{{growth.date}}</p></a>
+        {% endfor %}
+        </div>
+    </aside>
+</div>
 
 {% endblock %}

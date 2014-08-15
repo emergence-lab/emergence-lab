@@ -1,0 +1,60 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav>
+        <ul class="nav nav-pills">
+            <li><a href="{% url 'create_growth_start' %}"><span class="glyphicon glyphicon-plus"></span> Create Growth</a></li>
+            <li><a href="{% url 'afm_filter' %}"><span class="glyphicon glyphicon-search"></span> Sample Lookup</a></li>
+        </ul>
+    </nav>
+    <div class="row">
+        <nav class="col-xs-2">
+            <div class="tabbable tabs-left">
+                <ul class="nav nav-tabs">
+                    <li><h4 class="tabs-left-header">My Projects</h4></li>
+                    {% if not project %}
+                        <li class="active">
+                    {% else %}
+                        <li>
+                    {% endif %}
+                            <a href="{% url 'dashboard' %}">All</a>
+                        </li>
+                {% for p in active_projects %}
+                    {% if p.id == project.id %}
+                        <li class="active">
+                    {% else %}
+                        <li>
+                    {% endif %}
+                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{p}}</a>
+                        </li>
+                {% endfor %}
+                <li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add Project</a></li>
+                {% if inactive_projects %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                        {% for p in inactive_projects %}
+                            <li><a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{p}}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+                </ul>
+            </div>
+        </nav>
+        <section class="col-xs-10">
+            <div class="container-fluid no-padding">
+                {% block dashboard_content %}
+                {% endblock %}
+            </div>
+        </section>
+        
+    </div>
+</div>
+
+<div class="spacer"></div>
+
+{% endblock %}

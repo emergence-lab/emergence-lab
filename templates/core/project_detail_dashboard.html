@@ -1,34 +1,24 @@
-{% extends "core/base.html" %}
+{% extends "core/dashboard.html" %}
 
-{% block title %}{{project}}{% endblock %}
-
-{% block content %}
-<main class="container">
-    <nav>
-        <ol class="breadcrumb">
-            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li class='active'>{{project}}</li>
-        </ol>
-    </nav>
-
-    <section class="row">
-        <div class="col-md-6">
-            <header><h1 class="page-header">{{project}}</h1></header>
+{% block dashboard_content %}
+    <div class="row">
+        <div class="col-sm-6">
+            <header><h1 class="page-header"><a href="{% url 'project_detail_all' slug=project.slug %}">{{project}}</a></h1></header>
             <article>
                 <p>{{project.description}}</p>
             </article>
         </div>
 
-        <aside class="col-md-3">
+        <aside class="col-sm-3">
             <header><h4>Investigations</h4></header>
             <div class="list-group">
             {% for investigation in project.investigation_set.all %}
-                <a class="list-group-item" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug%}">{{investigation}}</a>
+                <a class="list-group-item" href="{% url 'investigation_detail_dashboard' project=project.slug slug=investigation.slug%}">{{investigation}}</a>
             {% endfor %}
             </div>
         </aside>
 
-        <aside class="col-md-3">
+        <aside class="col-sm-3">
             <header><h4>Recent Growths</h4></header>
             <div class="list-group">
             {% for growth in growths %}
@@ -36,9 +26,6 @@
             {% endfor %}
             </div>
         </aside>
+    </div>
 
-
-    </section>
-
-</main>
 {% endblock %}

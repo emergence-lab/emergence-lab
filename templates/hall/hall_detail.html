@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <ol class="breadcrumb">
-        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'growth_detail' slug=hall.growth.growth_number %}">{{hall.growth}}</a></li>
         <li><a href="{% url 'sample_family_detail' growth=hall.growth.growth_number pocket=hall.sample.pocket %}">{{hall.growth}}_{{hall.sample.pocket}}</a></li>
         <li><a href="{% url 'sample_detail' pk=hall.sample.id %}">{{hall.sample}}</a></li>

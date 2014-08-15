@@ -174,6 +174,44 @@ class ProjectDetailView(DetailView):
         return context
 
 
+class InvestigationDetailDashboardView(DashboardMixin, DetailView):
+    """
+    View for details of an investigation in the dashboard.
+    """
+    template_name = 'core/investigation_detail_dashboard.html'
+    model = investigation
+
+    def get_context_data(self, **kwargs):
+        context = super(InvestigationDetailDashboardView, self).get_context_data(**kwargs)
+        userid = operator.objects.filter(user__username=self.request.user.username).values('id')
+        context['growths'] = (growth.objects.filter(project=self.object,
+                                                    operator_id=userid)
+                                            .order_by('-growth_number')[:25])
+        context['project'] = self.object.project
+        return context
+
+
+class InvestigationDetailView(DetailView):
+    """
+    View for details of an investigation.
+    """
+    template_name = 'core/investigation_detail.html'
+    model = investigation
+
+    def get_context_data(self, **kwargs):
+        context = super(InvestigationDetailView, self).get_context_data(**kwargs)
+        if 'username' in self.kwargs:
+            userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
+            context['growths'] = (growth.objects.filter(project=self.object,
+                                                        operator_id=userid)
+                                                .order_by('-growth_number')[:25])
+        else:
+            context['growths'] = (growth.objects.filter(project=self.object)
+                                                .order_by('-growth_number')[:25])
+        context['project'] = self.object.project
+        return context
+
+
 class project_list(ActiveListView):
     """
     View to list all projects and provide actions.
