@@ -1,5 +1,11 @@
 {% extends "core/dashboard.html" %}
 
+{% block dashboard_breadcrumb %}
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'project_detail_dashboard' slug=project.slug %}">{{project}}</a></li>
+    <li class='active'>{{investigation}}</li>
+{% endblock dashboard_breadcrumb %}
+
 {% block dashboard_content %}
     <div class="row">
         <div class="col-sm-6">
@@ -27,4 +33,4 @@
         </aside>
     </div>
 
-{% endblock %}
+{% endblock dashboard_content %}

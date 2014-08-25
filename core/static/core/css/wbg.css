@@ -142,3 +142,11 @@
   border-color: #ddd #ddd #ddd transparent;
   *border-left-color: #ffffff;
 }
+
+.col-padding-left {
+  padding-left: 0;
+}
+
+.col-padding-right {
+  padding-right: 0;
+}

@@ -5,13 +5,21 @@
 {% block content %}
 <div class="container-fluid">
     <nav>
+        <ol class="breadcrumb">
+            {% block dashboard_breadcrumb %}
+                <li  class='active'>Dashboard</li>
+            {% endblock dashboard_breadcrumb %}
+        </ol>
+    </nav>
+
+    <nav>
         <ul class="nav nav-pills">
             <li><a href="{% url 'create_growth_start' %}"><span class="glyphicon glyphicon-plus"></span> Create Growth</a></li>
             <li><a href="{% url 'afm_filter' %}"><span class="glyphicon glyphicon-search"></span> Sample Lookup</a></li>
         </ul>
     </nav>
     <div class="row">
-        <nav class="col-xs-2">
+        <nav class="col-xs-2 col-padding-right">
             <div class="tabbable tabs-left">
                 <ul class="nav nav-tabs">
                     <li><h4 class="tabs-left-header">My Projects</h4></li>
@@ -45,10 +53,10 @@
                 </ul>
             </div>
         </nav>
-        <section class="col-xs-10">
+        <section class="col-xs-10 col-padding-left">
             <div class="container-fluid no-padding">
                 {% block dashboard_content %}
-                {% endblock %}
+                {% endblock dashboard_content %}
             </div>
         </section>
         

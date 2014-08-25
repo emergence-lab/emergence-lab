@@ -1,6 +1,20 @@
 {% extends "core/dashboard.html" %}
 
+{% block dashboard_breadcrumb %}
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li class='active'>{{project}}</li>
+{% endblock dashboard_breadcrumb %}
+
 {% block dashboard_content %}
+    <ul class="nav nav-tabs">
+        <li class="active"><a>Home</a></li>
+        <li><a href="#">Feed</a></li>
+        <li><a href="#">Growths</a></li>
+        <li><a href="#">Characterization</a></li>
+        <li><a href="#">Journal</a></li>
+        <li><a href="#">Settings</a></li>
+    </ul>
+
     <div class="row">
         <div class="col-sm-6">
             <header><h1 class="page-header"><a href="{% url 'project_detail_all' slug=project.slug %}">{{project}}</a></h1></header>
@@ -28,4 +42,4 @@
         </aside>
     </div>
 
-{% endblock %}
+{% endblock dashboard_content %}
