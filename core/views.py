@@ -90,7 +90,11 @@ class Dashboard(DetailView):
         return self.object
 
     def dispatch(self, request, *args, **kwargs):
-        self.object = operator.objects.get(user=request.user)
+        if request.user.last_login == request.user.date_joined:
+            self.object = operator(name=request.user.first_name, active=1, user_id=request.user.id)
+            self.object.save()
+        else:
+            self.object = operator.objects.get(user=request.user)
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 
 
