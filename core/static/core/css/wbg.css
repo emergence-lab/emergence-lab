@@ -19,9 +19,13 @@
 }
 
 .spacer {
-    height: 200px;
+    height: 75px;
 }
 
 .link-pointer {
     cursor: pointer;
+}
+
+.img-wizard {
+    width: 100%;
 }

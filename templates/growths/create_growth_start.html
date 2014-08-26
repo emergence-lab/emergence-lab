@@ -13,10 +13,13 @@
 <div class="container">
     <div class="row">
         <div class="col-xs-6 col-xs-offset-3">
-            <img style="width:100%;" src="{% static 'growths/img/start-progress.png' %}"></img>
+            <img class="img-wizard" src="{% static 'growths/img/start-progress.png' %}" />
         </div>
     </div>
-    <h1>Start Growth <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button></h1>
+    <h1 class="page-header">
+        Start Growth
+        <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button>
+    </h1>
 
     <form action="" method="POST">
     {% csrf_token %}

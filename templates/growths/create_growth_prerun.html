@@ -13,10 +13,13 @@
 <div class="container">
     <div class="row">
         <div class="col-xs-6 col-xs-offset-3">
-            <img style="width:100%;" src="{% static 'growths/img/prerun-progress.png' %}"></img>
+            <img class="img-wizard" src="{% static 'growths/img/prerun-progress.png' %}" />
         </div>
     </div>
-    <h1>Pre-run Growth Info &amp; Checklist <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button></h1>
+    <h1 class="page-header">
+        Pre-run Growth Info &amp; Checklist
+        <button class="btn btn-info pull-right" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button>
+    </h1>
 
     <div class="tabbable">
         <ul id ="maintablist" class="nav nav-tabs">
