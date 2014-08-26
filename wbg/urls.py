@@ -8,6 +8,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 import core.views
 import growths.views
 import afm.api
+import dashboard.views
 
 
 admin.autodiscover()
@@ -45,9 +46,9 @@ urlpatterns = patterns(
     url(r'^sample/split/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
 
     # dashboard views
-    url(r'^dashboard/$', login_required(core.views.Dashboard.as_view()), name='dashboard'),
-    url(r'^dashboard/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailDashboardView.as_view()), name='project_detail_dashboard'),
-    url(r'^dashboard/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.InvestigationDetailDashboardView.as_view()), name='investigation_detail_dashboard'),
+    url(r'^dashboard/$', login_required(dashboard.views.Dashboard.as_view()), name='dashboard'),
+    url(r'^dashboard/(?P<slug>[\w-]+)/$', login_required(dashboard.views.ProjectDetailDashboardView.as_view()), name='project_detail_dashboard'),
+    url(r'^dashboard/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(dashboard.views.InvestigationDetailDashboardView.as_view()), name='investigation_detail_dashboard'),
 
     # creategrowth urls
     url(r'^creategrowth/start/$', login_required(growths.views.CreateGrowthStartView.as_view()), name='create_growth_start'),

@@ -70,39 +70,6 @@ class homepage(TemplateView):
     template_name = "core/index.html"
 
 
-class DashboardMixin(object):
-
-    def get_context_data(self, **kwargs):
-        projects = growth.objects.filter(operator=self.request.user.operator).values_list('project', flat=True).distinct()
-        kwargs['active_projects'] = project.current.filter(id__in=projects)
-        kwargs['inactive_projects'] = project.retired.filter(id__in=projects)
-        return super(DashboardMixin, self).get_context_data(**kwargs)
-
-
-class Dashboard(DetailView):
-    """
-    Main dashboard for the user with commonly used actions.
-    """
-    template_name = 'core/dashboard.html'
-    model = operator
-    object = None
-
-    def get_context_data(self, **kwargs):
-        context = super(Dashboard, self).get_context_data(**kwargs)
-        context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
-        projects = growth.objects.filter(operator=self.object).values_list('project', flat=True).distinct()
-        context['active_projects'] = project.current.filter(id__in=projects)
-        context['inactive_projects'] = project.retired.filter(id__in=projects)
-        return context
-
-    def get_object(self, queryset=None):
-        return self.object
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = operator.objects.get(user=request.user)
-        return super(Dashboard, self).dispatch(request, *args, **kwargs)
-
-
 def protected_media(request, filename):
     fullpath = os.path.join(settings.MEDIA_ROOT, filename)
     response = HttpResponse(mimetype='image/jpeg')
@@ -138,22 +105,6 @@ class platter_list(ActiveListView):
     model = platter
 
 
-class ProjectDetailDashboardView(DashboardMixin, DetailView):
-    """
-    View for details of a project in the dashboard.
-    """
-    template_name = 'core/project_detail_dashboard.html'
-    model = project
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectDetailDashboardView, self).get_context_data(**kwargs)
-        userid = operator.objects.filter(user__username=self.request.user.username).values('id')
-        context['growths'] = (growth.objects.filter(project=self.object,
-                                                    operator_id=userid)
-                                            .order_by('-growth_number')[:25])
-        return context
-
-
 class ProjectDetailView(DetailView):
     """
     View for details of a project.
@@ -171,23 +122,6 @@ class ProjectDetailView(DetailView):
         else:
             context['growths'] = (growth.objects.filter(project=self.object)
                                                 .order_by('-growth_number')[:25])
-        return context
-
-
-class InvestigationDetailDashboardView(DashboardMixin, DetailView):
-    """
-    View for details of an investigation in the dashboard.
-    """
-    template_name = 'core/investigation_detail_dashboard.html'
-    model = investigation
-
-    def get_context_data(self, **kwargs):
-        context = super(InvestigationDetailDashboardView, self).get_context_data(**kwargs)
-        userid = operator.objects.filter(user__username=self.request.user.username).values('id')
-        context['growths'] = (growth.objects.filter(project=self.object,
-                                                    operator_id=userid)
-                                            .order_by('-growth_number')[:25])
-        context['project'] = self.object.project
         return context
 
 
