@@ -567,7 +567,6 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
 
 def create_growth_postrun(request):
     if request.method == "POST":
-        print ("post request")
         prcform = postrun_checklist_form(request.POST, prefix='prcform')
         prsform = prerun_sources_form(request.POST, prefix='prsform')
         commentsform = comments_form(request.POST, prefix='commentsform')
@@ -580,27 +579,13 @@ def create_growth_postrun(request):
             lastgrowth = lastgrowth[0]
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
-        print ("get request")
-        lastsource = source.objects.latest('id')
-        lastsource = source.objects.filter(id=lastsource.id)
-        lastsource = lastsource[0]
-        lastgrowth = growth.objects.latest('id')
-        lastgrowth = growth.objects.filter(id=lastgrowth.id)
-        lastgrowth = lastgrowth[0]
-        newcp2mg = lastsource.cp2mg
-        newtmin1 = lastsource.tmin1
-        newtmin2 = lastsource.tmin2
-        newtmga1 = lastsource.tmga1
-        newtmga2 = lastsource.tmga2
-        newtmal1 = lastsource.tmal1
-        newtega1 = lastsource.tega1
-        newnh3 = lastsource.nh3
-        newsih4 = lastsource.sih4
-        newdate_time = lastsource.date_time
+        lastgrowth = growth.objects.latest('growth_number')
         prcform = postrun_checklist_form(prefix='prcform')
         commentsform = comments_form(prefix='commentsform', initial={'comment_field': lastgrowth.run_comments})
-        prsform = prerun_sources_form(prefix='prsform', initial={'cp2mg': newcp2mg, 'tmin1': newtmin1,
-                        'tmin2': newtmin2, 'tmga1': newtmga1, 'tmga2': newtmga2, 'tmal1': newtmal1,
-                        'tega1': newtega1, 'nh3': newnh3, 'sih4': newsih4, 'date_time': newdate_time})
+        try:
+            last_sources = source.objects.latest('date_time')
+            prsform = prerun_sources_form(instance=last_sources, prefix='prsform')
+        except:
+            prsform = prerun_sources_form(prefix='prsform')
     return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform})
 
