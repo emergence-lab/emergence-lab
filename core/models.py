@@ -51,6 +51,7 @@ class project(models.Model):
     name = models.CharField(max_length=45)
     slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
+    core = models.BooleanField(default=False)
     description = MarkupField(blank=True, markup_type='markdown')
     start_date = models.DateTimeField(auto_now_add=True)
 
