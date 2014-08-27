@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View
 import gitlab
 
-from .models import investigation, operator, platter, project
+from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
 
 
@@ -90,11 +90,15 @@ class Dashboard(DetailView):
         return self.object
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.last_login == request.user.date_joined:
+        try:
+            self.object = operator.objects.get(user=request.user)
+        except:
             self.object = operator(name=request.user.first_name, active=1, user_id=request.user.id)
             self.object.save()
-        else:
-            self.object = operator.objects.get(user=request.user)
+            core_projects = project.objects.filter(core=True).values_list('id', flat=True)
+            for proj in core_projects:
+                core_project_tracking = project_tracking(operator=self.object, project_id=proj, is_pi=True)
+                core_project_tracking.save()
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 
 
