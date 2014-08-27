@@ -94,6 +94,7 @@ class operator(models.Model):
     name = models.CharField(max_length=45)
     active = models.BooleanField(default=True)
     user = models.OneToOneField(User)
+    projects = models.ManyToManyField(project, through='project_tracking')
 
     objects = models.Manager()
     current = active_manager()
@@ -104,3 +105,15 @@ class operator(models.Model):
 
     class Meta:
         db_table = 'operators'
+
+
+class project_tracking(models.Model):
+    """
+    Stores ownership and tracking information for projects.
+    """
+    project = models.ForeignKey(project)
+    operator = models.ForeignKey(operator)
+    is_pi = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'project_operator_tracking'
