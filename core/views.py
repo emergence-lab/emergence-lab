@@ -52,12 +52,12 @@ class QuickSearchRedirect(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         growth_number = self.request.GET.get('growth', None)
         try:
-            obj = sample.get_sample(growth_number)
-            return reverse('sample_detail', args=(obj.id,))
+            growth.get_growth(growth_number)
+            return reverse('growth_detail', args=(growth_number,))
         except:
             try:
-                growth.get_growth(growth_number)
-                return reverse('growth_detail', args=(growth_number,))
+                obj = sample.get_sample(growth_number)
+                return reverse('sample_detail', args=(obj.id,))
             except:
                 pass
         return reverse('afm_filter')
