@@ -447,9 +447,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
     def get_context_data(self, **kwargs):
         self.object = None
         context = super(create_growth_readings, self).get_context_data(**kwargs)
-        lastgrowth = growth.objects.latest('id')
-        lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
-        lastgrowth = lastgrowth[0]
+        lastgrowth = growth.objects.latest('growth_number')
         commentsform = comments_form(prefix='commentsform', initial={'comment_field': lastgrowth.run_comments})
         context["commentscontext"] = commentsform
         context["growth"] = lastgrowth
@@ -574,11 +572,9 @@ def create_growth_postrun(request):
         commentsform = comments_form(request.POST, prefix='commentsform')
         if prcform.is_valid() and prsform.is_valid() and commentsform.is_valid():
             print ("successful validation. Now let's do something.")
-            lastgrowth = growth.objects.latest('id')
-            lastgrowth = growth.objects.filter(id=lastgrowth.id)
+            lastgrowth = growth.objects.latest('growth_number')
             lastgrowth.update(run_comments=commentsform.cleaned_data['comment_field'])
             prsform.save()
-            lastgrowth = lastgrowth[0]
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
         lastgrowth = growth.objects.latest('growth_number')
