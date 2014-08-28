@@ -8,13 +8,13 @@ from growths.models import growth
 class DashboardMixin(object):
 
     def get_context_data(self, **kwargs):
-        projects = growth.objects.filter(operator=self.request.user.operator).values_list('project', flat=True).distinct()
+        projects = operator.objects.filter(user=self.request.user).values_list('projects__id', flat=True)
         kwargs['active_projects'] = project.current.filter(id__in=projects)
         kwargs['inactive_projects'] = project.retired.filter(id__in=projects)
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 
-class Dashboard(DetailView):
+class Dashboard(DashboardMixin, DetailView):
     """
     Main dashboard for the user with commonly used actions.
     """
@@ -25,9 +25,6 @@ class Dashboard(DetailView):
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
         context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
-        projects = growth.objects.filter(operator=self.object).values_list('project', flat=True).distinct()
-        context['active_projects'] = project.current.filter(id__in=projects)
-        context['inactive_projects'] = project.retired.filter(id__in=projects)
         return context
 
     def get_object(self, queryset=None):
