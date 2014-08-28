@@ -383,7 +383,7 @@ class CreateGrowthPrerunView(TemplateView):
     template_name = 'growths/create_growth_prerun.html'
 
     def post(self, request, *args, **kwargs):
-        lastgrowth = growth.objects.latest('id')
+        lastgrowth = growth.objects.latest('growth_number')
         pcform = prerun_checklist_form(request.POST, prefix='pcform')
         pgform = prerun_growth_form(request.POST, prefix='pgform', instance=lastgrowth)
         sourceform = prerun_sources_form(request.POST, prefix="sourceform")
