@@ -70,38 +70,6 @@ class homepage(TemplateView):
     template_name = "core/index.html"
 
 
-class Dashboard(DetailView):
-    """
-    Main dashboard for the user with commonly used actions.
-    """
-    template_name = 'core/dashboard.html'
-    model = operator
-    object = None
-
-    def get_context_data(self, **kwargs):
-        context = super(Dashboard, self).get_context_data(**kwargs)
-        context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
-        projects = growth.objects.filter(operator=self.object).values_list('project', flat=True).distinct()
-        context['active_projects'] = project.current.filter(id__in=projects)
-        context['inactive_projects'] = project.retired.filter(id__in=projects)
-        return context
-
-    def get_object(self, queryset=None):
-        return self.object
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.object = operator.objects.get(user=request.user)
-        except:
-            self.object = operator(name=request.user.first_name, active=1, user_id=request.user.id)
-            self.object.save()
-            core_projects = project.objects.filter(core=True).values_list('id', flat=True)
-            for proj in core_projects:
-                core_project_tracking = project_tracking(operator=self.object, project_id=proj, is_pi=True)
-                core_project_tracking.save()
-        return super(Dashboard, self).dispatch(request, *args, **kwargs)
-
-
 def protected_media(request, filename):
     fullpath = os.path.join(settings.MEDIA_ROOT, filename)
     response = HttpResponse(mimetype='image/jpeg')
@@ -145,7 +113,6 @@ class ProjectDetailView(DetailView):
     model = project
 
     def get_context_data(self, **kwargs):
-        print(self.kwargs)
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         if 'username' in self.kwargs:
             userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
@@ -155,6 +122,27 @@ class ProjectDetailView(DetailView):
         else:
             context['growths'] = (growth.objects.filter(project=self.object)
                                                 .order_by('-growth_number')[:25])
+        return context
+
+
+class InvestigationDetailView(DetailView):
+    """
+    View for details of an investigation.
+    """
+    template_name = 'core/investigation_detail.html'
+    model = investigation
+
+    def get_context_data(self, **kwargs):
+        context = super(InvestigationDetailView, self).get_context_data(**kwargs)
+        if 'username' in self.kwargs:
+            userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
+            context['growths'] = (growth.objects.filter(project=self.object,
+                                                        operator_id=userid)
+                                                .order_by('-growth_number')[:25])
+        else:
+            context['growths'] = (growth.objects.filter(project=self.object)
+                                                .order_by('-growth_number')[:25])
+        context['project'] = self.object.project
         return context
 
 
