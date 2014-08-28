@@ -58,6 +58,7 @@
             <td><strong>Serial Number</strong></td>
             <td><strong>Orientation</strong></td>
             <td><strong>Miscut</strong></td>
+            <td><strong>Comment</strong></td>
         </tr>
         {% for sample in samples %}
         <tr>
@@ -74,6 +75,7 @@
             <td>{{sample.substrate_serial}}</td>
             <td>{{sample.substrate_orientation}}</td>
             <td>{{sample.substrate_miscut}}</td>
+            <td>{{sample.comment}}</td>
         </tr>
         {% endfor %}
     </table>
