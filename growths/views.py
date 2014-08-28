@@ -235,7 +235,7 @@ class update_readings(SingleObjectMixin, TemplateView):
             rform = readings_form(instance=readings(), prefix=('reading' + str(numberofreadings)),
                                   initial={'growth': reading.growth,
                 'layer': reading.layer, 'layer_desc': reading.layer_desc,
-                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'tc_out': reading.tc_out,
+                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
                 'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm, 'gc_pressure': reading.gc_pressure,
                 'gc_position': reading.gc_position, 'voltage_in': reading.voltage_in,
                 'voltage_out': reading.voltage_out, 'current_in': reading.current_in,
@@ -272,6 +272,7 @@ class update_readings(SingleObjectMixin, TemplateView):
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
                 newpyro_in = rform.cleaned_data['pyro_in']
+                newecp_temp = rform.cleaned_data['ecp_temp']
                 newtc_out = rform.cleaned_data['tc_out']
                 newtc_in = rform.cleaned_data['tc_in']
                 newmotor_rpm = rform.cleaned_data['motor_rpm']
@@ -315,7 +316,7 @@ class update_readings(SingleObjectMixin, TemplateView):
                 print (newlayer_desc)
                 thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
                 thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
-                                   pyro_out=newpyro_out, pyro_in=newpyro_in, tc_out=newtc_out,
+                                   pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
                                    tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
                                    gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
                                    current_in=newcurrent_in, current_out=newcurrent_out, top_vp_flow=newtop_vp_flow,
@@ -461,7 +462,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
             rform = readings_form(instance=readings(), prefix=('reading' + str(numberofreadings)),
                                   initial={'growth': reading.growth,
                 'layer': reading.layer, 'layer_desc': reading.layer_desc,
-                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'tc_out': reading.tc_out,
+                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
                 'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm, 'gc_pressure': reading.gc_pressure,
                 'gc_position': reading.gc_position, 'voltage_in': reading.voltage_in,
                 'voltage_out': reading.voltage_out, 'current_in': reading.current_in,
@@ -504,6 +505,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
                 newpyro_in = rform.cleaned_data['pyro_in']
+                newecp_temp = rform.cleaned_data['ecp_temp']
                 newtc_out = rform.cleaned_data['tc_out']
                 newtc_in = rform.cleaned_data['tc_in']
                 newmotor_rpm = rform.cleaned_data['motor_rpm']
@@ -547,7 +549,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
                 print (newlayer_desc)
                 thisreading = readings.objects.filter(growth=lastgrowth, layer=newlayer)
                 thisreading.update(layer=newlayer, layer_desc=newlayer_desc,
-                                   pyro_out=newpyro_out, pyro_in=newpyro_in, tc_out=newtc_out,
+                                   pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
                                    tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
                                    gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
                                    current_in=newcurrent_in, current_out=newcurrent_out, top_vp_flow=newtop_vp_flow,
