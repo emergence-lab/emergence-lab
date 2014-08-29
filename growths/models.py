@@ -193,6 +193,7 @@ class readings(models.Model):
     # readings
     pyro_out = models.DecimalField(max_digits=7, decimal_places=2)
     pyro_in = models.DecimalField(max_digits=7, decimal_places=2)
+    ecp_temp = models.DecimalField(max_digits=7, decimal_places=2)
     tc_out = models.DecimalField(max_digits=7, decimal_places=2)
     tc_in = models.DecimalField(max_digits=7, decimal_places=2)
     motor_rpm = models.DecimalField(max_digits=7, decimal_places=2)

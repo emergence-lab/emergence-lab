@@ -15,7 +15,7 @@ class sample_form(ModelForm):
     class Meta:
         model = sample
         fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
-                  'substrate_miscut', 'size', 'location']
+                  'substrate_miscut', 'size', 'location', 'comment']
 
     def clean_parent(self):
         parent_name = self.cleaned_data['parent']
