@@ -6,67 +6,58 @@
 {% block content %}
 
 <div class="container">
-    <ol class="breadcrumb">
-        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
-        <li class="active">Readings</li>
-    </ol>
+    <header>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
+            <li class="active">Readings</li>
+        </ol>
 
-    <a href="{% url 'update_readings' growth %}" class="btn btn-warning">Edit</a>
-
-    <div class="row">
-
-        {% for reading in readingslist %}
-        <div class="col-xs-2">
-                
-                <h3>Layer: {{reading.layer}}</h3>
-                <p><strong>Description: </strong>{{reading.layer_desc}}</p>
-                <p><strong>Pyro out: </strong>{{reading.pyro_out}}</p>
-                <p><strong>Pyro in: </strong>{{reading.pyro_in}}</p>
-                <p><strong>tc out: </strong>{{reading.tc_out}}</p>
-                <p><strong>tc in: </strong>{{reading.tc_in}}</p>
-                <p><strong>ecp temp: </strong>{{reading.ecp_temp}}</p>
-                <p><strong>motor rpm: </strong>{{reading.motor_rpm}}</p>
-                <p><strong>gc pressure: </strong>{{reading.gc_pressure}}</p>
-                <p><strong>gc position: </strong>{{reading.gc_position}}</p>
-                <p><strong>Voltage in: </strong>{{reading.voltage_in}}</p>
-                <p><strong>Voltage out: </strong>{{reading.voltage_out}}</p>
-                <p><strong>current in: </strong>{{reading.current_in}}</p>
-                <p><strong>current out: </strong>{{reading.current_out}}</p>
-                <p><strong>top vp flow: </strong>{{reading.top_vp_flow}}</p>
-                <p><strong>hydride inner: </strong>{{reading.hydride_inner}}</p>
-                <p><strong>hydrideouter: </strong>{{reading.hydride_outer}}</p>
-                <p><strong>alkyl flow inner: </strong>{{reading.alkyl_flow_inner}}</p>
-                <p><strong>alkyl push inner </strong>{{reading.alkyl_push_inner}}</p>
-                <p><strong>alkyl flow middle </strong>{{reading.alkyl_flow_middle}}</p>
-                <p><strong>alkyl push middle: </strong>{{reading.alkyl_push_middle}}</p>
-                <p><strong>alkyl flow outer: </strong>{{reading.alkyl_flow_outer}}</p>
-                <p><strong>alkyl push outer: </strong>{{reading.alkyl_push_outer}}</p>
-                <p><strong>N2 flow: </strong>{{reading.n2_flow}}</p>
-                <p><strong>H2 flow: </strong>{{reading.h2_flow}}</p>
-                <p><strong>NH3 flow: </strong>{{reading.nh3_flow}}</p>
-                <p><strong>Hydride pressure: </strong>{{reading.hydride_pressure}}</p>
-                <p><strong>tmga1 flow: </strong>{{reading.tmga1_flow}}</p>
-                <p><strong>tmga1 pressure: </strong>{{reading.tmga1_pressure}}</p>
-                <p><strong>tmga2 flow: </strong>{{reading.tmga2_flow}}</p>
-                <p><strong>tmga2 pressure: </strong>{{reading.tmga2_pressure}}</p>
-                <p><strong>tega2 flow: </strong>{{reading.tega2_flow}}</p>
-                <p><strong>tega2 pressure: </strong>{{reading.tega2_pressure}}</p>
-                <p><strong>tmin1 flow: </strong>{{reading.tmin1_flow}}</p>
-                <p><strong>tmin1 pressure: </strong>{{reading.tmin1_pressure}}</p>
-                <p><strong>tmal1 flow: </strong>{{reading.tmal1_flow}}</p>
-                <p><strong>tmal1 pressure: </strong>{{reading.tmal1_pressure}}</p>
-                <p><strong>cp2mg flow: </strong>{{reading.cp2mg_flow}}</p>
-                <p><strong>cp2mg pressure: </strong>{{reading.cp2mg_pressure}}</p>
-                <p><strong>cp2mg dilution: </strong>{{reading.cp2mg_dilution}}</p>
-                <p><strong>silane flow: </strong>{{reading.silane_flow}}</p>
-                <p><strong>silane dilution: </strong>{{reading.silane_dilution}}</p>
-                <p><strong>silane mix: </strong>{{reading.silane_mix}}</p>
-                <p><strong>silane pressure: </strong>{{reading.silane_pressure}}</p>
-
-        </div>
-        {% endfor %}
-    </div>
+        <h1 class="page-header">
+            Readings for {{growth}}
+            <div class="pull-right">
+                <a href="{% url 'update_readings' growth %}" class="btn btn-warning">Edit</a>
+            </div>
+        </h1>
+    </header>
+    
+    <section class="row">
+        <table class="table table-striped table-bordered table-hover table-condensed">
+            {% for row in readings_table %}
+                {% if forloop.first %}
+                    <thead>
+                        <tr>
+                            {% for col in row %}
+                                <td><strong>{{col}}</strong></td>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% elif forloop.last %}
+                        <tr>
+                            {% for col in row %}
+                                {% if forloop.first %}
+                                    <td><strong>{{col}}</strong></td>
+                                {% else %}
+                                    <td>{{col}}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                {% else %}
+                    <tr>
+                        {% for col in row %}
+                            {% if forloop.first %}
+                                <td><strong>{{col}}</strong></td>
+                            {% else %}
+                                <td>{{col}}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </section>
 
 </div>
 

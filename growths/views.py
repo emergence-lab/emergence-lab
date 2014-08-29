@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 
 from django.shortcuts import render, render_to_response
@@ -115,17 +116,32 @@ class SplitSampleView(FormView):
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
-class readings_detail(SessionHistoryMixin, DetailView):
+class readings_detail(DetailView):
     model = growth
     template_name = 'growths/readings_detail.html'
     slug_field = 'growth_number'
     context_object_name = 'growth'
 
     def get_context_data(self, **kwargs):
-        self.object = None
         context = super(readings_detail, self).get_context_data(**kwargs)
-        context["growth"] = self.get_object()
-        context["readingslist"] = readings.objects.filter(growth=self.get_object())
+        context['growth'] = self.object
+
+        # turn list organized by column into a list organized by row
+        #  and add labels to first column
+        readings_list = readings.objects.filter(growth=self.object).values_list()
+        context['readings_table'] = zip(
+            ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'Thermocouple Out',
+             'Thermocouple In', 'ECP Temp', 'Motor RPM', 'GC Pressure',
+             'GC Position', 'Voltage In', 'Voltage Out', 'Current In',
+             'Current Out', 'Top VP Flow', 'Hydride Inner', 'Hydride Outer',
+             'Alkyl Flow Inner', 'Alkyl Push Inner', 'Alkyl Flow Middle',
+             'Alkyl Push Inner', 'Alkyl Flow Outer', 'Alkyl Push Outer',
+             'N2 Flow', 'H2 Flow', 'NH3 Flow', 'Hydride Pressure', 'TMGa1 Flow',
+             'TMGa1 Pressure', 'TMGa2 Flow', 'TMGa2 Pressure', 'TEGa1 FLow',
+             'TEGa1 Pressure', 'TMIn1 Flow', 'TMIn1 Pressure', 'TMAl1 Flow',
+             'TMAl1 Pressure', 'Cp2Mg Flow', 'Cp2Mg Pressure', 'Cp2Mg Dilution',
+             'SiH4 Flow', 'SiH4 Dilution', 'SiH4 Mix', 'SiH4 Pressure'], *readings_list)[2:]
+
         return context
 
 
