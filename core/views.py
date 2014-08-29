@@ -4,11 +4,12 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View
+from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View, FormView
 import gitlab
 
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
+from .forms import TrackProjectForm
 
 
 class SessionHistoryMixin(object):
@@ -179,3 +180,19 @@ class ExceptionHandlerView(View):
             if not success:
                 raise Exception('Error submitting issue')
         return HttpResponseRedirect(path)
+
+
+class TrackProjectView(CreateView):
+    model = project_tracking
+    form_class = TrackProjectForm
+    template_name = 'core/track_project.html'
+
+    def form_valid(self, form):
+        project_id = form.cleaned_data['project']
+        try:
+            self.object = project_tracking.objects.get(operator=self.request.user.operator, project_id=project_id)
+            self.object.is_pi = form.cleaned_data['is_pi']
+            self.object.save()
+        except:
+            self.object = form.save(operator=self.request.user.operator)
+        return HttpResponseRedirect(reverse('dashboard'))

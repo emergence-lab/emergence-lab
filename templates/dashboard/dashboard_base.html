@@ -50,6 +50,8 @@
                     {% endif %}
                 {% endfor %}
 
+                <a href="{% url 'track_project' %}" class="list-group-item"><span class="glyphicon glyphicon-plus"></span> Add Project</a>
+
                 {% if inactive_projects %}
                     <div class="list-group-item dropdown">
                         <a href="" class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>

@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Track Projects{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <form action="{% url 'track_project' %}" method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary">Create</button>
+            {% endbuttons %}
+        </form>
+    </div>
+{% endblock content %}

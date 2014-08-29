@@ -30,9 +30,11 @@ urlpatterns = patterns(
     url(r'^operators/create/$', login_required(core.views.operator_create.as_view()), name='operator_create'),
     url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
     url(r'^projects/$', login_required(core.views.project_list.as_view()), name='project_list'),
+    url(r'^projects/track', login_required(core.views.TrackProjectView.as_view()), name='track_project'),
     url(r'^projects/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_all'),
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.InvestigationDetailView.as_view()), name='investigation_detail_all'),
     url(r'^investigations/$', login_required(core.views.investigation_list.as_view()), name='investigation_list'),
+
 
     # growths urls
     url(r'^growths/search/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
