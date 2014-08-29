@@ -129,6 +129,9 @@ class readings_detail(DetailView):
         # turn list organized by column into a list organized by row
         #  and add labels to first column
         readings_list = readings.objects.filter(growth=self.object).values_list()
+        if not readings_list:
+            return context
+    
         context['readings_table'] = zip(
             ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'Thermocouple Out',
              'Thermocouple In', 'ECP Temp', 'Motor RPM', 'GC Pressure',

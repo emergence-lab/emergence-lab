@@ -20,20 +20,32 @@
             </div>
         </h1>
     </header>
-    
-    <section class="row">
-        <table class="table table-striped table-bordered table-hover table-condensed">
-            {% for row in readings_table %}
-                {% if forloop.first %}
-                    <thead>
-                        <tr>
-                            {% for col in row %}
-                                <td><strong>{{col}}</strong></td>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                {% elif forloop.last %}
+
+    {% if readings_table %}
+        <section class="row">
+            <table class="table table-striped table-bordered table-hover table-condensed">
+                {% for row in readings_table %}
+                    {% if forloop.first %}
+                        <thead>
+                            <tr>
+                                {% for col in row %}
+                                    <td><strong>{{col}}</strong></td>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                    {% elif forloop.last %}
+                            <tr>
+                                {% for col in row %}
+                                    {% if forloop.first %}
+                                        <td><strong>{{col}}</strong></td>
+                                    {% else %}
+                                        <td>{{col}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    {% else %}
                         <tr>
                             {% for col in row %}
                                 {% if forloop.first %}
@@ -43,21 +55,11 @@
                                 {% endif %}
                             {% endfor %}
                         </tr>
-                    </tbody>
-                {% else %}
-                    <tr>
-                        {% for col in row %}
-                            {% if forloop.first %}
-                                <td><strong>{{col}}</strong></td>
-                            {% else %}
-                                <td>{{col}}</td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                {% endif %}
-            {% endfor %}
-        </table>
-    </section>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </section>
+    {% endif %}
 
 </div>
 
