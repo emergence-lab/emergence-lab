@@ -258,15 +258,11 @@ class update_readings(SingleObjectMixin, TemplateView):
         context["readingslist"] = formlist
         return context
     def post(self, request, **kwargs):
-        print ("IS THIS POST TEST WORKING? YES. YES IT IS.")
         numberofreadings = len(readings.objects.filter(growth=self.get_object()))
         print (numberofreadings)
         for x in range(0, numberofreadings):
-            print("inside for loop")
-            print(x)
             rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
             if rform.is_valid():
-                print ("rform is valid")
                 newgrowth = growth=self.get_object()
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
@@ -312,8 +308,6 @@ class update_readings(SingleObjectMixin, TemplateView):
                 newsilane_dilution = rform.cleaned_data['silane_dilution']
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
-                print("LAYER DESCRIPTION:")
-                print (newlayer_desc)
                 thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
                 thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
                                    pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
@@ -483,9 +477,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
         context["readingslist"] = formlist
         return context
     def post(self, request, **kwargs):
-        print ("IS THIS POST TEST WORKING? YES. YES IT IS.")
-        lastgrowth = growth.objects.latest('id')
-        lastgrowth = growth.objects.filter(growth_number=lastgrowth.growth_number)
+        lastgrowth = growth.objects.latest('growth_number')
         commentsform = comments_form(request.POST, prefix='commentsform')
         if commentsform.is_valid():
             newcomments = commentsform.cleaned_data['comment_field']
@@ -494,11 +486,8 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
         numberofreadings = len(readings.objects.filter(growth=lastgrowth))
         print (numberofreadings)
         for x in range(0, numberofreadings):
-            print("inside for loop")
-            print(x)
             rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
             if rform.is_valid():
-                print ("rform is valid")
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
@@ -543,8 +532,6 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
                 newsilane_dilution = rform.cleaned_data['silane_dilution']
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
-                print("LAYER DESCRIPTION:")
-                print (newlayer_desc)
                 thisreading = readings.objects.filter(growth=lastgrowth, layer=newlayer)
                 thisreading.update(layer=newlayer, layer_desc=newlayer_desc,
                                    pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
