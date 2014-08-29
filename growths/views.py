@@ -410,6 +410,7 @@ class CreateGrowthPrerunView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CreateGrowthPrerunView, self).get_context_data(**kwargs)
         last_growth = growth.objects.latest('growth_number')
+        context['growth'] = last_growth
         context['pcform'] = prerun_checklist_form(prefix='pcform')
         context['pgform'] = prerun_growth_form(prefix='pgform',
                                                initial={
@@ -572,5 +573,5 @@ def create_growth_postrun(request):
             prsform = prerun_sources_form(instance=last_sources, prefix='prsform')
         except:
             prsform = prerun_sources_form(prefix='prsform')
-    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform})
+    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform, 'growth': lastgrowth})
 
