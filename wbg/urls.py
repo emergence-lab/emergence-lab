@@ -31,6 +31,7 @@ urlpatterns = patterns(
     url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
     url(r'^projects/$', login_required(core.views.project_list.as_view()), name='project_list'),
     url(r'^projects/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_all'),
+    url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.InvestigationDetailView.as_view()), name='investigation_detail_all'),
     url(r'^investigations/$', login_required(core.views.investigation_list.as_view()), name='investigation_list'),
 
     # growths urls
@@ -44,7 +45,7 @@ urlpatterns = patterns(
     url(r'^sample/split/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
 
     # dashboard views
-    url(r'^dashboard/$', login_required(core.views.Dashboard.as_view()), name='profile_dashboard'),
+    url(r'^dashboard/', include('dashboard.urls')),
 
     # creategrowth urls
     url(r'^creategrowth/start/$', login_required(growths.views.CreateGrowthStartView.as_view()), name='create_growth_start'),

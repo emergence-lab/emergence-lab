@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{investigation}}{% endblock %}
+
+{% block content %}
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'project_detail_all' slug=project.slug %}">{{project}}</a></li>
+            <li class='active'>{{investigation}}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <header>
+                <h1 class="page-header">
+                    {{investigation}}
+                    <a class="btn btn-default pull-right" href="{% url 'project_detail_all' slug=project.slug %}">
+                        <span class="glyphicon glyphicon-arrow-left"></span>
+                        Back to Project
+                    </a>
+                </h1>
+            </header>
+            <article>
+                <p>{{investigation.description}}</p>
+            </article>
+        </div>
+
+        <aside class="col-sm-3 col-sm-offset-3">
+            <header><h4>Recent Growths</h4></header>
+            <div class="list-group">
+            {% for growth in growths %}
+                <a class="list-group-item" href="{% url 'growth_detail' growth.growth_number %}">{{growth}} <p class="pull-right">{{growth.date}}</p></a>
+            {% endfor %}
+            </div>
+        </aside>
+    </div>
+</main>
+{% endblock %}
