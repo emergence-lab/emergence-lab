@@ -131,7 +131,7 @@ class readings_detail(DetailView):
         readings_list = readings.objects.filter(growth=self.object).values_list()
         if not readings_list:
             return context
-    
+
         context['readings_table'] = zip(
             ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'Thermocouple Out',
              'Thermocouple In', 'ECP Temp', 'Motor RPM', 'GC Pressure',
@@ -324,8 +324,9 @@ class CreateGrowthPrerunView(TemplateView):
             if pf.has_changed():
                 sample_forms.append(sf)
         if sample_forms and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sample_forms]) and commentsform.is_valid():
-            
             lastgrowth = pgform.save()
+            lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
+            lastgrowth.save()
             for i, sform in enumerate(sample_forms):
                 pocket = i + 1
                 new_sample = sform.save(growth=lastgrowth, pocket=pocket)
