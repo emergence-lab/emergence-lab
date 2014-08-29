@@ -394,9 +394,8 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
         lastgrowth = growth.objects.latest('growth_number')
         commentsform = comments_form(request.POST, prefix='commentsform')
         if commentsform.is_valid():
-            newcomments = commentsform.cleaned_data['comment_field']
-            lastgrowth.update(run_comments=newcomments)
-        lastgrowth = lastgrowth[0]
+            lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
+            lastgrowth.save()
         numberofreadings = len(readings.objects.filter(growth=lastgrowth))
         print (numberofreadings)
         for x in range(0, numberofreadings):
@@ -474,7 +473,8 @@ def create_growth_postrun(request):
         if prcform.is_valid() and prsform.is_valid() and commentsform.is_valid():
             print ("successful validation. Now let's do something.")
             lastgrowth = growth.objects.latest('growth_number')
-            lastgrowth.update(run_comments=commentsform.cleaned_data['comment_field'])
+            lastgrowth.run_comments=commentsform.cleaned_data['comment_field']
+            lastgrowth.save()
             prsform.save()
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
