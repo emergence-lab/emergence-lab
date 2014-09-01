@@ -45,6 +45,7 @@ class sample_form(ModelForm):
         if instance.parent is None:
             instance.parent = instance
         else:
+            instance.parent.location = 'Consumed'
             instance.substrate_type = 'growth'
             instance.substrate_serial = instance.parent.substrate_serial
             instance.substrate_orientation = instance.parent.substrate_orientation
@@ -52,6 +53,8 @@ class sample_form(ModelForm):
 
         if commit:
             instance.save()
+            if instance.parent != instance:
+                instance.parent.save()
         return instance
 
 
