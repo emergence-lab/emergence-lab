@@ -78,6 +78,15 @@ class start_growth_form(ModelForm):
         fields = ['growth_number', 'date', 'operator', 'project', 'investigation',
                   'platter', 'reactor']
 
+    def clean_growth_number(self):
+        growth_number = self.cleaned_data['growth_number']
+        m = re.match('^([gt][1-9][0-9]{3,})$', growth_number)
+        if not m:
+            raise forms.ValidationError('Growth {0} improperly formatted. Did you accidently include the growth tag?'.format(growth_number))
+
+        return growth_number
+
+
     def save(self, *args, **kwargs):
         commit = kwargs.pop('commit', True)
         comments = kwargs.pop('runcomments')
