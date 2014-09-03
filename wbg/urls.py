@@ -17,23 +17,22 @@ urlpatterns = patterns(
     # urls, add login_required() around the as_view() call for security
 
     # misc urls
-    url(r'^$', core.views.homepage.as_view(), name='home'),
-    url(r'^media/(?P<filename>.*)$', login_required(core.views.protected_media)),
-    url(r'^quicksearch/', login_required(core.views.QuickSearchRedirect.as_view()), name='quicksearch'),
-    url(r'^exception/', login_required(core.views.ExceptionHandlerView.as_view()), name='exception'),
+    url(r'^$', core.views.HomepageView.as_view(), name='home'),
+    url(r'^media/(?P<filename>.*)$', core.views.protected_media),
+    url(r'^quicksearch/', core.views.QuickSearchRedirectView.as_view(), name='quicksearch'),
+    url(r'^exception/', core.views.ExceptionHandlerView.as_view(), name='exception'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
     url(r'^wbg-admin/', include(admin.site.urls)),
 
     # core urls
-    url(r'^operators/$', login_required(core.views.operator_list.as_view()), name='operator_list'),
-    url(r'^operators/create/$', login_required(core.views.operator_create.as_view()), name='operator_create'),
-    url(r'^platters/$', login_required(core.views.platter_list.as_view()), name='platter_list'),
-    url(r'^projects/$', login_required(core.views.project_list.as_view()), name='project_list'),
-    url(r'^projects/track', login_required(core.views.TrackProjectView.as_view()), name='track_project'),
-    url(r'^projects/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_all'),
-    url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.InvestigationDetailView.as_view()), name='investigation_detail_all'),
-    url(r'^investigations/$', login_required(core.views.investigation_list.as_view()), name='investigation_list'),
+    url(r'^operators/$', core.views.OperatorListView.as_view(), name='operator_list'),
+    url(r'^platters/$', core.views.PlatterListView.as_view(), name='platter_list'),
+    url(r'^projects/$', core.views.ProjectListView.as_view(), name='project_list'),
+    url(r'^projects/track', core.views.TrackProjectView.as_view(), name='track_project'),
+    url(r'^projects/(?P<slug>[\w-]+)/$', core.views.ProjectDetailView.as_view(), name='project_detail_all'),
+    url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', core.views.InvestigationDetailView.as_view(), name='investigation_detail_all'),
+    url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
 
 
     # growths urls
