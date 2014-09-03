@@ -32,7 +32,11 @@ class Dashboard(DashboardMixin, DetailView):
         return self.object
 
     def dispatch(self, request, *args, **kwargs):
-        self.object = operator.objects.get(user=request.user)
+        try:
+            self.object = operator.objects.get(user=request.user)
+        except:
+            self.object = operator(name=request.user.first_name, active=1, user=request.user)
+            self.object.save()
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 
 
