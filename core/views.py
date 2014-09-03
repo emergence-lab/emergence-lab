@@ -145,7 +145,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('project_list')
+        return reverse('project_detail_all', kwargs={'slug': self.object.slug})
 
 
 class InvestigationDetailView(LoginRequiredMixin, DetailView):
