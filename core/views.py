@@ -12,7 +12,7 @@ from actstream import action
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
 from .forms import TrackProjectForm
-from .streams import project_stream, investigation_stream
+from .streams import project_stream, operator_project_stream, investigation_stream, operator_investigation_stream
 
 
 class SessionHistoryMixin(object):
@@ -144,11 +144,12 @@ class InvestigationDetailView(DetailView):
             context['growths'] = (growth.objects.filter(project=self.object,
                                                         operator_id=userid)
                                                 .order_by('-growth_number')[:25])
+            context['stream'] = operator_investigation_stream(userid, self.object)
         else:
             context['growths'] = (growth.objects.filter(project=self.object)
                                                 .order_by('-growth_number')[:25])
+            context['stream'] = investigation_stream(self.object)
         context['project'] = self.object.project
-        context['stream'] = investigation_stream(self.object)
         return context
 
 
