@@ -131,6 +131,23 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating a project.
+    """
+    template_name = 'core/project_create.html'
+    model = project
+    fields = ('name', 'description')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        action.send(self.request.user.operator, verb='created', target=self.object)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('project_list')
+
+
 class InvestigationDetailView(LoginRequiredMixin, DetailView):
     """
     View for details of an investigation.
