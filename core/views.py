@@ -5,7 +5,9 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View, FormView
+
 import gitlab
+from actstream import action
 
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
@@ -191,8 +193,21 @@ class TrackProjectView(CreateView):
         project_id = form.cleaned_data['project']
         try:
             self.object = project_tracking.objects.get(operator=self.request.user.operator, project_id=project_id)
+            if self.object.is_pi != form.cleaned_data['is_pi']:
+                if form.cleaned_data['is_pi']:
+                    verb = 'added as owner of'
+                else:
+                    verb = 'removed as owner of'
+            else:
+                verb = None
             self.object.is_pi = form.cleaned_data['is_pi']
             self.object.save()
         except:
             self.object = form.save(operator=self.request.user.operator)
+            if form.cleaned_data['is_pi']:
+                verb = 'added as owner of'
+            else:
+                verb = 'started watching'
+        if verb:
+            action.send(self.request.user.operator, verb=verb, action_object=project_id)
         return HttpResponseRedirect(reverse('dashboard'))

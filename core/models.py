@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+
 from autoslug import AutoSlugField
 from markupfield.fields import MarkupField
+from actstream import registry
 
 
 class active_manager(models.Manager):
@@ -118,3 +120,9 @@ class project_tracking(models.Model):
 
     class Meta:
         db_table = 'project_operator_tracking'
+
+
+registry.register(User)
+registry.register(project)
+registry.register(investigation)
+registry.register(operator)

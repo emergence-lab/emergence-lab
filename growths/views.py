@@ -7,6 +7,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
+from actstream import action
+
 from core.models import operator
 from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
@@ -199,6 +201,7 @@ class SplitSampleView(FormView):
             parent.pk = None
             parent.piece = last_letter
             parent.save()
+        action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project)
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
@@ -562,6 +565,7 @@ def create_growth_postrun(request):
             lastgrowth = growth.objects.latest('growth_number')
             lastgrowth.update(run_comments=commentsform.cleaned_data['comment_field'])
             prsform.save()
+            action.send(request.user.operator, verb='completed growth', action_object=lastgrowth, target=lastgrowth.project, investigation=lastgrowth.investigation_id)
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
         lastgrowth = growth.objects.latest('growth_number')
