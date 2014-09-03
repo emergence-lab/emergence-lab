@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic import DetailView
 
 from core.models import operator, project, investigation
-from core.streams import project_stream, investigation_stream
+from core.streams import operator_project_stream, operator_investigation_stream
 from growths.models import growth
 
 
@@ -49,7 +49,7 @@ class ProjectDetailDashboardView(DashboardMixin, DetailView):
         context['growths'] = (growth.objects.filter(project=self.object,
                                                     operator_id=userid)
                                             .order_by('-growth_number')[:25])
-        context['stream'] = project_stream(self.request.user.operator, self.object)
+        context['stream'] = operator_project_stream(self.request.user.operator, self.object)
         return context
 
 
@@ -67,5 +67,5 @@ class InvestigationDetailDashboardView(DashboardMixin, DetailView):
                                                     operator_id=userid)
                                             .order_by('-growth_number')[:25])
         context['project'] = self.object.project
-        context['stream'] = investigation_stream(self.request.user.operator, self.object)
+        context['stream'] = operator_investigation_stream(self.request.user.operator, self.object)
         return context
