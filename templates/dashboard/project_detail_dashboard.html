@@ -26,11 +26,15 @@
             <header>
                 <h1 class="page-header">Activity Feed</h1>
             </header>
-            <ul class="list-group">
-                {% for action in stream %}
-                    <li class="list-group-item">{{action}}</li>
-                {% endfor %}
-            </ul>
+            {% if stream %}
+                <ul class="list-group">
+                    {% for action in stream %}
+                        <li class="list-group-item">{{action}}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No activity</p>
+            {% endif %}
         </div>
         <div class="tab-pane fade" id="growths">
             <header><h1 class="page-header">Recent Growths</h1></header>

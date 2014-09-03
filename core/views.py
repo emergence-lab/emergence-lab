@@ -209,5 +209,5 @@ class TrackProjectView(CreateView):
             else:
                 verb = 'started watching'
         if verb:
-            action.send(self.request.user.operator, verb=verb, action_object=project_id)
+            action.send(self.request.user.operator, verb=verb, target=project_id)
         return HttpResponseRedirect(reverse('dashboard'))

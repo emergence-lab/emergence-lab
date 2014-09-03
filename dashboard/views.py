@@ -1,10 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import DetailView
-from django.contrib.contenttypes.models import ContentType
-
-from actstream.models import actor_stream
 
 from core.models import operator, project, investigation
+from core.streams import project_stream, investigation_stream
 from growths.models import growth
 
 
@@ -51,11 +49,7 @@ class ProjectDetailDashboardView(DashboardMixin, DetailView):
         context['growths'] = (growth.objects.filter(project=self.object,
                                                     operator_id=userid)
                                             .order_by('-growth_number')[:25])
-        project_content_id = ContentType.objects.get(name='project').id
-        context['stream'] = (actor_stream(self.request.user.operator).filter(target_content_type_id=project_content_id,
-                                                                    target_object_id=self.object.id)
-                            | actor_stream(self.request.user.operator).filter(action_object_content_type_id=project_content_id,
-                                                                     action_object_object_id=self.object.id))
+        context['stream'] = project_stream(self.request.user.operator, self.object)
         return context
 
 
@@ -73,4 +67,5 @@ class InvestigationDetailDashboardView(DashboardMixin, DetailView):
                                                     operator_id=userid)
                                             .order_by('-growth_number')[:25])
         context['project'] = self.object.project
+        context['stream'] = investigation_stream(self.request.user.operator, self.object)
         return context

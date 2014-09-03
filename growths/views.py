@@ -201,7 +201,7 @@ class SplitSampleView(FormView):
             parent.pk = None
             parent.piece = last_letter
             parent.save()
-        action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project)
+        action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project, investigation=parent.growth.investigation_id)
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
