@@ -171,6 +171,31 @@ class InvestigationDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+class InvestigationCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating an investigation.
+    """
+    template_name = 'core/investigation_create.html'
+    model = investigation
+    fields = ('name', 'description')
+
+    def dispatch(self, request, *args, **kwargs):
+        print(kwargs)
+        self.initial = {'project': project.objects.get(slug=kwargs.pop('slug'))}
+        return super(InvestigationCreateView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.initial['project']
+        self.object = form.save()
+        action.send(self.request.user.operator, verb='added investigation to',
+                    target=self.object.project, investigation=self.object.id)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
+                                                           'slug': self.object.slug})
+
+
 class ProjectListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all projects and provide actions.

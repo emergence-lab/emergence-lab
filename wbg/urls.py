@@ -32,8 +32,10 @@ urlpatterns = patterns(
     url(r'^projects/create$', core.views.ProjectCreateView.as_view(), name='project_create'),
     url(r'^projects/track', core.views.TrackProjectView.as_view(), name='track_project'),
     url(r'^projects/(?P<slug>[\w-]+)/$', core.views.ProjectDetailView.as_view(), name='project_detail_all'),
+    url(r'^projects/(?P<slug>[\w-]+)/add-investigation/$', core.views.InvestigationCreateView.as_view(), name='investigation_create'),
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', core.views.InvestigationDetailView.as_view(), name='investigation_detail_all'),
     url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
+
 
 
     # growths urls
