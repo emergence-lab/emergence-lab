@@ -103,6 +103,32 @@ class OperatorListView(LoginRequiredMixin, ActiveListView):
     model = operator
 
 
+class ActivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified operator to active.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        operator_obj = operator.objects.get(pk=pk)
+        if not operator_obj.active:
+            operator_obj.active = True
+            operator_obj.save()
+        return reverse('operator_list')
+
+
+class DeactivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified operator to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        operator_obj = operator.objects.get(pk=pk)
+        if operator_obj.active:
+            operator_obj.active = False
+            operator_obj.save()
+        return reverse('operator_list')
+
+
 class PlatterListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all operators and provide actions.

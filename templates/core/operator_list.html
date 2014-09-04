@@ -21,7 +21,7 @@
                     <div class="clearfix">
                         {{operator}}
                         <div class="pull-right">
-                            <a class="btn btn-warning btn-sm" href="">
+                            <a class="btn btn-warning btn-sm" href="{% url 'operator_deactivate' id=operator.id %}">
                                 <span class="glyphicon glyphicon-log-out"></span>
                                 Retire
                             </a>
@@ -39,7 +39,15 @@
         <section>
             <ul class="list-group">
                 {% for operator in inactive_list %}
-                    <li class="list-group-item">{{operator}}</li>
+                    <li class="list-group-item">
+                        <div class="clearfix">
+                            {{operator}}
+                            <a href="{% url 'operator_activate' id=operator.id %}" class="pull-right btn btn-warning btn-sm">
+                                <span class="glyphicon glyphicon-log-in"></span>
+                                Make Active
+                            </a>
+                        </div>
+                    </li>
                 {% endfor %}
             </ul>
         </section>

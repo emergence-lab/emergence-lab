@@ -28,6 +28,8 @@ urlpatterns = patterns(
 
     # core urls
     url(r'^operators/$', core.views.OperatorListView.as_view(), name='operator_list'),
+    url(r'^operators/(?P<id>\d+)/activate$', never_cache(core.views.ActivateOperatorRedirectView.as_view()), name='operator_activate'),
+    url(r'^operators/(?P<id>\d+)/deactivate$', never_cache(core.views.DeactivateOperatorRedirectView.as_view()), name='operator_deactivate'),
     url(r'^platters/$', core.views.PlatterListView.as_view(), name='platter_list'),
     url(r'^platters/create/$', core.views.PlatterCreateView.as_view(), name='platter_create'),
     url(r'^platters/(?P<id>\d+)/activate/$', never_cache(core.views.ActivatePlatterRedirectView.as_view()), name='platter_activate'),
