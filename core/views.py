@@ -210,7 +210,6 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
     fields = ('name', 'description')
 
     def dispatch(self, request, *args, **kwargs):
-        print(kwargs)
         self.initial = {'project': project.objects.get(slug=kwargs.pop('slug'))}
         return super(InvestigationCreateView, self).dispatch(request, *args, **kwargs)
 
