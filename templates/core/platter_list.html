@@ -29,7 +29,7 @@
                     <div class="clearfix">
                         {{platter.name}} ({{platter.serial}}) - Started on {{platter.start_date}}
                         <div class="pull-right">
-                            <a href="#" class="btn btn-warning btn-sm">
+                            <a href="{% url 'platter_deactivate' id=platter.id %}" class="btn btn-warning btn-sm">
                                 <span class="glyphicon glyphicon-log-out"></span>
                                 Retire
                             </a>
@@ -54,7 +54,7 @@
                         <div class="clearfix">
                             {{platter.name}} ({{platter.serial}}) - Retired on {{platter.end_date}}
                             <div class="pull-right">
-                                <a href="#" class="btn btn-warning btn-sm">
+                                <a href="{% url 'platter_activate' id=platter.id %}" class="btn btn-warning btn-sm">
                                     <span class="glyphicon glyphicon-log-in"></span>
                                     Unretire
                                 </a>

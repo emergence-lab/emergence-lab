@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from django.shortcuts import render
@@ -124,6 +125,33 @@ class PlatterCreateView(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
+        return reverse('platter_list')
+
+
+class ActivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified platter to active.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        platter_obj = platter.objects.get(pk=pk)
+        if not platter_obj.active:
+            platter_obj.active = True
+            platter_obj.save()
+        return reverse('platter_list')
+
+
+class DeactivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified platter to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        platter_obj = platter.objects.get(pk=pk)
+        if platter_obj.active:
+            platter_obj.active = False
+            platter_obj.end_date = datetime.date.today()
+            platter_obj.save()
         return reverse('platter_list')
 
 
