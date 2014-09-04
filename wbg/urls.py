@@ -28,6 +28,7 @@ urlpatterns = patterns(
     # core urls
     url(r'^operators/$', core.views.OperatorListView.as_view(), name='operator_list'),
     url(r'^platters/$', core.views.PlatterListView.as_view(), name='platter_list'),
+    url(r'^platters/create/$', core.views.PlatterCreateView.as_view(), name='platter_create'),
     url(r'^projects/$', core.views.ProjectListView.as_view(), name='project_list'),
     url(r'^projects/create/$', core.views.ProjectCreateView.as_view(), name='project_create'),
     url(r'^projects/track/$', core.views.TrackProjectView.as_view(), name='track_project'),

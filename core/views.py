@@ -110,6 +110,23 @@ class PlatterListView(LoginRequiredMixin, ActiveListView):
     model = platter
 
 
+class PlatterCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating a platter.
+    """
+    template_name = 'core/platter_create.html'
+    model = platter
+    fields = ('name', 'serial')
+
+    def form_valid(self, form):
+        form.instance.active = True
+        self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('platter_list')
+
+
 class ProjectListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all projects and provide actions.
