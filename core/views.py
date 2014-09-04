@@ -178,6 +178,68 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return reverse('project_detail_all', kwargs={'slug': self.object.slug})
 
 
+class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project as tracked for the logged in user.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        operator_obj = self.request.user.operator
+        tracking_obj, created = project_tracking.objects.get_or_create(project=project_obj,
+                                                                       operator=operator_obj,
+                                                                       defaults={'is_pi': False})
+        if created:
+            action.send(operator_obj, verb='started watching', target=project_obj)
+        return reverse('project_list')
+
+
+class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project as not tracked for the logged in user.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        operator_obj = self.request.user.operator
+        tracking_obj = project_tracking.objects.filter(project=project_obj,
+                                                       operator=operator_obj)
+        if tracking_obj.count():
+            action.send(operator_obj, verb='stopped watching', target=project_obj)
+            tracking_obj.delete()
+        return reverse('project_list')
+
+
+class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project to active.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        if not project_obj.active:
+            operator_obj = self.request.user.operator
+            project_obj.active = True
+            project_obj.save()
+            action.send(operator_obj, verb='activated project', target=project_obj)
+        return reverse('project_list')
+
+
+class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        if project_obj.active:
+            operator_obj = self.request.user.operator
+            project_obj.active = False
+            project_obj.save()
+            action.send(operator_obj, verb='deactivated project', target=project_obj)
+        return reverse('project_list')
+
+
 class InvestigationDetailView(LoginRequiredMixin, DetailView):
     """
     View for details of an investigation.

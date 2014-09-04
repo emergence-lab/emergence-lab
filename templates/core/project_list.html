@@ -29,17 +29,17 @@
                         <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
                         <div class="pull-right">
                             {% if project.id not in tracking %}
-                                <a href="#" class="btn btn-success btn-sm">
+                                <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-success btn-sm">
                                     <span class="glyphicon glyphicon-plus"></span>
                                     Track Project
                                 </a>
                             {% else %}
-                                <a href="#" class="btn btn-success btn-sm">
+                                <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-success btn-sm">
                                     <span class="glyphicon glyphicon-minus"></span>
                                     Untrack Project
                                 </a>
                             {% endif %}
-                            <a href="" class="btn btn-warning btn-sm">
+                            <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning btn-sm">
                                 <span class="glyphicon glyphicon-log-out"></span>
                                 Make Inactive
                             </a>
@@ -68,7 +68,7 @@
                 <li class="list-group-item">
                     <div class="clearfix">
                         <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
-                        <a href="" class="pull-right btn btn-warning btn-sm">
+                        <a href="{% url 'project_activate' slug=project.slug %}" class="pull-right btn btn-warning btn-sm">
                             <span class="glyphicon glyphicon-log-in"></span>
                             Make Active
                         </a>

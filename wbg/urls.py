@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login, logout
+from django.views.decorators.cache import never_cache
 import django.contrib
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -33,6 +34,10 @@ urlpatterns = patterns(
     url(r'^projects/create/$', core.views.ProjectCreateView.as_view(), name='project_create'),
     url(r'^projects/track/$', core.views.TrackProjectView.as_view(), name='track_project'),
     url(r'^projects/(?P<slug>[\w-]+)/$', core.views.ProjectDetailView.as_view(), name='project_detail_all'),
+    url(r'^projects/(?P<slug>[\w-]+)/track/$', never_cache(core.views.TrackProjectRedirectView.as_view()), name='project_track'),
+    url(r'^projects/(?P<slug>[\w-]+)/untrack/$', never_cache(core.views.UntrackProjectRedirectView.as_view()), name='project_untrack'),
+    url(r'^projects/(?P<slug>[\w-]+)/activate/$', never_cache(core.views.ActivateProjectRedirectView.as_view()), name='project_activate'),
+    url(r'^projects/(?P<slug>[\w-]+)/deactivate/$', never_cache(core.views.DeactivateProjectRedirectView.as_view()), name='project_deactivate'),
     url(r'^projects/(?P<slug>[\w-]+)/add-investigation/$', core.views.InvestigationCreateView.as_view(), name='investigation_create'),
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', core.views.InvestigationDetailView.as_view(), name='investigation_detail_all'),
     url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
