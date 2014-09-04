@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="container">
+<main class="container">
     <nav>
         <ol class="breadcrumb">
             <li class='active'>Projects</li>
@@ -28,10 +28,17 @@
                     <div class="clearfix">
                         <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
                         <div class="pull-right">
-                            <a href="" class="btn btn-success btn-sm">
-                                <span class="glyphicon glyphicon-search"></span>
-                                Track Project
-                            </a>
+                            {% if project.id not in tracking %}
+                                <a href="#" class="btn btn-success btn-sm">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    Track Project
+                                </a>
+                            {% else %}
+                                <a href="#" class="btn btn-success btn-sm">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                    Untrack Project
+                                </a>
+                            {% endif %}
                             <a href="" class="btn btn-warning btn-sm">
                                 <span class="glyphicon glyphicon-log-out"></span>
                                 Make Inactive
@@ -71,6 +78,6 @@
         </ul>
     </section>
 
-</div>
+</main>
 
 {% endblock content %}

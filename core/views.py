@@ -110,6 +110,19 @@ class PlatterListView(LoginRequiredMixin, ActiveListView):
     model = platter
 
 
+class ProjectListView(LoginRequiredMixin, ActiveListView):
+    """
+    View to list all projects and provide actions.
+    """
+    template_name = "core/project_list.html"
+    model = project
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectListView, self).get_context_data(**kwargs)
+        context['tracking'] = project_tracking.objects.filter(operator=self.request.user.operator).values_list('project_id', flat=True)
+        return context
+
+
 class ProjectDetailView(LoginRequiredMixin, DetailView):
     """
     View for details of a project.
@@ -194,14 +207,6 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
                                                            'slug': self.object.slug})
-
-
-class ProjectListView(LoginRequiredMixin, ActiveListView):
-    """
-    View to list all projects and provide actions.
-    """
-    template_name = "core/project_list.html"
-    model = project
 
 
 class InvestigationListView(LoginRequiredMixin, ActiveListView):
