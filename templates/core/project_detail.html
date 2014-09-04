@@ -6,6 +6,7 @@
 <main class="container">
     <nav>
         <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li><a href="{% url 'project_list' %}">Projects</a></li>
             <li class='active'>{{project}}</li>
         </ol>
