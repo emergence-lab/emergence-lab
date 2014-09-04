@@ -3,27 +3,48 @@
 {% block title %}Operators{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h3>Current Operators</h3>
-        <ul class="list-group">
-        {% for operator in active_list %}
-            <li class="list-group-item">
-                <div class="clearfix">
-                    {{operator}}
-                    <a class="pull-right btn btn-default btn-sm" href="">Retire</a>
-                </div>
-            </li>
-        {% endfor %}
-        </ul>
 
-        <h3>Former Operators</h3>
-        <ul class="list-group">
-        {% for operator in inactive_list %}
-            <li class="list-group-item">{{operator}}</li>
-        {% endfor %}
-        </ul>
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li class='active'>Operators</li>
+        </ol>
+    </nav>
 
-        <a href="{% url 'home' %}">Back</a>
-    </div>
+    <header>
+        <h1 class="page-header">Current Operators</h1>
+    </header>
+    <section>
+        <ul class="list-group">
+            {% for operator in active_list %}
+                <li class="list-group-item">
+                    <div class="clearfix">
+                        {{operator}}
+                        <div class="pull-right">
+                            <a class="btn btn-warning btn-sm" href="">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                                Retire
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if inactive_list %}
+        <header>
+            <h1 class="page-header">Former Operators</h1>
+        </header>
+        <section>
+            <ul class="list-group">
+                {% for operator in inactive_list %}
+                    <li class="list-group-item">{{operator}}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+</main>
 
 {% endblock %}
