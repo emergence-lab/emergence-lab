@@ -5,14 +5,9 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-4 col-md-offset-4">
-        <div>
-            <a href="{% url 'home' %}">
-                <img src="{% static 'core/img/logo.png' %}" alt="WBG" class="center-block">
-            </a>
-        </div> 
-</div>
+<a href="">
+    <img src="{% static 'core/img/logo.png' %}" alt="WBG" class="center-block">
+</a>
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
         <div class="center-block">
@@ -30,8 +25,6 @@
                     {% bootstrap_icon "log-in" %}  Login
                 </button>
             {% endbuttons %}
-            <br>            
-            <!--<input type="submit" class="btn btn-default" value="Login" />-->
             <input type="hidden" name="next" value="{{next}}" />
 
         </form>
