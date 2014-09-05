@@ -133,8 +133,8 @@ class readings_detail(DetailView):
             return context
 
         context['readings_table'] = zip(
-            ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'Thermocouple Out',
-             'Thermocouple In', 'ECP Temp', 'Motor RPM', 'GC Pressure',
+            ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'ECP Temp',
+             'Thermocouple Out', 'Thermocouple In', 'Motor RPM', 'GC Pressure',
              'GC Position', 'Voltage In', 'Voltage Out', 'Current In',
              'Current Out', 'Top VP Flow', 'Hydride Inner', 'Hydride Outer',
              'Alkyl Flow Inner', 'Alkyl Push Inner', 'Alkyl Flow Middle',
