@@ -4,10 +4,9 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from .models import afm
 from .forms import afm_form
-from core.views import SessionHistoryMixin
 
 
-class AFMList(SessionHistoryMixin, ListView):
+class AFMList(ListView):
     """
     List the most recent afm data
     """
@@ -16,7 +15,7 @@ class AFMList(SessionHistoryMixin, ListView):
     paginate_by = 25
 
 
-class AFMDetail(SessionHistoryMixin, DetailView):
+class AFMDetail(DetailView):
     """
     Detail view of the afm model.
     """

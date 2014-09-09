@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from django.shortcuts import render
@@ -5,9 +6,11 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View, FormView
+from django.contrib.auth.decorators import login_required
 
 import gitlab
 from actstream import action
+from braces.views import LoginRequiredMixin
 
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
@@ -15,30 +18,9 @@ from .forms import TrackProjectForm
 from .streams import project_stream, operator_project_stream, investigation_stream, operator_investigation_stream
 
 
-class SessionHistoryMixin(object):
-    max_history = 5
-    request = None
-
-    def add_breadcrumb_history(self, request):
-        history = request.session.get('breadcrumb_history', [])
-
-        if not history or history[-1] != request.path:
-            history.append(request.path)
-
-        if len(history) > self.max_history:
-            history.pop(0)
-
-        request.session['breadcrumb_history'] = history
-        return history
-
-    def get_context_data(self, **kwargs):
-        kwargs['breadcrumb'] = self.add_breadcrumb_history(self.request)
-        return super(SessionHistoryMixin, self).get_context_data(**kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.request = request
-        return super(SessionHistoryMixin, self).dispatch(request, *args, **kwargs)
-
+##############
+# Misc Views #
+##############
 
 class ActiveListView(ListView):
     """
@@ -51,8 +33,43 @@ class ActiveListView(ListView):
         return context
 
 
-class QuickSearchRedirect(RedirectView):
+@login_required
+def protected_media(request, filename):
+    """
+    Allows media files to be protected via Django authentication
+    """
+    fullpath = os.path.join(settings.MEDIA_ROOT, filename)
+    response = HttpResponse(mimetype='image/jpeg')
+    response['X-Sendfile'] = fullpath
+    return response
 
+
+class ExceptionHandlerView(LoginRequiredMixin, View):
+    """
+    Handles creating an exception via ajax.
+    """
+    def post(self, request, *args, **kwargs):
+        path = request.POST.get('path', '')
+        user = request.POST.get('user', 0)
+        title = request.POST.get('title', 'Exception Form Issue')
+        tags = request.POST.getlist('tag[]')
+        tags.append('exception-form')
+        complaint = request.POST.get('complaint', '')
+        if complaint:
+            git = gitlab.Gitlab(settings.GITLAB_HOST,
+                                token=settings.GITLAB_PRIVATE_TOKEN, verify_ssl=False)
+            success = git.createissue(8, title=title, labels=', '.join(tags),
+                                      description='User: {0}\nPage: {1}\nProblem: {2}'.format(user, path, complaint))
+            if not success:
+                raise Exception('Error submitting issue')
+        return HttpResponseRedirect(path)
+
+
+class QuickSearchRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    View to handle redirection to the correct growth or sample from the
+    quicksearch bar in the page header.
+    """
     def get_redirect_url(self, *args, **kwargs):
         growth_number = self.request.GET.get('growth', None)
         try:
@@ -67,21 +84,18 @@ class QuickSearchRedirect(RedirectView):
         return reverse('afm_filter')
 
 
-class homepage(TemplateView):
+class HomepageView(TemplateView):
     """
     View for the homepage of the application.
     """
     template_name = "core/index.html"
 
 
-def protected_media(request, filename):
-    fullpath = os.path.join(settings.MEDIA_ROOT, filename)
-    response = HttpResponse(mimetype='image/jpeg')
-    response['X-Sendfile'] = fullpath
-    return response
+###############
+# Model Views #
+###############
 
-
-class operator_list(ActiveListView):
+class OperatorListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all operators and provide actions.
     """
@@ -89,19 +103,33 @@ class operator_list(ActiveListView):
     model = operator
 
 
-class operator_create(CreateView):
+class ActivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
     """
-    View to create operators.
+    Sets the specified operator to active.
     """
-    template_name = "core/operator_create.html"
-    model = operator
-    fields = ['name']
-
-    def get_success_url(self):
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        operator_obj = operator.objects.get(pk=pk)
+        if not operator_obj.active:
+            operator_obj.active = True
+            operator_obj.save()
         return reverse('operator_list')
 
 
-class platter_list(ActiveListView):
+class DeactivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified operator to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        operator_obj = operator.objects.get(pk=pk)
+        if operator_obj.active:
+            operator_obj.active = False
+            operator_obj.save()
+        return reverse('operator_list')
+
+
+class PlatterListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all operators and provide actions.
     """
@@ -109,7 +137,64 @@ class platter_list(ActiveListView):
     model = platter
 
 
-class ProjectDetailView(DetailView):
+class PlatterCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating a platter.
+    """
+    template_name = 'core/platter_create.html'
+    model = platter
+    fields = ('name', 'serial')
+
+    def form_valid(self, form):
+        form.instance.active = True
+        self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('platter_list')
+
+
+class ActivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified platter to active.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        platter_obj = platter.objects.get(pk=pk)
+        if not platter_obj.active:
+            platter_obj.active = True
+            platter_obj.save()
+        return reverse('platter_list')
+
+
+class DeactivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified platter to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        platter_obj = platter.objects.get(pk=pk)
+        if platter_obj.active:
+            platter_obj.active = False
+            platter_obj.end_date = datetime.date.today()
+            platter_obj.save()
+        return reverse('platter_list')
+
+
+class ProjectListView(LoginRequiredMixin, ActiveListView):
+    """
+    View to list all projects and provide actions.
+    """
+    template_name = "core/project_list.html"
+    model = project
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectListView, self).get_context_data(**kwargs)
+        context['tracking'] = project_tracking.objects.filter(operator=self.request.user.operator).values_list('project_id', flat=True)
+        return context
+
+
+class ProjectDetailView(LoginRequiredMixin, DetailView):
     """
     View for details of a project.
     """
@@ -130,7 +215,86 @@ class ProjectDetailView(DetailView):
         return context
 
 
-class InvestigationDetailView(DetailView):
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating a project.
+    """
+    template_name = 'core/project_create.html'
+    model = project
+    fields = ('name', 'description')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        action.send(self.request.user.operator, verb='created', target=self.object)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('project_detail_all', kwargs={'slug': self.object.slug})
+
+
+class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project as tracked for the logged in user.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        operator_obj = self.request.user.operator
+        tracking_obj, created = project_tracking.objects.get_or_create(project=project_obj,
+                                                                       operator=operator_obj,
+                                                                       defaults={'is_pi': False})
+        if created:
+            action.send(operator_obj, verb='started watching', target=project_obj)
+        return reverse('project_list')
+
+
+class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project as not tracked for the logged in user.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        operator_obj = self.request.user.operator
+        tracking_obj = project_tracking.objects.filter(project=project_obj,
+                                                       operator=operator_obj)
+        if tracking_obj.count():
+            action.send(operator_obj, verb='stopped watching', target=project_obj)
+            tracking_obj.delete()
+        return reverse('project_list')
+
+
+class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project to active.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        if not project_obj.active:
+            operator_obj = self.request.user.operator
+            project_obj.active = True
+            project_obj.save()
+            action.send(operator_obj, verb='activated project', target=project_obj)
+        return reverse('project_list')
+
+
+class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified project to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=slug)
+        if project_obj.active:
+            operator_obj = self.request.user.operator
+            project_obj.active = False
+            project_obj.save()
+            action.send(operator_obj, verb='deactivated project', target=project_obj)
+        return reverse('project_list')
+
+
+class InvestigationDetailView(LoginRequiredMixin, DetailView):
     """
     View for details of an investigation.
     """
@@ -153,15 +317,31 @@ class InvestigationDetailView(DetailView):
         return context
 
 
-class project_list(ActiveListView):
+class InvestigationCreateView(LoginRequiredMixin, CreateView):
     """
-    View to list all projects and provide actions.
+    View for creating an investigation.
     """
-    template_name = "core/project_list.html"
-    model = project
+    template_name = 'core/investigation_create.html'
+    model = investigation
+    fields = ('name', 'description')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.initial = {'project': project.objects.get(slug=kwargs.pop('slug'))}
+        return super(InvestigationCreateView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.initial['project']
+        self.object = form.save()
+        action.send(self.request.user.operator, verb='added investigation to',
+                    target=self.object.project, investigation=self.object.id)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
+                                                           'slug': self.object.slug})
 
 
-class investigation_list(ActiveListView):
+class InvestigationListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all projects and provide actions.
     """
@@ -169,26 +349,10 @@ class investigation_list(ActiveListView):
     model = investigation
 
 
-class ExceptionHandlerView(View):
-
-    def post(self, request, *args, **kwargs):
-        path = request.POST.get('path', '')
-        user = request.POST.get('user', 0)
-        title = request.POST.get('title', 'Exception Form Issue')
-        tags = request.POST.getlist('tag[]')
-        tags.append('exception-form')
-        complaint = request.POST.get('complaint', '')
-        if complaint:
-            git = gitlab.Gitlab(settings.GITLAB_HOST,
-                                token=settings.GITLAB_PRIVATE_TOKEN, verify_ssl=False)
-            success = git.createissue(8, title=title, labels=', '.join(tags),
-                                      description='User: {0}\nPage: {1}\nProblem: {2}'.format(user, path, complaint))
-            if not success:
-                raise Exception('Error submitting issue')
-        return HttpResponseRedirect(path)
-
-
-class TrackProjectView(CreateView):
+class TrackProjectView(LoginRequiredMixin, CreateView):
+    """
+    View to handle tracking projects.
+    """
     model = project_tracking
     form_class = TrackProjectForm
     template_name = 'core/track_project.html'
