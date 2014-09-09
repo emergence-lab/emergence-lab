@@ -6,6 +6,7 @@ import time
 import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from core.validators import*
+from html2text import html2text
 
 
 # Create the form class.
@@ -66,6 +67,9 @@ class growth_form(ModelForm):
 
 
 class GrowthUpdateForm(ModelForm):
+    def clean_run_comments(self):
+        return html2text(self.cleaned_data['run_comments'])
+
     class Meta:
         model = growth
         fields = ('run_comments', 'has_gan', 'has_algan', 'has_aln',

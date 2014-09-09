@@ -1,12 +1,13 @@
 {% extends 'core/base.html' %}
 {% load bootstrap3 %}
+{% load wysiwyg %}
 
 {% block title %}
 Update {{growth}}
 {% endblock title %}
 
 {% block header %}
-{{form.media}}
+{%  wysiwyg_setup %}
 {% endblock header %}
 
 {% block content %}
@@ -17,6 +18,8 @@ Update {{growth}}
         {% bootstrap_form form %}
         <button class="btn btn-warning" type="submit">Update</button>
     </form>
+
+    {% wysiwyg_editor "id_run_comments" %}
 </div>
 
 {% endblock content %}
