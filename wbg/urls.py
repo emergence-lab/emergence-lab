@@ -51,6 +51,7 @@ urlpatterns = patterns(
     # growths urls
     url(r'^growths/search/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.GrowthDetailView.as_view()), name='growth_detail'),
+    url(r'^(?P<slug>[gt][1-9][0-9]{3,})/update$', login_required(growths.views.GrowthUpdateView.as_view()), name='growth_update'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/recipe/$', login_required(growths.views.recipe_detail.as_view()), name='recipe_detail'),
     url(r'^(?P<growth>[gt][1-9][0-9]{3,})/(?P<pocket>\d+\-?\d*)/$', login_required(growths.views.SampleFamilyDetailView.as_view()), name='sample_family_detail'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/$', login_required(growths.views.readings_detail.as_view()), name='readings_detail'),

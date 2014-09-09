@@ -65,6 +65,14 @@ class growth_form(ModelForm):
                   'has_n', 'has_p', 'has_u']
 
 
+class GrowthUpdateForm(ModelForm):
+    class Meta:
+        model = growth
+        fields = ('run_comments', 'has_gan', 'has_algan', 'has_aln',
+                  'other_material', 'is_template', 'is_buffer', 'has_n',
+                  'has_p', 'has_u',)
+
+
 class p_form(forms.Form):
     add_sample = forms.BooleanField(required=False)
 
