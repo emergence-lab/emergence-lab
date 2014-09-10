@@ -103,8 +103,9 @@ class SplitSampleView(FormView):
         parent = form.cleaned_data['parent']
         piece_siblings = sample.get_piece_siblings(parent).order_by('-piece')
         original_parent = parent.parent_id
+        original_pk = parent.pk
         if piece_siblings:
-            last_letter = piece_siblings.first().piece
+            last_letter = max(parent.piece, piece_siblings.first().piece)
         else:
             last_letter = 'a'
             parent.piece = 'a'
@@ -112,10 +113,13 @@ class SplitSampleView(FormView):
         for i in range(num_pieces - 1):
             last_letter = unichr(ord(last_letter) + 1)
             parent.pk = None
+            parent.parent = None
             parent.piece = last_letter
             parent.save()
-            if original_parent == parent.parent_id:
-                parent.parent_id = parent.pk
+            if original_parent == original_pk:
+                parent.parent = parent
+            else:
+                parent.parent_id = original_parent
                 parent.save()
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
