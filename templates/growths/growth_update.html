@@ -3,20 +3,20 @@
 {% load wysiwyg %}
 
 {% block title %}
-Add Investigation
+Update {{growth}}
 {% endblock title %}
 
 {% block header %}
-    {{form.media}}
+{{form.media}}
 {% endblock header %}
 
 {% block content %}
 
 <div class="container">
-    <form action="" method="post" class="form">
+    <form action="{% url 'growth_update' slug=growth.growth_number %}" method="post" class="form">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button class="btn btn-primary" type="submit">Create</button>
+        <button class="btn btn-warning" type="submit">Update</button>
     </form>
 </div>
 

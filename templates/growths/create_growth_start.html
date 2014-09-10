@@ -1,11 +1,11 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load wysiwyg %}
 
 {% block title %}Start Growth{%endblock%}
 {% block header %}
     {% load staticfiles %}
-    
-
+    {{commentsform.media}}
 {% endblock %}
 
 {% block content %}

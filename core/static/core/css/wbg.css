@@ -164,3 +164,7 @@ a.list-group-item.active-parent:focus {
   background-color:#1c65a4; /* #428bca darkened 15% */
   border-color:#1c65a4;
 }
+
+.cke_reset {
+  width: 100% !important;
+}

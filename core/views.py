@@ -14,7 +14,7 @@ from braces.views import LoginRequiredMixin
 
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
-from .forms import TrackProjectForm
+from .forms import TrackProjectForm, CreateProjectForm, CreateInvestigationForm
 from .streams import project_stream, operator_project_stream, investigation_stream, operator_investigation_stream
 
 
@@ -221,7 +221,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     """
     template_name = 'core/project_create.html'
     model = project
-    fields = ('name', 'description')
+    form_class = CreateProjectForm
 
     def form_valid(self, form):
         self.object = form.save()
@@ -323,7 +323,7 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
     """
     template_name = 'core/investigation_create.html'
     model = investigation
-    fields = ('name', 'description')
+    form_class = CreateInvestigationForm
 
     def dispatch(self, request, *args, **kwargs):
         self.initial = {'project': project.objects.get(slug=kwargs.pop('slug'))}

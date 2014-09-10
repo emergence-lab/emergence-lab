@@ -1,10 +1,40 @@
 from django import forms
-from django.forms import ModelForm
+from django.core.exceptions import ValidationError
 
-from .models import project_tracking
+from html2text import html2text
+from ckeditor.widgets import CKEditorWidget
+
+from .models import project, investigation, project_tracking
 
 
-class TrackProjectForm(ModelForm):
+class MarkdownField(forms.CharField):
+    widget = CKEditorWidget()
+
+    def clean(self, value):
+        value = super(MarkdownField, self).clean(value)
+        try:
+            return html2text(value)
+        except:
+            raise ValidationError
+
+
+class CreateProjectForm(forms.ModelForm):
+    description = MarkdownField()
+
+    class Meta:
+        model = project
+        fields = ('name', 'description')
+
+
+class CreateInvestigationForm(forms.ModelForm):
+    description = MarkdownField()
+
+    class Meta:
+        model = investigation
+        fields = ('name', 'description')
+
+
+class TrackProjectForm(forms.ModelForm):
 
     def save(self, **kwargs):
         commit = kwargs.pop('commit', True)

@@ -1,11 +1,12 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load wysiwyg %}
 
 {% block title %}Create Growth Prerun{% endblock %}
 
 {% block header %}
     {% load staticfiles %}
-
+    {{commentsform.media}}
 {% endblock %}
 
 {% block content %}
