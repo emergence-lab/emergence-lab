@@ -20,5 +20,8 @@ class journal_entry(models.Model):
     slug = AutoSlugField(populate_from='title', unique_with=('author'))
     investigations = models.ManyToManyField(core.models.investigation)
 
+    def __unicode__(self):
+        return self.title
+
     class Meta:
         db_table = 'journal_entries'
