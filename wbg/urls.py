@@ -63,6 +63,9 @@ urlpatterns = patterns(
     # dashboard views
     url(r'^dashboard/', include('dashboard.urls')),
 
+    # journal urls
+    url(r'^notebook/', include('journal.urls')),
+
     # creategrowth urls
     url(r'^creategrowth/start/$', login_required(growths.views.CreateGrowthStartView.as_view()), name='create_growth_start'),
     url(r'^creategrowth/prerun/$', login_required(growths.views.CreateGrowthPrerunView.as_view()), name='create_growth_prerun'),
