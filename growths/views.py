@@ -120,7 +120,7 @@ class SplitSampleView(FormView):
                 parent.parent = parent
             else:
                 parent.parent_id = original_parent
-                parent.save()
+            parent.save()
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
