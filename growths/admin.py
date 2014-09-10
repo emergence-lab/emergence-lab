@@ -4,8 +4,8 @@ import growths.models
 
 
 class SampleAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'parent', 'size', 'substrate_serial')
-    ordering = ('-growth', 'pocket', 'piece')
+    list_display = ('__str__', 'parent', 'size', 'location', 'substrate_serial')
+    ordering = ('-growth__growth_number', 'pocket', 'piece')
 
 
 class GrowthAdmin(admin.ModelAdmin):
