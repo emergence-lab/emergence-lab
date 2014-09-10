@@ -6,12 +6,14 @@ import time
 import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from core.validators import*
-from html2text import html2text
+
+from core.forms import MarkdownField
 
 
 # Create the form class.
 class sample_form(ModelForm):
     parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
+    comment = MarkdownField()
 
     class Meta:
         model = sample
@@ -67,8 +69,7 @@ class growth_form(ModelForm):
 
 
 class GrowthUpdateForm(ModelForm):
-    def clean_run_comments(self):
-        return html2text(self.cleaned_data['run_comments'])
+    run_comments = MarkdownField()
 
     class Meta:
         model = growth
@@ -177,4 +178,4 @@ class readings_form(ModelForm):
 
 
 class comments_form(forms.Form):
-    comment_field = forms.CharField(widget=forms.Textarea, label="Run Comments", required=False)
+    comment_field = MarkdownField(label="Run Comments", required=False)

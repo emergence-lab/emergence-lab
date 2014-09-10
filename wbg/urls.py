@@ -15,6 +15,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     'django.contrib.auth.views',
+    url(r'^ckeditor/', include('ckeditor.urls')),
     # urls, add login_required() around the as_view() call for security
 
     # misc urls

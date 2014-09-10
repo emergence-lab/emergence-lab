@@ -7,7 +7,7 @@ Update {{growth}}
 {% endblock title %}
 
 {% block header %}
-{%  wysiwyg_setup %}
+{{form.media}}
 {% endblock header %}
 
 {% block content %}
@@ -18,8 +18,6 @@ Update {{growth}}
         {% bootstrap_form form %}
         <button class="btn btn-warning" type="submit">Update</button>
     </form>
-
-    {% wysiwyg_editor "id_run_comments" %}
 </div>
 
 {% endblock content %}
