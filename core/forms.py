@@ -1,11 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm
 
 from html2text import html2text
 from ckeditor.widgets import CKEditorWidget
 
-from .models import project_tracking
+from .models import project, investigation, project_tracking
 
 
 class MarkdownField(forms.CharField):
@@ -19,7 +18,23 @@ class MarkdownField(forms.CharField):
             raise ValidationError
 
 
-class TrackProjectForm(ModelForm):
+class CreateProjectForm(forms.ModelForm):
+    description = MarkdownField()
+
+    class Meta:
+        model = project
+        fields = ('name', 'description')
+
+
+class CreateInvestigationForm(forms.ModelForm):
+    description = MarkdownField()
+
+    class Meta:
+        model = investigation
+        fields = ('name', 'description')
+
+
+class TrackProjectForm(forms.ModelForm):
 
     def save(self, **kwargs):
         commit = kwargs.pop('commit', True)

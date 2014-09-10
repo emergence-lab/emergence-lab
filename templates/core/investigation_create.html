@@ -1,9 +1,14 @@
 {% extends 'core/base.html' %}
 {% load bootstrap3 %}
+{% load wysiwyg %}
 
 {% block title %}
 Add Investigation
 {% endblock title %}
+
+{% block header %}
+    {{form.media}}
+{% endblock header %}
 
 {% block content %}
 

@@ -1,9 +1,14 @@
 {% extends 'core/base.html' %}
 {% load bootstrap3 %}
+{% load wysiwyg %}
 
 {% block title %}
 Create Project
 {% endblock title %}
+
+{% block header %}
+    {{form.media}}
+{% endblock header %}
 
 {% block content %}
 
