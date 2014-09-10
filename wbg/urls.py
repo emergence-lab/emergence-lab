@@ -14,6 +14,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     'django.contrib.auth.views',
+    url(r'^grappelli/', include('grappelli.urls')),
     # urls, add login_required() around the as_view() call for security
 
     # misc urls
