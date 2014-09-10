@@ -4,7 +4,7 @@ import growths.models
 
 
 class SampleAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'parent', 'size')
+    list_display = ('__str__', 'parent', 'size', 'substrate_serial')
     ordering = ('-growth', 'pocket', 'piece')
 
 
