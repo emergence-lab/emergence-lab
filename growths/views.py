@@ -370,7 +370,7 @@ class CreateGrowthPrerunView(TemplateView):
         for i in range(1, 7):
             context['pf_{0}'.format(i)] = p_form(prefix='pf_{0}'.format(i))
             context['sform_{0}'.format(i)] = sample_form(prefix='sform_{0}'.format(i), instance=sample(),
-                                                         initial={'substrate_serial': 'wbg_{0}'.format(serial_number.generate_serial()),
+                                                         initial={'substrate_serial': 'WBG-{0}-{1}'.format(last_growth.growth_number[1:], i),
                                                                   'location': 'Lab'})
         return context
 
