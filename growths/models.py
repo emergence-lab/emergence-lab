@@ -166,7 +166,7 @@ class sample(models.Model):
 
         A child is defined as a sample that has the current sample marked as a parent.
         """
-        return sample.objects.filter(parent=sample_obj).exclude(pk=sample_obj.id)
+        return sample_obj.sample_set,exclude(pk=sample_obj.pk)
 
     @staticmethod
     def get_piece_siblings(sample_obj):
