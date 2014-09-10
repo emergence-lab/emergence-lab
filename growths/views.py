@@ -102,6 +102,7 @@ class SplitSampleView(FormView):
         num_pieces = form.cleaned_data['pieces']
         parent = form.cleaned_data['parent']
         piece_siblings = sample.get_piece_siblings(parent).order_by('-piece')
+        original_parent = parent.parent_id
         if piece_siblings:
             last_letter = piece_siblings.first().piece
         else:
@@ -113,6 +114,9 @@ class SplitSampleView(FormView):
             parent.pk = None
             parent.piece = last_letter
             parent.save()
+            if original_parent == parent.parent_id:
+                parent.parent = parent
+                parent.save()
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
