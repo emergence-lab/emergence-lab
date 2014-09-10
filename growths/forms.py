@@ -50,6 +50,7 @@ class sample_form(ModelForm):
             instance.substrate_serial = instance.parent.substrate_serial
             instance.substrate_orientation = instance.parent.substrate_orientation
             instance.substrate_miscut = instance.parent.substrate_miscut
+            instance.size = instance.parent.size
 
         if commit:
             instance.save()
