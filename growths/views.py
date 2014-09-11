@@ -146,7 +146,7 @@ class readings_detail(DetailView):
              'GC Position', 'Voltage In', 'Voltage Out', 'Current In',
              'Current Out', 'Top VP Flow', 'Hydride Inner', 'Hydride Outer',
              'Alkyl Flow Inner', 'Alkyl Push Inner', 'Alkyl Flow Middle',
-             'Alkyl Push Inner', 'Alkyl Flow Outer', 'Alkyl Push Outer',
+             'Alkyl Push Middle', 'Alkyl Flow Outer', 'Alkyl Push Outer',
              'N2 Flow', 'H2 Flow', 'NH3 Flow', 'Hydride Pressure', 'TMGa1 Flow',
              'TMGa1 Pressure', 'TMGa2 Flow', 'TMGa2 Pressure', 'TEGa1 FLow',
              'TEGa1 Pressure', 'TMIn1 Flow', 'TMIn1 Pressure', 'TMAl1 Flow',
