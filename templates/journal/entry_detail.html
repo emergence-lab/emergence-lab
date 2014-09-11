@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+{{entry.title}}
+{% endblock title %}
+
+{% block content %}
+
+<article class="container">
+    <header>
+        <h1 class="page-header">
+            {{entry.title}}
+            <small class="pull-right">{{entry.date}}</small>
+        </h1>
+        <p>{{entry.author}}</p>
+    </header>
+    <section>
+        {{entry.entry}}
+    </section>
+</article>
+
+{% endblock content %}

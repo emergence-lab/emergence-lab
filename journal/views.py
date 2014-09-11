@@ -25,3 +25,12 @@ class JournalCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('dashboard')
+
+
+class JournalDetailView(LoginRequiredMixin, DetailView):
+    """
+    View for details of a journal entry.
+    """
+    template_name = 'journal/entry_detail.html'
+    model = journal_entry
+    context_object_name = 'entry'
