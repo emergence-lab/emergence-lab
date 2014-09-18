@@ -24,7 +24,7 @@ class JournalCreateView(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('dashboard')
+        return reverse('journal_list', kwargs={'username': self.request.user.username})
 
 
 class JournalDetailView(LoginRequiredMixin, DetailView):
@@ -34,3 +34,15 @@ class JournalDetailView(LoginRequiredMixin, DetailView):
     template_name = 'journal/entry_detail.html'
     model = journal_entry
     context_object_name = 'entry'
+
+
+class JournalListView(LoginRequiredMixin, ListView):
+    """
+    View a list of recent journal entries.
+    """
+    template_name = 'journal/entry_list.html'
+    model = journal_entry
+    context_object_name = 'entries'
+
+    def get_queryset(self):
+        return journal_entry.objects.filter(author=self.request.user.operator).order_by('-date')
