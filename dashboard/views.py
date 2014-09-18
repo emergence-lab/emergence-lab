@@ -4,6 +4,7 @@ from django.views.generic import DetailView
 from core.models import operator, project, investigation
 from core.streams import operator_project_stream, operator_investigation_stream
 from growths.models import growth
+from journal.models import journal_entry
 
 
 class DashboardMixin(object):
@@ -53,6 +54,9 @@ class ProjectDetailDashboardView(DashboardMixin, DetailView):
         context['growths'] = (growth.objects.filter(project=self.object,
                                                     operator_id=userid)
                                             .order_by('-growth_number')[:25])
+        context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all(),
+                                                           author_id=userid)
+                                                    .order_by('-date')[:25])
         context['stream'] = operator_project_stream(self.request.user.operator, self.object)
         return context
 
@@ -70,6 +74,9 @@ class InvestigationDetailDashboardView(DashboardMixin, DetailView):
         context['growths'] = (growth.objects.filter(project=self.object,
                                                     operator_id=userid)
                                             .order_by('-growth_number')[:25])
+        context['entries'] = (journal_entry.objects.filter(investigations__pk=self.object.id,
+                                                           author_id=userid)
+                                                    .order_by('-date')[:25])
         context['project'] = self.object.project
         context['stream'] = operator_investigation_stream(self.request.user.operator, self.object)
         return context
