@@ -1,13 +1,14 @@
 import time
 
 from django.shortcuts import render, render_to_response
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView, RedirectView
 from django.views.generic.edit import ProcessFormView
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 from actstream import action
+from braces.views import LoginRequiredMixin
 
 from core.models import operator
 from .models import growth, sample, readings, serial_number, recipe_layer, source
@@ -592,4 +593,19 @@ def create_growth_postrun(request):
         except:
             prsform = prerun_sources_form(prefix='prsform')
     return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform})
+
+
+class CancelGrowthRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Cancels the current growth and redirects to the dashboard.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        current_growth = growth.objects.latest('growth_number')
+        # delete readings
+        readings.objects.filter(growth=current_growth).delete()
+        # delete samples
+        sample.objects.filter(growth=current_growth).delete()
+        # delete growth
+        current_growth.delete()
+        return reverse('dashboard')
 

@@ -68,6 +68,7 @@ urlpatterns = patterns(
     url(r'^creategrowth/prerun/$', login_required(growths.views.CreateGrowthPrerunView.as_view()), name='create_growth_prerun'),
     url(r'^creategrowth/readings/$', login_required(growths.views.create_growth_readings.as_view()), name='create_growth_readings'),
     url(r'^creategrowth/postrun/$', login_required(growths.views.create_growth_postrun), name='create_growth_postrun'),
+    url(r'^creategrowth/cancel/$', never_cache(growths.views.CancelGrowthRedirectView.as_view()), name='cancel_growth'),
 
     # afm urls
     url(r'^afm/', include('afm.urls')),
