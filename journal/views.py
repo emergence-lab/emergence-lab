@@ -21,6 +21,7 @@ class JournalCreateView(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.author = self.request.user.operator
         self.object.save()
+        form.save_m2m()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
