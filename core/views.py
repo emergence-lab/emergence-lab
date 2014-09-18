@@ -16,6 +16,7 @@ from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
 from .forms import TrackProjectForm, CreateProjectForm, CreateInvestigationForm
 from .streams import project_stream, operator_project_stream, investigation_stream, operator_investigation_stream
+from journal.models import journal_entry
 
 
 ##############
@@ -208,9 +209,14 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
             context['growths'] = (growth.objects.filter(project=self.object,
                                                         operator_id=userid)
                                                 .order_by('-growth_number')[:25])
+            context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all(),
+                                                               author_id=userid)
+                                                        .order_by('-date')[:25])
         else:
             context['growths'] = (growth.objects.filter(project=self.object)
                                                 .order_by('-growth_number')[:25])
+            context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all())
+                                                       .order_by('-date')[:25])
         context['stream'] = project_stream(self.object)
         return context
 
@@ -308,10 +314,15 @@ class InvestigationDetailView(LoginRequiredMixin, DetailView):
             context['growths'] = (growth.objects.filter(project=self.object,
                                                         operator_id=userid)
                                                 .order_by('-growth_number')[:25])
+            context['entries'] = (journal_entry.objects.filter(investigations__pk=self.object.id,
+                                                               author_id=userid)
+                                                       .order_by('-date')[:25])
             context['stream'] = operator_investigation_stream(userid, self.object)
         else:
             context['growths'] = (growth.objects.filter(project=self.object)
                                                 .order_by('-growth_number')[:25])
+            context['entries'] = (journal_entry.objects.filter(investigations__pk=self.object.id)
+                                                       .order_by('-date')[:25])
             context['stream'] = investigation_stream(self.object)
         context['project'] = self.object.project
         return context
