@@ -4,7 +4,7 @@ from django.views.generic import DetailView
 from braces.views import LoginRequiredMixin
 
 from core.models import operator, project, investigation
-from core.streams import operator_project_stream, operator_investigation_stream
+from core.streams import project_stream, investigation_stream
 from growths.models import growth
 
 
@@ -54,10 +54,9 @@ class ProjectDetailDashboardView(LoginRequiredMixin, DashboardMixin, DetailView)
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailDashboardView, self).get_context_data(**kwargs)
         userid = operator.objects.filter(user__username=self.request.user.username).values('id')
-        context['growths'] = (growth.objects.filter(project=self.object,
-                                                    operator_id=userid)
+        context['growths'] = (growth.objects.filter(project=self.object)
                                             .order_by('-growth_number')[:25])
-        context['stream'] = operator_project_stream(self.request.user.operator, self.object)
+        context['stream'] = project_stream(self.object)
         return context
 
 
@@ -71,9 +70,8 @@ class InvestigationDetailDashboardView(LoginRequiredMixin, DashboardMixin, Detai
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailDashboardView, self).get_context_data(**kwargs)
         userid = operator.objects.filter(user__username=self.request.user.username).values('id')
-        context['growths'] = (growth.objects.filter(project=self.object,
-                                                    operator_id=userid)
+        context['growths'] = (growth.objects.filter(project=self.object)
                                             .order_by('-growth_number')[:25])
         context['project'] = self.object.project
-        context['stream'] = operator_investigation_stream(self.request.user.operator, self.object)
+        context['stream'] = investigation_stream(self.object)
         return context
