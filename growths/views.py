@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 
 from django.shortcuts import render, render_to_response
@@ -103,93 +104,6 @@ class SampleFamilyDetailView(ListView):
         return context
 
 
-def create_growth(request):
-    if request.method == "POST":
-        gform = growth_form(request.POST, instance=growth())
-        # sforms = [sample_form(request.POST, prefix=str(x), instnace=sample()) for x in range(0,6)]
-        pf_1 = p_form(request.POST, prefix="pf_1")
-        pf_2 = p_form(request.POST, prefix="pf_2")
-        pf_3 = p_form(request.POST, prefix="pf_3")
-        pf_4 = p_form(request.POST, prefix="pf_4")
-        pf_5 = p_form(request.POST, prefix="pf_5")
-        pf_6 = p_form(request.POST, prefix="pf_6")
-        sform_1 = sample_form(request.POST, instance=sample(), prefix="sform_1")
-        sform_2 = sample_form(request.POST, instance=sample(), prefix="sform_2")
-        sform_3 = sample_form(request.POST, instance=sample(), prefix="sform_3")
-        sform_4 = sample_form(request.POST, instance=sample(), prefix="sform_4")
-        sform_5 = sample_form(request.POST, instance=sample(), prefix="sform_5")
-        sform_6 = sample_form(request.POST, instance=sample(), prefix="sform_6")
-        sforms_list = []
-        sforms = [sform_1, sform_2, sform_3, sform_4, sform_5, sform_6]
-        pforms = [pf_1, pf_2, pf_3, pf_4, pf_5, pf_6]
-        for x in range(0, 6):
-            if (pforms[x]).has_changed():
-                print("The form has changed!!")
-                sforms_list.append(sforms[x])
-        if gform.is_valid() and all([sf.is_valid() for sf in sforms_list]):
-            print ("validation success")
-            new_g = gform.save()
-            pocket = 0
-            for sf in sforms_list:
-                pocket = pocket + 1
-                new_s = sf.save(growthid=new_g, pocketnum=pocket)
-                new_s.save()
-                print ("Here goes nothing")
-                if new_s.substrate_serial.startswith('wbg_'):
-                    print ("Success! It does start with 'wbg_'")
-                    entireserial = new_s.substrate_serial
-                    newserialnumber = ''
-                    for x in range(4, len(entireserial)):
-                        newserialnumber = newserialnumber + entireserial[x]
-                    newserialnumber = int(newserialnumber)
-                    sn = serial_number.objects.create(serial_number = newserialnumber)
-                    sn.save
-#                 new_s = sf.save(commit=False)
-#                 new_s.growth = new_g
-#                 new_s.save()
-            # return HttpResponseRedirect(reverse('home'))
-            return HttpResponseRedirect(reverse('growth_detail', args=[new_g.growth_number]))
-    else:
-        num_items = 0
-        model = growth
-        query = model.objects.all()
-        last = str(query[len(query) - 1])
-        last_int = ''
-        for i in xrange(1, 5):
-            last_int += last[i]
-        last_int = (int(last_int) + 1)
-        last = ('g' + str(last_int))
-        currenttime = time.strftime("%Y-%m-%d")
-        gform = growth_form(instance=growth(), initial={'growth_number': last, 'date': currenttime})
-
-        # sform = [sample_form(prefix=str(x), instance=sample()) for x in range(0,6)]
-
-        last = serial_number.objects.latest('id')
-        lastnumber = last.serial_number
-        nextserial = lastnumber + 1
-
-        def generate_serial(sn):
-            return ('wbg_' + str(sn))
-
-        pf_1 = p_form(prefix="pf_1")
-        pf_2 = p_form(prefix="pf_2")
-        pf_3 = p_form(prefix="pf_3")
-        pf_4 = p_form(prefix="pf_4")
-        pf_5 = p_form(prefix="pf_5")
-        pf_6 = p_form(prefix="pf_6")
-        sform_1 = sample_form(instance=sample(), prefix="sform_1", initial={'substrate_serial': generate_serial(nextserial)})
-        sform_2 = sample_form(instance=sample(), prefix="sform_2", initial={'substrate_serial': generate_serial(nextserial + 1)})
-        sform_3 = sample_form(instance=sample(), prefix="sform_3", initial={'substrate_serial': generate_serial(nextserial + 2)})
-        sform_4 = sample_form(instance=sample(), prefix="sform_4", initial={'substrate_serial': generate_serial(nextserial + 3)})
-        sform_5 = sample_form(instance=sample(), prefix="sform_5", initial={'substrate_serial': generate_serial(nextserial + 4)})
-        sform_6 = sample_form(instance=sample(), prefix="sform_6", initial={'substrate_serial': generate_serial(nextserial + 5)})
-
-    return render(request, 'growths/create_growth.html',
-                  {'gform': gform, 'sform_1': sform_1, 'sform_2': sform_2, 'sform_3': sform_3,
-                   'sform_4': sform_4, 'sform_5': sform_5, 'sform_6': sform_6, 'pf_1': pf_1,
-                   'pf_2': pf_2, 'pf_3': pf_3, 'pf_4': pf_4, 'pf_5': pf_5, 'pf_6': pf_6, })
-
-
 class SplitSampleView(FormView):
     form_class = split_form
     template_name = 'growths/split_sample.html'
@@ -206,8 +120,10 @@ class SplitSampleView(FormView):
         num_pieces = form.cleaned_data['pieces']
         parent = form.cleaned_data['parent']
         piece_siblings = sample.get_piece_siblings(parent).order_by('-piece')
+        original_parent = parent.parent_id
+        original_pk = parent.pk
         if piece_siblings:
-            last_letter = piece_siblings.first().piece
+            last_letter = max(parent.piece, piece_siblings.first().piece)
         else:
             last_letter = 'a'
             parent.piece = 'a'
@@ -215,9 +131,15 @@ class SplitSampleView(FormView):
         for i in range(num_pieces - 1):
             last_letter = unichr(ord(last_letter) + 1)
             parent.pk = None
+            parent.parent = None
             parent.piece = last_letter
             parent.save()
-        action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project, investigation=parent.growth.investigation_id)
+            if original_parent == original_pk:
+                parent.parent = parent
+            else:
+                parent.parent_id = original_parent
+            parent.save()
+            action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project, investigation=parent.growth.investigation_id)
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
@@ -228,10 +150,28 @@ class readings_detail(DetailView):
     context_object_name = 'growth'
 
     def get_context_data(self, **kwargs):
-        self.object = None
         context = super(readings_detail, self).get_context_data(**kwargs)
-        context["growth"] = self.get_object()
-        context["readingslist"] = readings.objects.filter(growth=self.get_object())
+        context['growth'] = self.object
+
+        # turn list organized by column into a list organized by row
+        #  and add labels to first column
+        readings_list = readings.objects.filter(growth=self.object).values_list()
+        if not readings_list:
+            return context
+
+        context['readings_table'] = zip(
+            ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'ECP Temp',
+             'Thermocouple Out', 'Thermocouple In', 'Motor RPM', 'GC Pressure',
+             'GC Position', 'Voltage In', 'Voltage Out', 'Current In',
+             'Current Out', 'Top VP Flow', 'Hydride Inner', 'Hydride Outer',
+             'Alkyl Flow Inner', 'Alkyl Push Inner', 'Alkyl Flow Middle',
+             'Alkyl Push Middle', 'Alkyl Flow Outer', 'Alkyl Push Outer',
+             'N2 Flow', 'H2 Flow', 'NH3 Flow', 'Hydride Pressure', 'TMGa1 Flow',
+             'TMGa1 Pressure', 'TMGa2 Flow', 'TMGa2 Pressure', 'TEGa1 FLow',
+             'TEGa1 Pressure', 'TMIn1 Flow', 'TMIn1 Pressure', 'TMAl1 Flow',
+             'TMAl1 Pressure', 'Cp2Mg Flow', 'Cp2Mg Pressure', 'Cp2Mg Dilution',
+             'SiH4 Flow', 'SiH4 Dilution', 'SiH4 Mix', 'SiH4 Pressure'], *readings_list)[2:]
+
         return context
 
 
@@ -411,8 +351,9 @@ class CreateGrowthPrerunView(TemplateView):
             if pf.has_changed():
                 sample_forms.append(sf)
         if sample_forms and pcform.is_valid() and pgform.is_valid() and sourceform.is_valid() and all([sf.is_valid() for sf in sample_forms]) and commentsform.is_valid():
-            
             lastgrowth = pgform.save()
+            lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
+            lastgrowth.save()
             for i, sform in enumerate(sample_forms):
                 pocket = i + 1
                 new_sample = sform.save(growth=lastgrowth, pocket=pocket)
@@ -429,6 +370,7 @@ class CreateGrowthPrerunView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CreateGrowthPrerunView, self).get_context_data(**kwargs)
         last_growth = growth.objects.latest('growth_number')
+        context['growth'] = last_growth
         context['pcform'] = prerun_checklist_form(prefix='pcform')
         context['pgform'] = prerun_growth_form(prefix='pgform',
                                                initial={
@@ -447,7 +389,7 @@ class CreateGrowthPrerunView(TemplateView):
         for i in range(1, 7):
             context['pf_{0}'.format(i)] = p_form(prefix='pf_{0}'.format(i))
             context['sform_{0}'.format(i)] = sample_form(prefix='sform_{0}'.format(i), instance=sample(),
-                                                         initial={'substrate_serial': 'wbg_{0}'.format(serial_number.generate_serial()),
+                                                         initial={'substrate_serial': 'WBG-{0}-{1}'.format(last_growth.growth_number[1:], i),
                                                                   'location': 'Lab'})
         return context
 
@@ -499,9 +441,8 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
         lastgrowth = growth.objects.latest('growth_number')
         commentsform = comments_form(request.POST, prefix='commentsform')
         if commentsform.is_valid():
-            newcomments = commentsform.cleaned_data['comment_field']
-            lastgrowth.update(run_comments=newcomments)
-        lastgrowth = lastgrowth[0]
+            lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
+            lastgrowth.save()
         numberofreadings = len(readings.objects.filter(growth=lastgrowth))
         print (numberofreadings)
         for x in range(0, numberofreadings):
@@ -579,7 +520,8 @@ def create_growth_postrun(request):
         if prcform.is_valid() and prsform.is_valid() and commentsform.is_valid():
             print ("successful validation. Now let's do something.")
             lastgrowth = growth.objects.latest('growth_number')
-            lastgrowth.update(run_comments=commentsform.cleaned_data['comment_field'])
+            lastgrowth.run_comments=commentsform.cleaned_data['comment_field']
+            lastgrowth.save()
             prsform.save()
             action.send(request.user.operator, verb='completed growth', action_object=lastgrowth, target=lastgrowth.project, investigation=lastgrowth.investigation_id)
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
@@ -592,7 +534,7 @@ def create_growth_postrun(request):
             prsform = prerun_sources_form(instance=last_sources, prefix='prsform')
         except:
             prsform = prerun_sources_form(prefix='prsform')
-    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform})
+    return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform, 'growth': lastgrowth})
 
 
 class CancelGrowthRedirectView(LoginRequiredMixin, RedirectView):
