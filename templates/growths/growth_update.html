@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+{% load bootstrap3 %}
+{% load wysiwyg %}
+
+{% block title %}
+Update {{growth}}
+{% endblock title %}
+
+{% block header %}
+{{form.media}}
+{% endblock header %}
+
+{% block content %}
+
+<div class="container">
+    <form action="{% url 'growth_update' slug=growth.growth_number %}" method="post" class="form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="btn btn-warning" type="submit">Update</button>
+    </form>
+</div>
+
+{% endblock content %}

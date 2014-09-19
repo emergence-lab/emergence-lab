@@ -1,11 +1,12 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load wysiwyg %}
 
 {% block title %}Create Growth Prerun{% endblock %}
 
 {% block header %}
     {% load staticfiles %}
-
+    {{commentsform.media}}
 {% endblock %}
 
 {% block content %}
@@ -19,6 +20,7 @@
     <h1 class="page-header">
         Pre-run Growth Info &amp; Checklist for {{growth}}
         <div class="pull-right">
+            <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancelmodal">Cancel Growth</button>
             <button class="btn btn-info" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button>
         </div>
     </h1>
@@ -173,7 +175,8 @@
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>
+
         <div class="modal fade" id="commentsmodal" tabindex="-1" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -191,6 +194,25 @@
             </div>
         </div>           
         </form>
+
+        <div class="modal fade" id="cancelmodal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <header class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h1 class="modal-title">Cancel Growth</h1>
+                    </header>
+                    <div class="modal-body">
+                        <strong>Warning:</strong> This will cancel the current growth. You should do this if you needed to abort the growth prior to any readings being taken.
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'cancel_growth' %}" class="btn btn-danger">Cancel Growth</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>

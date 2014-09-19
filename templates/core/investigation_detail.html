@@ -1,6 +1,6 @@
 {% extends "core/base.html" %}
 
-{% block title %}{{project}}{% endblock %}
+{% block title %}{{investigation}}{% endblock %}
 
 {% block content %}
 <main class="container">
@@ -8,7 +8,8 @@
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li><a href="{% url 'project_list' %}">Projects</a></li>
-            <li class='active'>{{project}}</li>
+            <li><a href="{% url 'project_detail_all' slug=project.slug %}">{{project}}</a></li>
+            <li class='active'>{{investigation}}</li>
         </ol>
     </nav>
 
@@ -22,10 +23,10 @@
     <div class="row tab-content">
         <div class="tab-pane fade in active" id="home">
             <header>
-                <h1 class="page-header">{{project}}</h1>
+                <h1 class="page-header">{{investigation}}</h1>
             </header>
             <article>
-                <p>{{project.description}}</p>
+                <p>{{investigation.description}}</p>
             </article>
         </div>
         <div class="tab-pane fade" id="feed">
@@ -54,6 +55,5 @@
             <header><h1 class="page-header">Recent Characterization</h1></header>
         </div>
     </div>
-
 </main>
 {% endblock %}

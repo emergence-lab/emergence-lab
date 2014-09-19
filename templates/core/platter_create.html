@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+Create Platter
+{% endblock title %}
+
+{% block content %}
+
+<div class="container">
+    <form action="{% url 'platter_create' %}" method="post" class="form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="btn btn-primary" type="submit">Create</button>
+    </form>
+</div>
+
+{% endblock content %}

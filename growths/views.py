@@ -2,23 +2,25 @@ from __future__ import print_function
 import time
 
 from django.shortcuts import render, render_to_response
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView, RedirectView
 from django.views.generic.edit import ProcessFormView
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
+from actstream import action
+from braces.views import LoginRequiredMixin
+
 from core.models import operator
 from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
-from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form
+from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form, GrowthUpdateForm
 from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 import afm.models
 import hall.models
-from core.views import SessionHistoryMixin
 
 
-class growth_list(SessionHistoryMixin, RelationalFilterView):
+class growth_list(RelationalFilterView):
     filterset_class = growth_filter
     template_name = 'growths/growth_filter.html'
 
@@ -32,7 +34,7 @@ class afm_compare(ListView):
         return objects
 
 
-class GrowthDetailView(SessionHistoryMixin, DetailView):
+class GrowthDetailView(DetailView):
     model = growth
     template_name = 'growths/growth_detail.html'
     slug_field = 'growth_number'
@@ -46,7 +48,23 @@ class GrowthDetailView(SessionHistoryMixin, DetailView):
         return context
 
 
-class SampleDetailView(SessionHistoryMixin, DetailView):
+class GrowthUpdateView(UpdateView):
+    """
+    View to update information about a growth.
+    """
+    model = growth
+    template_name = 'growths/growth_update.html'
+    slug_field = 'growth_number'
+    form_class = GrowthUpdateForm
+
+    def get_initial(self):
+        return {'run_comments': self.object.run_comments.rendered}
+
+    def get_success_url(self):
+        return reverse('growth_detail', args=(self.object.growth_number,))
+
+
+class SampleDetailView(DetailView):
     model = sample
     template_name = 'growths/sample_detail.html'
     context_object_name = 'sample'
@@ -121,6 +139,7 @@ class SplitSampleView(FormView):
             else:
                 parent.parent_id = original_parent
             parent.save()
+            action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project, investigation=parent.growth.investigation_id)
         return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
 
 
@@ -146,7 +165,7 @@ class readings_detail(DetailView):
              'GC Position', 'Voltage In', 'Voltage Out', 'Current In',
              'Current Out', 'Top VP Flow', 'Hydride Inner', 'Hydride Outer',
              'Alkyl Flow Inner', 'Alkyl Push Inner', 'Alkyl Flow Middle',
-             'Alkyl Push Inner', 'Alkyl Flow Outer', 'Alkyl Push Outer',
+             'Alkyl Push Middle', 'Alkyl Flow Outer', 'Alkyl Push Outer',
              'N2 Flow', 'H2 Flow', 'NH3 Flow', 'Hydride Pressure', 'TMGa1 Flow',
              'TMGa1 Pressure', 'TMGa2 Flow', 'TMGa2 Pressure', 'TEGa1 FLow',
              'TEGa1 Pressure', 'TMIn1 Flow', 'TMIn1 Pressure', 'TMAl1 Flow',
@@ -268,7 +287,7 @@ class update_readings(SingleObjectMixin, TemplateView):
         return HttpResponseRedirect(reverse('update_readings', args=[self.get_object()]))
 
 
-class recipe_detail(SessionHistoryMixin, DetailView):
+class recipe_detail(DetailView):
     model = growth
     template_name = 'growths/recipe_detail.html'
     slug_field = 'growth_number'
@@ -504,6 +523,7 @@ def create_growth_postrun(request):
             lastgrowth.run_comments=commentsform.cleaned_data['comment_field']
             lastgrowth.save()
             prsform.save()
+            action.send(request.user.operator, verb='completed growth', action_object=lastgrowth, target=lastgrowth.project, investigation=lastgrowth.investigation_id)
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
         lastgrowth = growth.objects.latest('growth_number')
@@ -515,4 +535,19 @@ def create_growth_postrun(request):
         except:
             prsform = prerun_sources_form(prefix='prsform')
     return render(request, 'growths/create_growth_postrun.html', {'prcform': prcform, 'prsform': prsform, 'commentsform': commentsform, 'growth': lastgrowth})
+
+
+class CancelGrowthRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Cancels the current growth and redirects to the dashboard.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        current_growth = growth.objects.latest('growth_number')
+        # delete readings
+        readings.objects.filter(growth=current_growth).delete()
+        # delete samples
+        sample.objects.filter(growth=current_growth).delete()
+        # delete growth
+        current_growth.delete()
+        return reverse('dashboard')
 

@@ -7,15 +7,22 @@
 
 <div class="container">
     <ol class="breadcrumb">
-        <li><a href="{% url 'profile_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li class='active'>{{growth}}</li>
     </ol>
 
-    <h1>{{growth}}</h1>
+    <header>
+        <h1 class="page-header">
+            {{growth}}
+            <div class="pull-right">
+                <a href="{% url 'growth_update' slug=growth.growth_number %}" class="btn btn-warning">Edit</a>
+            </div>
+        </h1>
+    </header>
 
     
 
-    <h3>Growth Info</h3>
+    <h3 class="page-header">Growth Info</h3>
     <p><a class="btn btn-primary" href="{% url 'recipe_detail' growth %}">Recipe Info</a></p>
     <p><a class="btn btn-primary" href="{%url 'readings_detail' growth %}">Readings Info</a></p>
     <p><strong>Date: </strong>{{growth.date}}</p>

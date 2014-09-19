@@ -1,42 +1,84 @@
 {% extends "core/base.html" %}
 
-{% block title %}Projects{% endblock %}
+{% block title %}Projects{% endblock title %}
 
 {% block content %}
-    <div class="container">
-        <h3>Active Projects <a class="btn btn-primary" href="">Add new</a></h3>
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Projects</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Active Projects
+            <a class="btn btn-primary pull-right" href="{% url 'project_create' %}">
+                <span class="glyphicon glyphicon-plus"></span>
+                Add Project
+            </a>
+        </h1>
+    </header>
+
+    <section>
         <ul class="list-group">
-        {% for project in active_list %}
-            <li class="list-group-item">
-                <div class="clearfix">
-                    {{project.name}}
-                    <div class="pull-right">
-                        <a href="" class="btn btn-default btn-sm">Make Inactive</a>
-                        <a href="" class="btn btn-default btn-sm">Add Investigation</a>
+            {% for project in active_list %}
+                <li class="list-group-item">
+                    <div class="clearfix">
+                        <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
+                        <div class="pull-right">
+                            {% if project.id not in tracking %}
+                                <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-success btn-sm">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    Track Project
+                                </a>
+                            {% else %}
+                                <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-success btn-sm">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                    Untrack Project
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning btn-sm">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                                Make Inactive
+                            </a>
+                            <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Add Investigation
+                            </a>
+                        </div>
+                        <ul>
+                            {% for investigation in project.investigation_set.all %}
+                                <li><a href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a></li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    <ul>
-                    {% for investigation in project.investigation_set.all %}
-                        <li>{{investigation.name}}</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-            </li>
-        {% endfor %}
+                </li>
+            {% endfor %}
         </ul>
+    </section>
 
-        <h3>Inactive Projects</h3>
+    <header>
+        <h1 class="page-header">Inactive Projects</h1>
+    </header>
+    <section>
         <ul class="list-group">
-        {% for project in inactive_list %}
-            <li class="list-group-item">
-                <div class="clearfix">
-                    {{project.name}}
-                    <a href="" class="pull-right btn btn-default btn-sm">Make Active</a>
-                </div>
-            </li>
-        {% endfor %}
+            {% for project in inactive_list %}
+                <li class="list-group-item">
+                    <div class="clearfix">
+                        <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
+                        <a href="{% url 'project_activate' slug=project.slug %}" class="pull-right btn btn-warning btn-sm">
+                            <span class="glyphicon glyphicon-log-in"></span>
+                            Make Active
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
         </ul>
+    </section>
 
-        <a href="{% url 'home' %}">Back</a>
-    </div>
+</main>
 
-{% endblock %}
+{% endblock content %}
