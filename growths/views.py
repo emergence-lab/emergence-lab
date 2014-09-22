@@ -155,7 +155,7 @@ class readings_detail(DetailView):
 
         # turn list organized by column into a list organized by row
         #  and add labels to first column
-        readings_list = readings.objects.filter(growth=self.object).values_list()
+        readings_list = readings.objects.filter(growth=self.object).order_by('layer').values_list()
         if not readings_list:
             return context
 
