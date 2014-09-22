@@ -27,7 +27,7 @@
                 <h1 class="page-header">{{project}}</h1>
             </header>
             <article>
-                <p>{{project.description}}</p>
+                <p>{{project.description|safe}}</p>
             </article>
         </div>
         <div class="tab-pane fade" id="feed">

@@ -4,7 +4,7 @@ from django.db import models
 
 from actstream import registry
 from autoslug import AutoSlugField
-from markupfield.fields import MarkupField
+from ckeditor.fields import RichTextField
 
 import core.models
 
@@ -14,7 +14,7 @@ class journal_entry(models.Model):
     Stores journal entries.
     """
     title = models.CharField(max_length=100)
-    entry = MarkupField(blank=True, markup_type='markdown')
+    entry = RichTextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(core.models.operator)
     slug = AutoSlugField(populate_from='title', unique_with=('author'))

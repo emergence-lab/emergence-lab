@@ -4,7 +4,7 @@ from django.db import models
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 from actstream import registry
-from markupfield.fields import MarkupField
+from ckeditor.fields import RichTextField
 
 import core.models
 
@@ -31,7 +31,7 @@ class growth(models.Model):
     platter = models.ForeignKey(core.models.platter,
                                 limit_choices_to={'active': True})
     reactor = models.CharField(max_length=10, choices=REACTOR_CHOICES)
-    run_comments = MarkupField(blank=True, markup_type='markdown')
+    run_comments = RichTextField(blank=True)
 
     # layer materials
     has_gan = models.BooleanField(default=False)
@@ -113,7 +113,7 @@ class sample(models.Model):
     substrate_serial = models.CharField(max_length=20, blank=True)  # wafer serial or growth number
     substrate_orientation = models.CharField(max_length=10, default='0001')
     substrate_miscut = models.DecimalField(max_digits=4, decimal_places=1, default=0)
-    comment = MarkupField(blank=True, markup_type='markdown')
+    comment = RichTextField(blank=True)
 
     def __unicode__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)

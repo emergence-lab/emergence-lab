@@ -55,9 +55,6 @@ class GrowthUpdateView(UpdateView):
     slug_field = 'growth_number'
     form_class = GrowthUpdateForm
 
-    def get_initial(self):
-        return {'run_comments': self.object.run_comments.rendered}
-
     def get_success_url(self):
         return reverse('growth_detail', args=(self.object.growth_number,))
 
