@@ -13,7 +13,7 @@ from core.forms import MarkdownField
 # Create the form class.
 class sample_form(ModelForm):
     parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
-    comment = MarkdownField()
+    comment = MarkdownField(required=False)
 
     class Meta:
         model = sample
