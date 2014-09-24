@@ -47,6 +47,8 @@ urlpatterns = patterns(
     url(r'^projects/(?P<slug>[\w-]+)/add-investigation/$', core.views.InvestigationCreateView.as_view(), name='investigation_create'),
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/$', core.views.InvestigationDetailView.as_view(), name='investigation_detail_all'),
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/edit/$', core.views.InvestigationUpdateView.as_view(), name='investigation_update'),
+    url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/activate/$', never_cache(core.views.ActivateInvestigationRedirectView.as_view()), name='investigation_activate'),
+    url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/deactivate/$', never_cache(core.views.DeactivateInvestigationRedirectView.as_view()), name='investigation_deactivate'),
     url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
 
 

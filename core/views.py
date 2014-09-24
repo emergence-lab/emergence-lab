@@ -391,6 +391,41 @@ class InvestigationListView(LoginRequiredMixin, ActiveListView):
     model = investigation
 
 
+class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified investigation to active.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        project_slug = kwargs.pop('project')
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=project_slug)
+        investigation_obj = investigation.objects.get(slug=slug)
+        if not investigation_obj.active:
+            operator_obj = self.request.user.operator
+            investigation_obj.active = True
+            investigation_obj.save()
+            action.send(operator_obj, verb='activated investigation', action_object=investigation_obj, target=project_obj)
+        return reverse('project_list')
+
+
+class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified investigation to inactive.
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        project_slug = kwargs.pop('project')
+        slug = kwargs.pop('slug')
+        project_obj = project.objects.get(slug=project_slug)
+        investigation_obj = investigation.objects.get(slug=slug)
+        if investigation_obj.active:
+            operator_obj = self.request.user.operator
+            investigation_obj.active = False
+            investigation_obj.save()
+            action.send(operator_obj, verb='deactivated investigation', action_object=investigation_obj, target=project_obj)
+        return reverse('project_list')
+
+
+
 class TrackProjectView(LoginRequiredMixin, CreateView):
     """
     View to handle tracking projects.
