@@ -118,3 +118,10 @@ a.list-group-item.active-parent:focus {
 .right-spacer-sm { margin-right: 20px; }
 .right-spacer-md { margin-right: 50px; }
 .right-spacer-lg { margin-right: 100px; }
+
+.investigation-subitem {
+  width: 300px;
+  list-style: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
