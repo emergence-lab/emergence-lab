@@ -3,7 +3,30 @@
 {% block dashboard_content %}
 
 <div class="row">
-    <aside class="col-sm-3 col-sm-offset-9">
+    <section class="col-lg-9 col-xs-12">
+
+        {% if active_projects %}
+
+        {# No projects being tracked #}
+        {% else %}
+            <div class="alert alert-info">
+                <h3>You don't have any active projects</h3>
+                <p>Get started by creating a new project or tracking an existing one.</p>
+                <div class="top-spacer-sm">
+                    <a href="{% url 'project_create' %}" class="btn btn-success right-spacer-xs">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        New Project
+                    </a>
+                    <a href="{% url 'track_project' %}" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-search"></span>
+                        Track Project
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+    <aside class="col-lg-3 visible-lg">
         <header><h4>Recent Growths</h4></header>
         <div class="list-group">
         {% for growth in growths %}
@@ -11,6 +34,7 @@
         {% endfor %}
         </div>
     </aside>
+
 </div>
 
 {% endblock %}

@@ -3,7 +3,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid bottom-spacer-lg">
     <nav>
         <ol class="breadcrumb">
             {% block dashboard_breadcrumb %}
@@ -36,9 +36,17 @@
             </li>
         </ul>
     </nav>
-    <div class="row">
-        <nav class="col-xs-2">
-            <h4 class="sidebar-header">My Projects</h4>
+
+    <div class="row top-spacer-sm">
+        <nav class="col-xs-2 sidebar">
+            <header class="sidebar-header">
+                <a href="{% url 'track_project' %}">
+                    <h4>
+                        Projects
+                        <span class="glyphicon glyphicon-plus pull-right right-spacer-sm"></span>
+                    </h4>
+                </a>
+            </header>
             <div class="list-group">
                 {% if not project %}
                     <a href="{% url 'dashboard' %}" class="list-group-item active">All</a>
@@ -68,8 +76,6 @@
                     {% endif %}
                 {% endfor %}
 
-                <a href="{% url 'track_project' %}" class="list-group-item"><span class="glyphicon glyphicon-plus"></span> Add Project</a>
-
                 {% if inactive_projects %}
                     <div class="list-group-item dropdown">
                         <a href="" class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
@@ -83,7 +89,7 @@
             </div>
         </nav>
         <section class="col-xs-10">
-            <div class="container-fluid no-padding">
+            <div class="container-fluid">
                 {% block dashboard_content %}
                 {% endblock dashboard_content %}
             </div>
@@ -91,7 +97,5 @@
         
     </div>
 </div>
-
-<div class="spacer"></div>
 
 {% endblock %}

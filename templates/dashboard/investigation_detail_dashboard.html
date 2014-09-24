@@ -21,10 +21,6 @@
             <header>
                 <h1 class="page-header">
                     <a href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation}}</a>
-                    <a class="btn btn-default pull-right" href="{% url 'project_detail_dashboard' slug=project.slug %}">
-                        <span class="glyphicon glyphicon-arrow-left"></span>
-                        Back to Project
-                    </a>
                 </h1>
             </header>
             <article>
