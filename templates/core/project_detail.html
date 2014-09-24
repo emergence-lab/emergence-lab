@@ -80,7 +80,41 @@
             {% endfor %}
         </div>
         <div class="tab-pane fade" id="settings">
-            <header><h1 class="page-header">Settings</h1></header>
+            <header>
+                <h1 class="page-header">Settings</h1>
+            </header>
+            <div>
+                {% if tracking %}
+                    <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-success">
+                        <span class="glyphicon glyphicon-minus"></span>
+                        Untrack Project
+                    </a>
+                {% else %}
+                    <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-success">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Track Project
+                    </a>
+                {% endif %}
+                <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Add Investigation
+                </a>
+                {% if project.active %}
+                    <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning">
+                        <span class="glyphicon glyphicon-log-out"></span>
+                        Make Inactive
+                    </a>
+                {% else %}
+                    <a href="{% url 'project_activate' slug=project.slug %}" class="btn btn-warning">
+                        <span class="glyphicon glyphicon-log-in"></span>
+                        Make Active
+                    </a>
+                {% endif %}
+                <a href="{% url 'project_update' slug=project.slug %}" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-edit"></span>
+                    Edit Description
+                </a>
+            </div>
         </div>
     </div>
 

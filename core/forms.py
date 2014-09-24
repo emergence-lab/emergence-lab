@@ -4,13 +4,6 @@ from django.core.exceptions import ValidationError
 from .models import project, investigation, project_tracking
 
 
-class CreateProjectForm(forms.ModelForm):
-
-    class Meta:
-        model = project
-        fields = ('name', 'description')
-
-
 class CreateInvestigationForm(forms.ModelForm):
 
     class Meta:

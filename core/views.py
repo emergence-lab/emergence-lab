@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View, FormView
+from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View, FormView, UpdateView
 from django.contrib.auth.decorators import login_required
 
 import gitlab
@@ -14,7 +14,7 @@ from braces.views import LoginRequiredMixin
 
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
-from .forms import TrackProjectForm, CreateProjectForm, CreateInvestigationForm
+from .forms import TrackProjectForm, CreateInvestigationForm
 from .streams import project_stream, operator_project_stream, investigation_stream, operator_investigation_stream
 from journal.models import journal_entry
 
@@ -212,11 +212,17 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
             context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all(),
                                                                author_id=userid)
                                                         .order_by('-date')[:25])
+            context['tracking'] = (project_tracking.objects.filter(operator_id=userid,
+                                                                   project=self.object)
+                                                           .exists())
         else:
             context['growths'] = (growth.objects.filter(project=self.object)
                                                 .order_by('-growth_number')[:25])
             context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all())
                                                        .order_by('-date')[:25])
+            context['tracking'] = (project_tracking.objects.filter(operator=self.request.user.operator,
+                                                                   project=self.object)
+                                                           .exists())
         context['stream'] = project_stream(self.object)
         return context
 
@@ -227,12 +233,24 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     """
     template_name = 'core/project_create.html'
     model = project
-    form_class = CreateProjectForm
+    fields = ('name', 'description',)
 
     def form_valid(self, form):
         self.object = form.save()
         action.send(self.request.user.operator, verb='created', target=self.object)
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('project_detail_all', kwargs={'slug': self.object.slug})
+
+
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    View for editing information about a project.
+    """
+    template_name = 'core/project_update.html'
+    model = project
+    fields = ('description',)
 
     def get_success_url(self):
         return reverse('project_detail_all', kwargs={'slug': self.object.slug})
@@ -346,6 +364,19 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
         action.send(self.request.user.operator, verb='added investigation to',
                     target=self.object.project, investigation=self.object.id)
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
+                                                           'slug': self.object.slug})
+
+
+class InvestigationUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    View for editing information about a project.
+    """
+    template_name = 'core/investigation_update.html'
+    model = investigation
+    fields = ('description',)
 
     def get_success_url(self):
         return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
