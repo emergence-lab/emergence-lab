@@ -67,6 +67,14 @@
                     <li>
                         <a class="navbar-link" href="{% url 'dashboard' %}"><span class="glyphicon glyphicon-th-list"></span> Dashboard</a>
                     </li>
+                    {% if user.is_staff %}
+                        <li>
+                            <a href="{% url 'admin:index' %}">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                Admin
+                            </a>
+                        </li>
+                    {% endif %}
                     <li><button class="btn btn-default navbar-btn" data-toggle="modal" data-target="#exception-modal">Report Issue</button></li>
                     {% endif %}
                 </ul>
@@ -81,6 +89,12 @@
                                 <span class="glyphicon glyphicon-th-list"></span>
                                 Dashboard
                             </a></li>
+                            {% if user.is_staff %}
+                                <li><a href="{% url 'admin:index' %}">
+                                    <span class="glyphicon glyphicon-cog"></span>
+                                    Administration
+                                </a></li>
+                            {% endif %}
                             <li><a class="navbar-link" href="{% url 'logout' %}">
                                 <span class="glyphicon glyphicon-log-out"></span>
                                 Logout
