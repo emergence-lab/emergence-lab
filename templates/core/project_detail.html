@@ -24,10 +24,65 @@
     <div class="row tab-content">
         <div class="tab-pane fade in active" id="home">
             <header>
-                <h1 class="page-header">{{project}}</h1>
+                <div class="pull-right">
+                    {% if project.active %}
+                        <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning btn-sm">
+                            <span class="glyphicon glyphicon-log-out"></span>
+                            Make Inactive
+                        </a>
+                    {% else %}
+                        <a href="{% url 'project_activate' slug=project.slug %}" class="btn btn-warning btn-sm">
+                            <span class="glyphicon glyphicon-log-in"></span>
+                            Make Active
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'project_update' slug=project.slug %}" class="btn btn-warning btn-sm">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        Edit
+                    </a>
+                </div>
+                <h1 class="page-header project-header">
+                    {% if tracking %}
+                        <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Stop Tracking Project">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Track Project">
+                            <span class="glyphicon glyphicon-star"></span>
+                        </a>
+                    {% endif %}
+                    
+                    {{project}}
+                    <small>
+                        <span class="glyphicon glyphicon-time left-spacer-sm"></span>
+                        created on {{project.start_date.date}}
+                    </small>
+                </h1>
             </header>
-            <article>
-                <p>{{project.description|safe}}</p>
+            <article class="row">
+                <div class="col-md-6">
+                    <p>{{project.description|safe}}</p>
+                </div>
+                <div class="col-md-6 hidden-sm hidden-xs">
+                    <h3 class="page-header clearfix">
+                        <div class="pull-right">
+                            <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-success btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Add Investigation
+                            </a>
+                        </div>
+                        Investigations
+                    </h3>
+                    <div class="list-group">
+                        {% for investigation in project.investigation_set.all %}
+                            {% if investigation.active %}
+                                <a class="list-group-item" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
+                            {% else %}
+                                <a class="list-group-item disabled" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             </article>
         </div>
         <div class="tab-pane fade" id="feed">
@@ -84,39 +139,22 @@
                 <h1 class="page-header">Settings</h1>
             </header>
             <div>
-                {% if tracking %}
-                    <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-success">
-                        <span class="glyphicon glyphicon-minus"></span>
-                        Untrack Project
-                    </a>
-                {% else %}
-                    <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-success">
-                        <span class="glyphicon glyphicon-plus"></span>
-                        Track Project
-                    </a>
-                {% endif %}
                 <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-primary">
                     <span class="glyphicon glyphicon-plus"></span>
                     Add Investigation
-                </a>
-                {% if project.active %}
-                    <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning">
-                        <span class="glyphicon glyphicon-log-out"></span>
-                        Make Inactive
-                    </a>
-                {% else %}
-                    <a href="{% url 'project_activate' slug=project.slug %}" class="btn btn-warning">
-                        <span class="glyphicon glyphicon-log-in"></span>
-                        Make Active
-                    </a>
-                {% endif %}
-                <a href="{% url 'project_update' slug=project.slug %}" class="btn btn-warning">
-                    <span class="glyphicon glyphicon-edit"></span>
-                    Edit Description
                 </a>
             </div>
         </div>
     </div>
 
 </main>
+
 {% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    $(function () {
+        $("[data-toggle='tooltip']").tooltip();
+    });
+</script>
+{% endblock scripts %}

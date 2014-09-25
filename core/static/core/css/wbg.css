@@ -54,6 +54,10 @@ a.list-group-item.active-parent:focus {
   width: 100% !important;
 }
 
+/* project/investigation detail */
+.project-header small {
+  font-size: 45%;
+}
 
 /* dashboard sidebar */
 .sidebar {

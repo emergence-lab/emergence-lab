@@ -30,12 +30,12 @@
                         <div class="pull-right">
                             {% if project.id not in tracking %}
                                 <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-success btn-sm">
-                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
                                     Track Project
                                 </a>
                             {% else %}
                                 <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-success btn-sm">
-                                    <span class="glyphicon glyphicon-minus"></span>
+                                    <span class="glyphicon glyphicon-remove"></span>
                                     Untrack Project
                                 </a>
                             {% endif %}
