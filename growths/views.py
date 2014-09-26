@@ -1,10 +1,11 @@
 import time
+import datetime
 
 from django.shortcuts import render, render_to_response
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView
 from django.views.generic.edit import ProcessFormView
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 from actstream import action
@@ -12,7 +13,7 @@ from actstream import action
 from core.models import operator
 from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
-from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form
+from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form, SampleSizeForm
 from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 import afm.models
 import hall.models
@@ -215,20 +216,36 @@ class SplitSampleView(FormView):
     def form_valid(self, form):
         num_pieces = form.cleaned_data['pieces']
         parent = form.cleaned_data['parent']
-        piece_siblings = sample.get_piece_siblings(parent).order_by('-piece')
-        if piece_siblings:
-            last_letter = piece_siblings.first().piece
-        else:
-            last_letter = 'a'
-            parent.piece = 'a'
-            parent.save()
-        for i in range(num_pieces - 1):
-            last_letter = unichr(ord(last_letter) + 1)
-            parent.pk = None
-            parent.piece = last_letter
-            parent.save()
+        parent.split(num_pieces)
         action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project, investigation=parent.growth.investigation_id)
-        return HttpResponseRedirect(reverse('sample_family_detail', args=(parent.growth.growth_number, parent.pocket)))
+        return HttpResponseRedirect(reverse('sample_change_size', args=(parent.growth.growth_number, parent.pocket)))
+
+
+class ChangeSizeView(TemplateView):
+    template_name = 'growths/sample_size.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ChangeSizeView, self).get_context_data(**kwargs)
+        growth_number = self.kwargs.get('growth', None)
+        pocket = self.kwargs.get('pocket', None)
+        samples = sample.objects.filter(growth__growth_number=growth_number, pocket=pocket, date_modified__range=[datetime.datetime.now() - datetime.timedelta(seconds=5), datetime.datetime.now()])
+
+        context['growth'] = growth.objects.get(growth_number=growth_number)
+        context['pocket'] = pocket
+        context['samples'] = samples
+        context['form'] = SampleSizeForm(samples=samples)
+        return context
+
+    def post(self, request, **kwargs):
+        sample_data = []
+        for k, v in request.POST.iteritems():
+            if k[0] == 'g':
+                sample_data.append((k, v))
+        for sample_name, size in sample_data:
+            obj = sample.get_sample(sample_name)
+            obj.size = size
+            obj.save()
+        return HttpResponseRedirect(reverse('sample_family_detail', args=(obj.growth.growth_number, obj.pocket)))
 
 
 class readings_detail(DetailView):

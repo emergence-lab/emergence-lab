@@ -145,12 +145,17 @@ class postrun_checklist_form(forms.Form):
 
 
 class split_form(ModelForm):
-    pieces = forms.IntegerField(label="Number of pieces", validators=[validate_not_zero])
+    pieces = forms.IntegerField(label="Number of pieces")
     parent = forms.CharField(label="Sample to split")
 
     class Meta:
         model = sample
         fields = ['parent', 'pieces']
+
+    def clean_pieces(self):
+        if self.cleaned_data['pieces'] <= 1:
+            raise forms.ValidationError('Number of pieces must be greater than 1')
+        return self.cleaned_data['pieces']
 
     def clean_parent(self):
         try:
@@ -159,6 +164,15 @@ class split_form(ModelForm):
         except Exception as e:
             raise forms.ValidationError(str(e))
 
+
+class SampleSizeForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        samples = kwargs.pop('samples', [])
+        super(SampleSizeForm, self).__init__(*args, **kwargs)
+
+        for i, sample_name in enumerate(samples):
+            self.fields['{0}'.format(sample_name)] = forms.ChoiceField(choices=sample.SIZE_CHOICES)
 
 class readings_form(ModelForm):
     class Meta:
