@@ -84,7 +84,7 @@ urlpatterns = patterns(
     url(r'^api/v0/afm/(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
 
     # hall urls
-    url(r'^hall/$', include('hall.urls')),
+    url(r'^hall/', include('hall.urls')),
     
     # user-specific views
     url(r'^(?P<username>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_user'),
