@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+{{entry.title}}
+{% endblock title %}
+
+{% block content %}
+
+<article class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'journal_list' username=request.user %}">Entries</a></li>
+            <li class='active'>{{entry.title}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            {{entry.title}}
+            <small class="pull-right">{{entry.date}}</small>
+        </h1>
+        <p>{{entry.author}}</p>
+    </header>
+    <section>
+        {{entry.entry|safe}}
+    </section>
+</article>
+
+{% endblock content %}

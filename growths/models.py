@@ -4,7 +4,7 @@ from django.db import models
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 from actstream import registry
-from markupfield.fields import MarkupField
+from ckeditor.fields import RichTextField
 
 import core.models
 
@@ -31,7 +31,7 @@ class growth(models.Model):
     platter = models.ForeignKey(core.models.platter,
                                 limit_choices_to={'active': True})
     reactor = models.CharField(max_length=10, choices=REACTOR_CHOICES)
-    run_comments = MarkupField(blank=True, markup_type='markdown')
+    run_comments = RichTextField(blank=True)
 
     # layer materials
     has_gan = models.BooleanField(default=False)
@@ -113,7 +113,9 @@ class sample(models.Model):
     substrate_serial = models.CharField(max_length=20, blank=True)  # wafer serial or growth number
     substrate_orientation = models.CharField(max_length=10, default='0001')
     substrate_miscut = models.DecimalField(max_digits=4, decimal_places=1, default=0)
-    comment = MarkupField(blank=True, markup_type='markdown')
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    comment = RichTextField(blank=True)
 
     def __unicode__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)
@@ -179,6 +181,43 @@ class sample(models.Model):
         A piece sibling is defined as samples that were split from the same piece.
         """
         return sample.objects.filter(growth=sample_obj.growth, pocket=sample_obj.pocket).exclude(pk=sample_obj.id)
+
+    def split(self, number_pieces):
+        """
+        Splits a sample into the specified number of pieces. Sets the size to 'other'.
+        Parent is inherited from the original sample.
+        """
+        siblings = sample.objects.filter(growth=self.growth, pocket=self.pocket).order_by('-piece')
+        parent = self
+        original_id = self.id
+        original_parent_id = self.parent_id
+        self.save()
+        new_pieces = [parent]
+        if len(siblings) > 1:
+            last_letter = siblings.first().piece
+        else:
+            last_letter = 'a'
+            parent.piece = 'a'
+            parent.size = 'other'
+            parent.save()
+        for i in range(number_pieces - 1):
+            if last_letter != 'z':
+                last_letter = unichr(ord(last_letter) + 1)
+            else:
+                raise Exception('Too many pieces')
+            print(last_letter)
+            parent.pk = None
+            parent.parent = None
+            parent.piece = last_letter
+            parent.size = 'other'
+            parent.save()
+            if original_parent_id == original_id:
+                parent.parent = parent
+            else:
+                parent.parent_id = original_parent_id
+            parent.save()
+            new_pieces.append(parent)
+        return new_pieces
 
     class Meta:
         db_table = 'samples'

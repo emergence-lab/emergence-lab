@@ -5,15 +5,14 @@ from growths.models import growth, sample, readings, source
 import time
 import re
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from core.validators import*
+from core.validators import *
 
-from core.forms import MarkdownField
+from ckeditor.widgets import CKEditorWidget
 
 
 # Create the form class.
 class sample_form(ModelForm):
     parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
-    comment = MarkdownField(required=False)
 
     class Meta:
         model = sample
@@ -70,16 +69,6 @@ class growth_form(ModelForm):
                   'has_algan', 'has_ingan', 'has_alingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_superlattice', 'has_mqw', 'has_graded',
                   'has_n', 'has_p', 'has_u']
-
-
-class GrowthUpdateForm(ModelForm):
-    run_comments = MarkdownField()
-
-    class Meta:
-        model = growth
-        fields = ('run_comments', 'has_gan', 'has_algan', 'has_aln',
-                  'other_material', 'is_template', 'is_buffer', 'has_n',
-                  'has_p', 'has_u',)
 
 
 class p_form(forms.Form):
@@ -169,12 +158,17 @@ class postrun_checklist_form(forms.Form):
 
 
 class split_form(ModelForm):
-    pieces = forms.IntegerField(label="Number of pieces", validators=[validate_not_zero])
+    pieces = forms.IntegerField(label="Number of pieces")
     parent = forms.CharField(label="Sample to split")
 
     class Meta:
         model = sample
         fields = ['parent', 'pieces']
+
+    def clean_pieces(self):
+        if self.cleaned_data['pieces'] <= 1:
+            raise forms.ValidationError('Number of pieces must be greater than 1')
+        return self.cleaned_data['pieces']
 
     def clean_parent(self):
         try:
@@ -184,6 +178,15 @@ class split_form(ModelForm):
             raise forms.ValidationError(str(e))
 
 
+class SampleSizeForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        samples = kwargs.pop('samples', [])
+        super(SampleSizeForm, self).__init__(*args, **kwargs)
+
+        for i, sample_name in enumerate(samples):
+            self.fields['{0}'.format(sample_name)] = forms.ChoiceField(choices=sample.SIZE_CHOICES)
+
 class readings_form(ModelForm):
     class Meta:
         model = readings
@@ -191,4 +194,4 @@ class readings_form(ModelForm):
 
 
 class comments_form(forms.Form):
-    comment_field = MarkdownField(label="Run Comments", required=False)
+    comment_field = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)

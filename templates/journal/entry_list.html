@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+Recent Entries
+{% endblock title %}
+
+{% block content %}
+
+<section class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Entries</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Recent Entries
+            <div class="pull-right">
+                <a href="{% url 'journal_create' %}" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    New Entry
+                </a>
+            </div>
+        </h1>
+    </header>
+    {% for entry in entries %}
+        <article class="panel panel-default">
+            <header class="panel-heading">
+                <h1 class="panel-title">
+                    <a href="{% url 'journal_detail' username=request.user slug=entry.slug %}">{{entry.title}}</a>
+                    <small class="pull-right">{{entry.date}}</small>
+                </h1>
+            </header>
+            <section class="panel-body">
+                {{entry.entry|safe}}
+            </section>
+        </article>
+    {% endfor %}
+</section>
+
+{% endblock content %}

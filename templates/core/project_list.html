@@ -17,7 +17,7 @@
             Active Projects
             <a class="btn btn-primary pull-right" href="{% url 'project_create' %}">
                 <span class="glyphicon glyphicon-plus"></span>
-                Add Project
+                Create Project
             </a>
         </h1>
     </header>
@@ -27,16 +27,15 @@
             {% for project in active_list %}
                 <li class="list-group-item">
                     <div class="clearfix">
-                        <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
                         <div class="pull-right">
                             {% if project.id not in tracking %}
                                 <a href="{% url 'project_track' slug=project.slug %}" class="btn btn-success btn-sm">
-                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <span class="glyphicon glyphicon-star"></span>
                                     Track Project
                                 </a>
                             {% else %}
                                 <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-success btn-sm">
-                                    <span class="glyphicon glyphicon-minus"></span>
+                                    <span class="glyphicon glyphicon-remove"></span>
                                     Untrack Project
                                 </a>
                             {% endif %}
@@ -49,9 +48,30 @@
                                 Add Investigation
                             </a>
                         </div>
+                        <h4>
+                            <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
+                            <small>created on {{project.start_date.date}}</small>
+                        </h4>
                         <ul>
                             {% for investigation in project.investigation_set.all %}
-                                <li><a href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a></li>
+                                <li class="investigation-subitem clearfix">
+                                    <div class="pull-right">
+                                        {% if investigation.active %}
+                                            <a href="{% url 'investigation_deactivate' project=project.slug slug=investigation.slug %}" class="btn btn-sm btn-warning">
+                                                <span class="glyphicon glyphicon-log-out"></span>
+                                                Make Inactive
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'investigation_activate' project=project.slug slug=investigation.slug %}" class="btn btn-sm btn-warning">
+                                                <span class="glyphicon glyphicon-log-in"></span>
+                                                Make Active
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">
+                                        {{investigation.name}}
+                                    </a>
+                                </li>
                             {% endfor %}
                         </ul>
                     </div>

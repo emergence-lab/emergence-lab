@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from autoslug import AutoSlugField
-from markupfield.fields import MarkupField
+from ckeditor.fields import RichTextField
 from actstream import registry
 
 
@@ -54,7 +54,7 @@ class project(models.Model):
     slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
     core = models.BooleanField(default=False)
-    description = MarkupField(blank=True, markup_type='markdown')
+    description = RichTextField(blank=True)
     start_date = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
@@ -75,7 +75,7 @@ class investigation(models.Model):
     name = models.CharField(max_length=45)
     slug = AutoSlugField(populate_from='name')
     active = models.BooleanField(default=True)
-    description = MarkupField(blank=True, markup_type='markdown')
+    description = RichTextField(blank=True)
     start_date = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey(project)
 

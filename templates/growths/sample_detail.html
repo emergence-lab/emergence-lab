@@ -14,8 +14,14 @@
             <li class="active">{{sample}}</li>
         </ol>
         <h2 class="page-header">
+            <div class="pull-right">
+                <a href="{% url 'split_sample' %}?sample={{sample}}" class="btn btn-warning">Split</a>
+                <a href="{% url 'sample_update' pk=sample.id %}" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    Edit
+                </a>
+            </div>
             {{sample}}
-            <a href="{% url 'split_sample' %}?sample={{sample}}" class="btn btn-warning pull-right">Split</a>
         </h2>
 
     </header>
@@ -32,7 +38,7 @@
             <p><strong>Serial Number: </strong>{{sample.substrate_serial}}</p>
             <p><strong>Orientation: </strong>{{sample.substrate_orientation}}</p>
             <p><strong>Miscut: </strong>{{sample.substrate_miscut}}</p>
-            <p><strong>Comments: </strong>{{sample.comment}}</p>
+            <p><strong>Comments: </strong>{{sample.comment|safe}}</p>
         </div>
 
         <div class="col-xs-2">

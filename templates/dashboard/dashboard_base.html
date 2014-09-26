@@ -3,7 +3,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid bottom-spacer-lg">
     <nav>
         <ol class="breadcrumb">
             {% block dashboard_breadcrumb %}
@@ -14,8 +14,14 @@
 
     <nav>
         <ul class="nav nav-pills">
-            <li><a class="btn btn-link" href="{% url 'create_growth_start' %}"><span class="glyphicon glyphicon-plus"></span> Create Growth</a></li>
-            <li><a class="btn btn-link" href="{% url 'afm_filter' %}"><span class="glyphicon glyphicon-search"></span> Sample Lookup</a></li>
+            <li><a class="btn btn-link" href="{% url 'create_growth_start' %}">
+                <span class="glyphicon glyphicon-plus"></span>
+                Create Growth
+            </a></li>
+            <li><a class="btn btn-link" href="{% url 'afm_filter' %}">
+                <span class="glyphicon glyphicon-search"></span>
+                Sample Lookup
+            </a></li>
             <li class="dropdown">
                 <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Administration <span class="caret"></span></a>
                 <ul class="dropdown-menu">
@@ -26,9 +32,17 @@
             </li>
         </ul>
     </nav>
-    <div class="row">
-        <nav class="col-xs-2">
-            <h4 class="sidebar-header">My Projects</h4>
+
+    <div class="row top-spacer-sm">
+        <nav class="col-xs-2 sidebar">
+            <header class="sidebar-header">
+                <a href="{% url 'track_project' %}">
+                    <h4>
+                        Projects
+                        <span class="glyphicon glyphicon-plus pull-right right-spacer-sm"></span>
+                    </h4>
+                </a>
+            </header>
             <div class="list-group">
                 {% if not project %}
                     <a href="{% url 'dashboard' %}" class="list-group-item active">All</a>
@@ -50,15 +64,14 @@
                                 <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem">{{i}}</a>
                             {% endif %}
                         {% endfor %}
-                        {% if investigation %}
-                           
-                        {% endif %}
+                        <a href="{% url 'investigation_create' slug=p.slug %}" class="list-group-item subitem">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            Add Investigation
+                        </a>
                     {% else %}
                         <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item">{{p}}</a>
                     {% endif %}
                 {% endfor %}
-
-                <a href="{% url 'track_project' %}" class="list-group-item"><span class="glyphicon glyphicon-plus"></span> Track Project</a>
 
                 {% if inactive_projects %}
                     <div class="list-group-item dropdown">
@@ -73,7 +86,7 @@
             </div>
         </nav>
         <section class="col-xs-10">
-            <div class="container-fluid no-padding">
+            <div class="container-fluid">
                 {% block dashboard_content %}
                 {% endblock dashboard_content %}
             </div>
@@ -81,7 +94,5 @@
         
     </div>
 </div>
-
-<div class="spacer"></div>
 
 {% endblock %}

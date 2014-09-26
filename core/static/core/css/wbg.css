@@ -18,10 +18,6 @@
     float: left;
 }
 
-.spacer {
-    height: 75px;
-}
-
 .link-pointer {
     cursor: pointer;
 }
@@ -41,119 +37,8 @@
   padding: 0;
 }
 
-/* stackoverflow.com/questions/18432577/ */
-.tabs-below > .nav-tabs,
-.tabs-right > .nav-tabs,
-.tabs-left > .nav-tabs {
-  border-bottom: 0;
-}
-
-.tab-content > .tab-pane,
-.pill-content > .pill-pane {
-  display: none;
-}
-
-.tab-content > .active,
-.pill-content > .active {
-  display: block;
-}
-
-.tabs-below > .nav-tabs {
-  border-top: 1px solid #ddd;
-}
-
-.tabs-below > .nav-tabs > li {
-  margin-top: -1px;
-  margin-bottom: 0;
-}
-
-.tabs-below > .nav-tabs > li > a {
-  -webkit-border-radius: 0 0 4px 4px;
-     -moz-border-radius: 0 0 4px 4px;
-          border-radius: 0 0 4px 4px;
-}
-
-.tabs-below > .nav-tabs > li > a:hover,
-.tabs-below > .nav-tabs > li > a:focus {
-  border-top-color: #ddd;
-  border-bottom-color: transparent;
-}
-
-.tabs-below > .nav-tabs > .active > a,
-.tabs-below > .nav-tabs > .active > a:hover,
-.tabs-below > .nav-tabs > .active > a:focus {
-  border-color: transparent #ddd #ddd #ddd;
-}
-
-.tabs-left > .nav-tabs > li,
-.tabs-right > .nav-tabs > li {
-  float: none;
-}
-
-.tabs-left > .nav-tabs > li > a,
-.tabs-right > .nav-tabs > li > a {
-  min-width: 74px;
-  margin-right: 0;
-  margin-bottom: 3px;
-}
-
-.tabs-left > .nav-tabs {
-  float: left;
-  margin-right: 19px;
-  border-right: 1px solid #ddd;
-}
-
-.tabs-left > .nav-tabs > li > a {
-  margin-right: -1px;
-  -webkit-border-radius: 4px 0 0 4px;
-     -moz-border-radius: 4px 0 0 4px;
-          border-radius: 4px 0 0 4px;
-}
-
-.tabs-left > .nav-tabs > li > a:hover,
-.tabs-left > .nav-tabs > li > a:focus {
-  border-color: #eeeeee #dddddd #eeeeee #eeeeee;
-}
-
-.tabs-left > .nav-tabs .active > a,
-.tabs-left > .nav-tabs .active > a:hover,
-.tabs-left > .nav-tabs .active > a:focus {
-  border-color: #ddd transparent #ddd #ddd;
-  *border-right-color: #ffffff;
-}
-
-.tabs-right > .nav-tabs {
-  float: right;
-  margin-left: 19px;
-  border-left: 1px solid #ddd;
-}
-
-.tabs-right > .nav-tabs > li > a {
-  margin-left: -1px;
-  -webkit-border-radius: 0 4px 4px 0;
-     -moz-border-radius: 0 4px 4px 0;
-          border-radius: 0 4px 4px 0;
-}
-
-.tabs-right > .nav-tabs > li > a:hover,
-.tabs-right > .nav-tabs > li > a:focus {
-  border-color: #eeeeee #eeeeee #eeeeee #dddddd;
-}
-
-.tabs-right > .nav-tabs .active > a,
-.tabs-right > .nav-tabs .active > a:hover,
-.tabs-right > .nav-tabs .active > a:focus {
-  border-color: #ddd #ddd #ddd transparent;
-  *border-left-color: #ffffff;
-}
-
 .list-group-item.subitem {
   padding-left: 30px;
-}
-
-.sidebar-header {
-  padding-left: 15px;
-  padding-top: 25px;
 }
 
 a.list-group-item.active-parent,
@@ -167,4 +52,80 @@ a.list-group-item.active-parent:focus {
 
 .cke_reset {
   width: 100% !important;
+}
+
+/* project/investigation detail */
+.project-header small {
+  font-size: 45%;
+}
+
+/* dashboard sidebar */
+.sidebar {
+  padding: 0;
+  margin: 0 0;
+}
+
+.sidebar-header {
+  padding-left: 15px;
+  padding-top: 15px;
+  /*border-bottom: 1px solid #aaa;*/
+}
+
+.sidebar-header a {
+  text-decoration: none;
+  color: #888;
+}
+
+.sidebar-header a:hover,
+.sidebar-header a:focus {
+  text-decoration: none;
+  color: #444;
+}
+
+.sidebar-list-item {
+  display: block;
+  text-align: right;
+  padding: 1.5em 20px 5px 0;
+  border-bottom: 1px solid #aaa;
+  font-size: 16px;
+  color: #444;
+}
+
+.sidebar-list-subitem {
+  padding-left: 30px;
+}
+
+
+/* quick spacer helper classes */
+.spacer-xs { height: 25px; }
+.spacer-sm { height: 50px; }
+.spacer,
+.spacer-md { height: 75px; }
+.spacer-lg { height: 100px; }
+
+.top-spacer-xs { margin-top: 10px; }
+.top-spacer-sm { margin-top: 20px; }
+.top-spacer-md { margin-top: 50px; }
+.top-spacer-lg { margin-top: 100px; }
+
+.bottom-spacer-xs { margin-bottom: 10px; }
+.bottom-spacer-sm { margin-bottom: 20px; }
+.bottom-spacer-md { margin-bottom: 50px; }
+.bottom-spacer-lg { margin-bottom: 100px; }
+
+.left-spacer-xs { margin-left: 10px; }
+.left-spacer-sm { margin-left: 20px; }
+.left-spacer-md { margin-left: 50px; }
+.left-spacer-lg { margin-left: 100px; }
+
+.right-spacer-xs { margin-right: 10px; }
+.right-spacer-sm { margin-right: 20px; }
+.right-spacer-md { margin-right: 50px; }
+.right-spacer-lg { margin-right: 100px; }
+
+.investigation-subitem {
+  width: 300px;
+  list-style: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
