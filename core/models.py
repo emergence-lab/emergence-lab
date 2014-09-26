@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 
 from autoslug import AutoSlugField
 from ckeditor.fields import RichTextField
-from actstream import registry
 
 
 class active_manager(models.Manager):
@@ -120,9 +119,3 @@ class project_tracking(models.Model):
 
     class Meta:
         db_table = 'project_operator_tracking'
-
-
-registry.register(User)
-registry.register(project)
-registry.register(investigation)
-registry.register(operator)

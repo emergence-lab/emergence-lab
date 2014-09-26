@@ -3,7 +3,6 @@ import re
 from django.db import models
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
-from actstream import registry
 from ckeditor.fields import RichTextField
 
 import core.models
@@ -390,7 +389,3 @@ class source(models.Model):
 
     class Meta:
         db_table = 'sources'
-
-
-registry.register(growth)
-registry.register(sample)

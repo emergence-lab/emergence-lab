@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from actstream import registry
 from autoslug import AutoSlugField
 from ckeditor.fields import RichTextField
 
