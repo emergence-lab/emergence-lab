@@ -171,7 +171,7 @@ class sample(models.Model):
 
         A child is defined as a sample that has the current sample marked as a parent.
         """
-        return sample.objects.filter(parent=sample_obj).exclude(pk=sample_obj.id)
+        return sample_obj.sample_set,exclude(pk=sample_obj.pk)
 
     @staticmethod
     def get_piece_siblings(sample_obj):
@@ -189,6 +189,8 @@ class sample(models.Model):
         """
         siblings = sample.objects.filter(growth=self.growth, pocket=self.pocket).order_by('-piece')
         parent = self
+        original_id = self.id
+        original_parent_id = self.parent_id
         self.save()
         new_pieces = [parent]
         if len(siblings) > 1:
@@ -205,8 +207,14 @@ class sample(models.Model):
                 raise Exception('Too many pieces')
             print(last_letter)
             parent.pk = None
+            parent.parent = None
             parent.piece = last_letter
             parent.size = 'other'
+            parent.save()
+            if original_parent_id == original_id:
+                parent.parent = parent
+            else:
+                parent.parent_id = original_parent_id
             parent.save()
             new_pieces.append(parent)
         return new_pieces

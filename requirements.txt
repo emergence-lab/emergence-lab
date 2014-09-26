@@ -20,3 +20,4 @@ django-braces==1.4.0
 django-wysiwyg==0.7.0
 django-ckeditor-updated==4.4.0
 html2text==2014.9.8
+django-grappelli==2.5.4

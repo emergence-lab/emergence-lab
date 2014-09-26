@@ -47,13 +47,17 @@ class sample_form(ModelForm):
         if instance.parent is None:
             instance.parent = instance
         else:
+            instance.parent.location = 'Consumed'
             instance.substrate_type = 'growth'
             instance.substrate_serial = instance.parent.substrate_serial
             instance.substrate_orientation = instance.parent.substrate_orientation
             instance.substrate_miscut = instance.parent.substrate_miscut
+            instance.size = instance.parent.size
 
         if commit:
             instance.save()
+            if instance.parent != instance:
+                instance.parent.save()
         return instance
 
 
@@ -76,6 +80,15 @@ class start_growth_form(ModelForm):
         model = growth
         fields = ['growth_number', 'date', 'operator', 'project', 'investigation',
                   'platter', 'reactor']
+
+    def clean_growth_number(self):
+        growth_number = self.cleaned_data['growth_number']
+        m = re.match('^([gt][1-9][0-9]{3,})$', growth_number)
+        if not m:
+            raise forms.ValidationError('Growth {0} improperly formatted. Did you accidently include the growth tag?'.format(growth_number))
+
+        return growth_number
+
 
     def save(self, *args, **kwargs):
         commit = kwargs.pop('commit', True)

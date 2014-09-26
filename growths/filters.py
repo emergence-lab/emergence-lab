@@ -81,4 +81,4 @@ class growth_filter(filters.FilterSet):
             'afm': ['rms', 'zrange', 'size'],
             'hall': ['sheet_concentration', 'sheet_resistance', 'mobility', 'bulk_concentration', 'bulk_resistance']
         }
-        order_by = ['growth_number']
+        order_by = ['-growth_number']

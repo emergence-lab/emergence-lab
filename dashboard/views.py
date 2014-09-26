@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.views.generic import DetailView
 
+from braces.views import LoginRequiredMixin
+
 from core.models import operator, project, investigation
 from core.streams import project_stream, investigation_stream
 from growths.models import growth
@@ -8,7 +10,9 @@ from journal.models import journal_entry
 
 
 class DashboardMixin(object):
-
+    """
+    Mixin that populates the context with active and inactive projects.
+    """
     def get_context_data(self, **kwargs):
         projects = operator.objects.filter(user=self.request.user).values_list('projects__id', flat=True)
         kwargs['active_projects'] = project.current.filter(id__in=projects)
@@ -16,7 +20,7 @@ class DashboardMixin(object):
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 
-class Dashboard(DashboardMixin, DetailView):
+class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
     """
     Main dashboard for the user with commonly used actions.
     """
@@ -41,7 +45,7 @@ class Dashboard(DashboardMixin, DetailView):
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 
 
-class ProjectDetailDashboardView(DashboardMixin, DetailView):
+class ProjectDetailDashboardView(LoginRequiredMixin, DashboardMixin, DetailView):
     """
     View for details of a project in the dashboard.
     """
@@ -52,13 +56,11 @@ class ProjectDetailDashboardView(DashboardMixin, DetailView):
         context = super(ProjectDetailDashboardView, self).get_context_data(**kwargs)
         context['growths'] = (growth.objects.filter(project=self.object)
                                             .order_by('-growth_number')[:25])
-        context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all())
-                                                    .order_by('-date')[:25])
         context['stream'] = project_stream(self.object)
         return context
 
 
-class InvestigationDetailDashboardView(DashboardMixin, DetailView):
+class InvestigationDetailDashboardView(LoginRequiredMixin, DashboardMixin, DetailView):
     """
     View for details of an investigation in the dashboard.
     """
@@ -70,8 +72,6 @@ class InvestigationDetailDashboardView(DashboardMixin, DetailView):
         userid = operator.objects.filter(user__username=self.request.user.username).values('id')
         context['growths'] = (growth.objects.filter(investigation=self.object)
                                             .order_by('-growth_number')[:25])
-        context['entries'] = (journal_entry.objects.filter(investigations__pk=self.object.id)
-                                                    .order_by('-date')[:25])
         context['project'] = self.object.project
         context['stream'] = investigation_stream(self.object)
         return context

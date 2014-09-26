@@ -12,8 +12,6 @@
         <li><a href="#feed" data-toggle="tab"><span class="glyphicon glyphicon-list"></span> Feed</a></li>
         <li><a href="#growths" data-toggle="tab"><span class="glyphicon glyphicon-file"></span> Growths</a></li>
         <li><a href="#characterization" data-toggle="tab"><span class="glyphicon glyphicon-signal"></span> Characterization</a></li>
-        <li><a href="#journal" data-toggle="tab"><span class="glyphicon glyphicon-book"></span> Journal</a></li>
-        <li><a href="#settings" data-toggle="tab"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
     </ul>
 
     <div class="row tab-content">
@@ -51,33 +49,6 @@
         </div>
         <div class="tab-pane fade" id="characterization">
             <header><h1 class="page-header">Recent Characterization</h1></header>
-        </div>
-        <div class="tab-pane fade" id="journal">
-            <header>
-                <h1 class="page-header">
-                    Recent Entries
-                    <a href="{% url 'journal_create' %}" class="btn btn-success">
-                        <span class="glyphicon glyphicon-plus"></span>
-                        New Entry
-                    </a>
-                </h1>
-            </header>
-            {% for entry in entries %}
-                <article class="panel panel-default">
-                    <header class="panel-heading">
-                        <h1 class="panel-title">
-                            <a href="{% url 'journal_detail' username=request.user slug=entry.slug %}">{{entry.title}}</a>
-                            <small class="pull-right">{{entry.date}}</small>
-                        </h1>
-                    </header>
-                    <section class="panel-body">
-                        {{entry.entry}}
-                    </section>
-                </article>
-            {% endfor %}
-        </div>
-        <div class="tab-pane fade" id="settings">
-            <header><h1 class="page-header">Settings</h1></header>
         </div>
     </div>
 
