@@ -51,8 +51,6 @@ urlpatterns = patterns(
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/deactivate/$', never_cache(core.views.DeactivateInvestigationRedirectView.as_view()), name='investigation_deactivate'),
     url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
 
-
-
     # growths urls
     url(r'^growths/search/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.GrowthDetailView.as_view()), name='growth_detail'),
@@ -62,6 +60,7 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/$', login_required(growths.views.readings_detail.as_view()), name='readings_detail'),
     url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
     url(r'^sample/(?P<pk>\d+)/$', login_required(growths.views.SampleDetailView.as_view()), name='sample_detail'),
+    url(r'^sample/(?P<pk>\d+)/update/$', login_required(growths.views.SampleUpdateView.as_view()), name='sample_update'),
     url(r'^sample/split/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
 
     # dashboard views

@@ -14,8 +14,14 @@
             <li class="active">{{sample}}</li>
         </ol>
         <h2 class="page-header">
+            <div class="pull-right">
+                <a href="{% url 'split_sample' %}?sample={{sample}}" class="btn btn-warning">Split</a>
+                <a href="{% url 'sample_update' pk=sample.id %}" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    Edit
+                </a>
+            </div>
             {{sample}}
-            <a href="{% url 'split_sample' %}?sample={{sample}}" class="btn btn-warning pull-right">Split</a>
         </h2>
 
     </header>

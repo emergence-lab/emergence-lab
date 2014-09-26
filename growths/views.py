@@ -12,7 +12,7 @@ from actstream import action
 from core.models import operator
 from .models import growth, sample, readings, serial_number, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
-from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form, GrowthUpdateForm
+from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form
 from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
 import afm.models
 import hall.models
@@ -53,7 +53,9 @@ class GrowthUpdateView(UpdateView):
     model = growth
     template_name = 'growths/growth_update.html'
     slug_field = 'growth_number'
-    form_class = GrowthUpdateForm
+    fields = ('run_comments', 'has_gan', 'has_algan', 'has_aln',
+              'other_material', 'is_template', 'is_buffer', 'has_n',
+              'has_p', 'has_u',)
 
     def get_success_url(self):
         return reverse('growth_detail', args=(self.object.growth_number,))
@@ -82,6 +84,18 @@ class SampleDetailView(DetailView):
         context['char_hall'] = hall.models.hall.objects.filter(sample=context['object']).order_by('sample__pocket', 'sample__piece', 'date')
 
         return context
+
+
+class SampleUpdateView(UpdateView):
+    """
+    View to update information about a sample.
+    """
+    model = sample
+    template_name = 'growths/sample_update.html'
+    fields = ('comment',)
+
+    def get_success_url(self):
+        return reverse('sample_detail', args=(self.object.pk,))
 
 
 class SampleFamilyDetailView(ListView):
