@@ -64,24 +64,40 @@
                     <p>{{project.description|safe}}</p>
                 </div>
                 <div class="col-md-6 hidden-sm hidden-xs">
-                    <h3 class="page-header clearfix">
-                        <div class="pull-right">
-                            <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-success btn-sm">
-                                <span class="glyphicon glyphicon-plus"></span>
-                                Add Investigation
-                            </a>
+                    {% if project.investigation_set.all %}
+                        <h3 class="page-header clearfix">
+                            <div class="pull-right">
+                                <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-success btn-sm">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    Add Investigation
+                                </a>
+                            </div>
+                            Investigations
+                        </h3>
+                        <div class="list-group">
+                            {% for investigation in project.investigation_set.all %}
+                                {% if investigation.active %}
+                                    <a class="list-group-item" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
+                                {% else %}
+                                    <a class="list-group-item disabled" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <h3 class="page-header">
+                            Investigations
+                        </h3>
+                        <div class="alert alert-info">
+                            <h3>This project doesn't have any investigations</h3>
+                            <p>Get started by creating a new one.</p>
+                            <div class="top-spacer-sm">
+                                <a href="{% url 'investigation_create' slug=project.slug %}" class="btn btn-success right-spacer-xs">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    New Investigation
+                                </a>
+                            </div>
                         </div>
-                        Investigations
-                    </h3>
-                    <div class="list-group">
-                        {% for investigation in project.investigation_set.all %}
-                            {% if investigation.active %}
-                                <a class="list-group-item" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
-                            {% else %}
-                                <a class="list-group-item disabled" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
+                    {% endif %}
                 </div>
             </article>
         </div>
