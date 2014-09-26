@@ -15,6 +15,6 @@ import django.core.handlers.wsgi
 sys.path.append('/var/wsgi')
 sys.path.append('/var/wsgi/wbg')
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wbg.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wbg.settings.base')
 
 application = django.core.handlers.wsgi.WSGIHandler()

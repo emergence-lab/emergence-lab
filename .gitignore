@@ -58,5 +58,5 @@ target/
 
 # Project-specific
 static/
-settings.py
+secrets.json
 tunnel.sh
