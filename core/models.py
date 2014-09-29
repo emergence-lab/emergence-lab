@@ -198,6 +198,25 @@ class platter(models.Model):
     def __str__(self):
         return self.name
 
+    def activate(self):
+        """
+        Activate a platter.
+        """
+        if self.active:
+            raise Exception('Platter was already active')
+        self.active = True
+        self.save()
+
+    def deactivate(self):
+        """
+        Deactivate a platter and set the end date to today.
+        """
+        if not self.active:
+            raise Exception('Platter was already not active')
+        self.active = False
+        self.end_date = timezone.now()
+        self.save()
+
 
 class project(models.Model):
     """

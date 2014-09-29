@@ -168,9 +168,7 @@ class ActivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         platter_obj = platter.objects.get(pk=pk)
-        if not platter_obj.active:
-            platter_obj.active = True
-            platter_obj.save()
+        platter_obj.activate()
         return reverse('platter_list')
 
 
@@ -183,10 +181,7 @@ class DeactivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         platter_obj = platter.objects.get(pk=pk)
-        if platter_obj.active:
-            platter_obj.active = False
-            platter_obj.end_date = datetime.date.today()
-            platter_obj.save()
+        platter_obj.deactivate()
         return reverse('platter_list')
 
 
