@@ -113,9 +113,7 @@ class ActivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         operator_obj = operator.objects.get(pk=pk)
-        if not operator_obj.active:
-            operator_obj.active = True
-            operator_obj.save()
+        operator_obj.activate()
         return reverse('operator_list')
 
 
@@ -128,9 +126,7 @@ class DeactivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         operator_obj = operator.objects.get(pk=pk)
-        if operator_obj.active:
-            operator_obj.active = False
-            operator_obj.save()
+        operator_obj.deactivate()
         return reverse('operator_list')
 
 

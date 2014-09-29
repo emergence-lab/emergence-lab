@@ -175,20 +175,49 @@ class inactive_manager(models.Manager):
         return super(inactive_manager, self).get_queryset().filter(active=False)
 
 
-@python_2_unicode_compatible
-class platter(models.Model):
+class ActiveStateMixin(models.Model):
     """
-    Stores platter information.
+    Mixin for models that keep an active/inactive state.
     """
-    name = models.CharField(_('name'), max_length=45)
     active = models.BooleanField(_('active'), default=True)
-    serial = models.CharField(_('serial number'), max_length=20, blank=True)
-    start_date = models.DateField(_('date started'), auto_now_add=True)
-    end_date = models.DateField(_('date retired'), blank=True, null=True)
 
     objects = models.Manager()
     current = active_manager()
     retired = inactive_manager()
+
+    class Meta:
+        abstract = True
+
+    def activate(self, save=True):
+        """
+        Activate the object, raise an exception if it was already active.
+        """
+        if self.active:
+            raise Exception('{0} was already active'.format(self._meta.verbose_name))
+        self.active = True
+        if save:
+            self.save()
+
+    def deactivate(self, save=True):
+        """
+        Deactivate the object, raise an exception if it was already active.
+        """
+        if not self.active:
+            raise Exception('{0} was already not active'.format(self._meta.verbose_name))
+        self.active = False
+        if save:
+            self.save()
+
+
+@python_2_unicode_compatible
+class platter(ActiveStateMixin, models.Model):
+    """
+    Stores platter information.
+    """
+    name = models.CharField(_('name'), max_length=45)
+    serial = models.CharField(_('serial number'), max_length=20, blank=True)
+    start_date = models.DateField(_('date started'), auto_now_add=True)
+    end_date = models.DateField(_('date retired'), blank=True, null=True)
 
     class Meta:
         verbose_name = _('platter')
@@ -198,22 +227,11 @@ class platter(models.Model):
     def __str__(self):
         return self.name
 
-    def activate(self):
-        """
-        Activate a platter.
-        """
-        if self.active:
-            raise Exception('Platter was already active')
-        self.active = True
-        self.save()
-
     def deactivate(self):
         """
         Deactivate a platter and set the end date to today.
         """
-        if not self.active:
-            raise Exception('Platter was already not active')
-        self.active = False
+        super(platter, self).deactivate(save=False)
         self.end_date = timezone.now()
         self.save()
 
@@ -262,24 +280,23 @@ class investigation(models.Model):
         db_table = 'investigations'
 
 
-class operator(models.Model):
+@python_2_unicode_compatible
+class operator(ActiveStateMixin, models.Model):
     """
     Stores operator information.
     """
     name = models.CharField(max_length=45)
-    active = models.BooleanField(default=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     projects = models.ManyToManyField(project, through='project_tracking')
 
-    objects = models.Manager()
-    current = active_manager()
-    retired = inactive_manager()
+    class Meta:
+        verbose_name = _('operator')
+        verbose_name_plural = _('operators')
+        db_table = 'operators'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
-    class Meta:
-        db_table = 'operators'
 
 
 class ProjectTracking(models.Model):
