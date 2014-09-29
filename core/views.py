@@ -108,6 +108,8 @@ class ActivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified operator to active.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         operator_obj = operator.objects.get(pk=pk)
@@ -121,6 +123,8 @@ class DeactivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified operator to inactive.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         operator_obj = operator.objects.get(pk=pk)
