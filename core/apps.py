@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from actstream import registry
 
@@ -11,4 +11,4 @@ class CoreAppConfig(AppConfig):
         registry.register(self.get_model('project'))
         registry.register(self.get_model('investigation'))
         registry.register(self.get_model('operator'))
-        registry.register(User)
+        registry.register(get_user_model())

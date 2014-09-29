@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from autoslug import AutoSlugField
@@ -95,7 +95,7 @@ class operator(models.Model):
     """
     name = models.CharField(max_length=45)
     active = models.BooleanField(default=True)
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     projects = models.ManyToManyField(project, through='project_tracking')
 
     objects = models.Manager()

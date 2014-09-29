@@ -40,6 +40,10 @@ ROOT_URLCONF = 'wbg.urls'
 
 WSGI_APPLICATION = 'wbg.wsgi.application'
 
+
+# User login
+
+AUTH_USER_MODEL = 'auth.User'
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 
