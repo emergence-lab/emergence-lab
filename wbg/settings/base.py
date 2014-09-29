@@ -58,15 +58,15 @@ TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
 # Installed Apps
 
 INSTALLED_APPS = (
-    # administration
-    'grappelli',
     # builtin apps
-    'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # administration
+    'grappelli',
+    'django.contrib.admin',
     # 3rd party apps
     'datetimewidget',
     'django_filters',
