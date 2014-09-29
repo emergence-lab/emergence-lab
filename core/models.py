@@ -175,25 +175,28 @@ class inactive_manager(models.Manager):
         return super(inactive_manager, self).get_queryset().filter(active=False)
 
 
+@python_2_unicode_compatible
 class platter(models.Model):
     """
     Stores platter information.
     """
-    name = models.CharField(max_length=45)
-    active = models.BooleanField(default=True)
-    serial = models.CharField(max_length=20, blank=True)
-    start_date = models.DateField(auto_now_add=True)
-    end_date = models.DateField(blank=True, null=True)
+    name = models.CharField(_('name'), max_length=45)
+    active = models.BooleanField(_('active'), default=True)
+    serial = models.CharField(_('serial number'), max_length=20, blank=True)
+    start_date = models.DateField(_('date started'), auto_now_add=True)
+    end_date = models.DateField(_('date retired'), blank=True, null=True)
 
     objects = models.Manager()
     current = active_manager()
     retired = inactive_manager()
 
-    def __unicode__(self):
-        return self.name
-
     class Meta:
+        verbose_name = _('platter')
+        verbose_name_plural = _('platters')
         db_table = 'platters'
+
+    def __str__(self):
+        return self.name
 
 
 class project(models.Model):

@@ -163,6 +163,8 @@ class ActivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified platter to active.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         platter_obj = platter.objects.get(pk=pk)
@@ -176,6 +178,8 @@ class DeactivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified platter to inactive.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
         platter_obj = platter.objects.get(pk=pk)
