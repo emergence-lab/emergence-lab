@@ -79,7 +79,10 @@ class User(auth.models.AbstractBaseUser):
         related_name='custom_users', related_query_name='custom_user')
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    # projects = models.ManyToManyField('project', through='project_tracking')
+    projects = models.ManyToManyField('project', through='ProjectTracking',
+        verbose_name=_('tracked projects'), blank=True,
+        help_text=_('Projects this user is tracking'),
+        related_name='users', related_query_name='user')
 
     objects = auth.models.UserManager()
 
@@ -255,6 +258,18 @@ class operator(models.Model):
 
     class Meta:
         db_table = 'operators'
+
+
+class ProjectTracking(models.Model):
+    """
+    Stores ownership and tracking information for projects.
+    """
+    project = models.ForeignKey(project)
+    user = models.ForeignKey(User)
+    is_owner = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'project_tracking'
 
 
 class project_tracking(models.Model):
