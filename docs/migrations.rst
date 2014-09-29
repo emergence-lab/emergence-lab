@@ -20,11 +20,11 @@ Workflow for adding apps to database:
 
         dev$ gedit wbg/settings.py
 
-    #) Add app to south tracking::
+    #) Create initital migrations::
 
-        dev$ ./manage.py convert_to_south APPNAME
+        dev$ ./manage.py makemigrations APPNAME
 
-    #) Migrate app with south to add table to database::
+    #) Migrate app to add table to database::
 
         dev$ ./manage.py migrate APPNAME
 
@@ -54,7 +54,7 @@ Workflow for editing models:
     #) Make sure the database is synced and git is up to date::
 
         dev$ git pull
-        dev$ ./manage.py syncdb
+        dev$ ./manage.py migrate
 
     #) Make changes to models::
 
@@ -62,7 +62,7 @@ Workflow for editing models:
 
     #) Create migration and migrate app::
 
-        dev$ ./manage.py schemamigration APPNAME --auto
+        dev$ ./manage.py makemigrations APPNAME
         dev$ ./manage.py migrate APPNAME
 
     #) Add migrations to version control and push (assuming master branch)::

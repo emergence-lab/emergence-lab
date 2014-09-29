@@ -14,7 +14,7 @@ Contents:
    deployment
    migrations
    design
-   modules
+   core
    organization
 
 
