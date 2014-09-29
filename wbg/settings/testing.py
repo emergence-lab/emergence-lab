@@ -16,7 +16,9 @@ logger.propogate = True
 
 # Authentication
 
-AUTH_LDAP_SERVER_URI = 'ldap://localhost:9999'
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 
 # Database
