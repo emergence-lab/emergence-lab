@@ -142,6 +142,8 @@ class prerun_checklist_form(forms.Form):
 class prerun_sources_form(ModelForm):
     class Meta:
         model = source
+        fields = ('cp2mg', 'tmin1', 'tmin2', 'tmga1', 'tmga2', 'tmal1',
+                  'tega1', 'nh3', 'sih4',)
 
 
 class postrun_checklist_form(forms.Form):
