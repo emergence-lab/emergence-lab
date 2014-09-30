@@ -37,6 +37,8 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
         return self.object
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.is_anonymous():
+            return super(Dashboard, self).dispatch(request, *args, **kwargs)
         try:
             self.object = operator.objects.get(user=request.user)
         except:
