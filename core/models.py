@@ -183,8 +183,8 @@ class ActiveStateMixin(models.Model):
     active = models.BooleanField(_('active'), default=True)
 
     objects = models.Manager()
-    current = active_manager()
-    retired = inactive_manager()
+    active_objects = active_manager()
+    inactive_objects = inactive_manager()
 
     class Meta:
         abstract = True

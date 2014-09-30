@@ -15,8 +15,8 @@ class DashboardMixin(object):
     """
     def get_context_data(self, **kwargs):
         projects = operator.objects.filter(user=self.request.user).values_list('projects__id', flat=True)
-        kwargs['active_projects'] = project.current.filter(id__in=projects)
-        kwargs['inactive_projects'] = project.retired.filter(id__in=projects)
+        kwargs['active_projects'] = project.active_objects.filter(id__in=projects)
+        kwargs['inactive_projects'] = project.inactive_objects.filter(id__in=projects)
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 
@@ -40,7 +40,7 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
         try:
             self.object = operator.objects.get(user=request.user)
         except:
-            self.object = operator(name=request.user.first_name, active=1, user=request.user)
+            self.object = operator(name=request.user.first_name, user=request.user)
             self.object.save()
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 

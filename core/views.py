@@ -29,8 +29,8 @@ class ActiveListView(ListView):
     """
     def get_context_data(self, **kwargs):
         context = super(ActiveListView, self).get_context_data(**kwargs)
-        context['active_list'] = self.model.current.all()
-        context['inactive_list'] = self.model.retired.all()
+        context['active_list'] = self.model.active_objects.all()
+        context['inactive_list'] = self.model.inactive_objects.all()
         return context
 
 
