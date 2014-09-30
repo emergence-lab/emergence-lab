@@ -213,6 +213,17 @@ class ActiveStateMixin(models.Model):
             self.save()
 
 
+class TimestampMixin(models.Model):
+    """
+    Mixin for models that keeps track of when an object was created or modified.
+    """
+    created = models.DateTimeField(_('date created'), auto_now_add=True)
+    modified = models.DateTimeField(_('date modified'), auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 @python_2_unicode_compatible
 class platter(ActiveStateMixin, models.Model):
     """
@@ -289,7 +300,6 @@ class operator(ActiveStateMixin, models.Model):
 
     def __str__(self):
         return self.name
-
 
 
 class ProjectTracking(models.Model):
