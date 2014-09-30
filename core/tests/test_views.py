@@ -135,6 +135,28 @@ class TestPlatterCRUD(TestCase):
         self.assertFalse(obj.active)
         self.assertEqual(timezone.now().date(), obj.end_date)
 
+    def test_platter_create_valid_data(self):
+        url = reverse('platter_create')
+        list_url = reverse('platter_list')
+        data = {'name': 'platter 3', 'serial': '123-456'}
+        response = self.client.post(url, data)
+        self.assertRedirects(response, list_url)
+        self.assertTrue(platter.objects.filter(**data).first().active)
+
+    def test_platter_create_empty_data(self):
+        url = reverse('platter_create')
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'name',
+            'This field is required.')
+
+    def test_platter_create_long_name(self):
+        url = reverse('platter_create')
+        data = {'name': '12345678911234567892123456789312345678941234567895'}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'name',
+            'Ensure this value has at most 45 characters (it has 50).')
+
 
 class TestProjectCRUD(TestCase):
 
