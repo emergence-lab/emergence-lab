@@ -53,7 +53,7 @@
                 {% for platter in inactive_list %}
                     <li class="list-group-item">
                         <div class="clearfix">
-                            {{platter.name}} ({{platter.serial}}) - Retired on {{platter.end_date}}
+                            {{platter.name}} ({{platter.serial}}) - Retired on {{platter.status_changed.date}}
                             <div class="pull-right">
                                 <a href="{% url 'platter_activate' id=platter.id %}" class="btn btn-warning btn-sm">
                                     <span class="glyphicon glyphicon-log-in"></span>

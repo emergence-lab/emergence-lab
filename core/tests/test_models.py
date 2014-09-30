@@ -14,12 +14,11 @@ class TestPlatter(TestCase):
     def test_activate_valid(self):
         obj = platter(name='platter 1', active=False,
                      start_date=timezone.now() - timedelta(days=30),
-                     end_date=timezone.now())
+                     status_changed=timezone.now())
         self.assertFalse(obj.active)
-        self.assertEqual(obj.status_changed, None)
         obj.activate()
         self.assertTrue(obj.active)
-        self.assertNotEqual(obj.status_changed, None)
+        self.assertEqual(obj.status_changed.date(), timezone.now().date())
 
     def test_activate_invalid(self):
         obj = platter(name='platter 1', active=True,
@@ -34,12 +33,11 @@ class TestPlatter(TestCase):
         self.assertEqual(obj.status_changed, None)
         obj.deactivate()
         self.assertFalse(obj.active)
-        self.assertEqual(timezone.now().date(), obj.end_date.date())
-        self.assertNotEqual(obj.status_changed, None)
+        self.assertEqual(obj.status_changed.date(), timezone.now().date())
 
     def test_deactivate_invalid(self):
         obj = platter(name='platter 1', active=False,
                      start_date=timezone.now() - timedelta(days=30),
-                     end_date=timezone.now())
+                     status_changed=timezone.now())
         with self.assertRaises(Exception):
             obj.deactivate()

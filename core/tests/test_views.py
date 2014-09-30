@@ -93,7 +93,7 @@ class TestPlatterCRUD(TestCase):
             platter(name='platter 1', active=True),
             platter(name='platter 2', active=False,
                     start_date=timezone.now() - timedelta(days=30),
-                    end_date=timezone.now())
+                    status_changed=timezone.now())
         ])
         get_user_model().objects.create_user('username1', password='')
         self.client.login(username='username1', password='')
@@ -133,7 +133,7 @@ class TestPlatterCRUD(TestCase):
 
         self.assertRedirects(response, list_url)
         self.assertFalse(obj.active)
-        self.assertEqual(timezone.now().date(), obj.end_date)
+        self.assertEqual(timezone.now().date(), obj.status_changed.date())
 
     def test_platter_create_valid_data(self):
         url = reverse('platter_create')

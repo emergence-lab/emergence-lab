@@ -221,7 +221,6 @@ class platter(ActiveStateMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     serial = models.CharField(_('serial number'), max_length=20, blank=True)
     start_date = models.DateField(_('date started'), auto_now_add=True)
-    end_date = models.DateField(_('date retired'), blank=True, null=True)
 
     class Meta:
         verbose_name = _('platter')
@@ -230,14 +229,6 @@ class platter(ActiveStateMixin, models.Model):
 
     def __str__(self):
         return self.name
-
-    def deactivate(self):
-        """
-        Deactivate a platter and set the end date to today.
-        """
-        super(platter, self).deactivate(save=False)
-        self.end_date = timezone.now()
-        self.save()
 
 
 @python_2_unicode_compatible
