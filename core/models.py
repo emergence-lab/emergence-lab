@@ -252,7 +252,6 @@ class project(ActiveStateMixin, TimestampMixin, models.Model):
     slug = AutoSlugField(_('slug'), populate_from='name')
     core = models.BooleanField(_('core project'), default=False)
     description = RichTextField(_('description'), blank=True)
-    start_date = models.DateTimeField(_('date started'), auto_now_add=True)
 
     class Meta:
         verbose_name = _('project')
@@ -272,7 +271,6 @@ class investigation(ActiveStateMixin, TimestampMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     slug = AutoSlugField(_('slug'), populate_from='name')
     description = RichTextField(_('description'), blank=True)
-    start_date = models.DateTimeField(_('date started'), auto_now_add=True)
     project = models.ForeignKey(project)
 
     class Meta:
