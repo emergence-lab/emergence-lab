@@ -26,7 +26,7 @@ AUTHENTICATION_BACKENDS = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'test',
+        'NAME': 'test.sqlite3',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
