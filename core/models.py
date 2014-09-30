@@ -258,26 +258,25 @@ class project(ActiveStateMixin, models.Model):
         return self.name
 
 
-class investigation(models.Model):
+@python_2_unicode_compatible
+class investigation(ActiveStateMixin, models.Model):
     """
-    Stores information on an individual investigation related to one or more projects.
+    Stores information on an individual investigation related to one or more
+    projects.
     """
-    name = models.CharField(max_length=45)
-    slug = AutoSlugField(populate_from='name')
-    active = models.BooleanField(default=True)
-    description = RichTextField(blank=True)
-    start_date = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(_('name'), max_length=45)
+    slug = AutoSlugField(_('slug'), populate_from='name')
+    description = RichTextField(_('description'), blank=True)
+    start_date = models.DateTimeField(_('date started'), auto_now_add=True)
     project = models.ForeignKey(project)
 
-    objects = models.Manager()
-    current = active_manager()
-    retired = inactive_manager()
-
-    def __unicode__(self):
-        return self.name
-
     class Meta:
+        verbose_name = _('investigation')
+        verbose_name_plural = _('investigations')
         db_table = 'investigations'
+
+    def __str__(self):
+        return self.name
 
 
 @python_2_unicode_compatible

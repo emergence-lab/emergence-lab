@@ -9,7 +9,7 @@ from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from core.models import operator, platter, project
+from core.models import investigation, operator, platter, project
 
 
 class TestHomepage(TestCase):
@@ -218,6 +218,73 @@ class TestProjectCRUD(TestCase):
 
     def test_project_create_empty_data(self):
         url = reverse('project_create')
+        response = self.client.post(url, {})
+        self.assertFormError(response, 'form', 'name',
+            'This field is required.')
+
+
+class TestInvestigationCRUD(TestCase):
+
+    def setUp(self):
+        project1 = project.objects.create(name='project 1', active=True)
+        project2 = project.objects.create(name='project 2', active=False,
+                       start_date=timezone.now() - timedelta(days=30))
+        investigation.objects.bulk_create([
+            investigation(name='investigation 1', active=True,
+                project=project1),
+            investigation(name='investigation 2', active=False,
+                project=project2, start_date=timezone.now())
+        ])
+        user = get_user_model().objects.create_user('username1', password='')
+        op = operator.objects.create(name='name 1', user=user,
+                 active=True)
+        self.client.login(username='username1', password='')
+
+    def test_project_list_investigation_content(self):
+        url = reverse('project_list')
+        response = self.client.get(url)
+        for invest in investigation.objects.all():
+            if invest.project.active:
+                self.assertContains(response, invest.name)
+            else:
+                self.assertNotContains(response, invest.name)
+
+    def test_investigation_activate(self):
+        obj = investigation.objects.filter(active=False).first()
+        proj = obj.project
+        url = reverse('investigation_activate', args=(proj.slug, obj.slug))
+        list_url = reverse('project_list')
+        response = self.client.get(url)
+        obj = investigation.objects.get(id=obj.id)
+
+        self.assertRedirects(response, list_url)
+        self.assertTrue(obj.active)
+
+    def test_investigation_deactivate(self):
+        obj = investigation.objects.filter(active=True).first()
+        proj = obj.project
+        url = reverse('investigation_deactivate', args=(proj.slug, obj.slug))
+        list_url = reverse('project_list')
+        response = self.client.get(url)
+        obj = investigation.objects.get(id=obj.id)
+
+        self.assertRedirects(response, list_url)
+        self.assertFalse(obj.active)
+
+    def test_investigation_create_valid_data(self):
+        proj = project.objects.filter(active=True).first()
+        url = reverse('investigation_create', args=(proj.slug,))
+        data = {'name': 'investigation 3'}
+        response = self.client.post(url, data)
+        obj = investigation.objects.get(**data)
+        self.assertEqual(obj.slug, 'investigation-3')
+        detail_url = reverse('investigation_detail_all',
+                         args=(proj.slug, obj.slug,))
+        self.assertRedirects(response, detail_url)
+
+    def test_investigation_create_empty_data(self):
+        proj = project.objects.filter(active=True).first()
+        url = reverse('investigation_create', args=(proj.slug,))
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
