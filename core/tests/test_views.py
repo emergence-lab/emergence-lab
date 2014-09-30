@@ -9,7 +9,7 @@ from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from core.models import operator, platter
+from core.models import operator, platter, project
 
 
 class TestHomepage(TestCase):
@@ -134,3 +134,53 @@ class TestPlatterCRUD(TestCase):
         self.assertRedirects(response, list_url)
         self.assertFalse(obj.active)
         self.assertEqual(timezone.now().date(), obj.end_date)
+
+
+class TestProjectCRUD(TestCase):
+
+    def setUp(self):
+        project.objects.bulk_create([
+            project(name='project 1', active=True),
+            project(name='project 2', active=False,
+                    start_date=timezone.now() - timedelta(days=30))
+        ])
+        user = get_user_model().objects.create_user('username1', password='')
+        op = operator.objects.create(name='name 1', user=user,
+                                     active=True)
+        self.client.login(username='username1', password='')
+
+    def test_project_list_url_resolution(self):
+        match = resolve('/projects/')
+        self.assertEqual(match.url_name, 'project_list')
+
+    def test_project_list_template(self):
+        url = reverse('project_list')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/project_list.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_project_list_content(self):
+        url = reverse('project_list')
+        response = self.client.get(url)
+        for proj in project.objects.all():
+            self.assertContains(response, proj.name)
+
+    def test_project_activate(self):
+        obj = project.objects.filter(active=False).first()
+        url = reverse('project_activate', args=(obj.slug,))
+        list_url = reverse('project_list')
+        response = self.client.get(url)
+        obj = project.objects.get(id=obj.id)
+
+        self.assertRedirects(response, list_url)
+        self.assertTrue(obj.active)
+
+    def test_project_deactivate(self):
+        obj = project.objects.filter(active=True).first()
+        url = reverse('project_deactivate', args=(obj.slug,))
+        list_url = reverse('project_list')
+        response = self.client.get(url)
+        obj = project.objects.get(id=obj.id)
+
+        self.assertRedirects(response, list_url)
+        self.assertFalse(obj.active)

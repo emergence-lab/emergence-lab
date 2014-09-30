@@ -259,6 +259,8 @@ class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified project as tracked for the logged in user.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
@@ -275,6 +277,8 @@ class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified project as not tracked for the logged in user.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
@@ -291,6 +295,8 @@ class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified project to active.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
@@ -306,6 +312,8 @@ class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified project to inactive.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
@@ -394,6 +402,8 @@ class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified investigation to active.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         project_slug = kwargs.pop('project')
         slug = kwargs.pop('slug')
@@ -411,6 +421,8 @@ class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
     """
     Sets the specified investigation to inactive.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         project_slug = kwargs.pop('project')
         slug = kwargs.pop('slug')

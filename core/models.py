@@ -236,26 +236,25 @@ class platter(ActiveStateMixin, models.Model):
         self.save()
 
 
-class project(models.Model):
+@python_2_unicode_compatible
+class project(ActiveStateMixin, models.Model):
     """
-    Stores information on a project, which is a higher level organizational tool.
+    Stores information on a project, which is a higher level organizational
+    tool.
     """
-    name = models.CharField(max_length=45)
-    slug = AutoSlugField(populate_from='name')
-    active = models.BooleanField(default=True)
-    core = models.BooleanField(default=False)
-    description = RichTextField(blank=True)
-    start_date = models.DateTimeField(auto_now_add=True)
-
-    objects = models.Manager()
-    current = active_manager()
-    retired = inactive_manager()
-
-    def __unicode__(self):
-        return self.name
+    name = models.CharField(_('name'), max_length=45)
+    slug = AutoSlugField(_('slug'), populate_from='name')
+    core = models.BooleanField(_('core project'), default=False)
+    description = RichTextField(_('description'), blank=True)
+    start_date = models.DateTimeField(_('date started'), auto_now_add=True)
 
     class Meta:
+        verbose_name = _('project')
+        verbose_name_plural = _('projects')
         db_table = 'projects'
+
+    def __str__(self):
+        return self.name
 
 
 class investigation(models.Model):
