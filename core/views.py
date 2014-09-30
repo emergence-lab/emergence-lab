@@ -147,7 +147,7 @@ class PlatterCreateView(LoginRequiredMixin, CreateView):
     fields = ('name', 'serial')
 
     def form_valid(self, form):
-        form.instance.active = True
+        form.instance.is_active = True
         self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())
 
@@ -300,11 +300,8 @@ class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
-        if not project_obj.active:
-            operator_obj = self.request.user.operator
-            project_obj.active = True
-            project_obj.save()
-            action.send(operator_obj, verb='activated project', target=project_obj)
+        project_obj.activate()
+        action.send(self.request.user.operator, verb='activated project', target=project_obj)
         return reverse('project_list')
 
 
@@ -317,11 +314,8 @@ class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
-        if project_obj.active:
-            operator_obj = self.request.user.operator
-            project_obj.active = False
-            project_obj.save()
-            action.send(operator_obj, verb='deactivated project', target=project_obj)
+        project_obj.deactivate()
+        action.send(self.request.user.operator, verb='deactivated project', target=project_obj)
         return reverse('project_list')
 
 
@@ -409,11 +403,9 @@ class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=project_slug)
         investigation_obj = investigation.objects.get(slug=slug)
-        if not investigation_obj.active:
-            operator_obj = self.request.user.operator
-            investigation_obj.active = True
-            investigation_obj.save()
-            action.send(operator_obj, verb='activated investigation', action_object=investigation_obj, target=project_obj)
+        investigation_obj.activate()
+        action.send(self.request.user.operator, verb='activated investigation',
+            action_object=investigation_obj, target=project_obj)
         return reverse('project_list')
 
 
@@ -428,11 +420,9 @@ class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=project_slug)
         investigation_obj = investigation.objects.get(slug=slug)
-        if investigation_obj.active:
-            operator_obj = self.request.user.operator
-            investigation_obj.active = False
-            investigation_obj.save()
-            action.send(operator_obj, verb='deactivated investigation', action_object=investigation_obj, target=project_obj)
+        investigation_obj.deactivate()
+        action.send(self.request.user.operator, verb='deactivated investigation',
+            action_object=investigation_obj, target=project_obj)
         return reverse('project_list')
 
 

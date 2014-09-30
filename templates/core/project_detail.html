@@ -23,7 +23,7 @@
         <div class="tab-pane fade in active" id="home">
             <header>
                 <div class="pull-right">
-                    {% if project.active %}
+                    {% if project.is_active %}
                         <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning btn-sm">
                             <span class="glyphicon glyphicon-log-out"></span>
                             Make Inactive
@@ -74,7 +74,7 @@
                         </h3>
                         <div class="list-group">
                             {% for investigation in project.investigation_set.all %}
-                                {% if investigation.active %}
+                                {% if investigation.is_active %}
                                     <a class="list-group-item" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>
                                 {% else %}
                                     <a class="list-group-item disabled" href="{% url 'investigation_detail_all' project=project.slug slug=investigation.slug %}">{{investigation.name}}</a>

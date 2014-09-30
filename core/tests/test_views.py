@@ -44,9 +44,9 @@ class TestOperatorCRUD(TestCase):
         user1 = User.objects.create_user('username1', password='')
         user2 = User.objects.create_user('username2', password='')
         operator1 = operator.objects.create(name='name 1', user=user1,
-                                            active=True)
+                                            is_active=True)
         operator2 = operator.objects.create(name='name 2', user=user2,
-                                            active=False)
+                                            is_active=False)
         self.client.login(username='username1', password='')
 
     def test_operator_list_url_resolution(self):
@@ -66,32 +66,32 @@ class TestOperatorCRUD(TestCase):
             self.assertContains(response, op.name)
 
     def test_operator_activate(self):
-        op = operator.objects.filter(active=False).first()
+        op = operator.objects.filter(is_active=False).first()
         url = reverse('operator_activate', args=(op.id,))
         list_url = reverse('operator_list')
         response = self.client.get(url)
         op = operator.objects.get(id=op.id)
 
         self.assertRedirects(response, list_url)
-        self.assertTrue(op.active)
+        self.assertTrue(op.is_active)
 
     def test_operator_deactivate(self):
-        op = operator.objects.filter(active=True).first()
+        op = operator.objects.filter(is_active=True).first()
         url = reverse('operator_deactivate', args=(op.id,))
         list_url = reverse('operator_list')
         response = self.client.get(url)
         op = operator.objects.get(id=op.id)
 
         self.assertRedirects(response, list_url)
-        self.assertFalse(op.active)
+        self.assertFalse(op.is_active)
 
 
 class TestPlatterCRUD(TestCase):
 
     def setUp(self):
         platter.objects.bulk_create([
-            platter(name='platter 1', active=True),
-            platter(name='platter 2', active=False,
+            platter(name='platter 1', is_active=True),
+            platter(name='platter 2', is_active=False,
                     start_date=timezone.now() - timedelta(days=30),
                     status_changed=timezone.now())
         ])
@@ -115,24 +115,24 @@ class TestPlatterCRUD(TestCase):
             self.assertContains(response, plt.name)
 
     def test_platter_activate(self):
-        obj = platter.objects.filter(active=False).first()
+        obj = platter.objects.filter(is_active=False).first()
         url = reverse('platter_activate', args=(obj.id,))
         list_url = reverse('platter_list')
         response = self.client.get(url)
         obj = platter.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
-        self.assertTrue(obj.active)
+        self.assertTrue(obj.is_active)
 
     def test_platter_deactivate(self):
-        obj = platter.objects.filter(active=True).first()
+        obj = platter.objects.filter(is_active=True).first()
         url = reverse('platter_deactivate', args=(obj.id,))
         list_url = reverse('platter_list')
         response = self.client.get(url)
         obj = platter.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
-        self.assertFalse(obj.active)
+        self.assertFalse(obj.is_active)
         self.assertEqual(timezone.now().date(), obj.status_changed.date())
 
     def test_platter_create_valid_data(self):
@@ -141,7 +141,7 @@ class TestPlatterCRUD(TestCase):
         data = {'name': 'platter 3', 'serial': '123-456'}
         response = self.client.post(url, data)
         self.assertRedirects(response, list_url)
-        self.assertTrue(platter.objects.filter(**data).first().active)
+        self.assertTrue(platter.objects.filter(**data).first().is_active)
 
     def test_platter_create_empty_data(self):
         url = reverse('platter_create')
@@ -162,13 +162,13 @@ class TestProjectCRUD(TestCase):
 
     def setUp(self):
         project.objects.bulk_create([
-            project(name='project 1', active=True),
-            project(name='project 2', active=False,
+            project(name='project 1', is_active=True),
+            project(name='project 2', is_active=False,
                     created=timezone.now() - timedelta(days=30))
         ])
         user = get_user_model().objects.create_user('username1', password='')
         op = operator.objects.create(name='name 1', user=user,
-                                     active=True)
+                                     is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_url_resolution(self):
@@ -188,24 +188,24 @@ class TestProjectCRUD(TestCase):
             self.assertContains(response, proj.name)
 
     def test_project_activate(self):
-        obj = project.objects.filter(active=False).first()
+        obj = project.objects.filter(is_active=False).first()
         url = reverse('project_activate', args=(obj.slug,))
         list_url = reverse('project_list')
         response = self.client.get(url)
         obj = project.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
-        self.assertTrue(obj.active)
+        self.assertTrue(obj.is_active)
 
     def test_project_deactivate(self):
-        obj = project.objects.filter(active=True).first()
+        obj = project.objects.filter(is_active=True).first()
         url = reverse('project_deactivate', args=(obj.slug,))
         list_url = reverse('project_list')
         response = self.client.get(url)
         obj = project.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
-        self.assertFalse(obj.active)
+        self.assertFalse(obj.is_active)
 
     def test_project_create_valid_data(self):
         url = reverse('project_create')
@@ -226,31 +226,31 @@ class TestProjectCRUD(TestCase):
 class TestInvestigationCRUD(TestCase):
 
     def setUp(self):
-        project1 = project.objects.create(name='project 1', active=True)
-        project2 = project.objects.create(name='project 2', active=False,
+        project1 = project.objects.create(name='project 1', is_active=True)
+        project2 = project.objects.create(name='project 2', is_active=False,
                        created=timezone.now() - timedelta(days=30))
         investigation.objects.bulk_create([
-            investigation(name='investigation 1', active=True,
+            investigation(name='investigation 1', is_active=True,
                 project=project1),
-            investigation(name='investigation 2', active=False,
+            investigation(name='investigation 2', is_active=False,
                 project=project2, created=timezone.now())
         ])
         user = get_user_model().objects.create_user('username1', password='')
         op = operator.objects.create(name='name 1', user=user,
-                 active=True)
+                 is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):
         url = reverse('project_list')
         response = self.client.get(url)
         for invest in investigation.objects.all():
-            if invest.project.active:
+            if invest.project.is_active:
                 self.assertContains(response, invest.name)
             else:
                 self.assertNotContains(response, invest.name)
 
     def test_investigation_activate(self):
-        obj = investigation.objects.filter(active=False).first()
+        obj = investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_activate', args=(proj.slug, obj.slug))
         list_url = reverse('project_list')
@@ -258,10 +258,10 @@ class TestInvestigationCRUD(TestCase):
         obj = investigation.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
-        self.assertTrue(obj.active)
+        self.assertTrue(obj.is_active)
 
     def test_investigation_deactivate(self):
-        obj = investigation.objects.filter(active=True).first()
+        obj = investigation.objects.filter(is_active=True).first()
         proj = obj.project
         url = reverse('investigation_deactivate', args=(proj.slug, obj.slug))
         list_url = reverse('project_list')
@@ -269,10 +269,10 @@ class TestInvestigationCRUD(TestCase):
         obj = investigation.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
-        self.assertFalse(obj.active)
+        self.assertFalse(obj.is_active)
 
     def test_investigation_create_valid_data(self):
-        proj = project.objects.filter(active=True).first()
+        proj = project.objects.filter(is_active=True).first()
         url = reverse('investigation_create', args=(proj.slug,))
         data = {'name': 'investigation 3'}
         response = self.client.post(url, data)
@@ -283,7 +283,7 @@ class TestInvestigationCRUD(TestCase):
         self.assertRedirects(response, detail_url)
 
     def test_investigation_create_empty_data(self):
-        proj = project.objects.filter(active=True).first()
+        proj = project.objects.filter(is_active=True).first()
         url = reverse('investigation_create', args=(proj.slug,))
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',

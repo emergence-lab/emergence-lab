@@ -165,7 +165,7 @@ class ActiveManager(models.Manager):
     Manager to filter on the ``active`` field.
     """
     def get_queryset(self):
-        return super(ActiveManager, self).get_queryset().filter(active=True)
+        return super(ActiveManager, self).get_queryset().filter(is_active=True)
 
 
 class InactiveManager(models.Manager):
@@ -173,14 +173,14 @@ class InactiveManager(models.Manager):
     Manager to filter on the ``active`` field.
     """
     def get_queryset(self):
-        return super(InactiveManager, self).get_queryset().filter(active=False)
+        return super(InactiveManager, self).get_queryset().filter(is_active=False)
 
 
 class ActiveStateMixin(models.Model):
     """
     Mixin for models that keep an active/inactive state.
     """
-    active = models.BooleanField(_('active'), default=True)
+    is_active = models.BooleanField(_('active'), default=True)
     status_changed = models.DateTimeField(_('status changed'), null=True, blank=True)
 
     objects = models.Manager()
@@ -194,9 +194,9 @@ class ActiveStateMixin(models.Model):
         """
         Activate the object, raise an exception if it was already active.
         """
-        if self.active:
+        if self.is_active:
             raise Exception('{0} was already active'.format(self._meta.verbose_name))
-        self.active = True
+        self.is_active = True
         self.status_changed = timezone.now()
         if save:
             self.save()
@@ -205,9 +205,9 @@ class ActiveStateMixin(models.Model):
         """
         Deactivate the object, raise an exception if it was already active.
         """
-        if not self.active:
+        if not self.is_active:
             raise Exception('{0} was already not active'.format(self._meta.verbose_name))
-        self.active = False
+        self.is_active = False
         self.status_changed = timezone.now()
         if save:
             self.save()

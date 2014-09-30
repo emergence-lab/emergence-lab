@@ -45,7 +45,7 @@ class RelationalFilterView(FilterView):
 
 
 class growth_filter(filters.FilterSet):
-    operator = filters.ModelMultipleChoiceFilter(queryset=operator.objects.filter(active=True))
+    operator = filters.ModelMultipleChoiceFilter(queryset=operator.active_objects.all())
     project = filters.ModelMultipleChoiceFilter(queryset=project.objects.all())
     investigation = filters.ModelMultipleChoiceFilter(queryset=investigation.objects.all())
     date = filters.DateFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],

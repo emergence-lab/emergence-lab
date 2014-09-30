@@ -20,7 +20,7 @@
                     <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Stop Tracking Project">
                         <span class="glyphicon glyphicon-remove"></span>
                     </a>
-                    {% if project.active %}
+                    {% if project.is_active %}
                         <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning btn-sm">
                             <span class="glyphicon glyphicon-log-out"></span>
                             Make Inactive

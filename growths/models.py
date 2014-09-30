@@ -22,13 +22,13 @@ class growth(models.Model):
     growth_number = models.SlugField(max_length=10)
     date = models.DateField()
     operator = models.ForeignKey(core.models.operator,
-                                 limit_choices_to={'active': True})
+                                 limit_choices_to={'is_active': True})
     project = models.ForeignKey(core.models.project,
-                                limit_choices_to={'active': True})
+                                limit_choices_to={'is_active': True})
     investigation = models.ForeignKey(core.models.investigation,
-                                      limit_choices_to={'active': True})
+                                      limit_choices_to={'is_active': True})
     platter = models.ForeignKey(core.models.platter,
-                                limit_choices_to={'active': True})
+                                limit_choices_to={'is_active': True})
     reactor = models.CharField(max_length=10, choices=REACTOR_CHOICES)
     run_comments = RichTextField(blank=True)
 

@@ -4,13 +4,13 @@ import core.models
 
 
 class InvestigationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'project', 'active', 'created')
-    list_filter = ('project', 'active')
+    list_display = ('name', 'slug', 'project', 'is_active', 'created')
+    list_filter = ('project', 'is_active')
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'active', 'created')
-    list_filter = ('active',)
+    list_display = ('name', 'slug', 'is_active', 'created')
+    list_filter = ('is_active',)
 
 
 class ProjectTrackingInline(admin.TabularInline):
@@ -20,7 +20,7 @@ class ProjectTrackingInline(admin.TabularInline):
 
 class OperatorAdmin(admin.ModelAdmin):
     inlines = (ProjectTrackingInline, )
-    fields = ('name', 'active', 'user')
+    fields = ('name', 'is_active', 'user')
 
 
 admin.site.register(core.models.operator, OperatorAdmin)

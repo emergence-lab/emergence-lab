@@ -56,7 +56,7 @@
                             {% for investigation in project.investigation_set.all %}
                                 <li class="investigation-subitem clearfix">
                                     <div class="pull-right">
-                                        {% if investigation.active %}
+                                        {% if investigation.is_active %}
                                             <a href="{% url 'investigation_deactivate' project=project.slug slug=investigation.slug %}" class="btn btn-sm btn-warning">
                                                 <span class="glyphicon glyphicon-log-out"></span>
                                                 Make Inactive
