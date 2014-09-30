@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login, logout
@@ -13,11 +13,9 @@ import afm.api
 
 admin.autodiscover()
 
-urlpatterns = patterns(
-    'django.contrib.auth.views',
+urlpatterns = [
     url(r'^ckeditor/', include('ckeditor.urls')),
     url(r'^grappelli/', include('grappelli.urls')),
-    # urls, add login_required() around the as_view() call for security
 
     # misc urls
     url(r'^$', core.views.HomepageView.as_view(), name='home'),
@@ -88,6 +86,6 @@ urlpatterns = patterns(
     
     # user-specific views
     url(r'^(?P<username>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_user'),
-)
+]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
