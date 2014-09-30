@@ -125,7 +125,7 @@
                                 <td>{{sample.substrate_serial}}</td>
                                 <td>{{sample.substrate_orientation}}</td>
                                 <td>{{sample.substrate_miscut}}</td>
-                                <td>{{sample.comment}}</td>
+                                <td>{{sample.comment|safe}}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
