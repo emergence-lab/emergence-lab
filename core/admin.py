@@ -4,12 +4,12 @@ import core.models
 
 
 class InvestigationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'project', 'active', 'start_date')
+    list_display = ('name', 'slug', 'project', 'active', 'created')
     list_filter = ('project', 'active')
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'active', 'start_date')
+    list_display = ('name', 'slug', 'active', 'created')
     list_filter = ('active',)
 
 

@@ -164,7 +164,7 @@ class TestProjectCRUD(TestCase):
         project.objects.bulk_create([
             project(name='project 1', active=True),
             project(name='project 2', active=False,
-                    start_date=timezone.now() - timedelta(days=30))
+                    created=timezone.now() - timedelta(days=30))
         ])
         user = get_user_model().objects.create_user('username1', password='')
         op = operator.objects.create(name='name 1', user=user,
@@ -228,12 +228,12 @@ class TestInvestigationCRUD(TestCase):
     def setUp(self):
         project1 = project.objects.create(name='project 1', active=True)
         project2 = project.objects.create(name='project 2', active=False,
-                       start_date=timezone.now() - timedelta(days=30))
+                       created=timezone.now() - timedelta(days=30))
         investigation.objects.bulk_create([
             investigation(name='investigation 1', active=True,
                 project=project1),
             investigation(name='investigation 2', active=False,
-                project=project2, start_date=timezone.now())
+                project=project2, created=timezone.now())
         ])
         user = get_user_model().objects.create_user('username1', password='')
         op = operator.objects.create(name='name 1', user=user,

@@ -243,7 +243,7 @@ class platter(ActiveStateMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class project(ActiveStateMixin, models.Model):
+class project(ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on a project, which is a higher level organizational
     tool.
@@ -264,7 +264,7 @@ class project(ActiveStateMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class investigation(ActiveStateMixin, models.Model):
+class investigation(ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on an individual investigation related to one or more
     projects.

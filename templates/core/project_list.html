@@ -50,7 +50,7 @@
                         </div>
                         <h4>
                             <a href="{% url 'project_detail_all' slug=project.slug %}">{{project.name}}</a>
-                            <small>created on {{project.start_date.date}}</small>
+                            <small>created on {{project.created.date}}</small>
                         </h4>
                         <ul>
                             {% for investigation in project.investigation_set.all %}
