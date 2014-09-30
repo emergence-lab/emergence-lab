@@ -206,3 +206,18 @@ class TestProjectCRUD(TestCase):
 
         self.assertRedirects(response, list_url)
         self.assertFalse(obj.active)
+
+    def test_project_create_valid_data(self):
+        url = reverse('project_create')
+        data = {'name': 'project 3'}
+        response = self.client.post(url, data)
+        obj = project.objects.get(**data)
+        self.assertEqual(obj.slug, 'project-3')
+        detail_url = reverse('project_detail_all', args=(obj.slug,))
+        self.assertRedirects(response, detail_url)
+
+    def test_project_create_empty_data(self):
+        url = reverse('project_create')
+        response = self.client.post(url, {})
+        self.assertFormError(response, 'form', 'name',
+            'This field is required.')
