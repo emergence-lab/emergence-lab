@@ -1,7 +1,8 @@
 -r base.txt
 
-coverage==3.7.1
+coverage
 selenium
 pep8
 flake8
+pep8-naming
 tox
