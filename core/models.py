@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib import auth
 from django.core import validators
-from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -53,9 +53,8 @@ class User(auth.models.AbstractBaseUser):
     username = models.CharField(_('username'), max_length=30, unique=True,
         help_text=_('Required. 30 characters or fewer. Letters, digits and '
                     '@/./+/-/_ only.'),
-        validators=[
-            validators.RegexValidator(r'^[\w.@+-]+$', _('Enter a valid username.'), 'invalid')
-        ])
+        validators=[validators.RegexValidator(r'^[\w.@+-]+$',
+            _('Enter a valid username.'), 'invalid')])
     full_name = models.CharField(_('full name'), max_length=255, blank=True)
     short_name = models.CharField(_('preferred name'), max_length=50, blank=True)
     email = models.EmailField(_('email address'), blank=True)

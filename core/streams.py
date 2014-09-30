@@ -1,8 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 
-from actstream.models import actor_stream, target_stream
-
-from .models import operator, project, investigation
+from actstream.models import target_stream
 
 
 _operator_contentid = ContentType.objects.get(name='operator').id

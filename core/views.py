@@ -1,21 +1,21 @@
-import datetime
 import os
 
-from django.shortcuts import render
-from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView, DetailView, ListView, RedirectView, TemplateView, View, FormView, UpdateView
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.views.generic import (CreateView, DetailView, ListView,
+                                  RedirectView, TemplateView, View, UpdateView)
 
-import gitlab
 from actstream import action
 from braces.views import LoginRequiredMixin
+import gitlab
 
 from .models import investigation, operator, platter, project, project_tracking
 from growths.models import growth, sample
-from .forms import TrackProjectForm, CreateInvestigationForm
-from .streams import project_stream, operator_project_stream, investigation_stream, operator_investigation_stream
+from .forms import TrackProjectForm
+from .streams import (project_stream, investigation_stream,
+                      operator_investigation_stream)
 from journal.models import journal_entry
 
 
@@ -353,7 +353,7 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
     """
     template_name = 'core/investigation_create.html'
     model = investigation
-    form_class = CreateInvestigationForm
+    fields = ('name', 'description')
 
     def dispatch(self, request, *args, **kwargs):
         self.initial = {'project': project.objects.get(slug=kwargs.pop('slug'))}
@@ -424,7 +424,6 @@ class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
         action.send(self.request.user.operator, verb='deactivated investigation',
             action_object=investigation_obj, target=project_obj)
         return reverse('project_list')
-
 
 
 class TrackProjectView(LoginRequiredMixin, CreateView):

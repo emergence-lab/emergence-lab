@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.generic import DetailView
 
 from braces.views import LoginRequiredMixin
@@ -6,7 +5,6 @@ from braces.views import LoginRequiredMixin
 from core.models import operator, project, investigation
 from core.streams import project_stream, investigation_stream
 from growths.models import growth
-from journal.models import journal_entry
 
 
 class DashboardMixin(object):
@@ -69,7 +67,6 @@ class InvestigationDetailDashboardView(LoginRequiredMixin, DashboardMixin, Detai
 
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailDashboardView, self).get_context_data(**kwargs)
-        userid = operator.objects.filter(user__username=self.request.user.username).values('id')
         context['growths'] = (growth.objects.filter(investigation=self.object)
                                             .order_by('-growth_number')[:25])
         context['project'] = self.object.project

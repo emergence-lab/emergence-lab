@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login, logout
 from django.views.decorators.cache import never_cache
-import django.contrib
+
 from rest_framework.urlpatterns import format_suffix_patterns
 
 import core.views
@@ -83,7 +83,7 @@ urlpatterns = [
 
     # hall urls
     url(r'^hall/', include('hall.urls')),
-    
+
     # user-specific views
     url(r'^(?P<username>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_user'),
 ]

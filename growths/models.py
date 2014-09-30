@@ -170,7 +170,7 @@ class sample(models.Model):
 
         A child is defined as a sample that has the current sample marked as a parent.
         """
-        return sample_obj.sample_set,exclude(pk=sample_obj.pk)
+        return sample_obj.sample_set.exclude(pk=sample_obj.pk)
 
     @staticmethod
     def get_piece_siblings(sample_obj):
@@ -368,6 +368,7 @@ class recipe_layer(models.Model):
 
     class Meta:
         db_table = 'recipe_layers'
+
 
 class source(models.Model):
     """

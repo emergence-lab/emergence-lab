@@ -5,7 +5,6 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from .models import afm
 from growths.models import growth, sample
-import growths.models
 
 
 class afm_form(forms.ModelForm):
@@ -29,9 +28,9 @@ class afm_form(forms.ModelForm):
 
         try:
             self.cleaned_data['growth'] = growth.objects.get(growth_number=growth_number)
-        except MultipleObjectsReturned as e:
+        except MultipleObjectsReturned:
             raise forms.ValidationError('Growth {0} ambiguous'.format(growth_number))
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise forms.ValidationError('Growth {0} does not exist'.format(growth_number))
 
         return self.cleaned_data['growth']
@@ -62,9 +61,9 @@ class afm_form(forms.ModelForm):
 
         try:
             self.cleaned_data['sample'] = sample.objects.get(**kwargs)
-        except MultipleObjectsReturned as e:
+        except MultipleObjectsReturned:
             raise forms.ValidationError('Sample {0} ambiguous, specify the pocket or piece'.format(sample_name))
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             raise forms.ValidationError('Sample {0} does not exist'.format(sample_name))
 
         return self.cleaned_data['sample']

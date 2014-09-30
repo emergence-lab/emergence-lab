@@ -1,6 +1,4 @@
-from django.shortcuts import render_to_response
-from django.http import HttpResponse
-from django.views.generic import View, CreateView, ListView, DetailView
+from django.views.generic import ListView, DetailView
 
 from .models import hall
 

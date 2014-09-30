@@ -2,7 +2,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView, DetailView, ListView
 
-from actstream import action
 from braces.views import LoginRequiredMixin
 
 from .models import journal_entry

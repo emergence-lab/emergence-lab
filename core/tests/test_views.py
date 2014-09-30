@@ -16,7 +16,7 @@ class TestHomepage(TestCase):
 
     def setUp(self):
         User = get_user_model()
-        user = User.objects.create_user('default', password='')
+        User.objects.create_user('default', password='')
 
     def test_homepage_url_resolution(self):
         match = resolve('/')
@@ -43,10 +43,10 @@ class TestOperatorCRUD(TestCase):
         User = get_user_model()
         user1 = User.objects.create_user('username1', password='')
         user2 = User.objects.create_user('username2', password='')
-        operator1 = operator.objects.create(name='name 1', user=user1,
-                                            is_active=True)
-        operator2 = operator.objects.create(name='name 2', user=user2,
-                                            is_active=False)
+        operator.objects.create(name='name 1', user=user1,
+                                is_active=True)
+        operator.objects.create(name='name 2', user=user2,
+                                is_active=False)
         self.client.login(username='username1', password='')
 
     def test_operator_list_url_resolution(self):
@@ -167,8 +167,8 @@ class TestProjectCRUD(TestCase):
                     created=timezone.now() - timedelta(days=30))
         ])
         user = get_user_model().objects.create_user('username1', password='')
-        op = operator.objects.create(name='name 1', user=user,
-                                     is_active=True)
+        operator.objects.create(name='name 1', user=user,
+                                is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_url_resolution(self):
@@ -231,13 +231,13 @@ class TestInvestigationCRUD(TestCase):
                        created=timezone.now() - timedelta(days=30))
         investigation.objects.bulk_create([
             investigation(name='investigation 1', is_active=True,
-                project=project1),
+                          project=project1),
             investigation(name='investigation 2', is_active=False,
-                project=project2, created=timezone.now())
+                          project=project2, created=timezone.now())
         ])
         user = get_user_model().objects.create_user('username1', password='')
-        op = operator.objects.create(name='name 1', user=user,
-                 is_active=True)
+        operator.objects.create(name='name 1', user=user,
+                                is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):

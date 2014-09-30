@@ -2,21 +2,24 @@ from __future__ import print_function
 import time
 import datetime
 
-from django.shortcuts import render, render_to_response
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView, FormView, RedirectView
-from django.views.generic.edit import ProcessFormView
+from django.shortcuts import render
+from django.views.generic import (DetailView, ListView, UpdateView,
+                                  TemplateView, FormView, RedirectView)
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
 from actstream import action
 from braces.views import LoginRequiredMixin
 
 from core.models import operator
-from .models import growth, sample, readings, serial_number, recipe_layer, source
+from .models import growth, sample, readings, recipe_layer, source
 from .filters import growth_filter, RelationalFilterView
-from .forms import growth_form, sample_form, p_form, split_form, readings_form, comments_form, SampleSizeForm
-from .forms import prerun_checklist_form, start_growth_form, prerun_growth_form, prerun_sources_form, postrun_checklist_form
+from .forms import (sample_form, p_form, split_form, readings_form,
+                    comments_form, SampleSizeForm)
+from .forms import (prerun_checklist_form, start_growth_form,
+                    prerun_growth_form, prerun_sources_form,
+                    postrun_checklist_form)
 import afm.models
 import hall.models
 
@@ -236,13 +239,13 @@ class update_readings(SingleObjectMixin, TemplateView):
             formlist.append(rform)
         context["readingslist"] = formlist
         return context
+
     def post(self, request, **kwargs):
         numberofreadings = len(readings.objects.filter(growth=self.get_object()))
-        print (numberofreadings)
         for x in range(0, numberofreadings):
-            rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
+            rform = readings_form(request.POST, prefix=('reading' + str(x + 1)))
             if rform.is_valid():
-                newgrowth = growth=self.get_object()
+                newgrowth = self.get_object()
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
@@ -288,7 +291,7 @@ class update_readings(SingleObjectMixin, TemplateView):
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
                 thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
-                thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
+                thisreading.update(growth=newgrowth, layer=newlayer, layer_desc=newlayer_desc,
                                    pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
                                    tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
                                    gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
@@ -376,7 +379,7 @@ class CreateGrowthPrerunView(TemplateView):
             lastgrowth.save()
             for i, sform in enumerate(sample_forms):
                 pocket = i + 1
-                new_sample = sform.save(growth=lastgrowth, pocket=pocket)
+                sform.save(growth=lastgrowth, pocket=pocket)
             return HttpResponseRedirect(reverse('create_growth_readings'))
         else:  # form did not validate
             saved_forms.update({
@@ -457,6 +460,7 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
             formlist.append(rform)
         context["readingslist"] = formlist
         return context
+
     def post(self, request, **kwargs):
         lastgrowth = growth.objects.latest('growth_number')
         commentsform = comments_form(request.POST, prefix='commentsform')
@@ -464,9 +468,8 @@ class create_growth_readings(SingleObjectMixin, TemplateView):
             lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
             lastgrowth.save()
         numberofreadings = len(readings.objects.filter(growth=lastgrowth))
-        print (numberofreadings)
         for x in range(0, numberofreadings):
-            rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
+            rform = readings_form(request.POST, prefix=('reading' + str(x + 1)))
             if rform.is_valid():
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
@@ -540,7 +543,7 @@ def create_growth_postrun(request):
         if prcform.is_valid() and prsform.is_valid() and commentsform.is_valid():
             print ("successful validation. Now let's do something.")
             lastgrowth = growth.objects.latest('growth_number')
-            lastgrowth.run_comments=commentsform.cleaned_data['comment_field']
+            lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
             lastgrowth.save()
             prsform.save()
             action.send(request.user.operator, verb='completed growth', action_object=lastgrowth, target=lastgrowth.project, investigation=lastgrowth.investigation_id)
@@ -570,4 +573,3 @@ class CancelGrowthRedirectView(LoginRequiredMixin, RedirectView):
         # delete growth
         current_growth.delete()
         return reverse('dashboard')
-

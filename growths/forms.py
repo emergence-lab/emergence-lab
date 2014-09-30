@@ -1,11 +1,7 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from growths.models import growth, sample, readings, source
-import time
 import re
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from core.validators import *
 
 from ckeditor.widgets import CKEditorWidget
 
@@ -89,7 +85,6 @@ class start_growth_form(ModelForm):
 
         return growth_number
 
-
     def save(self, *args, **kwargs):
         commit = kwargs.pop('commit', True)
         comments = kwargs.pop('runcomments')
@@ -112,12 +107,12 @@ class prerun_growth_form(ModelForm):
         material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
         materials = [field for field in material_fields if cleaned_data[field]]
         if not materials:
-            raise ValidationError('At least one material must be specified')
+            raise forms.ValidationError('At least one material must be specified')
 
         doping_fields = ['has_n', 'has_p', 'has_u']
         doping = [field for field in doping_fields if cleaned_data[field]]
         if not doping:
-            raise ValidationError('At least one doping type must be specified')
+            raise forms.ValidationError('At least one doping type must be specified')
 
         return cleaned_data
 
@@ -188,6 +183,7 @@ class SampleSizeForm(forms.Form):
 
         for i, sample_name in enumerate(samples):
             self.fields['{0}'.format(sample_name)] = forms.ChoiceField(choices=sample.SIZE_CHOICES)
+
 
 class readings_form(ModelForm):
     class Meta:

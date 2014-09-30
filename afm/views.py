@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -48,7 +47,7 @@ class AFMUpdate(UpdateView):
     form_class = afm_form
 
     def get_initial(self):
-        return {'growth': self.object.growth, 'sample': self.object.sample }
+        return {'growth': self.object.growth, 'sample': self.object.sample}
 
 
 class AFMDelete(DeleteView):
