@@ -9,7 +9,8 @@ from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from core.models import investigation, operator, platter, project
+from core.models import (investigation, operator, platter, project,
+                         project_tracking)
 
 
 class TestHomepage(TestCase):
@@ -166,17 +167,16 @@ class TestProjectCRUD(TestCase):
             project(name='project 2', is_active=False,
                     created=timezone.now() - timedelta(days=30))
         ])
-        user = get_user_model().objects.create_user('username1', password='')
-        operator.objects.create(name='name 1', user=user,
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
+        operator.objects.create(name='name 1', user=self.user,
                                 is_active=True)
         self.client.login(username='username1', password='')
 
-    def test_project_list_url_resolution(self):
-        match = resolve('/projects/')
+    def test_project_list_resolution_template(self):
+        url = '/projects/'
+        match = resolve(url)
         self.assertEqual(match.url_name, 'project_list')
-
-    def test_project_list_template(self):
-        url = reverse('project_list')
         response = self.client.get(url)
         self.assertTemplateUsed(response, 'core/project_list.html')
         self.assertEqual(response.status_code, 200)
@@ -186,6 +186,38 @@ class TestProjectCRUD(TestCase):
         response = self.client.get(url)
         for proj in project.objects.all():
             self.assertContains(response, proj.name)
+
+    def test_project_detail_resolution_template(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = '/projects/{0}/'.format(obj.slug)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'project_detail_all')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/project_detail.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_project_detail_content(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = reverse('project_detail_all', args=(obj.slug,))
+        response = self.client.get(url)
+        self.assertContains(response, obj.name)
+
+    def test_project_create_resolution_template(self):
+        url = '/projects/create/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'project_create')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/project_create.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_project_update_resolution_template(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = '/projects/{0}/edit/'.format(obj.slug)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'project_update')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/project_update.html')
+        self.assertEqual(response.status_code, 200)
 
     def test_project_activate(self):
         obj = project.objects.filter(is_active=False).first()
@@ -207,6 +239,30 @@ class TestProjectCRUD(TestCase):
         self.assertRedirects(response, list_url)
         self.assertFalse(obj.is_active)
 
+    def test_project_track(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = reverse('project_track', args=(obj.slug,))
+        list_url = reverse('project_list')
+        response = self.client.get(url)
+        self.assertRedirects(response, list_url)
+
+        obj = project.objects.get(id=obj.id)
+        tracking = project_tracking.objects.get(project=obj)
+        self.assertEqual(tracking.operator, self.user.operator)
+
+    def test_project_untrack(self):
+        obj = project.objects.filter(is_active=True).first()
+        tracking = project_tracking.objects.create(operator=self.user.operator,
+                                                   project=obj)
+        url = reverse('project_untrack', args=(obj.slug,))
+        list_url = reverse('project_list')
+        response = self.client.get(url)
+        self.assertRedirects(response, list_url)
+
+        obj = project.objects.get(id=obj.id)
+        tracking = project_tracking.objects.filter(project=obj).count()
+        self.assertEqual(tracking, 0)
+
     def test_project_create_valid_data(self):
         url = reverse('project_create')
         data = {'name': 'project 3'}
@@ -221,6 +277,16 @@ class TestProjectCRUD(TestCase):
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
+
+    def test_project_update_valid_data(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = reverse('project_update', args=(obj.slug,))
+        data = {'description': 'test description'}
+        response = self.client.post(url, data)
+        obj = project.objects.get(id=obj.id)
+        self.assertEqual(obj.description, data['description'])
+        detail_url = reverse('project_detail_all', args=(obj.slug,))
+        self.assertRedirects(response, detail_url)
 
 
 class TestInvestigationCRUD(TestCase):
@@ -248,6 +314,42 @@ class TestInvestigationCRUD(TestCase):
                 self.assertContains(response, invest.name)
             else:
                 self.assertNotContains(response, invest.name)
+
+    def test_investigation_detail_resolution_template(self):
+        obj = investigation.objects.filter(is_active=False).first()
+        proj = obj.project
+        url = '/projects/{0}/{1}/'.format(proj.slug, obj.slug)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'investigation_detail_all')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/investigation_detail.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_investigation_detail_content(self):
+        obj = investigation.objects.filter(is_active=False).first()
+        proj = obj.project
+        url = reverse('investigation_detail_all', args=(proj.slug, obj.slug))
+        response = self.client.get(url)
+        self.assertContains(response, obj.name)
+
+    def test_investigation_create_resolution_template(self):
+        proj = project.objects.filter(is_active=True).first()
+        url = '/projects/{0}/add-investigation/'.format(proj.slug)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'investigation_create')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/investigation_create.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_investigation_update_resolution_template(self):
+        obj = investigation.objects.filter(is_active=False).first()
+        proj = obj.project
+        url = '/projects/{0}/{1}/edit/'.format(proj.slug, obj.slug)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'investigation_update')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/investigation_update.html')
+        self.assertEqual(response.status_code, 200)
 
     def test_investigation_activate(self):
         obj = investigation.objects.filter(is_active=False).first()
@@ -288,3 +390,14 @@ class TestInvestigationCRUD(TestCase):
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
+
+    def test_investigation_update_valid_data(self):
+        obj = investigation.objects.filter(is_active=False).first()
+        proj = obj.project
+        url = reverse('investigation_update', args=(proj.slug, obj.slug))
+        data = {'description': 'test description'}
+        response = self.client.post(url, data)
+        obj = investigation.objects.get(id=obj.id)
+        self.assertEqual(obj.description, data['description'])
+        detail_url = reverse('investigation_detail_all', args=(proj.slug, obj.slug,))
+        self.assertRedirects(response, detail_url)
