@@ -202,6 +202,22 @@ class TestProjectCRUD(TestCase):
         response = self.client.get(url)
         self.assertContains(response, obj.name)
 
+    def test_project_detail_user_resolution_template(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = '/{0}/{1}/'.format(self.user.username, obj.slug)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'project_detail_user')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/project_detail.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_project_detail_user_content(self):
+        obj = project.objects.filter(is_active=True).first()
+        url = reverse('project_detail_user', args=(self.user.username,
+                                                   obj.slug,))
+        response = self.client.get(url)
+        self.assertContains(response, obj.name)
+
     def test_project_create_resolution_template(self):
         url = '/projects/create/'
         match = resolve(url)
