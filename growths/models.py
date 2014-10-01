@@ -1,13 +1,15 @@
 import re
 
-from django.db import models
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from ckeditor.fields import RichTextField
 
 import core.models
 
 
+@python_2_unicode_compatible
 class growth(models.Model):
     """
     Stores information related to the growth including tagging for material
@@ -56,7 +58,10 @@ class growth(models.Model):
     has_p = models.BooleanField(default=False)
     has_u = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    class Meta:
+        db_table = 'growths'
+
+    def __str__(self):
         return self.growth_number
 
     @staticmethod
@@ -77,10 +82,8 @@ class growth(models.Model):
             raise Exception('Growth {0} does not exist'.format(growth_number))
         return obj
 
-    class Meta:
-        db_table = 'growths'
 
-
+@python_2_unicode_compatible
 class sample(models.Model):
     """
     Stores information for an individual sample from a growth. Used as a
@@ -116,7 +119,10 @@ class sample(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     comment = RichTextField(blank=True)
 
-    def __unicode__(self):
+    class Meta:
+        db_table = 'samples'
+
+    def __str__(self):
         return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)
 
     @staticmethod
@@ -204,7 +210,6 @@ class sample(models.Model):
                 last_letter = unichr(ord(last_letter) + 1)
             else:
                 raise Exception('Too many pieces')
-            print(last_letter)
             parent.pk = None
             parent.parent = None
             parent.piece = last_letter
@@ -217,9 +222,6 @@ class sample(models.Model):
             parent.save()
             new_pieces.append(parent)
         return new_pieces
-
-    class Meta:
-        db_table = 'samples'
 
 
 class readings(models.Model):
