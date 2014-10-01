@@ -9,13 +9,16 @@ from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.utils import timezone
 
+from model_mommy import mommy
+
 from core.models import (investigation, operator, platter, project,
                          project_tracking)
 
 
 class TestHomepage(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         User = get_user_model()
         User.objects.create_user('default', password='')
 
@@ -40,7 +43,8 @@ class TestHomepage(TestCase):
 
 class TestOperatorCRUD(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         User = get_user_model()
         user1 = User.objects.create_user('username1', password='')
         user2 = User.objects.create_user('username2', password='')
@@ -48,6 +52,13 @@ class TestOperatorCRUD(TestCase):
                                 is_active=True)
         operator.objects.create(name='name 2', user=user2,
                                 is_active=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        operator.objects.all().delete()
+        get_user_model().objects.all().delete()
+
+    def setUp(self):
         self.client.login(username='username1', password='')
 
     def test_operator_list_url_resolution(self):
