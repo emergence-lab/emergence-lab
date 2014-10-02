@@ -177,7 +177,8 @@ class ActiveStateMixin(models.Model):
     Mixin for models that keep an active/inactive state.
     """
     is_active = models.BooleanField(_('active'), default=True)
-    status_changed = models.DateTimeField(_('status changed'), null=True, blank=True)
+    status_changed = models.DateTimeField(_('status changed'), null=True,
+                                          blank=True, editable=False)
 
     objects = models.Manager()
     active_objects = ActiveStateManager(active_test=True)
