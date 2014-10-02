@@ -159,20 +159,17 @@ class User(auth.models.AbstractBaseUser):
         return _user_has_module_perms(self, app_label)
 
 
-class ActiveManager(models.Manager):
+class ActiveStateManager(models.Manager):
     """
     Manager to filter on the ``active`` field.
     """
-    def get_queryset(self):
-        return super(ActiveManager, self).get_queryset().filter(is_active=True)
+    def __init__(self, active_test):
+        super(ActiveStateManager, self).__init__()
+        self.active_test = active_test
 
-
-class InactiveManager(models.Manager):
-    """
-    Manager to filter on the ``active`` field.
-    """
     def get_queryset(self):
-        return super(InactiveManager, self).get_queryset().filter(is_active=False)
+        return (super(ActiveStateManager, self)
+                    .get_queryset().filter(is_active=self.active_test))
 
 
 class ActiveStateMixin(models.Model):
@@ -183,8 +180,8 @@ class ActiveStateMixin(models.Model):
     status_changed = models.DateTimeField(_('status changed'), null=True, blank=True)
 
     objects = models.Manager()
-    active_objects = ActiveManager()
-    inactive_objects = InactiveManager()
+    active_objects = ActiveStateManager(active_test=True)
+    inactive_objects = ActiveStateManager(active_test=False)
 
     class Meta:
         abstract = True
