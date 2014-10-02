@@ -7,6 +7,7 @@ import unittest
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
+from django.utils import timezone
 
 from model_mommy import mommy
 
@@ -62,6 +63,95 @@ class TestGrowthView(TestCase):
         response = self.client.get(url)
         self.assertContains(response, self.g1000.growth_number)
 
+    def test_growth_update_resolution_template(self):
+        obj = mommy.make(growth, growth_number='g1002',
+                         project=self.g1000.project,
+                         investigation=self.g1000.investigation)
+        url = '/{0}/update/'.format(obj.growth_number)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'growth_update')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/growth_update.html')
+
+    def test_growth_update_valid_data(self):
+        obj = mommy.make(growth, growth_number='g1002',
+                         project=self.g1000.project,
+                         investigation=self.g1000.investigation)
+        url = reverse('growth_update', args=(obj.growth_number,))
+        data = {'run_comments': 'test comment'}
+        response = self.client.post(url, data)
+        obj = growth.objects.get(id=obj.id)
+        self.assertEqual(obj.run_comments, data['run_comments'])
+        detail_url = reverse('growth_detail', args=(obj.growth_number,))
+        self.assertRedirects(response, detail_url)
+
+    def test_readings_detail_resolution_template(self):
+        url = '/{0}/readings/'.format(self.g1000)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'readings_detail')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/readings_detail.html')
+
+    def test_readings_detail_content(self):
+        obj = mommy.make('growths.readings', growth=self.g1000,
+                         layer_desc='test desc')
+        url = reverse('readings_detail', args=(self.g1000,))
+        response = self.client.get(url)
+        self.assertContains(response, 'test desc')
+
+    def test_readings_update_resolution_template(self):
+        url = '/{0}/readings/update/'.format(self.g1000)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'update_readings')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/update_readings.html')
+
+    def test_readings_update_content(self):
+        obj = mommy.make('growths.readings', growth=self.g1000,
+                         layer_desc='test desc')
+        url = reverse('update_readings', args=(self.g1000,))
+        response = self.client.get(url)
+        self.assertContains(response, 'test desc')
+
+
+class TestSampleView(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        User = get_user_model()
+        user = User.objects.create_user('default', password='')
+        mommy.make('core.operator', user=user)
+
+        proj = mommy.make(project, name='project 1', slug='project-1')
+        invest = mommy.make(investigation, name='invest 1',
+                            slug='invest-1', project=proj)
+        cls.g1000 = mommy.make(growth, growth_number='g1000', project=proj,
+                               investigation=invest)
+        cls.g1001 = mommy.make(growth, growth_number='g1001', project=proj,
+                               investigation=invest)
+        for pocket in range(1, 7):
+            smpl = mommy.make(sample, growth=cls.g1000,
+                              pocket=pocket, piece='')
+            smpl.parent = smpl
+            smpl.save()
+        smpl = mommy.make(sample, growth=cls.g1001, parent=smpl,
+                          pocket=1, piece='')
+        smpl.split(3)
+
+    @classmethod
+    def tearDownClass(cls):
+        sample.objects.all().delete()
+        growth.objects.all().delete()
+        investigation.objects.all().delete()
+        project.objects.all().delete()
+        get_user_model().objects.all().delete()
+
+    def setUp(self):
+        self.client.login(username='default', password='')
+
     def test_sample_detail_resolution_template(self):
         obj = sample.objects.filter(growth__growth_number='g1001').first()
         url = '/sample/{0}/'.format(obj.id)
@@ -93,29 +183,6 @@ class TestGrowthView(TestCase):
         response = self.client.get(url)
         for obj in sample.objects.filter(growth__growth_number='g1001'):
             self.assertContains(response, obj.__str__())
-
-    def test_growth_update_resolution_template(self):
-        obj = mommy.make(growth, growth_number='g1002',
-                         project=self.g1000.project,
-                         investigation=self.g1000.investigation)
-        url = '/{0}/update/'.format(obj.growth_number)
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'growth_update')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'growths/growth_update.html')
-
-    def test_growth_update_valid_data(self):
-        obj = mommy.make(growth, growth_number='g1002',
-                         project=self.g1000.project,
-                         investigation=self.g1000.investigation)
-        url = reverse('growth_update', args=(obj.growth_number,))
-        data = {'run_comments': 'test comment'}
-        response = self.client.post(url, data)
-        obj = growth.objects.get(id=obj.id)
-        self.assertEqual(obj.run_comments, data['run_comments'])
-        detail_url = reverse('growth_detail', args=(obj.growth_number,))
-        self.assertRedirects(response, detail_url)
 
     def test_sample_update_resolution_template(self):
         obj = mommy.make(sample, growth=self.g1001, pocket=2)
@@ -188,32 +255,86 @@ class TestGrowthView(TestCase):
         for size in ['Whole', 'Half', 'Quarter']:
             self.assertContains(response, size)
 
-    def test_readings_detail_resolution_template(self):
-        url = '/{0}/readings/'.format(self.g1000)
+
+class TestCreateGrowth(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        User = get_user_model()
+        user = User.objects.create_user('default', password='')
+        cls.op = mommy.make('core.operator', user=user)
+
+        proj = mommy.make(project, name='project 1', slug='project-1')
+        invest = mommy.make(investigation, name='invest 1',
+                            slug='invest-1', project=proj)
+        cls.g1000 = mommy.make(growth, growth_number='g1000', project=proj,
+                               investigation=invest)
+        cls.g1001 = mommy.make(growth, growth_number='g1001', project=proj,
+                               investigation=invest)
+        for pocket in range(1, 7):
+            smpl = mommy.make(sample, growth=cls.g1000,
+                              pocket=pocket, piece='')
+            smpl.parent = smpl
+            smpl.save()
+        smpl = mommy.make(sample, growth=cls.g1001, parent=smpl,
+                          pocket=1, piece='')
+        smpl.split(3)
+
+    @classmethod
+    def tearDownClass(cls):
+        sample.objects.all().delete()
+        growth.objects.all().delete()
+        investigation.objects.all().delete()
+        project.objects.all().delete()
+        get_user_model().objects.all().delete()
+
+    def setUp(self):
+        self.client.login(username='default', password='')
+
+    def test_create_growth_start_resolution_template(self):
+        url = '/creategrowth/start/'
         match = resolve(url)
-        self.assertEqual(match.url_name, 'readings_detail')
+        self.assertEqual(match.url_name, 'create_growth_start')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'growths/readings_detail.html')
+        self.assertTemplateUsed(response, 'growths/create_growth_start.html')
 
-    def test_readings_detail_content(self):
-        obj = mommy.make('growths.readings', growth=self.g1000,
-                         layer_desc='test desc')
-        url = reverse('readings_detail', args=(self.g1000,))
-        response = self.client.get(url)
-        self.assertContains(response, 'test desc')
-
-    def test_readings_update_resolution_template(self):
-        url = '/{0}/readings/update/'.format(self.g1000)
+    def test_create_growth_prerun_resolution_template(self):
+        url = '/creategrowth/prerun/'
         match = resolve(url)
-        self.assertEqual(match.url_name, 'update_readings')
+        self.assertEqual(match.url_name, 'create_growth_prerun')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'growths/update_readings.html')
+        self.assertTemplateUsed(response, 'growths/create_growth_prerun.html')
 
-    def test_readings_update_content(self):
-        obj = mommy.make('growths.readings', growth=self.g1000,
-                         layer_desc='test desc')
-        url = reverse('update_readings', args=(self.g1000,))
+    def test_create_growth_readings_resolution_template(self):
+        url = '/creategrowth/readings/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'create_growth_readings')
         response = self.client.get(url)
-        self.assertContains(response, 'test desc')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/create_growth_readings.html')
+
+    def test_create_growth_postrun_resolution_template(self):
+        url = '/creategrowth/postrun/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'create_growth_postrun')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/create_growth_postrun.html')
+
+    def test_create_growth_start_valid_data(self):
+        url = reverse('create_growth_start')
+        plt = mommy.make('core.platter')
+        data = {
+            'cgsform-growth_number': 'g1002',
+            'cgsform-date': timezone.now().date(),
+            'cgsform-operator': self.op.id,
+            'cgsform-project': project.objects.all().first().id,
+            'cgsform-investigation': investigation.objects.all().first().id,
+            'cgsform-platter': plt.id,
+            'cgsform-reactor': 'd180',
+            'commentsform-comment_field': 'test comment',
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('create_growth_prerun'))
