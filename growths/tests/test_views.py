@@ -19,7 +19,8 @@ class TestGrowthView(TestCase):
     @classmethod
     def setUpClass(cls):
         User = get_user_model()
-        User.objects.create_user('default', password='')
+        user = User.objects.create_user('default', password='')
+        mommy.make('core.operator', user=user)
 
         proj = mommy.make(project, name='project 1', slug='project-1')
         invest = mommy.make(investigation, name='invest 1',
@@ -115,3 +116,104 @@ class TestGrowthView(TestCase):
         self.assertEqual(obj.run_comments, data['run_comments'])
         detail_url = reverse('growth_detail', args=(obj.growth_number,))
         self.assertRedirects(response, detail_url)
+
+    def test_sample_update_resolution_template(self):
+        obj = mommy.make(sample, growth=self.g1001, pocket=2)
+        obj.parent = obj
+        obj.save()
+        url = '/sample/{0}/update/'.format(obj.id)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'sample_update')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/sample_update.html')
+
+    def test_sample_update_valid_data(self):
+        obj = mommy.make(sample, growth=self.g1001, pocket=2)
+        obj.parent = obj
+        obj.save()
+        url = reverse('sample_update', args=(obj.id,))
+        data = {'comment': 'test comment'}
+        response = self.client.post(url, data)
+        obj = sample.objects.get(id=obj.id)
+        self.assertEqual(obj.comment, data['comment'])
+        detail_url = reverse('sample_detail', args=(obj.id,))
+        self.assertRedirects(response, detail_url)
+
+    def test_split_sample_resolution_template(self):
+        url = '/sample/split/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'split_sample')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/split_sample.html')
+
+    def test_split_sample_content(self):
+        url = reverse('split_sample')
+        data = {'sample': 'xxxx'}
+        response = self.client.get(url, data)
+        self.assertContains(response, 'xxxx')
+
+    def test_change_size_resolution_template(self):
+        url = '/{0}/{1}/size/'.format(self.g1000, 1)
+        match = resolve(url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/sample_size.html')
+
+    def test_split_sample_valid_data(self):
+        obj = mommy.make(sample, growth=self.g1001, pocket=2)
+        obj.parent = obj
+        obj.save()
+        url = reverse('split_sample')
+        data = {'parent': 'g1001_2', 'pieces': 3}
+        response = self.client.post(url, data)
+        change_size_url = reverse('sample_change_size',
+                                  args=(obj.growth.growth_number, obj.pocket))
+        self.assertRedirects(response, change_size_url)
+
+    def test_sample_size_valid_data(self):
+        obj = mommy.make(sample, growth=self.g1001, pocket=2)
+        obj.parent = obj
+        obj.save()
+        obj.split(3)
+        url = reverse('sample_change_size',
+                      args=(obj.growth.growth_number, obj.pocket))
+        data = {'g1001_2a': 'whole', 'g1001_2b': 'half', 'g1001_2c': 'quarter'}
+        response = self.client.post(url, data)
+        detail_url = reverse('sample_family_detail',
+                             args=(obj.growth.growth_number, obj.pocket))
+        self.assertRedirects(response, detail_url)
+        response = self.client.get(detail_url)
+        for size in ['Whole', 'Half', 'Quarter']:
+            self.assertContains(response, size)
+
+    def test_readings_detail_resolution_template(self):
+        url = '/{0}/readings/'.format(self.g1000)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'readings_detail')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/readings_detail.html')
+
+    def test_readings_detail_content(self):
+        obj = mommy.make('growths.readings', growth=self.g1000,
+                         layer_desc='test desc')
+        url = reverse('readings_detail', args=(self.g1000,))
+        response = self.client.get(url)
+        self.assertContains(response, 'test desc')
+
+    def test_readings_update_resolution_template(self):
+        url = '/{0}/readings/update/'.format(self.g1000)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'update_readings')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'growths/update_readings.html')
+
+    def test_readings_update_content(self):
+        obj = mommy.make('growths.readings', growth=self.g1000,
+                         layer_desc='test desc')
+        url = reverse('update_readings', args=(self.g1000,))
+        response = self.client.get(url)
+        self.assertContains(response, 'test desc')
