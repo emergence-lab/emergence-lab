@@ -7,7 +7,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import (CreateView, DetailView, ListView,
                                   RedirectView, TemplateView, View, UpdateView)
 
-from actstream import action
 from braces.views import LoginRequiredMixin
 import gitlab
 
@@ -236,7 +235,6 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        action.send(self.request.user.operator, verb='created', target=self.object)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -268,8 +266,6 @@ class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
         tracking_obj, created = project_tracking.objects.get_or_create(project=project_obj,
                                                                        operator=operator_obj,
                                                                        defaults={'is_pi': False})
-        if created:
-            action.send(operator_obj, verb='started watching', target=project_obj)
         return reverse('project_list')
 
 
@@ -286,7 +282,6 @@ class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
         tracking_obj = project_tracking.objects.filter(project=project_obj,
                                                        operator=operator_obj)
         if tracking_obj.count():
-            action.send(operator_obj, verb='stopped watching', target=project_obj)
             tracking_obj.delete()
         return reverse('project_list')
 
@@ -301,7 +296,6 @@ class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
         project_obj.activate()
-        action.send(self.request.user.operator, verb='activated project', target=project_obj)
         return reverse('project_list')
 
 
@@ -315,7 +309,6 @@ class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
         slug = kwargs.pop('slug')
         project_obj = project.objects.get(slug=slug)
         project_obj.deactivate()
-        action.send(self.request.user.operator, verb='deactivated project', target=project_obj)
         return reverse('project_list')
 
 
@@ -362,8 +355,6 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.project = self.initial['project']
         self.object = form.save()
-        action.send(self.request.user.operator, verb='added investigation to',
-                    target=self.object.project, investigation=self.object.id)
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -404,8 +395,6 @@ class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
         project_obj = project.objects.get(slug=project_slug)
         investigation_obj = investigation.objects.get(slug=slug)
         investigation_obj.activate()
-        action.send(self.request.user.operator, verb='activated investigation',
-            action_object=investigation_obj, target=project_obj)
         return reverse('project_list')
 
 
@@ -421,8 +410,6 @@ class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
         project_obj = project.objects.get(slug=project_slug)
         investigation_obj = investigation.objects.get(slug=slug)
         investigation_obj.deactivate()
-        action.send(self.request.user.operator, verb='deactivated investigation',
-            action_object=investigation_obj, target=project_obj)
         return reverse('project_list')
 
 
@@ -438,21 +425,8 @@ class TrackProjectView(LoginRequiredMixin, CreateView):
         project_id = form.cleaned_data['project']
         try:
             self.object = project_tracking.objects.get(operator=self.request.user.operator, project_id=project_id)
-            if self.object.is_pi != form.cleaned_data['is_pi']:
-                if form.cleaned_data['is_pi']:
-                    verb = 'added as owner of'
-                else:
-                    verb = 'removed as owner of'
-            else:
-                verb = None
             self.object.is_pi = form.cleaned_data['is_pi']
             self.object.save()
         except:
             self.object = form.save(operator=self.request.user.operator)
-            if form.cleaned_data['is_pi']:
-                verb = 'added as owner of'
-            else:
-                verb = 'started watching'
-        if verb:
-            action.send(self.request.user.operator, verb=verb, target=project_id)
         return HttpResponseRedirect(reverse('dashboard'))

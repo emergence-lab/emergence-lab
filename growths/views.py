@@ -9,7 +9,6 @@ from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
-from actstream import action
 from braces.views import LoginRequiredMixin
 
 from core.models import operator
@@ -135,7 +134,6 @@ class SplitSampleView(FormView):
         num_pieces = form.cleaned_data['pieces']
         parent = form.cleaned_data['parent']
         parent.split(num_pieces)
-        action.send(self.request.user.operator, verb='split sample', action_object=parent.growth, target=parent.growth.project, investigation=parent.growth.investigation_id)
         return HttpResponseRedirect(reverse('sample_change_size', args=(parent.growth.growth_number, parent.pocket)))
 
 
