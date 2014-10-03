@@ -4,6 +4,7 @@ WGB Django
 
 .. image:: ***REMOVED***gitlab-ci/projects/2/status.png?ref=rewrite
     :target: ***REMOVED***gitlab-ci/projects/2/
+    :alt: build status
 
 Web-based application written in Django with the following goals:
 
@@ -15,3 +16,8 @@ Documentation
 =============
 
 The full documentation is as ***REMOVED***docs/django/
+
+Development Setup
+=================
+
+To get started for development install dependencies with pip install -r requirements/development.txt. Create a ``secrets.json`` file with database and ldap information. To run the tests, run ``tox`` in the command line to run tests and flake8. To only run tests, use ``tox -e py27``.
