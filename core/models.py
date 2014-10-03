@@ -79,7 +79,7 @@ class User(auth.models.AbstractBaseUser):
         related_name='custom_users', related_query_name='custom_user')
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    projects = models.ManyToManyField('project', through='ProjectTracking',
+    projects = models.ManyToManyField('Project', through='ProjectTracking',
         verbose_name=_('tracked projects'), blank=True,
         help_text=_('Projects this user is tracking'),
         related_name='users', related_query_name='user')
@@ -222,7 +222,7 @@ class TimestampMixin(models.Model):
 
 
 @python_2_unicode_compatible
-class project(ActiveStateMixin, TimestampMixin, models.Model):
+class Project(ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on a project, which is a higher level organizational
     tool.
@@ -242,7 +242,7 @@ class project(ActiveStateMixin, TimestampMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class investigation(ActiveStateMixin, TimestampMixin, models.Model):
+class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on an individual investigation related to one or more
     projects.
@@ -250,7 +250,7 @@ class investigation(ActiveStateMixin, TimestampMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     slug = AutoSlugField(_('slug'), populate_from='name')
     description = RichTextField(_('description'), blank=True)
-    project = models.ForeignKey(project)
+    project = models.ForeignKey(Project)
 
     class Meta:
         verbose_name = _('investigation')
@@ -268,7 +268,7 @@ class operator(ActiveStateMixin, models.Model):
     """
     name = models.CharField(max_length=45)
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    projects = models.ManyToManyField(project, through='project_tracking')
+    projects = models.ManyToManyField(Project, through='project_tracking')
 
     class Meta:
         verbose_name = _('operator')
@@ -283,7 +283,7 @@ class ProjectTracking(models.Model):
     """
     Stores ownership and tracking information for projects.
     """
-    project = models.ForeignKey(project)
+    project = models.ForeignKey(Project)
     user = models.ForeignKey(User)
     is_owner = models.BooleanField(default=False)
 
@@ -295,7 +295,7 @@ class project_tracking(models.Model):
     """
     Stores ownership and tracking information for projects.
     """
-    project = models.ForeignKey(project)
+    project = models.ForeignKey(Project)
     operator = models.ForeignKey(operator)
     is_pi = models.BooleanField(default=False)
 

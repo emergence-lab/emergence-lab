@@ -2,7 +2,7 @@ import django_filters as filters
 from django_filters.views import FilterView
 from datetimewidget.widgets import DateTimeWidget
 
-from core.models import operator, project, investigation
+from core.models import operator, Project, Investigation
 from growths.models import growth
 
 
@@ -42,8 +42,8 @@ class RelationalFilterView(FilterView):
 
 class growth_filter(filters.FilterSet):
     operator = filters.ModelMultipleChoiceFilter(queryset=operator.active_objects.all())
-    project = filters.ModelMultipleChoiceFilter(queryset=project.objects.all())
-    investigation = filters.ModelMultipleChoiceFilter(queryset=investigation.objects.all())
+    project = filters.ModelMultipleChoiceFilter(queryset=Project.objects.all())
+    investigation = filters.ModelMultipleChoiceFilter(queryset=Investigation.objects.all())
     date = filters.DateFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
                               widget=DateTimeWidget(attrs={'class': 'datetime'},
                                                     options={'minView': '2',

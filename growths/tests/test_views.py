@@ -11,7 +11,6 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import project, investigation
 from growths.models import growth, sample, Platter
 
 
@@ -23,13 +22,8 @@ class TestGrowthView(TestCase):
         user = User.objects.create_user('default', password='')
         mommy.make('core.operator', user=user)
 
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        cls.g1000 = mommy.make(growth, growth_number='g1000', project=proj,
-                               investigation=invest)
-        cls.g1001 = mommy.make(growth, growth_number='g1001', project=proj,
-                               investigation=invest)
+        cls.g1000 = mommy.make(growth, growth_number='g1000')
+        cls.g1001 = mommy.make(growth, growth_number='g1001')
         for pocket in range(1, 7):
             smpl = mommy.make(sample, growth=cls.g1000,
                               pocket=pocket, piece='')
@@ -43,8 +37,6 @@ class TestGrowthView(TestCase):
     def tearDownClass(cls):
         sample.objects.all().delete()
         growth.objects.all().delete()
-        investigation.objects.all().delete()
-        project.objects.all().delete()
         get_user_model().objects.all().delete()
 
     def setUp(self):
@@ -64,9 +56,7 @@ class TestGrowthView(TestCase):
         self.assertContains(response, self.g1000.growth_number)
 
     def test_growth_update_resolution_template(self):
-        obj = mommy.make(growth, growth_number='g1002',
-                         project=self.g1000.project,
-                         investigation=self.g1000.investigation)
+        obj = mommy.make(growth, growth_number='g1002')
         url = '/{0}/update/'.format(obj.growth_number)
         match = resolve(url)
         self.assertEqual(match.url_name, 'growth_update')
@@ -75,9 +65,7 @@ class TestGrowthView(TestCase):
         self.assertTemplateUsed(response, 'growths/growth_update.html')
 
     def test_growth_update_valid_data(self):
-        obj = mommy.make(growth, growth_number='g1002',
-                         project=self.g1000.project,
-                         investigation=self.g1000.investigation)
+        obj = mommy.make(growth, growth_number='g1002')
         url = reverse('growth_update', args=(obj.growth_number,))
         data = {'run_comments': 'test comment'}
         response = self.client.post(url, data)
@@ -125,13 +113,8 @@ class TestSampleView(TestCase):
         user = User.objects.create_user('default', password='')
         mommy.make('core.operator', user=user)
 
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        cls.g1000 = mommy.make(growth, growth_number='g1000', project=proj,
-                               investigation=invest)
-        cls.g1001 = mommy.make(growth, growth_number='g1001', project=proj,
-                               investigation=invest)
+        cls.g1000 = mommy.make(growth, growth_number='g1000')
+        cls.g1001 = mommy.make(growth, growth_number='g1001')
         for pocket in range(1, 7):
             smpl = mommy.make(sample, growth=cls.g1000,
                               pocket=pocket, piece='')
@@ -145,8 +128,6 @@ class TestSampleView(TestCase):
     def tearDownClass(cls):
         sample.objects.all().delete()
         growth.objects.all().delete()
-        investigation.objects.all().delete()
-        project.objects.all().delete()
         get_user_model().objects.all().delete()
 
     def setUp(self):
@@ -332,13 +313,8 @@ class TestCreateGrowth(TestCase):
         user = User.objects.create_user('default', password='')
         cls.op = mommy.make('core.operator', user=user)
 
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        cls.g1000 = mommy.make(growth, growth_number='g1000', project=proj,
-                               investigation=invest)
-        cls.g1001 = mommy.make(growth, growth_number='g1001', project=proj,
-                               investigation=invest)
+        cls.g1000 = mommy.make(growth, growth_number='g1000')
+        cls.g1001 = mommy.make(growth, growth_number='g1001')
         for pocket in range(1, 7):
             smpl = mommy.make(sample, growth=cls.g1000,
                               pocket=pocket, piece='')
@@ -352,8 +328,6 @@ class TestCreateGrowth(TestCase):
     def tearDownClass(cls):
         sample.objects.all().delete()
         growth.objects.all().delete()
-        investigation.objects.all().delete()
-        project.objects.all().delete()
         get_user_model().objects.all().delete()
 
     def setUp(self):
@@ -393,14 +367,13 @@ class TestCreateGrowth(TestCase):
 
     def test_create_growth_start_valid_data(self):
         url = reverse('create_growth_start')
-        plt = mommy.make(Platter)
         data = {
             'cgsform-growth_number': 'g1002',
             'cgsform-date': timezone.now().date(),
             'cgsform-operator': self.op.id,
-            'cgsform-project': project.objects.all().first().id,
-            'cgsform-investigation': investigation.objects.all().first().id,
-            'cgsform-platter': plt.id,
+            'cgsform-project': mommy.make('core.Project').id,
+            'cgsform-investigation': mommy.make('core.Investigation').id,
+            'cgsform-platter': mommy.make(Platter).id,
             'cgsform-reactor': 'd180',
             'commentsform-comment_field': 'test comment',
         }

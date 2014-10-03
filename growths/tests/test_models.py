@@ -8,18 +8,13 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from core.models import project, investigation
 from growths.models import growth, sample
 
 class TestGrowth(TestCase):
 
     def test_growth_str(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        obj = mommy.prepare(growth, growth_number=growth_number, project=proj,
-                            investigation=invest)
+        obj = mommy.prepare(growth, growth_number=growth_number)
         self.assertEqual(obj.__str__(), growth_number)
 
     def test_get_growth_invalid(self):
@@ -32,11 +27,7 @@ class TestGrowth(TestCase):
 
     def test_get_growth_single_returned(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        obj = mommy.make(growth, growth_number=growth_number, project=proj,
-                         investigation=invest)
+        obj = mommy.make(growth, growth_number=growth_number)
         self.assertEqual(obj, growth.get_growth(growth_number))
 
 
@@ -44,11 +35,7 @@ class TestSample(TestCase):
 
     def test_sample_str(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number=growth_number,
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number=growth_number)
         obj = mommy.prepare(sample, growth=growth_obj, pocket=1, piece='a')
         self.assertEqual(obj.__str__(), 'g1000_1a')
 
@@ -58,32 +45,20 @@ class TestSample(TestCase):
 
     def test_get_sample_does_not_exist(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number=growth_number,
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number=growth_number)
         with self.assertRaisesRegexp(Exception, 'Sample .+ does not exist'):
             sample.get_sample(growth_number)
 
     def test_get_sample_single_returned(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number=growth_number,
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number=growth_number)
         obj = mommy.make(sample, growth=growth_obj, pocket=1)
         self.assertEqual(obj, sample.get_sample(growth_number))
         self.assertEqual(obj, sample.get_sample(growth_number + '_1'))
 
     def test_get_sample_multiple_returned(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number=growth_number,
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number=growth_number)
         sample_1 = mommy.make(sample, growth=growth_obj, pocket=1)
         mommy.make(sample, growth=growth_obj, pocket=2)
         with self.assertRaisesRegexp(Exception, 'ambiguous'):
@@ -92,44 +67,27 @@ class TestSample(TestCase):
 
     def test_get_sample_does_match_growth(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number=growth_number,
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number=growth_number)
         obj = mommy.make(sample, growth=growth_obj, pocket=1)
         self.assertEqual(obj, sample.get_sample(growth_number, growth_obj))
 
     def test_get_sample_does_not_match_growth(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_1 = mommy.make(growth, growth_number=growth_number,
-                              project=proj, investigation=invest)
-        growth_2 = mommy.make(growth, growth_number='g1001',
-                              project=proj, investigation=invest)
+        growth_1 = mommy.make(growth, growth_number=growth_number)
+        growth_2 = mommy.make(growth, growth_number='g1001')
         mommy.prepare(sample, growth=growth_1, pocket=1)
         with self.assertRaisesRegexp(Exception, 'does not match'):
             sample.get_sample(growth_number, growth_2)
 
     def test_get_sample_piece(self):
         growth_number = 'g1000'
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_1 = mommy.make(growth, growth_number=growth_number,
-                              project=proj, investigation=invest)
+        growth_1 = mommy.make(growth, growth_number=growth_number)
         obj = mommy.make(sample, growth=growth_1, pocket=1, piece='a')
         mommy.make(sample, growth=growth_1, pocket=1, piece='b')
         self.assertEqual(obj, sample.get_sample(growth_number + '_1a'))
 
     def test_get_siblings(self):
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number='g1000',
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number='g1000')
         samples = []
         for pocket in range(1, 7):
             samples.append(mommy.make(sample, growth=growth_obj, pocket=pocket))
@@ -137,13 +95,8 @@ class TestSample(TestCase):
         self.assertItemsEqual(samples, sample.get_siblings(sample_obj))
 
     def test_get_children(self):
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_1 = mommy.make(growth, growth_number='g1000',
-                              project=proj, investigation=invest)
-        growth_2 = mommy.make(growth, growth_number='g1001',
-                              project=proj, investigation=invest)
+        growth_1 = mommy.make(growth, growth_number='g1000')
+        growth_2 = mommy.make(growth, growth_number='g1001')
         parent_sample = mommy.make(sample, growth=growth_1)
         samples = []
         for pocket in range(1, 7):
@@ -152,11 +105,7 @@ class TestSample(TestCase):
         self.assertItemsEqual(samples, sample.get_children(parent_sample))
 
     def test_get_piece_siblings(self):
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number='g1000',
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number='g1000')
         samples = []
         for piece in 'abcdefg':
             samples.append(mommy.make(sample, growth=growth_obj,
@@ -165,11 +114,7 @@ class TestSample(TestCase):
         self.assertItemsEqual(samples, sample.get_piece_siblings(sample_obj))
 
     def test_split_first(self):
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number='g1000',
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number='g1000')
         sample_obj = mommy.make(sample, growth=growth_obj, pocket=1, piece='')
         sample_obj.parent = sample_obj
         pk = sample_obj.id
@@ -182,11 +127,7 @@ class TestSample(TestCase):
             self.assertIn(s.piece, 'abc')
 
     def test_split_last_piece(self):
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number='g1000',
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number='g1000')
         for piece in 'abc':
             sample_obj = mommy.make(sample, growth=growth_obj, pocket=1,
                                     piece=piece)
@@ -196,11 +137,7 @@ class TestSample(TestCase):
             self.assertIn(s.piece, 'cef')
 
     def test_split_last_piece(self):
-        proj = mommy.make(project, name='project 1', slug='project-1')
-        invest = mommy.make(investigation, name='invest 1',
-                            slug='invest-1', project=proj)
-        growth_obj = mommy.make(growth, growth_number='g1000',
-                                project=proj, investigation=invest)
+        growth_obj = mommy.make(growth, growth_number='g1000')
         for piece in 'abcd':
             sample_obj = mommy.make(sample, growth=growth_obj, pocket=1,
                                     piece=piece)

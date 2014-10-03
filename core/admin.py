@@ -24,6 +24,6 @@ class OperatorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(core.models.operator, OperatorAdmin)
-admin.site.register(core.models.project, ProjectAdmin)
-admin.site.register(core.models.investigation, InvestigationAdmin)
-admin.site.register(core.models.project_tracking)
+admin.site.register(core.models.Project, ProjectAdmin)
+admin.site.register(core.models.Investigation, InvestigationAdmin)
+admin.site.register(core.models.ProjectTracking)

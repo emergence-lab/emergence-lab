@@ -43,9 +43,9 @@ class growth(models.Model):
     date = models.DateField()
     operator = models.ForeignKey(core.models.operator,
                                  limit_choices_to={'is_active': True})
-    project = models.ForeignKey(core.models.project,
+    project = models.ForeignKey(core.models.Project,
                                 limit_choices_to={'is_active': True})
-    investigation = models.ForeignKey(core.models.investigation,
+    investigation = models.ForeignKey(core.models.Investigation,
                                       limit_choices_to={'is_active': True})
     platter = models.ForeignKey(Platter,
                                 limit_choices_to={'is_active': True})

@@ -10,7 +10,7 @@ from django.views.generic import (CreateView, DetailView, ListView,
 from braces.views import LoginRequiredMixin
 import gitlab
 
-from .models import investigation, operator, project, project_tracking
+from .models import Investigation, operator, Project, project_tracking
 from growths.models import growth, sample
 from .forms import TrackProjectForm
 from .streams import (project_stream, investigation_stream,
@@ -134,7 +134,7 @@ class ProjectListView(LoginRequiredMixin, ActiveListView):
     View to list all projects and provide actions.
     """
     template_name = "core/project_list.html"
-    model = project
+    model = Project
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
@@ -147,7 +147,7 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     View for details of a project.
     """
     template_name = 'core/project_detail.html'
-    model = project
+    model = Project
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
@@ -179,7 +179,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     View for creating a project.
     """
     template_name = 'core/project_create.html'
-    model = project
+    model = Project
     fields = ('name', 'description',)
 
     def form_valid(self, form):
@@ -195,7 +195,7 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     View for editing information about a project.
     """
     template_name = 'core/project_update.html'
-    model = project
+    model = Project
     fields = ('description',)
 
     def get_success_url(self):
@@ -210,9 +210,9 @@ class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
-        project_obj = project.objects.get(slug=slug)
+        project = Project.objects.get(slug=slug)
         operator_obj = self.request.user.operator
-        tracking_obj, created = project_tracking.objects.get_or_create(project=project_obj,
+        tracking_obj, created = project_tracking.objects.get_or_create(project=project,
                                                                        operator=operator_obj,
                                                                        defaults={'is_pi': False})
         return reverse('project_list')
@@ -226,7 +226,7 @@ class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
-        project_obj = project.objects.get(slug=slug)
+        project_obj = Project.objects.get(slug=slug)
         operator_obj = self.request.user.operator
         tracking_obj = project_tracking.objects.filter(project=project_obj,
                                                        operator=operator_obj)
@@ -243,8 +243,8 @@ class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
-        project_obj = project.objects.get(slug=slug)
-        project_obj.activate()
+        project = Project.objects.get(slug=slug)
+        project.activate()
         return reverse('project_list')
 
 
@@ -256,8 +256,8 @@ class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
-        project_obj = project.objects.get(slug=slug)
-        project_obj.deactivate()
+        project = Project.objects.get(slug=slug)
+        project.deactivate()
         return reverse('project_list')
 
 
@@ -266,7 +266,7 @@ class InvestigationDetailView(LoginRequiredMixin, DetailView):
     View for details of an investigation.
     """
     template_name = 'core/investigation_detail.html'
-    model = investigation
+    model = Investigation
 
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailView, self).get_context_data(**kwargs)
@@ -294,11 +294,11 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
     View for creating an investigation.
     """
     template_name = 'core/investigation_create.html'
-    model = investigation
+    model = Investigation
     fields = ('name', 'description')
 
     def dispatch(self, request, *args, **kwargs):
-        self.initial = {'project': project.objects.get(slug=kwargs.pop('slug'))}
+        self.initial = {'project': Project.objects.get(slug=kwargs.pop('slug'))}
         return super(InvestigationCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -316,7 +316,7 @@ class InvestigationUpdateView(LoginRequiredMixin, UpdateView):
     View for editing information about a project.
     """
     template_name = 'core/investigation_update.html'
-    model = investigation
+    model = Investigation
     fields = ('description',)
 
     def get_success_url(self):
@@ -329,7 +329,7 @@ class InvestigationListView(LoginRequiredMixin, ActiveListView):
     View to list all projects and provide actions.
     """
     template_name = "core/investigation_list.html"
-    model = investigation
+    model = Investigation
 
 
 class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
@@ -341,9 +341,9 @@ class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         project_slug = kwargs.pop('project')
         slug = kwargs.pop('slug')
-        project_obj = project.objects.get(slug=project_slug)
-        investigation_obj = investigation.objects.get(slug=slug)
-        investigation_obj.activate()
+        project = Project.objects.get(slug=project_slug)
+        investigation = Investigation.objects.get(slug=slug)
+        investigation.activate()
         return reverse('project_list')
 
 
@@ -356,9 +356,9 @@ class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         project_slug = kwargs.pop('project')
         slug = kwargs.pop('slug')
-        project_obj = project.objects.get(slug=project_slug)
-        investigation_obj = investigation.objects.get(slug=slug)
-        investigation_obj.deactivate()
+        project = Project.objects.get(slug=project_slug)
+        investigation = Investigation.objects.get(slug=slug)
+        investigation.deactivate()
         return reverse('project_list')
 
 

@@ -17,7 +17,7 @@ class journal_entry(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(core.models.operator)
     slug = AutoSlugField(populate_from='title', unique_with=('author'))
-    investigations = models.ManyToManyField(core.models.investigation)
+    investigations = models.ManyToManyField(core.models.Investigation)
 
     def __unicode__(self):
         return self.title

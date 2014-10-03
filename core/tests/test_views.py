@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import investigation, operator, project, project_tracking
+from core.models import Investigation, operator, Project, project_tracking
 
 
 class TestHomepage(TestCase):
@@ -100,15 +100,11 @@ class TestOperatorCRUD(TestCase):
 class TestProjectCRUD(TestCase):
 
     def setUp(self):
-        project.objects.bulk_create([
-            project(name='project 1', is_active=True),
-            project(name='project 2', is_active=False,
-                    created=timezone.now() - timedelta(days=30))
-        ])
+        mommy.make(Project, name='project 1', slug='project-1', is_active=True)
+        mommy.make(Project, name='project 2', slug='project-2', is_active=False)
         self.user = get_user_model().objects.create_user('username1',
                                                          password='')
-        operator.objects.create(name='name 1', user=self.user,
-                                is_active=True)
+        mommy.make(operator, user=self.user, is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_resolution_template(self):
@@ -122,11 +118,11 @@ class TestProjectCRUD(TestCase):
     def test_project_list_content(self):
         url = reverse('project_list')
         response = self.client.get(url)
-        for proj in project.objects.all():
-            self.assertContains(response, proj.name)
+        for project in Project.objects.all():
+            self.assertContains(response, project.name)
 
     def test_project_detail_resolution_template(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = '/projects/{0}/'.format(obj.slug)
         match = resolve(url)
         self.assertEqual(match.url_name, 'project_detail_all')
@@ -135,13 +131,13 @@ class TestProjectCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_project_detail_content(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_detail_all', args=(obj.slug,))
         response = self.client.get(url)
         self.assertContains(response, obj.name)
 
     def test_project_detail_user_resolution_template(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = '/{0}/{1}/'.format(self.user.username, obj.slug)
         match = resolve(url)
         self.assertEqual(match.url_name, 'project_detail_user')
@@ -150,7 +146,7 @@ class TestProjectCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_project_detail_user_content(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_detail_user', args=(self.user.username,
                                                    obj.slug,))
         response = self.client.get(url)
@@ -165,7 +161,7 @@ class TestProjectCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_project_update_resolution_template(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = '/projects/{0}/edit/'.format(obj.slug)
         match = resolve(url)
         self.assertEqual(match.url_name, 'project_update')
@@ -174,38 +170,38 @@ class TestProjectCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_project_activate(self):
-        obj = project.objects.filter(is_active=False).first()
+        obj = Project.objects.filter(is_active=False).first()
         url = reverse('project_activate', args=(obj.slug,))
         list_url = reverse('project_list')
         response = self.client.get(url)
-        obj = project.objects.get(id=obj.id)
+        obj = Project.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
         self.assertTrue(obj.is_active)
 
     def test_project_deactivate(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_deactivate', args=(obj.slug,))
         list_url = reverse('project_list')
         response = self.client.get(url)
-        obj = project.objects.get(id=obj.id)
+        obj = Project.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
         self.assertFalse(obj.is_active)
 
     def test_project_track(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_track', args=(obj.slug,))
         list_url = reverse('project_list')
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 
-        obj = project.objects.get(id=obj.id)
+        obj = Project.objects.get(id=obj.id)
         tracking = project_tracking.objects.get(project=obj)
         self.assertEqual(tracking.operator, self.user.operator)
 
     def test_project_untrack(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         tracking = project_tracking.objects.create(operator=self.user.operator,
                                                    project=obj)
         url = reverse('project_untrack', args=(obj.slug,))
@@ -213,7 +209,7 @@ class TestProjectCRUD(TestCase):
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 
-        obj = project.objects.get(id=obj.id)
+        obj = Project.objects.get(id=obj.id)
         tracking = project_tracking.objects.filter(project=obj).count()
         self.assertEqual(tracking, 0)
 
@@ -221,7 +217,7 @@ class TestProjectCRUD(TestCase):
         url = reverse('project_create')
         data = {'name': 'project 3'}
         response = self.client.post(url, data)
-        obj = project.objects.get(**data)
+        obj = Project.objects.get(**data)
         self.assertEqual(obj.slug, 'project-3')
         detail_url = reverse('project_detail_all', args=(obj.slug,))
         self.assertRedirects(response, detail_url)
@@ -233,11 +229,11 @@ class TestProjectCRUD(TestCase):
             'This field is required.')
 
     def test_project_update_valid_data(self):
-        obj = project.objects.filter(is_active=True).first()
+        obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_update', args=(obj.slug,))
         data = {'description': 'test description'}
         response = self.client.post(url, data)
-        obj = project.objects.get(id=obj.id)
+        obj = Project.objects.get(id=obj.id)
         self.assertEqual(obj.description, data['description'])
         detail_url = reverse('project_detail_all', args=(obj.slug,))
         self.assertRedirects(response, detail_url)
@@ -246,31 +242,31 @@ class TestProjectCRUD(TestCase):
 class TestInvestigationCRUD(TestCase):
 
     def setUp(self):
-        project1 = project.objects.create(name='project 1', is_active=True)
-        project2 = project.objects.create(name='project 2', is_active=False,
-                       created=timezone.now() - timedelta(days=30))
-        investigation.objects.bulk_create([
-            investigation(name='investigation 1', is_active=True,
-                          project=project1),
-            investigation(name='investigation 2', is_active=False,
-                          project=project2, created=timezone.now())
-        ])
+        project1 = mommy.make(Project, name='project 1', slug='project-1',
+                              is_active=True)
+        project2 = mommy.make(Project, name='project 2', slug='project-2',
+                              is_active=False)
+
+        mommy.make(Investigation, name='investigation 1',
+                   slug='investigation-1', is_active=True, project=project1)
+        mommy.make(Investigation, name='investigation 2',
+                   slug='investigation-2', is_active=False, project=project2)
+
         user = get_user_model().objects.create_user('username1', password='')
-        operator.objects.create(name='name 1', user=user,
-                                is_active=True)
+        mommy.make(operator, user=user, is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):
         url = reverse('project_list')
         response = self.client.get(url)
-        for invest in investigation.objects.all():
-            if invest.project.is_active:
-                self.assertContains(response, invest.name)
+        for investigation in Investigation.objects.all():
+            if investigation.project.is_active:
+                self.assertContains(response, investigation.name)
             else:
-                self.assertNotContains(response, invest.name)
+                self.assertNotContains(response, investigation.name)
 
     def test_investigation_detail_resolution_template(self):
-        obj = investigation.objects.filter(is_active=False).first()
+        obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = '/projects/{0}/{1}/'.format(proj.slug, obj.slug)
         match = resolve(url)
@@ -280,14 +276,14 @@ class TestInvestigationCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_investigation_detail_content(self):
-        obj = investigation.objects.filter(is_active=False).first()
+        obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_detail_all', args=(proj.slug, obj.slug))
         response = self.client.get(url)
         self.assertContains(response, obj.name)
 
     def test_investigation_create_resolution_template(self):
-        proj = project.objects.filter(is_active=True).first()
+        proj = Project.objects.filter(is_active=True).first()
         url = '/projects/{0}/add-investigation/'.format(proj.slug)
         match = resolve(url)
         self.assertEqual(match.url_name, 'investigation_create')
@@ -296,7 +292,7 @@ class TestInvestigationCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_investigation_update_resolution_template(self):
-        obj = investigation.objects.filter(is_active=False).first()
+        obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = '/projects/{0}/{1}/edit/'.format(proj.slug, obj.slug)
         match = resolve(url)
@@ -306,52 +302,52 @@ class TestInvestigationCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_investigation_activate(self):
-        obj = investigation.objects.filter(is_active=False).first()
+        obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_activate', args=(proj.slug, obj.slug))
         list_url = reverse('project_list')
         response = self.client.get(url)
-        obj = investigation.objects.get(id=obj.id)
+        obj = Investigation.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
         self.assertTrue(obj.is_active)
 
     def test_investigation_deactivate(self):
-        obj = investigation.objects.filter(is_active=True).first()
+        obj = Investigation.objects.filter(is_active=True).first()
         proj = obj.project
         url = reverse('investigation_deactivate', args=(proj.slug, obj.slug))
         list_url = reverse('project_list')
         response = self.client.get(url)
-        obj = investigation.objects.get(id=obj.id)
+        obj = Investigation.objects.get(id=obj.id)
 
         self.assertRedirects(response, list_url)
         self.assertFalse(obj.is_active)
 
     def test_investigation_create_valid_data(self):
-        proj = project.objects.filter(is_active=True).first()
+        proj = Project.objects.filter(is_active=True).first()
         url = reverse('investigation_create', args=(proj.slug,))
         data = {'name': 'investigation 3'}
         response = self.client.post(url, data)
-        obj = investigation.objects.get(**data)
+        obj = Investigation.objects.get(**data)
         self.assertEqual(obj.slug, 'investigation-3')
         detail_url = reverse('investigation_detail_all',
                          args=(proj.slug, obj.slug,))
         self.assertRedirects(response, detail_url)
 
     def test_investigation_create_empty_data(self):
-        proj = project.objects.filter(is_active=True).first()
+        proj = Project.objects.filter(is_active=True).first()
         url = reverse('investigation_create', args=(proj.slug,))
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
 
     def test_investigation_update_valid_data(self):
-        obj = investigation.objects.filter(is_active=False).first()
+        obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_update', args=(proj.slug, obj.slug))
         data = {'description': 'test description'}
         response = self.client.post(url, data)
-        obj = investigation.objects.get(id=obj.id)
+        obj = Investigation.objects.get(id=obj.id)
         self.assertEqual(obj.description, data['description'])
         detail_url = reverse('investigation_detail_all', args=(proj.slug, obj.slug,))
         self.assertRedirects(response, detail_url)

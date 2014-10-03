@@ -2,7 +2,7 @@ from django.views.generic import DetailView
 
 from braces.views import LoginRequiredMixin
 
-from core.models import operator, project, investigation
+from core.models import operator, Project, Investigation
 from core.streams import project_stream, investigation_stream
 from growths.models import growth
 
@@ -13,8 +13,8 @@ class DashboardMixin(object):
     """
     def get_context_data(self, **kwargs):
         projects = operator.objects.filter(user=self.request.user).values_list('projects__id', flat=True)
-        kwargs['active_projects'] = project.active_objects.filter(id__in=projects)
-        kwargs['inactive_projects'] = project.inactive_objects.filter(id__in=projects)
+        kwargs['active_projects'] = Project.active_objects.filter(id__in=projects)
+        kwargs['inactive_projects'] = Project.inactive_objects.filter(id__in=projects)
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 
@@ -48,7 +48,7 @@ class ProjectDetailDashboardView(LoginRequiredMixin, DashboardMixin, DetailView)
     View for details of a project in the dashboard.
     """
     template_name = 'dashboard/project_detail_dashboard.html'
-    model = project
+    model = Project
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailDashboardView, self).get_context_data(**kwargs)
@@ -63,7 +63,7 @@ class InvestigationDetailDashboardView(LoginRequiredMixin, DashboardMixin, Detai
     View for details of an investigation in the dashboard.
     """
     template_name = 'dashboard/investigation_detail_dashboard.html'
-    model = investigation
+    model = Investigation
 
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailDashboardView, self).get_context_data(**kwargs)
