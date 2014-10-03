@@ -26,10 +26,16 @@ AUTHENTICATION_BACKENDS = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'test.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
     }
+}
+
+
+# Password hashing
+
+PASSWORD_MANAGER = ('django.contrib.auth.hashers.MD5PasswordHasher',)
+
+
+# Model Mommy
+MOMMY_CUSTOM_FIELDS_GEN = {
+    'autoslug.AutoSlugField': lambda: 'default-value',
 }
