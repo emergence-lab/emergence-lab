@@ -42,7 +42,7 @@ class PlatterListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all operators and provide actions.
     """
-    template_name = "core/platter_list.html"
+    template_name = "growths/platter_list.html"
     model = Platter
 
 
@@ -50,7 +50,7 @@ class PlatterCreateView(LoginRequiredMixin, CreateView):
     """
     View for creating a platter.
     """
-    template_name = 'core/platter_create.html'
+    template_name = 'growths/platter_create.html'
     model = Platter
     fields = ('name', 'serial')
 

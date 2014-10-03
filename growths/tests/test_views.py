@@ -252,7 +252,7 @@ class TestPlatterCRUD(TestCase):
     def test_platter_list_template(self):
         url = reverse('platter_list')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/platter_list.html')
+        self.assertTemplateUsed(response, 'growths/platter_list.html')
         self.assertEqual(response.status_code, 200)
 
     def test_platter_list_content(self):
