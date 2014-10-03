@@ -14,9 +14,9 @@ Contents:
    deployment
    migrations
    design
-   core
    organization
-
+   core
+   growths
 
 Indices and tables
 ==================
@@ -24,4 +24,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
