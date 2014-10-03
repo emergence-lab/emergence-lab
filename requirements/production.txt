@@ -1,1 +1,4 @@
 -r base.txt
+
+--allow-external mysql-connector-python
+mysql-connector-python

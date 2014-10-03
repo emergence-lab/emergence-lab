@@ -104,7 +104,7 @@ MIDDLEWARE_CLASSES = (
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': get_secret('DATABASE_NAME'),
         'USER': get_secret('DATABASE_USER'),
         'PASSWORD': get_secret('DATABASE_PASSWORD'),

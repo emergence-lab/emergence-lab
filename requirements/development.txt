@@ -1,4 +1,6 @@
 -r base.txt
 
+--allow-external mysql-connector-python
+mysql-connector-python
 django-debug-toolbar==1.2.1
 tox
