@@ -2,12 +2,9 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from datetime import timedelta
-
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
-from django.utils import timezone
 
 from model_mommy import mommy
 
@@ -18,8 +15,7 @@ class TestHomepage(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        User.objects.create_user('default', password='')
+        get_user_model().objects.create_user('default', password='')
 
     def test_homepage_url_resolution(self):
         match = resolve('/')

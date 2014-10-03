@@ -339,9 +339,7 @@ class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        project_slug = kwargs.pop('project')
         slug = kwargs.pop('slug')
-        project = Project.objects.get(slug=project_slug)
         investigation = Investigation.objects.get(slug=slug)
         investigation.activate()
         return reverse('project_list')
@@ -354,9 +352,7 @@ class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        project_slug = kwargs.pop('project')
         slug = kwargs.pop('slug')
-        project = Project.objects.get(slug=project_slug)
         investigation = Investigation.objects.get(slug=slug)
         investigation.deactivate()
         return reverse('project_list')

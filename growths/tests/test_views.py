@@ -18,8 +18,7 @@ class TestGrowthView(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user = User.objects.create_user('default', password='')
+        user = get_user_model().objects.create_user('default', password='')
         mommy.make('core.operator', user=user)
 
         cls.g1000 = mommy.make(growth, growth_number='g1000')
@@ -83,8 +82,8 @@ class TestGrowthView(TestCase):
         self.assertTemplateUsed(response, 'growths/readings_detail.html')
 
     def test_readings_detail_content(self):
-        obj = mommy.make('growths.readings', growth=self.g1000,
-                         layer_desc='test desc')
+        mommy.make('growths.readings', growth=self.g1000,
+                   layer_desc='test desc')
         url = reverse('readings_detail', args=(self.g1000,))
         response = self.client.get(url)
         self.assertContains(response, 'test desc')
@@ -98,8 +97,8 @@ class TestGrowthView(TestCase):
         self.assertTemplateUsed(response, 'growths/update_readings.html')
 
     def test_readings_update_content(self):
-        obj = mommy.make('growths.readings', growth=self.g1000,
-                         layer_desc='test desc')
+        mommy.make('growths.readings', growth=self.g1000,
+                   layer_desc='test desc')
         url = reverse('update_readings', args=(self.g1000,))
         response = self.client.get(url)
         self.assertContains(response, 'test desc')
@@ -109,8 +108,7 @@ class TestSampleView(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user = User.objects.create_user('default', password='')
+        user = get_user_model().objects.create_user('default', password='')
         mommy.make('core.operator', user=user)
 
         cls.g1000 = mommy.make(growth, growth_number='g1000')
@@ -205,6 +203,7 @@ class TestSampleView(TestCase):
     def test_change_size_resolution_template(self):
         url = '/{0}/{1}/size/'.format(self.g1000, 1)
         match = resolve(url)
+        self.assertEqual(match.url_name, 'sample_change_size')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'growths/sample_size.html')
@@ -309,8 +308,7 @@ class TestCreateGrowth(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user = User.objects.create_user('default', password='')
+        user = get_user_model().objects.create_user('default', password='')
         cls.op = mommy.make('core.operator', user=user)
 
         cls.g1000 = mommy.make(growth, growth_number='g1000')

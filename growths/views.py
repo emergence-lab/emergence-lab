@@ -596,7 +596,6 @@ def create_growth_postrun(request):
             lastgrowth.run_comments = commentsform.cleaned_data['comment_field']
             lastgrowth.save()
             prsform.save()
-            action.send(request.user.operator, verb='completed growth', action_object=lastgrowth, target=lastgrowth.project, investigation=lastgrowth.investigation_id)
             return HttpResponseRedirect(reverse('growth_detail', args=[lastgrowth]))
     else:
         lastgrowth = growth.objects.latest('growth_number')

@@ -2,13 +2,12 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import unittest
-
 from django.test import TestCase
 
 from model_mommy import mommy
 
 from growths.models import growth, sample
+
 
 class TestGrowth(TestCase):
 
@@ -45,7 +44,7 @@ class TestSample(TestCase):
 
     def test_get_sample_does_not_exist(self):
         growth_number = 'g1000'
-        growth_obj = mommy.make(growth, growth_number=growth_number)
+        mommy.make(growth, growth_number=growth_number)
         with self.assertRaisesRegexp(Exception, 'Sample .+ does not exist'):
             sample.get_sample(growth_number)
 
@@ -126,7 +125,7 @@ class TestSample(TestCase):
         for s in samples:
             self.assertIn(s.piece, 'abc')
 
-    def test_split_last_piece(self):
+    def test_split_middle_piece(self):
         growth_obj = mommy.make(growth, growth_number='g1000')
         for piece in 'abc':
             sample_obj = mommy.make(sample, growth=growth_obj, pocket=1,

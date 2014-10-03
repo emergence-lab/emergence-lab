@@ -250,7 +250,7 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     slug = AutoSlugField(_('slug'), populate_from='name')
     description = RichTextField(_('description'), blank=True)
-    project = models.ForeignKey(Project)
+    project = models.ForeignKey(Project, verbose_name=_('project'))
 
     class Meta:
         verbose_name = _('investigation')
@@ -260,6 +260,20 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     def __str__(self):
         return self.name
 
+
+class ProjectTracking(models.Model):
+    """
+    Stores ownership and tracking information for projects.
+    """
+    project = models.ForeignKey(Project)
+    user = models.ForeignKey(User)
+    is_owner = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'project_tracking'
+
+
+# Legacy Models
 
 @python_2_unicode_compatible
 class operator(ActiveStateMixin, models.Model):
@@ -277,18 +291,6 @@ class operator(ActiveStateMixin, models.Model):
 
     def __str__(self):
         return self.name
-
-
-class ProjectTracking(models.Model):
-    """
-    Stores ownership and tracking information for projects.
-    """
-    project = models.ForeignKey(Project)
-    user = models.ForeignKey(User)
-    is_owner = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'project_tracking'
 
 
 class project_tracking(models.Model):
