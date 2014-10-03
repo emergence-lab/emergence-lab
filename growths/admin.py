@@ -23,3 +23,4 @@ class GrowthAdmin(admin.ModelAdmin):
 
 admin.site.register(growths.models.growth, GrowthAdmin)
 admin.site.register(growths.models.sample, SampleAdmin)
+admin.site.register(growths.models.Platter)

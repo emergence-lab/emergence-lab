@@ -11,8 +11,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import (investigation, operator, platter, project,
-                         project_tracking)
+from core.models import investigation, operator, project, project_tracking
 
 
 class TestHomepage(TestCase):
@@ -96,78 +95,6 @@ class TestOperatorCRUD(TestCase):
 
         self.assertRedirects(response, list_url)
         self.assertFalse(op.is_active)
-
-
-class TestPlatterCRUD(TestCase):
-
-    def setUp(self):
-        platter.objects.bulk_create([
-            platter(name='platter 1', is_active=True),
-            platter(name='platter 2', is_active=False,
-                    start_date=timezone.now() - timedelta(days=30),
-                    status_changed=timezone.now())
-        ])
-        get_user_model().objects.create_user('username1', password='')
-        self.client.login(username='username1', password='')
-
-    def test_platter_list_url_resolution(self):
-        match = resolve('/platters/')
-        self.assertEqual(match.url_name, 'platter_list')
-
-    def test_platter_list_template(self):
-        url = reverse('platter_list')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/platter_list.html')
-        self.assertEqual(response.status_code, 200)
-
-    def test_platter_list_content(self):
-        url = reverse('platter_list')
-        response = self.client.get(url)
-        for plt in platter.objects.all():
-            self.assertContains(response, plt.name)
-
-    def test_platter_activate(self):
-        obj = platter.objects.filter(is_active=False).first()
-        url = reverse('platter_activate', args=(obj.id,))
-        list_url = reverse('platter_list')
-        response = self.client.get(url)
-        obj = platter.objects.get(id=obj.id)
-
-        self.assertRedirects(response, list_url)
-        self.assertTrue(obj.is_active)
-
-    def test_platter_deactivate(self):
-        obj = platter.objects.filter(is_active=True).first()
-        url = reverse('platter_deactivate', args=(obj.id,))
-        list_url = reverse('platter_list')
-        response = self.client.get(url)
-        obj = platter.objects.get(id=obj.id)
-
-        self.assertRedirects(response, list_url)
-        self.assertFalse(obj.is_active)
-        self.assertEqual(timezone.now().date(), obj.status_changed.date())
-
-    def test_platter_create_valid_data(self):
-        url = reverse('platter_create')
-        list_url = reverse('platter_list')
-        data = {'name': 'platter 3', 'serial': '123-456'}
-        response = self.client.post(url, data)
-        self.assertRedirects(response, list_url)
-        self.assertTrue(platter.objects.filter(**data).first().is_active)
-
-    def test_platter_create_empty_data(self):
-        url = reverse('platter_create')
-        data = {}
-        response = self.client.post(url, data)
-        self.assertFormError(response, 'form', 'name',
-            'This field is required.')
-
-    def test_platter_create_long_name(self):
-        url = reverse('platter_create')
-        data = {'name': '12345678911234567892123456789312345678941234567895'}
-        response = self.client.post(url, data)
-        self.assertFormError(response, 'form', 'name',
-            'Ensure this value has at most 45 characters (it has 50).')
 
 
 class TestProjectCRUD(TestCase):

@@ -3,10 +3,28 @@ import re
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from ckeditor.fields import RichTextField
 
 import core.models
+
+
+@python_2_unicode_compatible
+class Platter(core.models.ActiveStateMixin, models.Model):
+    """
+    Stores platter information.
+    """
+    name = models.CharField(_('name'), max_length=45)
+    serial = models.CharField(_('serial number'), max_length=20, blank=True)
+    start_date = models.DateField(_('date started'), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('platter')
+        verbose_name_plural = _('platters')
+
+    def __str__(self):
+        return self.name
 
 
 @python_2_unicode_compatible
@@ -29,7 +47,7 @@ class growth(models.Model):
                                 limit_choices_to={'is_active': True})
     investigation = models.ForeignKey(core.models.investigation,
                                       limit_choices_to={'is_active': True})
-    platter = models.ForeignKey(core.models.platter,
+    platter = models.ForeignKey(Platter,
                                 limit_choices_to={'is_active': True})
     reactor = models.CharField(max_length=10, choices=REACTOR_CHOICES)
     run_comments = RichTextField(blank=True)

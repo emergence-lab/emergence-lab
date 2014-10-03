@@ -10,7 +10,7 @@ from django.views.generic import (CreateView, DetailView, ListView,
 from braces.views import LoginRequiredMixin
 import gitlab
 
-from .models import investigation, operator, platter, project, project_tracking
+from .models import investigation, operator, project, project_tracking
 from growths.models import growth, sample
 from .forms import TrackProjectForm
 from .streams import (project_stream, investigation_stream,
@@ -127,57 +127,6 @@ class DeactivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
         operator_obj = operator.objects.get(pk=pk)
         operator_obj.deactivate()
         return reverse('operator_list')
-
-
-class PlatterListView(LoginRequiredMixin, ActiveListView):
-    """
-    View to list all operators and provide actions.
-    """
-    template_name = "core/platter_list.html"
-    model = platter
-
-
-class PlatterCreateView(LoginRequiredMixin, CreateView):
-    """
-    View for creating a platter.
-    """
-    template_name = 'core/platter_create.html'
-    model = platter
-    fields = ('name', 'serial')
-
-    def form_valid(self, form):
-        form.instance.is_active = True
-        self.object = form.save()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('platter_list')
-
-
-class ActivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
-    """
-    Sets the specified platter to active.
-    """
-    permanent = False
-
-    def get_redirect_url(self, *args, **kwargs):
-        pk = kwargs.pop('id')
-        platter_obj = platter.objects.get(pk=pk)
-        platter_obj.activate()
-        return reverse('platter_list')
-
-
-class DeactivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
-    """
-    Sets the specified platter to inactive.
-    """
-    permanent = False
-
-    def get_redirect_url(self, *args, **kwargs):
-        pk = kwargs.pop('id')
-        platter_obj = platter.objects.get(pk=pk)
-        platter_obj.deactivate()
-        return reverse('platter_list')
 
 
 class ProjectListView(LoginRequiredMixin, ActiveListView):

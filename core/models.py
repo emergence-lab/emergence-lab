@@ -222,24 +222,6 @@ class TimestampMixin(models.Model):
 
 
 @python_2_unicode_compatible
-class platter(ActiveStateMixin, models.Model):
-    """
-    Stores platter information.
-    """
-    name = models.CharField(_('name'), max_length=45)
-    serial = models.CharField(_('serial number'), max_length=20, blank=True)
-    start_date = models.DateField(_('date started'), auto_now_add=True)
-
-    class Meta:
-        verbose_name = _('platter')
-        verbose_name_plural = _('platters')
-        db_table = 'platters'
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
 class project(ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on a project, which is a higher level organizational

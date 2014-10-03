@@ -3,7 +3,7 @@ import time
 import datetime
 
 from django.shortcuts import render
-from django.views.generic import (DetailView, ListView, UpdateView,
+from django.views.generic import (DetailView, ListView, UpdateView, CreateView,
                                   TemplateView, FormView, RedirectView)
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
@@ -12,7 +12,8 @@ from django.core.urlresolvers import reverse
 from braces.views import LoginRequiredMixin
 
 from core.models import operator
-from .models import growth, sample, readings, recipe_layer, source
+from core.views import ActiveListView
+from .models import growth, sample, readings, recipe_layer, source, Platter
 from .filters import growth_filter, RelationalFilterView
 from .forms import (sample_form, p_form, split_form, readings_form,
                     comments_form, SampleSizeForm)
@@ -35,6 +36,57 @@ class afm_compare(ListView):
         id_list = [int(id) for id in self.request.GET.getlist('afm')]
         objects = afm.models.afm.objects.filter(id__in=id_list)
         return objects
+
+
+class PlatterListView(LoginRequiredMixin, ActiveListView):
+    """
+    View to list all operators and provide actions.
+    """
+    template_name = "core/platter_list.html"
+    model = Platter
+
+
+class PlatterCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating a platter.
+    """
+    template_name = 'core/platter_create.html'
+    model = Platter
+    fields = ('name', 'serial')
+
+    def form_valid(self, form):
+        form.instance.is_active = True
+        self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('platter_list')
+
+
+class ActivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified platter to active.
+    """
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        platter = Platter.objects.get(pk=pk)
+        platter.activate()
+        return reverse('platter_list')
+
+
+class DeactivatePlatterRedirectView(LoginRequiredMixin, RedirectView):
+    """
+    Sets the specified platter to inactive.
+    """
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('id')
+        platter = Platter.objects.get(pk=pk)
+        platter.deactivate()
+        return reverse('platter_list')
 
 
 class GrowthDetailView(DetailView):
