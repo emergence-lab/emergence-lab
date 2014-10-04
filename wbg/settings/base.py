@@ -76,6 +76,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'ckeditor',
     'django_wysiwyg',
+    'mptt',
     # local apps
     'core',
     'dashboard',
