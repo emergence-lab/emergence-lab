@@ -14,6 +14,7 @@ Contents:
    deployment
    migrations
    design
+   process
    organization
    core
    growths
