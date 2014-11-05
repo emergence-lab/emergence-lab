@@ -65,8 +65,11 @@ urlpatterns = [
     url(r'^sample/split/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
     url(r'^api/v0/growths/$', growths.api.GrowthListAPI.as_view()),
     url(r'^api/v0/growths/(?P<pk>\d+)/$', growths.api.GrowthDetailAPI.as_view()),
+    url(r'^api/v0/growths/(?P<growth_number>.+)/$', growths.api.GrowthFetchObjectAPI.as_view()),
     url(r'^api/v0/readings/$', growths.api.ReadingsListAPI.as_view()),
     url(r'^api/v0/readings/(?P<pk>\d+)/$', growths.api.ReadingsDetailAPI.as_view()),
+    url(r'^api/v0/readings/create/$', growths.api.ReadingsCreateAPI.as_view()),
+
 
     # dashboard views
     url(r'^dashboard/', include('dashboard.urls')),

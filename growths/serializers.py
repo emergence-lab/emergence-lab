@@ -20,7 +20,7 @@ from .models import growth, readings
 
 class GrowthSerializer(serializers.ModelSerializer):
     """
-    Serializes the afm model.
+    Serializes the growth model.
 
     """
     growth = serializers.CharField(max_length=50)
@@ -32,6 +32,8 @@ class GrowthSerializer(serializers.ModelSerializer):
         return value
 
     def validate_growth(self, attrs, source):
+        print(source)
+        print(attrs)
         try:
             growth = growths.models.growth.get_growth(attrs[source])
         except Exception as e:
@@ -62,7 +64,7 @@ class GrowthSerializer(serializers.ModelSerializer):
 
 class ReadingsSerializer(serializers.ModelSerializer):
     """
-    Serializes the afm model.
+    Serializes the readings model.
 
     """
     growthid = serializers.IntegerField()
@@ -106,4 +108,4 @@ class ReadingsSerializer(serializers.ModelSerializer):
                   'n2_flow', 'h2_flow', 'nh3_flow', 'hydride_pressure', 'tmga1_flow', 'tmga1_pressure',
                   'tmga2_flow', 'tmga2_pressure', 'tega2_flow', 'tega2_pressure', 'tmin1_flow',
                   'tmin1_pressure', 'tmal1_flow', 'tmal1_pressure', 'cp2mg_flow', 'cp2mg_pressure',
-                  'cp2mg_dilution', 'silane_flow', 'silane_dilution', 'silane_mix', 'silane_pressure')
+                  'cp2mg_dilution', 'silane_flow', 'silane_dilution', 'silane_mix', 'silane_pressure', 'ecp_temp')
