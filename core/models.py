@@ -21,6 +21,10 @@ from ckeditor.fields import RichTextField
 # core.User instead of core.operator. Once that is complete, we will switch over
 # to core.User instead of auth.User. User data will be manually migrated over.
 
+#################
+## User Models ##
+#################
+
 def _user_get_all_permissions(user, obj):
     permissions = set()
     for backend in auth.get_backends():
@@ -159,6 +163,10 @@ class User(auth.models.AbstractBaseUser):
         return _user_has_module_perms(self, app_label)
 
 
+#######################
+## Mixins & Managers ##
+#######################
+
 class ActiveStateManager(models.Manager):
     """
     Manager to filter on the ``active`` field.
@@ -221,6 +229,10 @@ class TimestampMixin(models.Model):
         abstract = True
 
 
+########################
+## Project Management ##
+########################
+
 @python_2_unicode_compatible
 class Project(ActiveStateMixin, TimestampMixin, models.Model):
     """
@@ -273,7 +285,9 @@ class ProjectTracking(models.Model):
         db_table = 'project_tracking'
 
 
-# Legacy Models
+###################
+## Legacy Models ##
+###################
 
 @python_2_unicode_compatible
 class operator(ActiveStateMixin, models.Model):
