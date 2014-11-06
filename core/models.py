@@ -14,12 +14,71 @@ from autoslug import AutoSlugField
 from ckeditor.fields import RichTextField
 
 
-# Temporary duplication of django.contrib.auth.models code to try to more
-# smoothly transition to a custom user model. core.User will live alongside
-# core.operator and auth.User for the moment with auth.User being the value of
-# settings.AUTH_USER_MODEL. Eventually, we will switch all foreign keys to use
-# core.User instead of core.operator. Once that is complete, we will switch over
-# to core.User instead of auth.User. User data will be manually migrated over.
+#######################
+## Mixins & Managers ##
+#######################
+
+class ActiveStateManager(models.Manager):
+    """
+    Manager to filter on the ``active`` field.
+    """
+    def __init__(self, active_test):
+        super(ActiveStateManager, self).__init__()
+        self.active_test = active_test
+
+    def get_queryset(self):
+        return (super(ActiveStateManager, self)
+                    .get_queryset().filter(is_active=self.active_test))
+
+
+class ActiveStateMixin(models.Model):
+    """
+    Mixin for models that keep an active/inactive state.
+    """
+    is_active = models.BooleanField(_('active'), default=True)
+    status_changed = models.DateTimeField(_('status changed'), null=True,
+                                          blank=True, editable=False)
+
+    objects = models.Manager()
+    active_objects = ActiveStateManager(active_test=True)
+    inactive_objects = ActiveStateManager(active_test=False)
+
+    class Meta:
+        abstract = True
+
+    def activate(self, save=True):
+        """
+        Activate the object, raise an exception if it was already active.
+        """
+        if self.is_active:
+            raise Exception('{0} was already active'.format(self._meta.verbose_name))
+        self.is_active = True
+        self.status_changed = timezone.now()
+        if save:
+            self.save()
+
+    def deactivate(self, save=True):
+        """
+        Deactivate the object, raise an exception if it was already active.
+        """
+        if not self.is_active:
+            raise Exception('{0} was already not active'.format(self._meta.verbose_name))
+        self.is_active = False
+        self.status_changed = timezone.now()
+        if save:
+            self.save()
+
+
+class TimestampMixin(models.Model):
+    """
+    Mixin for models that keeps track of when an object was created or modified.
+    """
+    created = models.DateTimeField(_('date created'), auto_now_add=True)
+    modified = models.DateTimeField(_('date modified'), auto_now=True)
+
+    class Meta:
+        abstract = True
+
 
 #################
 ## User Models ##
@@ -49,7 +108,7 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
-class User(auth.models.AbstractBaseUser):
+class User(ActiveStateMixin, auth.models.AbstractBaseUser):
     """
     A custom user model that stores the name in a more portable way. Also
     stores information relating to project tracking.
@@ -69,9 +128,6 @@ class User(auth.models.AbstractBaseUser):
     is_staff = models.BooleanField(_('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
     groups = models.ManyToManyField(auth.models.Group,
         verbose_name=_('groups'), blank=True,
         help_text=_('The groups this user belongs to. A user will get all '
@@ -163,70 +219,7 @@ class User(auth.models.AbstractBaseUser):
         return _user_has_module_perms(self, app_label)
 
 
-#######################
-## Mixins & Managers ##
-#######################
 
-class ActiveStateManager(models.Manager):
-    """
-    Manager to filter on the ``active`` field.
-    """
-    def __init__(self, active_test):
-        super(ActiveStateManager, self).__init__()
-        self.active_test = active_test
-
-    def get_queryset(self):
-        return (super(ActiveStateManager, self)
-                    .get_queryset().filter(is_active=self.active_test))
-
-
-class ActiveStateMixin(models.Model):
-    """
-    Mixin for models that keep an active/inactive state.
-    """
-    is_active = models.BooleanField(_('active'), default=True)
-    status_changed = models.DateTimeField(_('status changed'), null=True,
-                                          blank=True, editable=False)
-
-    objects = models.Manager()
-    active_objects = ActiveStateManager(active_test=True)
-    inactive_objects = ActiveStateManager(active_test=False)
-
-    class Meta:
-        abstract = True
-
-    def activate(self, save=True):
-        """
-        Activate the object, raise an exception if it was already active.
-        """
-        if self.is_active:
-            raise Exception('{0} was already active'.format(self._meta.verbose_name))
-        self.is_active = True
-        self.status_changed = timezone.now()
-        if save:
-            self.save()
-
-    def deactivate(self, save=True):
-        """
-        Deactivate the object, raise an exception if it was already active.
-        """
-        if not self.is_active:
-            raise Exception('{0} was already not active'.format(self._meta.verbose_name))
-        self.is_active = False
-        self.status_changed = timezone.now()
-        if save:
-            self.save()
-
-
-class TimestampMixin(models.Model):
-    """
-    Mixin for models that keeps track of when an object was created or modified.
-    """
-    created = models.DateTimeField(_('date created'), auto_now_add=True)
-    modified = models.DateTimeField(_('date modified'), auto_now=True)
-
-    class Meta:
-        abstract = True
 
 
 ########################
@@ -241,13 +234,11 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
     """
     name = models.CharField(_('name'), max_length=45)
     slug = AutoSlugField(_('slug'), populate_from='name')
-    core = models.BooleanField(_('core project'), default=False)
     description = RichTextField(_('description'), blank=True)
 
     class Meta:
         verbose_name = _('project')
         verbose_name_plural = _('projects')
-        db_table = 'projects'
 
     def __str__(self):
         return self.name
@@ -267,7 +258,6 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     class Meta:
         verbose_name = _('investigation')
         verbose_name_plural = _('investigations')
-        db_table = 'investigations'
 
     def __str__(self):
         return self.name
@@ -280,40 +270,3 @@ class ProjectTracking(models.Model):
     project = models.ForeignKey(Project)
     user = models.ForeignKey(User)
     is_owner = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'project_tracking'
-
-
-###################
-## Legacy Models ##
-###################
-
-@python_2_unicode_compatible
-class operator(ActiveStateMixin, models.Model):
-    """
-    Stores operator information.
-    """
-    name = models.CharField(max_length=45)
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    projects = models.ManyToManyField(Project, through='project_tracking')
-
-    class Meta:
-        verbose_name = _('operator')
-        verbose_name_plural = _('operators')
-        db_table = 'operators'
-
-    def __str__(self):
-        return self.name
-
-
-class project_tracking(models.Model):
-    """
-    Stores ownership and tracking information for projects.
-    """
-    project = models.ForeignKey(Project)
-    operator = models.ForeignKey(operator)
-    is_pi = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'project_operator_tracking'

@@ -8,7 +8,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from core.models import Investigation, operator, Project, project_tracking
+from core.models import Investigation, Project, ProjectTracking
 
 
 class TestHomepage(TestCase):
@@ -43,14 +43,11 @@ class TestOperatorCRUD(TestCase):
         User = get_user_model()
         user1 = User.objects.create_user('username1', password='')
         user2 = User.objects.create_user('username2', password='')
-        operator.objects.create(name='name 1', user=user1,
-                                is_active=True)
-        operator.objects.create(name='name 2', user=user2,
-                                is_active=False)
+        user2.is_active = False
+        user2.save()
 
     @classmethod
     def tearDownClass(cls):
-        operator.objects.all().delete()
         get_user_model().objects.all().delete()
 
     def setUp(self):
@@ -67,27 +64,30 @@ class TestOperatorCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_operator_list_content(self):
+        User = get_user_model()
         url = reverse('operator_list')
         response = self.client.get(url)
-        for op in operator.objects.all():
-            self.assertContains(response, op.name)
+        for op in User.objects.all():
+            self.assertContains(response, op.short_name)
 
     def test_operator_activate(self):
-        op = operator.objects.filter(is_active=False).first()
+        User = get_user_model()
+        op = User.objects.filter(is_active=False).first()
         url = reverse('operator_activate', args=(op.id,))
         list_url = reverse('operator_list')
         response = self.client.get(url)
-        op = operator.objects.get(id=op.id)
+        op = User.objects.get(id=op.id)
 
         self.assertRedirects(response, list_url)
         self.assertTrue(op.is_active)
 
     def test_operator_deactivate(self):
-        op = operator.objects.filter(is_active=True).first()
+        User = get_user_model()
+        op = User.objects.filter(is_active=True).first()
         url = reverse('operator_deactivate', args=(op.id,))
         list_url = reverse('operator_list')
         response = self.client.get(url)
-        op = operator.objects.get(id=op.id)
+        op = User.objects.get(id=op.id)
 
         self.assertRedirects(response, list_url)
         self.assertFalse(op.is_active)
@@ -100,7 +100,6 @@ class TestProjectCRUD(TestCase):
         mommy.make(Project, name='project 2', slug='project-2', is_active=False)
         self.user = get_user_model().objects.create_user('username1',
                                                          password='')
-        mommy.make(operator, user=self.user, is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_resolution_template(self):
@@ -193,20 +192,19 @@ class TestProjectCRUD(TestCase):
         self.assertRedirects(response, list_url)
 
         obj = Project.objects.get(id=obj.id)
-        tracking = project_tracking.objects.get(project=obj)
-        self.assertEqual(tracking.operator, self.user.operator)
+        tracking = ProjectTracking.objects.get(project=obj)
+        self.assertEqual(tracking.user, self.user)
 
     def test_project_untrack(self):
         obj = Project.objects.filter(is_active=True).first()
-        tracking = project_tracking.objects.create(operator=self.user.operator,
-                                                   project=obj)
+        tracking = ProjectTracking.objects.create(user=self.user, project=obj)
         url = reverse('project_untrack', args=(obj.slug,))
         list_url = reverse('project_list')
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 
         obj = Project.objects.get(id=obj.id)
-        tracking = project_tracking.objects.filter(project=obj).count()
+        tracking = ProjectTracking.objects.filter(project=obj).count()
         self.assertEqual(tracking, 0)
 
     def test_project_create_valid_data(self):
@@ -249,7 +247,6 @@ class TestInvestigationCRUD(TestCase):
                    slug='investigation-2', is_active=False, project=project2)
 
         user = get_user_model().objects.create_user('username1', password='')
-        mommy.make(operator, user=user, is_active=True)
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):

@@ -1,16 +1,16 @@
 from django import forms
 
-from .models import project_tracking
+from .models import ProjectTracking
 
 
 class TrackProjectForm(forms.ModelForm):
 
     def save(self, **kwargs):
         commit = kwargs.pop('commit', True)
-        operator = kwargs.pop('operator')
+        user = kwargs.pop('user')
 
         instance = super(TrackProjectForm, self).save(commit=False)
-        instance.operator = operator
+        instance.user = user
 
         if commit:
             instance.save()
@@ -18,5 +18,5 @@ class TrackProjectForm(forms.ModelForm):
         return instance
 
     class Meta:
-        model = project_tracking
-        fields = ['project', 'is_pi']
+        model = ProjectTracking
+        fields = ['project', 'is_owner']

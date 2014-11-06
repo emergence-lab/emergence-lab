@@ -44,7 +44,7 @@ WSGI_APPLICATION = 'wbg.wsgi.application'
 
 # User login
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 
@@ -68,23 +68,24 @@ INSTALLED_APPS = (
     # administration
     'grappelli',
     'django.contrib.admin',
-    # 3rd party apps
-    'datetimewidget',
-    'django_filters',
+    # # 3rd party apps
+    # 'datetimewidget',
+    # 'django_filters',
     'bootstrap3',
-    'rest_framework',
-    'rest_framework.authtoken',
+    # 'rest_framework',
+    # 'rest_framework.authtoken',
     'ckeditor',
     'django_wysiwyg',
-    'mptt',
-    # local apps
+    # 'mptt',
+    # # local apps
     'core',
-    'dashboard',
-    'journal',
-    'growths',
-    'afm',
-    'hall',
-    # misc
+    'process',
+    # 'dashboard',
+    # 'journal',
+    # 'growths',
+    # 'afm',
+    # 'hall',
+    # # misc
     'actstream',
 )
 

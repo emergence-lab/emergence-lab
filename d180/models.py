@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -7,11 +8,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from ckeditor.fields import RichTextField
 
-import core.models
+from core.models import ActiveStateMixin
+from process.models import BaseProcess
 
 
 @python_2_unicode_compatible
-class Platter(core.models.ActiveStateMixin, models.Model):
+class Platter(ActiveStateMixin, models.Model):
     """
     Stores platter information.
     """
@@ -28,15 +30,13 @@ class Platter(core.models.ActiveStateMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class growth(models.Model):
+class Growth(BaseProcess):
     """
     Stores information related to the growth including tagging for material
     and device properties.
     """
-    REACTOR_CHOICES = [
-        ('d180', 'D180'),
-        ('d75', 'D75'),
-    ]
+    uid = models.SlugField(max_length=10)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     # general info
     growth_number = models.SlugField(max_length=10)
@@ -77,7 +77,8 @@ class growth(models.Model):
     has_u = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'growths'
+        verbose_name = _('growth')
+        verbose_name_plural = _('growths')
 
     def __str__(self):
         return self.growth_number
@@ -101,153 +102,12 @@ class growth(models.Model):
         return obj
 
 
-@python_2_unicode_compatible
-class sample(models.Model):
-    """
-    Stores information for an individual sample from a growth. Used as a
-    reference for characteriztion data.
-    """
-    SUBSTRATE_CHOICES = [
-        ('growth', 'Growth'),
-        ('sapphire', 'Sapphire'),
-        ('si', 'Silicon'),
-        ('sic', 'Silicon Carbide'),
-        ('bulk', 'Bulk III-N'),
-        ('other', 'Other'),
-    ]
-    SIZE_CHOICES = [
-        ('whole', 'Whole'),
-        ('half', 'Half'),
-        ('quarter', 'Quarter'),
-        ('square_cm', 'Square cm'),
-        ('other', 'Other'),
-    ]
-
-    growth = models.ForeignKey(growth)
-    pocket = models.CharField(max_length=10, default='1')
-    parent = models.ForeignKey('self', blank=True, null=True)
-    piece = models.CharField(max_length=5, blank=True)  # i.e. abcd...
-    size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='whole')
-    location = models.CharField(max_length=50)  # i.e. lab, w/ collaborator, etc.
-    substrate_type = models.CharField(max_length=20, choices=SUBSTRATE_CHOICES, default='sapphire')
-    substrate_serial = models.CharField(max_length=20, blank=True)  # wafer serial or growth number
-    substrate_orientation = models.CharField(max_length=10, default='0001')
-    substrate_miscut = models.DecimalField(max_digits=4, decimal_places=1, default=0)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-    comment = RichTextField(blank=True)
-
-    class Meta:
-        db_table = 'samples'
-
-    def __str__(self):
-        return '{0}_{1}{2}'.format(self.growth.growth_number, self.pocket, self.piece)
-
-    @staticmethod
-    def get_sample(sample_name, growth_object=None):
-        """
-        Returns the sample associated with the name or raises the
-        specified exception on errors.
-
-        growth_object may optionally be specified with a growth instance to
-        prevent duplicate queries.
-        """
-        # extract information from sample name
-        m = re.match('([gt][1-9][0-9]{3,})(?:\_([0-9]+\-?[0-9]*)([a-z]*))?', sample_name)
-        if not m:
-            raise Exception('Sample {0} improperly formatted'.format(sample_name))
-
-        # query for the growth if it wasn't specified
-        if growth_object is None:
-            growth_object = growth.get_growth(m.group(1))
-        elif growth_object.growth_number != m.group(1):
-            raise Exception('Sample {0} does not match the growth {1}'.format(sample_name, growth_object.growth_number))
-        filter_params = {'growth': growth_object}
-
-        # check if pocket or piece are specified
-        if m.group(2):
-            filter_params['pocket'] = int(m.group(2))
-        if m.group(3):
-            filter_params['piece'] = m.group(3)
-
-        try:
-            obj = sample.objects.get(**filter_params)
-        except MultipleObjectsReturned:
-            raise Exception('Sample {0} ambiguous'.format(sample_name))
-        except ObjectDoesNotExist:
-            raise Exception('Sample {0} does not exist'.format(sample_name))
-        return obj
-
-    @staticmethod
-    def get_siblings(sample_obj):
-        """
-        Return a queryset of samples that are siblings of the specified sample.
-
-        A sibling is defined as a sample that was in the same growth.
-        """
-        return sample.objects.filter(growth=sample_obj.growth).exclude(pk=sample_obj.id)
-
-    @staticmethod
-    def get_children(sample_obj):
-        """
-        Return a queryset of samples that are children of the specified sample.
-
-        A child is defined as a sample that has the current sample marked as a parent.
-        """
-        return sample_obj.sample_set.exclude(pk=sample_obj.pk)
-
-    @staticmethod
-    def get_piece_siblings(sample_obj):
-        """
-        Return a queryset of samples that are piece siblings of the specified sample.
-
-        A piece sibling is defined as samples that were split from the same piece.
-        """
-        return sample.objects.filter(growth=sample_obj.growth, pocket=sample_obj.pocket).exclude(pk=sample_obj.id)
-
-    def split(self, number_pieces):
-        """
-        Splits a sample into the specified number of pieces. Sets the size to 'other'.
-        Parent is inherited from the original sample.
-        """
-        siblings = sample.objects.filter(growth=self.growth, pocket=self.pocket).order_by('-piece')
-        parent = self
-        original_id = self.id
-        original_parent_id = self.parent_id
-        self.save()
-        new_pieces = [parent]
-        if len(siblings) > 1:
-            last_letter = siblings.first().piece
-        else:
-            last_letter = 'a'
-            parent.piece = 'a'
-            parent.size = 'other'
-            parent.save()
-        for i in range(number_pieces - 1):
-            if last_letter != 'z':
-                last_letter = unichr(ord(last_letter) + 1)
-            else:
-                raise Exception('Too many pieces')
-            parent.pk = None
-            parent.parent = None
-            parent.piece = last_letter
-            parent.size = 'other'
-            parent.save()
-            if original_parent_id == original_id:
-                parent.parent = parent
-            else:
-                parent.parent_id = original_parent_id
-            parent.save()
-            new_pieces.append(parent)
-        return new_pieces
-
-
-class readings(models.Model):
+class Readings(models.Model):
     """
     Stores readings (i.e. temperature) from a growth.
     """
     # growth and layer info
-    growth = models.ForeignKey(growth)
+    growth = models.ForeignKey(Growth)
     layer = models.IntegerField()
     layer_desc = models.CharField(max_length=45, blank=True)
 
@@ -299,18 +159,21 @@ class readings(models.Model):
         return self.growth.growth_number
 
     class Meta:
-        db_table = 'readings'
+        verbose_name = _('reading')
+        verbose_name_plural = _('readings')
 
 
-class recipe_layer(models.Model):
+class RecipeLayer(models.Model):
     """
     Stores layers used in the recipes
     """
-    growth = models.ForeignKey(growth)
+    growth = models.ForeignKey(Growth)
+
     layer_num = models.IntegerField()
     loop_num = models.IntegerField()
     loop_repeats = models.IntegerField()
     time = models.IntegerField()
+
     cp2mg_flow = models.IntegerField()
     tmin1_flow = models.IntegerField()
     tmin2_flow = models.IntegerField()
@@ -363,10 +226,11 @@ class recipe_layer(models.Model):
         return self.growth.growth_number
 
     class Meta:
-        db_table = 'recipe_layers'
+        verbose_name = _('layer')
+        verbose_name_plural = _('layers')
 
 
-class source(models.Model):
+class Source(models.Model):
     """
     Stores information on source consumption
     """
@@ -385,4 +249,5 @@ class source(models.Model):
         return self.date_time
 
     class Meta:
-        db_table = 'sources'
+        verbose_name = _('source entry')
+        verbose_name_plural = _('source entries')

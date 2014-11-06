@@ -10,12 +10,9 @@ from django.views.generic import (CreateView, DetailView, ListView,
 from braces.views import LoginRequiredMixin
 import gitlab
 
-from .models import Investigation, operator, Project, project_tracking
-from growths.models import growth, sample
+from .models import Investigation, Project, ProjectTracking, User
 from .forms import TrackProjectForm
-from .streams import (project_stream, investigation_stream,
-                      operator_investigation_stream)
-from journal.models import journal_entry
+from .streams import project_stream, investigation_stream
 
 
 ##############
@@ -70,18 +67,10 @@ class QuickSearchRedirectView(LoginRequiredMixin, RedirectView):
     View to handle redirection to the correct growth or sample from the
     quicksearch bar in the page header.
     """
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
-        growth_number = self.request.GET.get('growth', None)
-        try:
-            growth.get_growth(growth_number)
-            return reverse('growth_detail', args=(growth_number,))
-        except:
-            try:
-                obj = sample.get_sample(growth_number)
-                return reverse('sample_detail', args=(obj.id,))
-            except:
-                pass
-        return reverse('afm_filter')
+        return reverse('home')
 
 
 class HomepageView(TemplateView):
@@ -95,37 +84,37 @@ class HomepageView(TemplateView):
 # Model Views #
 ###############
 
-class OperatorListView(LoginRequiredMixin, ActiveListView):
+class UserListView(LoginRequiredMixin, ActiveListView):
     """
-    View to list all operators and provide actions.
+    View to list all user and provide actions.
     """
     template_name = "core/operator_list.html"
-    model = operator
+    model = User
 
 
-class ActivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
+class ActivateUserRedirectView(LoginRequiredMixin, RedirectView):
     """
-    Sets the specified operator to active.
+    Sets the specified user to active.
     """
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
-        operator_obj = operator.objects.get(pk=pk)
-        operator_obj.activate()
+        user = User.objects.get(pk=pk)
+        user.activate()
         return reverse('operator_list')
 
 
-class DeactivateOperatorRedirectView(LoginRequiredMixin, RedirectView):
+class DeactivateUserRedirectView(LoginRequiredMixin, RedirectView):
     """
-    Sets the specified operator to inactive.
+    Sets the specified user to inactive.
     """
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('id')
-        operator_obj = operator.objects.get(pk=pk)
-        operator_obj.deactivate()
+        user = User.objects.get(pk=pk)
+        user.deactivate()
         return reverse('operator_list')
 
 
@@ -138,7 +127,8 @@ class ProjectListView(LoginRequiredMixin, ActiveListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
-        context['tracking'] = project_tracking.objects.filter(operator=self.request.user.operator).values_list('project_id', flat=True)
+        context['tracking'] = (ProjectTracking.objects.filter(user=self.request.user)
+                                                      .values_list('project_id', flat=True))
         return context
 
 
@@ -152,24 +142,16 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         if 'username' in self.kwargs:
-            userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
-            context['growths'] = (growth.objects.filter(project=self.object,
-                                                        operator_id=userid)
-                                                .order_by('-growth_number')[:25])
-            context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all(),
-                                                               author_id=userid)
-                                                        .order_by('-date')[:25])
-            context['tracking'] = (project_tracking.objects.filter(operator_id=userid,
-                                                                   project=self.object)
-                                                           .exists())
+            userid = User.objects.filter(username=self.kwargs['username']).values('id')
+            context['tracking'] = (ProjectTracking.objects.filter(user_id=userid,
+                                                                  project=self.object)
+                                                          .exists())
         else:
-            context['growths'] = (growth.objects.filter(project=self.object)
-                                                .order_by('-growth_number')[:25])
-            context['entries'] = (journal_entry.objects.filter(investigations__in=self.object.investigation_set.all())
-                                                       .order_by('-date')[:25])
-            context['tracking'] = (project_tracking.objects.filter(operator=self.request.user.operator,
-                                                                   project=self.object)
-                                                           .exists())
+            context['tracking'] = (ProjectTracking.objects.filter(user=self.request.user,
+                                                                  project=self.object)
+                                                          .exists())
+        context['growths'] = []
+        context['entries'] = []
         context['stream'] = project_stream(self.object)
         return context
 
@@ -211,10 +193,10 @@ class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
         project = Project.objects.get(slug=slug)
-        operator_obj = self.request.user.operator
-        tracking_obj, created = project_tracking.objects.get_or_create(project=project,
-                                                                       operator=operator_obj,
-                                                                       defaults={'is_pi': False})
+        user = self.request.user
+        ProjectTracking.objects.get_or_create(project=project,
+                                              user=user,
+                                              defaults={'is_owner': False})
         return reverse('project_list')
 
 
@@ -226,12 +208,11 @@ class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         slug = kwargs.pop('slug')
-        project_obj = Project.objects.get(slug=slug)
-        operator_obj = self.request.user.operator
-        tracking_obj = project_tracking.objects.filter(project=project_obj,
-                                                       operator=operator_obj)
-        if tracking_obj.count():
-            tracking_obj.delete()
+        project = Project.objects.get(slug=slug)
+        user = self.request.user
+        tracking = ProjectTracking.objects.filter(project=project, user=user)
+        if tracking.count():
+            tracking.delete()
         return reverse('project_list')
 
 
@@ -271,21 +252,13 @@ class InvestigationDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailView, self).get_context_data(**kwargs)
         if 'username' in self.kwargs:
-            userid = operator.objects.filter(user__username=self.kwargs['username']).values('id')
-            context['growths'] = (growth.objects.filter(project=self.object,
-                                                        operator_id=userid)
-                                                .order_by('-growth_number')[:25])
-            context['entries'] = (journal_entry.objects.filter(investigations__pk=self.object.id,
-                                                               author_id=userid)
-                                                       .order_by('-date')[:25])
-            context['stream'] = operator_investigation_stream(userid, self.object)
+            userid = User.objects.filter(username=self.kwargs['username']).values('id')
         else:
-            context['growths'] = (growth.objects.filter(project=self.object)
-                                                .order_by('-growth_number')[:25])
-            context['entries'] = (journal_entry.objects.filter(investigations__pk=self.object.id)
-                                                       .order_by('-date')[:25])
-            context['stream'] = investigation_stream(self.object)
+            pass
+        context['stream'] = investigation_stream(self.object)
         context['project'] = self.object.project
+        context['growths'] = []
+        context['entries'] = []
         return context
 
 
@@ -362,16 +335,17 @@ class TrackProjectView(LoginRequiredMixin, CreateView):
     """
     View to handle tracking projects.
     """
-    model = project_tracking
+    model = ProjectTracking
     form_class = TrackProjectForm
     template_name = 'core/track_project.html'
 
     def form_valid(self, form):
         project_id = form.cleaned_data['project']
         try:
-            self.object = project_tracking.objects.get(operator=self.request.user.operator, project_id=project_id)
-            self.object.is_pi = form.cleaned_data['is_pi']
+            self.object = ProjectTracking.objects.get(user=self.request.user,
+                                                      project_id=project_id)
+            self.object.is_owner = form.cleaned_data['is_owner']
             self.object.save()
         except:
-            self.object = form.save(operator=self.request.user.operator)
+            self.object = form.save(user=self.request.user)
         return HttpResponseRedirect(reverse('dashboard'))
