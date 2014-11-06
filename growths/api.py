@@ -22,7 +22,8 @@ class GrowthDetailAPI(generics.RetrieveUpdateAPIView):
     queryset = growth.objects.all()
     serializer_class = GrowthSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    
+
+
 class GrowthFetchObjectAPI(generics.ListAPIView):
     """
     Show ID of a growth.
@@ -34,6 +35,7 @@ class GrowthFetchObjectAPI(generics.ListAPIView):
     serializer_class = GrowthSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
+
 class ReadingsListAPI(generics.ListCreateAPIView):
     """
     List all readings or create a new one via api.
@@ -41,13 +43,15 @@ class ReadingsListAPI(generics.ListCreateAPIView):
     queryset = readings.objects.all()
     serializer_class = ReadingsSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    
+
+
 class ReadingsCreateAPI(generics.CreateAPIView):
     """
     Create a new reading via api.
     """
     serializer_class = ReadingsSerializer
     permission_classes = (permissions.IsAuthenticated, )
+
 
 class ReadingsDetailAPI(generics.RetrieveUpdateAPIView):
     """
