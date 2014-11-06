@@ -15,8 +15,6 @@ class GrowthSerializer(serializers.ModelSerializer):
         return value
 
     def validate_growth(self, attrs, source):
-        print(source)
-        print(attrs)
         try:
             growth = growths.models.growth.get_growth(attrs[source])
         except Exception as e:
