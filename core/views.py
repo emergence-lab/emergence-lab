@@ -59,7 +59,7 @@ class ExceptionHandlerView(LoginRequiredMixin, View):
             git = gitlab.Gitlab(settings.GITLAB_HOST,
                                 token=settings.GITLAB_PRIVATE_TOKEN, verify_ssl=False)
             success = git.createissue(8, title=title, labels=', '.join(tags),
-                                      description='User: {0}\nPage: {1}\nProblem: {2}'.format(user, path, complaint))
+                                      description='User: {0}\n\nPage: {1}\n\nProblem: {2}'.format(user, path, complaint))
             if not success:
                 raise Exception('Error submitting issue')
         return HttpResponseRedirect(path)
