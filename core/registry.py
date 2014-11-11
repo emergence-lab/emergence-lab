@@ -1,12 +1,16 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from __future__ import absolute_import
+
 from inspect import isclass
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import get_model
+from django.db.models import get_model, Q
 
 import actstream.registry
 import six
 
-from .models import BaseProcess
+from .models.process import BaseProcess
 
 
 def validate(model_class, exception_class=ImproperlyConfigured):
@@ -54,8 +58,20 @@ class ProcessRegistry(dict):
                 'register it.'.format(model_class.__name__))
         actstream.registry.check(model_class_or_object)
 
+    def get_process_choices(self):
+        limit = None
+        for process_class in six.iterkeys(self):
+            app_label = m._meta.app_label
+            model = m.__name__
+            if limit is None:
+                limit = Q(app_label=app_label, model=model)
+            else:
+                limit = limit | Q(app_label=app_label, model=model)
+        return limit
+
 
 registry = ProcessRegistry()
 register = registry.register
 unregister = registry.unregister
+get_process_choices = registry.get_process_choices
 check = registry.check

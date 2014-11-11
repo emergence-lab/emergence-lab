@@ -1,88 +1,17 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
 from django.db import models
 from django.conf import settings
 from django.contrib import auth
-from django.core import validators
 from django.core.mail import send_mail
+from django.core import validators
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from autoslug import AutoSlugField
-from ckeditor.fields import RichTextField
+from .mixins import ActiveStateMixin
 
-
-#######################
-## Mixins & Managers ##
-#######################
-
-class ActiveStateManager(models.Manager):
-    """
-    Manager to filter on the ``active`` field.
-    """
-    def __init__(self, active_test):
-        super(ActiveStateManager, self).__init__()
-        self.active_test = active_test
-
-    def get_queryset(self):
-        return (super(ActiveStateManager, self)
-                    .get_queryset().filter(is_active=self.active_test))
-
-
-class ActiveStateMixin(models.Model):
-    """
-    Mixin for models that keep an active/inactive state.
-    """
-    is_active = models.BooleanField(_('active'), default=True)
-    status_changed = models.DateTimeField(_('status changed'), null=True,
-                                          blank=True, editable=False)
-
-    objects = models.Manager()
-    active_objects = ActiveStateManager(active_test=True)
-    inactive_objects = ActiveStateManager(active_test=False)
-
-    class Meta:
-        abstract = True
-
-    def activate(self, save=True):
-        """
-        Activate the object, raise an exception if it was already active.
-        """
-        if self.is_active:
-            raise Exception('{0} was already active'.format(self._meta.verbose_name))
-        self.is_active = True
-        self.status_changed = timezone.now()
-        if save:
-            self.save()
-
-    def deactivate(self, save=True):
-        """
-        Deactivate the object, raise an exception if it was already active.
-        """
-        if not self.is_active:
-            raise Exception('{0} was already not active'.format(self._meta.verbose_name))
-        self.is_active = False
-        self.status_changed = timezone.now()
-        if save:
-            self.save()
-
-
-class TimestampMixin(models.Model):
-    """
-    Mixin for models that keeps track of when an object was created or modified.
-    """
-    created = models.DateTimeField(_('date created'), auto_now_add=True)
-    modified = models.DateTimeField(_('date modified'), auto_now=True)
-
-    class Meta:
-        abstract = True
-
-
-#################
-## User Models ##
-#################
 
 def _user_get_all_permissions(user, obj):
     permissions = set()
@@ -152,7 +81,6 @@ class User(ActiveStateMixin, auth.models.AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        db_table = 'users'
 
     def get_full_name(self):
         return self.full_name
@@ -217,56 +145,3 @@ class User(ActiveStateMixin, auth.models.AbstractBaseUser):
             return True
 
         return _user_has_module_perms(self, app_label)
-
-
-
-
-
-########################
-## Project Management ##
-########################
-
-@python_2_unicode_compatible
-class Project(ActiveStateMixin, TimestampMixin, models.Model):
-    """
-    Stores information on a project, which is a higher level organizational
-    tool.
-    """
-    name = models.CharField(_('name'), max_length=45)
-    slug = AutoSlugField(_('slug'), populate_from='name')
-    description = RichTextField(_('description'), blank=True)
-
-    class Meta:
-        verbose_name = _('project')
-        verbose_name_plural = _('projects')
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
-    """
-    Stores information on an individual investigation related to one or more
-    projects.
-    """
-    name = models.CharField(_('name'), max_length=45)
-    slug = AutoSlugField(_('slug'), populate_from='name')
-    description = RichTextField(_('description'), blank=True)
-    project = models.ForeignKey(Project, verbose_name=_('project'))
-
-    class Meta:
-        verbose_name = _('investigation')
-        verbose_name_plural = _('investigations')
-
-    def __str__(self):
-        return self.name
-
-
-class ProjectTracking(models.Model):
-    """
-    Stores ownership and tracking information for projects.
-    """
-    project = models.ForeignKey(Project)
-    user = models.ForeignKey(User)
-    is_owner = models.BooleanField(default=False)

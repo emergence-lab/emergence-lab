@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import autoslug.fields
+import mptt.fields
 import ckeditor.fields
 import django.utils.timezone
 from django.conf import settings
@@ -13,6 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0001_initial'),
+        ('contenttypes', '0001_initial'),
     ]
 
     operations = [
@@ -34,7 +36,6 @@ class Migration(migrations.Migration):
                 ('groups', models.ManyToManyField(related_query_name='custom_user', related_name='custom_users', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
             ],
             options={
-                'db_table': 'users',
                 'verbose_name': 'user',
                 'verbose_name_plural': 'users',
             },
@@ -85,6 +86,27 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SampleNode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('uid', models.SlugField(max_length=20)),
+                ('comment', models.TextField(blank=True)),
+                ('object_id', models.PositiveIntegerField(null=True)),
+                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', null=True)),
+                ('parent', mptt.fields.TreeForeignKey(related_name='children', to='core.SampleNode', null=True)),
+            ],
+            options={
+                'abstract': False,
             },
             bases=(models.Model,),
         ),

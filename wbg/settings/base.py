@@ -76,10 +76,9 @@ INSTALLED_APPS = (
     # 'rest_framework.authtoken',
     'ckeditor',
     'django_wysiwyg',
-    # 'mptt',
+    'mptt',
     # # local apps
     'core',
-    'process',
     # 'dashboard',
     # 'journal',
     # 'growths',
