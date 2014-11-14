@@ -64,6 +64,7 @@ urlpatterns = [
     url(r'^sample/(?P<pk>\d+)/update/$', login_required(growths.views.SampleUpdateView.as_view()), name='sample_update'),
     url(r'^sample/split/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
     url(r'^api/v0/growths/$', growths.api.GrowthListAPI.as_view()),
+    url(r'^api/v0/growths/latest/$', growths.api.GrowthFetchCurrentAPI.as_view()),
     url(r'^api/v0/growths/(?P<pk>\d+)/$', growths.api.GrowthDetailAPI.as_view()),
     url(r'^api/v0/growths/(?P<growth_number>.+)/$', growths.api.GrowthFetchObjectAPI.as_view()),
     url(r'^api/v0/readings/$', growths.api.ReadingsListAPI.as_view()),

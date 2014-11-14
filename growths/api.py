@@ -36,6 +36,18 @@ class GrowthFetchObjectAPI(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
 
+class GrowthFetchCurrentAPI(generics.ListAPIView):
+    """
+    Show ID of latest growth.
+    """
+    def get_queryset(self):
+        growth_id = growth.objects.order_by('-id').first().id
+        return growth.objects.filter(id=growth_id)
+        
+    serializer_class = GrowthSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+
 class ReadingsListAPI(generics.ListCreateAPIView):
     """
     List all readings or create a new one via api.
