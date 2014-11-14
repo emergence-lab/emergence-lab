@@ -20,3 +20,12 @@ class TrackProjectForm(forms.ModelForm):
     class Meta:
         model = ProjectTracking
         fields = ['project', 'is_owner']
+
+
+class ChecklistForm(forms.Form):
+    fields = []
+
+    def __init__(self, *args, **kwargs):
+        super(ChecklistForm, self).__init__(*args, **kwargs)
+        for i, label in enumerate(fields):
+            self.fields['field_{0}'.format(i)] = forms.BooleanField(required=True, label=label)
