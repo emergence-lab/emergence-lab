@@ -1,1 +1,1 @@
-default_app_config = 'growths.apps.GrowthsAppConfig'
+default_app_config = 'd180.apps.D180AppConfig'

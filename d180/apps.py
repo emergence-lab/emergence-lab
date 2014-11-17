@@ -1,11 +1,10 @@
 from django.apps import AppConfig
 
-from actstream import registry
+from core.models import registry
 
 
-class GrowthsAppConfig(AppConfig):
-    name = 'growths'
+class D180AppConfig(AppConfig):
+    name = 'd180'
 
     def ready(self):
         registry.register(self.get_model('growth'))
-        registry.register(self.get_model('sample'))

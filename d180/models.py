@@ -1,15 +1,9 @@
-import re
-
 from django.conf import settings
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from ckeditor.fields import RichTextField
-
-from core.models import ActiveStateMixin
-from process.models import BaseProcess
+from core.models import ActiveStateMixin, BaseProcess, Investigation
 
 
 @python_2_unicode_compatible
@@ -32,25 +26,17 @@ class Platter(ActiveStateMixin, models.Model):
 @python_2_unicode_compatible
 class Growth(BaseProcess):
     """
-    Stores information related to the growth including tagging for material
-    and device properties.
+    Stores information related to a growth on the d180 including tagging for
+    material and device properties.
     """
-    uid = models.SlugField(max_length=10)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-
     # general info
-    growth_number = models.SlugField(max_length=10)
-    date = models.DateField()
-    operator = models.ForeignKey(core.models.operator,
-                                 limit_choices_to={'is_active': True})
-    project = models.ForeignKey(core.models.Project,
-                                limit_choices_to={'is_active': True})
-    investigation = models.ForeignKey(core.models.Investigation,
-                                      limit_choices_to={'is_active': True})
+    uid = models.SlugField(max_length=10)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             limit_choices_to={'is_active': True})
+    investigations = models.ManyToManyField(Investigation,
+        related_name='growths', related_query_name='growth',)
     platter = models.ForeignKey(Platter,
                                 limit_choices_to={'is_active': True})
-    reactor = models.CharField(max_length=10, choices=REACTOR_CHOICES)
-    run_comments = RichTextField(blank=True)
 
     # layer materials
     has_gan = models.BooleanField(default=False)
@@ -58,7 +44,6 @@ class Growth(BaseProcess):
     has_inn = models.BooleanField(default=False)
     has_algan = models.BooleanField(default=False)
     has_ingan = models.BooleanField(default=False)
-    has_alingan = models.BooleanField(default=False)
     other_material = models.CharField(max_length=50, blank=True)
 
     # layer orientation
@@ -67,6 +52,7 @@ class Growth(BaseProcess):
     # growth features
     is_template = models.BooleanField(default=False)
     is_buffer = models.BooleanField(default=False)
+    has_pulsed = models.BooleanField(default=False)
     has_superlattice = models.BooleanField(default=False)
     has_mqw = models.BooleanField(default=False)
     has_graded = models.BooleanField(default=False)
@@ -77,34 +63,17 @@ class Growth(BaseProcess):
     has_u = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = _('growth')
-        verbose_name_plural = _('growths')
+        verbose_name = _('d180 growth')
+        verbose_name_plural = _('d180 growths')
 
     def __str__(self):
-        return self.growth_number
-
-    @staticmethod
-    def get_growth(growth_number):
-        """
-        Returns the growth associated with the growth number or raises the
-        specified exception on errors
-        """
-        m = re.match('([gt][1-9][0-9]{3,})(?:\_([1-6])([a-z]*))?', growth_number)
-        if not m:
-            raise Exception('Growth {0} improperly formatted'.format(growth_number))
-
-        try:
-            obj = growth.objects.get(growth_number=growth_number)
-        except MultipleObjectsReturned:
-            raise Exception('Growth {0} ambiguous'.format(growth_number))
-        except ObjectDoesNotExist:
-            raise Exception('Growth {0} does not exist'.format(growth_number))
-        return obj
+        return self.uid
 
 
+@python_2_unicode_compatible
 class Readings(models.Model):
     """
-    Stores readings (i.e. temperature) from a growth.
+    Stores readings (i.e. temperature) from a d180 growth.
     """
     # growth and layer info
     growth = models.ForeignKey(Growth)
@@ -155,17 +124,18 @@ class Readings(models.Model):
     silane_mix = models.DecimalField(max_digits=7, decimal_places=2)
     silane_pressure = models.DecimalField(max_digits=7, decimal_places=2)
 
-    def __unicode__(self):
-        return self.growth.growth_number
-
     class Meta:
         verbose_name = _('reading')
         verbose_name_plural = _('readings')
 
+    def __str__(self):
+        return self.growth.__str__()
 
+
+@python_2_unicode_compatible
 class RecipeLayer(models.Model):
     """
-    Stores layers used in the recipes
+    Stores layers used in the recipes for a d180 growth.
     """
     growth = models.ForeignKey(Growth)
 
@@ -222,18 +192,20 @@ class RecipeLayer(models.Model):
     alk_push_middle = models.IntegerField()
     alk_push_outer = models.IntegerField()
 
-    def __unicode__(self):
-        return self.growth.growth_number
-
     class Meta:
         verbose_name = _('layer')
         verbose_name_plural = _('layers')
 
+    def __str__(self):
+        return self.growth.__str__()
 
+
+@python_2_unicode_compatible
 class Source(models.Model):
     """
     Stores information on source consumption
     """
+    created = models.DateTimeField(auto_now_add=True)
     cp2mg = models.DecimalField(max_digits=7, decimal_places=2)
     tmin1 = models.DecimalField(max_digits=7, decimal_places=2)
     tmin2 = models.DecimalField(max_digits=7, decimal_places=2)
@@ -243,11 +215,10 @@ class Source(models.Model):
     tega1 = models.DecimalField(max_digits=7, decimal_places=2)
     nh3 = models.DecimalField(max_digits=9, decimal_places=2)
     sih4 = models.DecimalField(max_digits=9, decimal_places=2)
-    date_time = models.DateTimeField(auto_now_add=True)
-
-    def __unicode__(self):
-        return self.date_time
 
     class Meta:
         verbose_name = _('source entry')
         verbose_name_plural = _('source entries')
+
+    def __str__(self):
+        return self.created

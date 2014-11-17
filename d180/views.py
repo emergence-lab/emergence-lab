@@ -11,15 +11,15 @@ from django.core.urlresolvers import reverse
 
 from braces.views import LoginRequiredMixin
 
-from core.models import operator
+from core.models import User, SampleNode
 from core.views import ActiveListView
-from .models import growth, sample, readings, recipe_layer, source, Platter
+from .models import Growth, SampleNode, Readings, RecipeLayer, Source, Platter
 from .filters import growth_filter, RelationalFilterView
-from .forms import (sample_form, p_form, split_form, readings_form,
+from .forms import (SampleForm, p_form, split_form, readings_form,
                     comments_form, SampleSizeForm)
-from .forms import (prerun_checklist_form, start_growth_form,
-                    prerun_growth_form, prerun_sources_form,
-                    postrun_checklist_form)
+from .forms import (PrerunChecklistForm, StartGrowthForm,
+                    PrerunGrowthForm, PrerunSourcesForm,
+                    PostrunChecklistForm)
 import afm.models
 import hall.models
 

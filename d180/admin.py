@@ -1,26 +1,13 @@
 from django.contrib import admin
 
-import growths.models
-
-
-class SampleAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'parent_sample', 'size', 'location', 'substrate_serial')
-    ordering = ('-growth__growth_number', 'pocket', 'piece')
-
-    def parent_sample(self, instance):
-        if instance.id == instance.parent_id:
-            return None
-        else:
-            return instance.parent
+import d180.models
 
 
 class GrowthAdmin(admin.ModelAdmin):
-    list_display = ('growth_number', 'date', 'operator', 'project',
-                    'investigation', 'reactor')
-    ordering = ('-growth_number',)
-    list_filter = ('operator', 'project', 'investigation', 'reactor')
+    list_display = ('uid', 'created', 'user',)
+    ordering = ('-uid',)
+    list_filter = ('user', 'investigations',)
 
 
-admin.site.register(growths.models.growth, GrowthAdmin)
-admin.site.register(growths.models.sample, SampleAdmin)
-admin.site.register(growths.models.Platter)
+admin.site.register(d180.models.Growth, GrowthAdmin)
+admin.site.register(d180.models.Platter)

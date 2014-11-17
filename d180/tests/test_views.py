@@ -11,7 +11,8 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from growths.models import growth, sample, Platter
+from core.models import SampleNode
+from d180.models import Growth, Platter
 
 
 class TestGrowthView(TestCase):
