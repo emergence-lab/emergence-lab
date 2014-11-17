@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from django.db import models
 from django.conf import settings
 from django.contrib import auth
+import django.contrib.auth.models
 from django.core.mail import send_mail
 from django.core import validators
 from django.utils import timezone
@@ -37,7 +38,7 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
-class User(ActiveStateMixin, auth.models.AbstractBaseUser):
+class User(ActiveStateMixin, django.contrib.auth.models.AbstractBaseUser):
     """
     A custom user model that stores the name in a more portable way. Also
     stores information relating to project tracking.

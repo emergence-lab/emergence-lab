@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .mixins import TimestampMixin
-from core import registry
+from .process import get_process_choices
 
 
 @python_2_unicode_compatible
@@ -20,7 +20,7 @@ class SampleNode(MPTTModel, TimestampMixin):
     comment = models.TextField(blank=True)
     parent = TreeForeignKey('self', null=True, related_name='children')
     content_type = models.ForeignKey(ContentType, null=True,
-        limit_choices_to=registry.get_process_choices())
+        limit_choices_to=get_process_choices())
     object_id = models.PositiveIntegerField(null=True)
     process = GenericForeignKey('content_type', 'object_id')
 
