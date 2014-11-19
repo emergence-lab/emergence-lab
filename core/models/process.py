@@ -33,6 +33,7 @@ class ProcessNode(mptt.MPTTModel, TimestampMixin):
     comment = fields.RichTextField(blank=True)
     parent = mptt.TreeForeignKey('self', null=True, related_name='children')
     process = models.ForeignKey(Process)
+    piece = models.CharField(max_length=5)
 
     def __str__(self):
-        return self.process.__str__()
+        return '{0}_{1}'.format(self.get_root().sample.uid, self.piece)

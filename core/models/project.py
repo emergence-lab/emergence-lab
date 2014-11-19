@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from autoslug import AutoSlugField
+import autoslug
 
 from .mixins import ActiveStateMixin, TimestampMixin
 from .user import User
@@ -21,7 +21,7 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
     tool.
     """
     name = models.CharField(_('name'), max_length=45)
-    slug = AutoSlugField(_('slug'), populate_from='name')
+    slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
 
     class Meta:
@@ -39,7 +39,7 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     projects.
     """
     name = models.CharField(_('name'), max_length=45)
-    slug = AutoSlugField(_('slug'), populate_from='name')
+    slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
     project = models.ForeignKey(Project, verbose_name=_('project'))
 

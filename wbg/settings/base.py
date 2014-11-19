@@ -79,7 +79,7 @@ INSTALLED_APPS = (
     'mptt',
     # # local apps
     'core',
-    'd180',
+    # 'd180',
     # 'dashboard',
     # 'journal',
     # 'growths',

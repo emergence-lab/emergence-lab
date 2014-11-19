@@ -76,3 +76,30 @@ class TestSampleManager(unittest.TestCase):
         self.assertNotEqual(sample_1.process_tree_id, sample_2.process_tree_id)
         self.assertEqual(sample_1.process_tree.process_id,
                          sample_2.process_tree.process_id)
+
+
+class TestSample(unittest.TestCase):
+
+    def test_split_sample_no_process(self):
+        """
+        Test that splitting a sample with no other processes done on it in half
+        results in 2 child nodes.
+        """
+        substrate = mommy.make('core.Substrate')
+        sample = Sample.objects.create_sample(substrate=substrate)
+        sample.split_sample(2)
+        self.assertIsNotNone(sample.process_tree)
+        self.assertEqual(2, sample.process_tree.get_descendant_count())
+
+    def test_split_sample_with_process(self):
+        """
+        Test that splitting a sample that already has had processes done on it
+        in half results in two additional nodes.
+        """
+        substrate = mommy.make('core.Substrate')
+        process = mommy.make('core.Process', uid='proc-0001')
+        sample = Sample.objects.create_sample(substrate, process=process)
+        initial = sample.process_tree.get_descendant_count()
+        sample.split_sample(2)
+        final = sample.process_tree.get_descendant_count()
+        self.assertEqual(initial + 2, final)
