@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('parent', mptt.fields.TreeForeignKey(related_name='children', to='core.ProcessNode', null=True)),
-                ('process', models.OneToOneField(to='core.Process')),
+                ('process', models.ForeignKey(to='core.Process')),
             ],
             options={
                 'abstract': False,

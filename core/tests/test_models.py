@@ -7,6 +7,8 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
+from core.models import Sample
+
 
 class TestActiveStateMixin(unittest.TestCase):
 
@@ -33,3 +35,20 @@ class TestActiveStateMixin(unittest.TestCase):
         obj = mommy.prepare('core.Project', is_active=False)
         with self.assertRaises(Exception):
             obj.deactivate()
+
+
+class TestSampleManager(unittest.TestCase):
+
+    def test_create_sample_no_process(self):
+        substrate = mommy.make('core.Substrate')
+        sample = Sample.objects.create_sample(substrate=substrate)
+        self.assertEqual(substrate.id, sample.substrate_id)
+        self.assertIsNone(sample.process_tree)
+
+    def test_create_sample_with_process(self):
+        substrate = mommy.make('core.Substrate')
+        process = mommy.make('core.Process')
+        sample = Sample.objects.create_sample(substrate=substrate,
+                                              process=process)
+        self.assertIsNotNone(sample.process_tree)
+        self.assertEqual(process.id, sample.process_tree.process_id)

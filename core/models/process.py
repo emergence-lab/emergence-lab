@@ -32,7 +32,7 @@ class ProcessNode(mptt.MPTTModel, TimestampMixin):
     """
     comment = fields.RichTextField(blank=True)
     parent = mptt.TreeForeignKey('self', null=True, related_name='children')
-    process = models.OneToOneField(Process)
+    process = models.ForeignKey(Process)
 
     def __str__(self):
         return self.process.__str__()
