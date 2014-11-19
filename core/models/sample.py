@@ -57,5 +57,5 @@ class Sample(TimestampMixin, models.Model):
 
     @classmethod
     def generate_uid(cls):
-        count = str(cls.objects.all().count()).zfill(4)
+        count = str(cls.objects.all().count() + 1).zfill(4)
         return 'smpl-{0}'.format(count)
