@@ -40,15 +40,39 @@ class TestActiveStateMixin(unittest.TestCase):
 class TestSampleManager(unittest.TestCase):
 
     def test_create_sample_no_process(self):
+        """
+        Test that the sample is properly created with a null process_tree
+        when it is created without any associated process.
+        """
         substrate = mommy.make('core.Substrate')
         sample = Sample.objects.create_sample(substrate=substrate)
         self.assertEqual(substrate.id, sample.substrate_id)
         self.assertIsNone(sample.process_tree)
 
     def test_create_sample_with_process(self):
+        """
+        Test that the sample is properly created with a process_tree when a
+        process is specified.
+        """
         substrate = mommy.make('core.Substrate')
         process = mommy.make('core.Process')
         sample = Sample.objects.create_sample(substrate=substrate,
                                               process=process)
         self.assertIsNotNone(sample.process_tree)
         self.assertEqual(process.id, sample.process_tree.process_id)
+
+    def test_create_sample_multiple_nodes_shared_process(self):
+        """
+        Test that multiple samples can share a process but will have different
+        trees.
+        """
+        substrate_1 = mommy.make('core.Substrate')
+        substrate_2 = mommy.make('core.Substrate')
+        process = mommy.make('core.Process')
+        sample_1 = Sample.objects.create_sample(substrate=substrate_1,
+                                                process=process)
+        sample_2 = Sample.objects.create_sample(substrate=substrate_2,
+                                                process=process)
+        self.assertNotEqual(sample_1.process_tree_id, sample_2.process_tree_id)
+        self.assertEqual(sample_1.process_tree.process_id,
+                         sample_2.process_tree.process_id)
