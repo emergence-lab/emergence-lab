@@ -5,7 +5,7 @@ from __future__ import absolute_import
 from django.db import models
 from django.conf import settings
 from django.contrib import auth
-import django.contrib.auth.models
+from django.contrib.auth import models as auth
 from django.core.mail import send_mail
 from django.core import validators
 from django.utils import timezone
@@ -38,7 +38,7 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
-class User(ActiveStateMixin, django.contrib.auth.models.AbstractBaseUser):
+class User(ActiveStateMixin, auth.AbstractBaseUser):
     """
     A custom user model that stores the name in a more portable way. Also
     stores information relating to project tracking.
@@ -58,12 +58,12 @@ class User(ActiveStateMixin, django.contrib.auth.models.AbstractBaseUser):
     is_staff = models.BooleanField(_('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
-    groups = models.ManyToManyField(auth.models.Group,
+    groups = models.ManyToManyField(auth.Group,
         verbose_name=_('groups'), blank=True,
         help_text=_('The groups this user belongs to. A user will get all '
                     'permissions granted to each of their groups.'),
         related_name='custom_users', related_query_name='custom_user')
-    user_permissions = models.ManyToManyField(auth.models.Permission,
+    user_permissions = models.ManyToManyField(auth.Permission,
         verbose_name=_('user permissions'), blank=True,
         help_text=_('Specific permissions for this user.'),
         related_name='custom_users', related_query_name='custom_user')
@@ -74,7 +74,7 @@ class User(ActiveStateMixin, django.contrib.auth.models.AbstractBaseUser):
         help_text=_('Projects this user is tracking'),
         related_name='users', related_query_name='user')
 
-    objects = auth.models.UserManager()
+    objects = auth.UserManager()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']

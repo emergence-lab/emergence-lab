@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import autoslug.fields
 import mptt.fields
-import ckeditor.fields
+import core.fields
 import django.utils.timezone
 from django.conf import settings
 import django.core.validators
@@ -51,11 +51,45 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
                 ('name', models.CharField(max_length=45, verbose_name='name')),
                 ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
-                ('description', ckeditor.fields.RichTextField(verbose_name='description', blank=True)),
+                ('description', core.fields.RichTextField(verbose_name='description', blank=True)),
             ],
             options={
                 'verbose_name': 'investigation',
                 'verbose_name_plural': 'investigations',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Process',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('uid', models.SlugField(max_length=25)),
+                ('comment', core.fields.RichTextField(blank=True)),
+                ('polymorphic_ctype', models.ForeignKey(related_name='polymorphic_core.process_set', editable=False, to='contenttypes.ContentType', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ProcessNode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('comment', core.fields.RichTextField(blank=True)),
+                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('parent', mptt.fields.TreeForeignKey(related_name='children', to='core.ProcessNode', null=True)),
+                ('process', models.OneToOneField(to='core.Process')),
+            ],
+            options={
+                'abstract': False,
             },
             bases=(models.Model,),
         ),
@@ -69,7 +103,7 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
                 ('name', models.CharField(max_length=45, verbose_name='name')),
                 ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
-                ('description', ckeditor.fields.RichTextField(verbose_name='description', blank=True)),
+                ('description', core.fields.RichTextField(verbose_name='description', blank=True)),
             ],
             options={
                 'verbose_name': 'project',
@@ -90,25 +124,41 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='SampleNode',
+            name='Sample',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('uid', models.SlugField(max_length=20)),
-                ('comment', models.TextField(blank=True)),
-                ('object_id', models.PositiveIntegerField(null=True)),
-                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType', null=True)),
-                ('parent', mptt.fields.TreeForeignKey(related_name='children', to='core.SampleNode', null=True)),
+                ('uid', models.SlugField(max_length=25)),
+                ('comment', core.fields.RichTextField(blank=True)),
+                ('process_tree', mptt.fields.TreeOneToOneField(to='core.ProcessNode')),
             ],
             options={
                 'abstract': False,
             },
             bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Substrate',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('comment', core.fields.RichTextField(blank=True)),
+                ('source', models.CharField(max_length=100, blank=True)),
+                ('serial', models.CharField(max_length=25, blank=True)),
+                ('polymorphic_ctype', models.ForeignKey(related_name='polymorphic_core.substrate_set', editable=False, to='contenttypes.ContentType', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='sample',
+            name='substrate',
+            field=models.OneToOneField(to='core.Substrate'),
+            preserve_default=True,
         ),
         migrations.AddField(
             model_name='investigation',

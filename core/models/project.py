@@ -8,10 +8,10 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from autoslug import AutoSlugField
-from ckeditor.fields import RichTextField
 
 from .mixins import ActiveStateMixin, TimestampMixin
 from .user import User
+from core import fields
 
 
 @python_2_unicode_compatible
@@ -22,7 +22,7 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
     """
     name = models.CharField(_('name'), max_length=45)
     slug = AutoSlugField(_('slug'), populate_from='name')
-    description = RichTextField(_('description'), blank=True)
+    description = fields.RichTextField(_('description'), blank=True)
 
     class Meta:
         verbose_name = _('project')
@@ -40,7 +40,7 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     """
     name = models.CharField(_('name'), max_length=45)
     slug = AutoSlugField(_('slug'), populate_from='name')
-    description = RichTextField(_('description'), blank=True)
+    description = fields.RichTextField(_('description'), blank=True)
     project = models.ForeignKey(Project, verbose_name=_('project'))
 
     class Meta:

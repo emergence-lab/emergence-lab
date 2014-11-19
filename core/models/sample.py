@@ -2,27 +2,36 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
 
-from mptt.models import MPTTModel, TreeForeignKey
+from mptt import models as mptt
+import polymorphic
 
 from .mixins import TimestampMixin
-from .process import get_process_choices
+from .process import ProcessNode
+from core import fields
 
 
 @python_2_unicode_compatible
-class SampleNode(MPTTModel, TimestampMixin):
-    uid = models.SlugField(max_length=20)
-    comment = models.TextField(blank=True)
-    parent = TreeForeignKey('self', null=True, related_name='children')
-    content_type = models.ForeignKey(ContentType, null=True,
-        limit_choices_to=get_process_choices())
-    object_id = models.PositiveIntegerField(null=True)
-    process = GenericForeignKey('content_type', 'object_id')
+class Substrate(polymorphic.PolymorphicModel, TimestampMixin):
+    """
+    Base class for all substrates.
+    """
+    comment = fields.RichTextField(blank=True)
+    source = models.CharField(max_length=100, blank=True)
+    serial = models.CharField(max_length=25, blank=True)
+
+    def __str__(self):
+        return self.serial
+
+
+@python_2_unicode_compatible
+class Sample(TimestampMixin, models.Model):
+    uid = models.SlugField(max_length=25)
+    comment = fields.RichTextField(blank=True)
+    substrate = models.OneToOneField(Substrate)
+    process_tree = mptt.TreeOneToOneField(ProcessNode)
 
     def __str__(self):
         return self.uid
