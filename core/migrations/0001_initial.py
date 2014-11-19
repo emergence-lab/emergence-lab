@@ -131,7 +131,7 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
                 ('uid', models.SlugField(max_length=25)),
                 ('comment', core.fields.RichTextField(blank=True)),
-                ('process_tree', mptt.fields.TreeOneToOneField(to='core.ProcessNode')),
+                ('process_tree', mptt.fields.TreeOneToOneField(null=True, to='core.ProcessNode')),
             ],
             options={
                 'abstract': False,

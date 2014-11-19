@@ -26,12 +26,36 @@ class Substrate(polymorphic.PolymorphicModel, TimestampMixin):
         return self.serial
 
 
+class SampleManager(models.Manager):
+
+    def _create_sample(self, uid, substrate, process_tree):
+        pass
+
+    def create_sample(self, substrate, comment='', process=None):
+        uid = self.model.generate_uid()
+        if process is None:
+            process_tree = None
+        else:
+            process_tree = ProcessNode.objects.create(process=process)
+        sample = self.model(uid=uid, substrate=substrate, comment=comment,
+                            process_tree=process_tree)
+        sample.save()
+        return sample
+
+
 @python_2_unicode_compatible
 class Sample(TimestampMixin, models.Model):
     uid = models.SlugField(max_length=25)
     comment = fields.RichTextField(blank=True)
     substrate = models.OneToOneField(Substrate)
-    process_tree = mptt.TreeOneToOneField(ProcessNode)
+    process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
+
+    objects = SampleManager()
 
     def __str__(self):
         return self.uid
+
+    @classmethod
+    def generate_uid(cls):
+        count = str(cls.objects.all().count()).zfill(4)
+        return 'smpl-{0}'.format(count)
