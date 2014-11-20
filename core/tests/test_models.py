@@ -37,6 +37,18 @@ class TestActiveStateMixin(unittest.TestCase):
             obj.deactivate()
 
 
+class TestUIDMixin(unittest.TestCase):
+
+    def test_set_uid(self):
+        Sample.prefix = 'prefix'
+        Sample.postfix = 'postfix'
+        Sample.padding = 6
+        substrate = mommy.make('core.Substrate')
+        sample = Sample.objects.create(substrate=substrate, process_tree=None)
+        expected = 'prefix{0}postfix'.format(str(sample.id).zfill(6))
+        self.assertEqual(expected, sample.uid)
+
+
 class TestSampleManager(unittest.TestCase):
 
     def test_create_sample_no_process(self):

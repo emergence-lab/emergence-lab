@@ -8,7 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from mptt import models as mptt
 import polymorphic
 
-from .mixins import TimestampMixin
+from .mixins import TimestampMixin, UIDMixin
 from .process import Process, ProcessNode
 from core import fields
 
@@ -32,39 +32,27 @@ class SampleManager(models.Manager):
         pass
 
     def create_sample(self, substrate, comment='', process=None):
-        uid = self.model._generate_uid()
         if process is None:
             process_tree = None
         else:
             process_tree = ProcessNode.objects.create(process=process,
                                                       piece='a')
-        sample = self.model(uid=uid, substrate=substrate, comment=comment,
+        sample = self.model(substrate=substrate, comment=comment,
                             process_tree=process_tree)
         sample.save()
         return sample
 
 
-@python_2_unicode_compatible
-class Sample(TimestampMixin, models.Model):
-    uid = models.SlugField(max_length=25)
+class Sample(UIDMixin, TimestampMixin, models.Model):
+    prefix = 'smpl-'
+
     comment = fields.RichTextField(blank=True)
     substrate = models.OneToOneField(Substrate)
     process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
 
     objects = SampleManager()
 
-    def __str__(self):
-        return self.uid
-
-    @classmethod
-    def _generate_uid(cls):
-        count = str(cls.objects.all().count() + 1).zfill(4)
-        return 'smpl-{0}'.format(count)
-
     def get_pieces(self):
-        pass
-
-    def get_num_pieces(self):
         pass
 
     def split_sample(self, number=2, comment=None):

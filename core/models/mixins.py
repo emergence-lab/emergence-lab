@@ -67,3 +67,28 @@ class TimestampMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class UIDMixin(models.Model):
+    """
+    Mixin for models that have a string uid based on the objects primary key id.
+    Uses the format prefix + zero-padded id + postfix.
+    """
+    prefix = ''
+    postfix = ''
+    padding = 4
+
+    uid = models.SlugField(max_length=25, blank=True, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.uid
+
+    def save(self, *args, **kwargs):
+        super(UIDMixin, self).save(*args, **kwargs)
+        self.uid = '{0}{1}{2}'.format(self.prefix,
+                                      str(self.id).zfill(self.padding),
+                                      self.postfix)
+        super(UIDMixin, self).save(update_fields=['uid'])
