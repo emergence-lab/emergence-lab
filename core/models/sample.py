@@ -61,7 +61,8 @@ class Sample(UIDMixin, TimestampMixin, models.Model):
             self.process_tree = ProcessNode.objects.create(process=dummy)
         if comment is None:
             comment = 'Split sample into {0} pieces'.format(number)
-        process = Process.objects.create(uid='split-0001', comment=comment)
+        process = Process.objects.create(uid='split-{id}{postfix}',
+                                         comment=comment)
         for i in range(number):
             node = ProcessNode(parent=self.process_tree, process=process)
             node.insert_at(self.process_tree, save=True)

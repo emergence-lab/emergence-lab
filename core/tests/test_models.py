@@ -39,13 +39,39 @@ class TestActiveStateMixin(unittest.TestCase):
 
 class TestUIDMixin(unittest.TestCase):
 
-    def test_set_uid(self):
+    @classmethod
+    def setUpClass(cls):
         Sample.prefix = 'prefix'
         Sample.postfix = 'postfix'
         Sample.padding = 6
-        substrate = mommy.make('core.Substrate')
-        sample = Sample.objects.create(substrate=substrate, process_tree=None)
+
+    def setUp(self):
+        self.substrate = mommy.make('core.Substrate')
+
+    def test_auto_both(self):
+        sample = Sample.objects.create(substrate=self.substrate,
+                                       process_tree=None)
         expected = 'prefix{0}postfix'.format(str(sample.id).zfill(6))
+        self.assertEqual(expected, sample.uid)
+
+    def test_set_id_auto_uid(self):
+        sample = Sample.objects.create(id=1000, substrate=self.substrate,
+                                       process_tree=None)
+        expected = 'prefix001000postfix'
+        self.assertEqual(expected, sample.uid)
+
+    def test_set_prefix(self):
+        sample = Sample.objects.create(uid='new-{id}{postfix}',
+                                       substrate=self.substrate,
+                                       process_tree=None)
+        expected = 'new-{0}postfix'.format(str(sample.id).zfill(6))
+        self.assertEqual(expected, sample.uid)
+
+    def test_set_postfix(self):
+        sample = Sample.objects.create(uid='{prefix}{id}-new',
+                                       substrate=self.substrate,
+                                       process_tree=None)
+        expected = 'prefix{0}-new'.format(str(sample.id).zfill(6))
         self.assertEqual(expected, sample.uid)
 
 
@@ -92,13 +118,15 @@ class TestSampleManager(unittest.TestCase):
 
 class TestSample(unittest.TestCase):
 
+    def setUp(self):
+        self.substrate = mommy.make('core.Substrate')
+
     def test_split_sample_no_process(self):
         """
         Test that splitting a sample with no other processes done on it in half
         results in 2 child nodes.
         """
-        substrate = mommy.make('core.Substrate')
-        sample = Sample.objects.create_sample(substrate=substrate)
+        sample = Sample.objects.create_sample(substrate=self.substrate)
         sample.split_sample(2)
         self.assertIsNotNone(sample.process_tree)
         self.assertEqual(2, sample.process_tree.get_descendant_count())
@@ -108,9 +136,8 @@ class TestSample(unittest.TestCase):
         Test that splitting a sample that already has had processes done on it
         in half results in two additional nodes.
         """
-        substrate = mommy.make('core.Substrate')
-        process = mommy.make('core.Process', uid='proc-0001')
-        sample = Sample.objects.create_sample(substrate, process=process)
+        process = mommy.make('core.Process')
+        sample = Sample.objects.create_sample(self.substrate, process=process)
         initial = sample.process_tree.get_descendant_count()
         sample.split_sample(2)
         final = sample.process_tree.get_descendant_count()

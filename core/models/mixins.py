@@ -73,6 +73,10 @@ class UIDMixin(models.Model):
     """
     Mixin for models that have a string uid based on the objects primary key id.
     Uses the format prefix + zero-padded id + postfix.
+
+    To override the default behavior, set the uid on instance creation. Any
+    of the default elements may be used by inserting {prefix}, {id}, or
+    {postfix} into the uid string. The approriate element will be substituted.
     """
     prefix = ''
     postfix = ''
@@ -88,7 +92,11 @@ class UIDMixin(models.Model):
 
     def save(self, *args, **kwargs):
         super(UIDMixin, self).save(*args, **kwargs)
-        self.uid = '{0}{1}{2}'.format(self.prefix,
-                                      str(self.id).zfill(self.padding),
-                                      self.postfix)
+        if self.uid == '':
+            self.uid = '{prefix}{id}{postfix}'
+        self.uid = self.uid.format(
+            prefix=self.prefix,
+            id=str(self.id).zfill(self.padding),
+            postfix=self.postfix
+        )
         super(UIDMixin, self).save(update_fields=['uid'])
