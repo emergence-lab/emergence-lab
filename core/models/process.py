@@ -8,20 +8,17 @@ from django.utils.encoding import python_2_unicode_compatible
 from mptt import models as mptt
 import polymorphic
 
-from .mixins import TimestampMixin
+from .mixins import TimestampMixin, UIDMixin
 from core import fields
 
 
-@python_2_unicode_compatible
-class Process(polymorphic.PolymorphicModel, TimestampMixin):
+class Process(polymorphic.PolymorphicModel, UIDMixin, TimestampMixin):
     """
     Base class for all processes.
     """
-    uid = models.SlugField(max_length=25)
-    comment = fields.RichTextField(blank=True)
+    prefix = 'proc-'
 
-    def __str__(self):
-        return self.uid
+    comment = fields.RichTextField(blank=True)
 
 
 @python_2_unicode_compatible
