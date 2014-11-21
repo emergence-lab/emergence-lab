@@ -84,6 +84,7 @@ INSTALLED_APPS = (
     'growths',
     'afm',
     'hall',
+    'schedule_queue',
     # misc
     'actstream',
 )

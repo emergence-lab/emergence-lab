@@ -92,6 +92,9 @@ urlpatterns = [
 
     # hall urls
     url(r'^hall/', include('hall.urls')),
+    
+    # schedule_queue urls
+    url(r'^scheduling/', include('schedule_queue.urls')),
 
     # user-specific views
     url(r'^(?P<username>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_user'),
