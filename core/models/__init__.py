@@ -5,4 +5,4 @@ from .mixins import ActiveStateMixin, TimestampMixin
 from .project import Project, Investigation, ProjectTracking
 from .user import User
 from .sample import Sample, Substrate
-from .process import Process, ProcessNode
+from .process import Process, ProcessNode, SplitProcess

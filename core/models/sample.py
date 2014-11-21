@@ -57,21 +57,29 @@ class Sample(AutoUIDMixin, TimestampMixin, models.Model):
     def _get_tree_queryset(self):
         return ProcessNode.objects.filter(tree_id=self.process_tree.tree_id)
 
+    def _refresh_tree(self):
+        self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
+
     def _get_next_piece(self):
         used_piece_names = list(self._get_tree_queryset()
             .order_by('-piece').values_list('piece', flat=True))
         return chr(ord(used_piece_names[0]) + 1)
 
-    def split(self, number=2, piece='a', comment=None):
-        """
+    def _insert_node(self, process, piece, parent, comment=''):
+        ProcessNode.objects.create(process=process, piece=piece,
+                                   comment=comment, parent_id=parent.id)
 
+    def split(self, number=2, piece='a', comment=None, force_refresh=True):
+        """
+        Splits the sample piece into the specific number of pieces, with an
+        optional comment on the split process itself.
         """
         if comment is None:
             comment = 'Split sample into {0} pieces'.format(number)
 
         process = SplitProcess.objects.create(comment=comment)
 
-        branch = self.get_branch(piece)
+        branch = self.get_piece(piece)
         for i in range(number):
             if i == 0:
                 new_piece = piece
@@ -85,25 +93,30 @@ class Sample(AutoUIDMixin, TimestampMixin, models.Model):
             #       the lft and rght items are not updated properly. Workarounds
             #       include manually updating the root node or requerying for
             #       the sample object which will force a refresh.
-            ProcessNode.objects.create(process=process,
-                                       piece=new_piece,
-                                       parent_id=branch.id)
-        # workaround to force the root node to update
-        self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
+            self._insert_node(process, new_piece, branch)
+        if force_refresh:  # workaround to force the root node to update
+            self._refresh_tree()
 
-    def get_tree(self):
-        return self.process_tree
+    def run_process(self, process, piece='a', comment='', force_refresh=True):
+        """
+        Append a process to the specified branch.
+        """
+        branch = self.get_piece(piece)
+        self._insert_node(process, piece, branch, comment)
+        if force_refresh:  # workaround to force the root node to update
+            self._refresh_tree()
 
-    def run_process(self, process, piece='a'):
-        branch = self.get_branch(piece)
-        ProcessNode.objects.create(process=process, piece=piece,
-                                   parent_id=branch.id)
-        self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
+    def insert_process(self, process, node_uid, comment='', after=True,
+                       force_refresh=True):
+        """
+        Insert a process into the tree before or after the specified node.
+        """
+        pass
 
     def get_pieces(self):
         pass
 
-    def get_branch(self, piece):
+    def get_piece(self, piece):
         """
         Branch uid in the format {sample uid}{piece}
         """
