@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 from django.db import models
-from django.conf import settings
-from django.contrib import auth
 from django.contrib.auth import models as auth
 from django.core.mail import send_mail
 from django.core import validators

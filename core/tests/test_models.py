@@ -77,43 +77,14 @@ class TestUIDMixin(unittest.TestCase):
 
 class TestSampleManager(unittest.TestCase):
 
-    def test_create_sample_no_process(self):
+    def test_create_sample(self):
         """
-        Test that the sample is properly created with a null process_tree
-        when it is created without any associated process.
+        Test that the sample is properly created with the root process.
         """
         substrate = mommy.make('core.Substrate')
         sample = Sample.objects.create_sample(substrate=substrate)
         self.assertEqual(substrate.id, sample.substrate_id)
-        self.assertIsNone(sample.process_tree)
-
-    def test_create_sample_with_process(self):
-        """
-        Test that the sample is properly created with a process_tree when a
-        process is specified.
-        """
-        substrate = mommy.make('core.Substrate')
-        process = mommy.make('core.Process')
-        sample = Sample.objects.create_sample(substrate=substrate,
-                                              process=process)
-        self.assertIsNotNone(sample.process_tree)
-        self.assertEqual(process.id, sample.process_tree.process_id)
-
-    def test_create_sample_multiple_nodes_shared_process(self):
-        """
-        Test that multiple samples can share a process but will have different
-        trees.
-        """
-        substrate_1 = mommy.make('core.Substrate')
-        substrate_2 = mommy.make('core.Substrate')
-        process = mommy.make('core.Process')
-        sample_1 = Sample.objects.create_sample(substrate=substrate_1,
-                                                process=process)
-        sample_2 = Sample.objects.create_sample(substrate=substrate_2,
-                                                process=process)
-        self.assertNotEqual(sample_1.process_tree_id, sample_2.process_tree_id)
-        self.assertEqual(sample_1.process_tree.process_id,
-                         sample_2.process_tree.process_id)
+        self.assertEqual(sample.uid + '_a.root', sample.process_tree.uid)
 
 
 class TestSample(unittest.TestCase):
@@ -121,24 +92,56 @@ class TestSample(unittest.TestCase):
     def setUp(self):
         self.substrate = mommy.make('core.Substrate')
 
-    def test_split_sample_no_process(self):
+    def test_split_sample(self):
         """
         Test that splitting a sample with no other processes done on it in half
         results in 2 child nodes.
         """
+        split_number = 4
         sample = Sample.objects.create_sample(substrate=self.substrate)
-        sample.split_sample(2)
-        self.assertIsNotNone(sample.process_tree)
-        self.assertEqual(2, sample.process_tree.get_descendant_count())
+        before = sample.process_tree.get_descendant_count()
+        sample.split(split_number)
+        after = sample.process_tree.get_descendant_count()
+        self.assertEqual(before + split_number, after)
 
-    def test_split_sample_with_process(self):
+    def test_multiple_split_sample(self):
         """
-        Test that splitting a sample that already has had processes done on it
-        in half results in two additional nodes.
+        Test that splitting a sample multiple times correctly assigns piece
+        letters
         """
-        process = mommy.make('core.Process')
-        sample = Sample.objects.create_sample(self.substrate, process=process)
-        initial = sample.process_tree.get_descendant_count()
-        sample.split_sample(2)
-        final = sample.process_tree.get_descendant_count()
-        self.assertEqual(initial + 2, final)
+        sample = Sample.objects.create_sample(substrate=self.substrate)
+        self.assertEqual(sample.process_tree.piece, 'a')
+        sample.split(2, 'a')
+        before_a = sample.get_branch('a')
+        before_b = sample.get_branch('b')
+        before_c = sample.get_branch('c')
+        self.assertIsNotNone(before_a)
+        self.assertIsNotNone(before_b)
+        self.assertIsNone(before_c)
+        sample.split(2, 'b')
+        after_a = sample.get_branch('a')
+        after_b = sample.get_branch('b')
+        after_c = sample.get_branch('c')
+        self.assertEqual(before_a.id, after_a.id)
+        self.assertNotEqual(before_b.id, after_b.id)
+        self.assertIsNotNone(after_c)
+        self.assertEqual(after_b.parent_id, before_b.id)
+        self.assertEqual(after_c.parent_id, before_b.id)
+
+    def test_get_branch(self):
+        sample = Sample.objects.create_sample(self.substrate)
+        sample.split(2)
+        left = sample.get_branch('a')
+        right = sample.get_branch('b')
+        self.assertEqual(left.piece, 'a')
+        self.assertEqual(right.piece, 'b')
+        self.assertEqual(left.parent, sample.process_tree)
+        self.assertEqual(right.parent, sample.process_tree)
+
+
+    def test_get_process_single(self):
+        sample = Sample.objects.create_sample(self.substrate)
+        process = sample.process_tree.process
+        result = sample.get_process(process.uid)
+        self.assertEqual(result.count(), 1)
+        self.assertEqual(result.first().id, sample.process_tree.id)

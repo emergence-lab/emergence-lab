@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 from django.db import models
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -69,7 +70,29 @@ class TimestampMixin(models.Model):
         abstract = True
 
 
-class UIDMixin(models.Model):
+@python_2_unicode_compatible
+class FunctionUIDMixin(models.Model):
+    """
+    Mixin for models that have a custom string uid.
+    """
+    uid = models.SlugField(max_length=25, blank=True, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.uid
+
+    def _generate_uid(self):
+        return str(self.id)
+
+    def save(self, *args, **kwargs):
+        super(FunctionUIDMixin, self).save(*args, **kwargs)
+        self.uid = self._generate_uid()
+        super(FunctionUIDMixin, self).save(update_fields=['uid'])
+
+
+class AutoUIDMixin(FunctionUIDMixin):
     """
     Mixin for models that have a string uid based on the objects primary key id.
     Uses the format prefix + zero-padded id + postfix.
@@ -82,21 +105,15 @@ class UIDMixin(models.Model):
     postfix = ''
     padding = 4
 
-    uid = models.SlugField(max_length=25, blank=True, editable=False)
-
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return self.uid
-
-    def save(self, *args, **kwargs):
-        super(UIDMixin, self).save(*args, **kwargs)
-        if self.uid == '':
-            self.uid = '{prefix}{id}{postfix}'
-        self.uid = self.uid.format(
+    def _generate_uid(self):
+        uid = self.uid
+        if uid == '':
+            uid = '{prefix}{id}{postfix}'
+        return uid.format(
             prefix=self.prefix,
             id=str(self.id).zfill(self.padding),
             postfix=self.postfix
         )
-        super(UIDMixin, self).save(update_fields=['uid'])
