@@ -196,4 +196,4 @@ class comments_form(forms.Form):
     comment_field = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)
 
 class reservation_close_form(forms.Form):    
-    is_active = forms.BooleanField(required=False)
+    is_active = forms.BooleanField(required=False, label="Cancel the following reservation:")

@@ -43,7 +43,17 @@
                 <div class="modal-body">
                     WARNING: If you start a new growth now you will NOT be able to return to this page!!
                     {{ reservation_object }}
-                    {% bootstrap_form reservation_form %} Close reservation by {{ reservation_object.user.operator.name }} for XX?
+                    {% bootstrap_form reservation_form %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>   
+                        </div>
+                        <div class="panel-body">
+                            <strong>Tool:</strong> {{ reservation_object.tool }} <br>
+                            <strong>User:</strong> {{ reservation_object.user.operator.name }} <br>
+                            <strong>Run Time:</strong> {{ reservation_object.growth_length_in_hours }}
+                        </div>                    
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
