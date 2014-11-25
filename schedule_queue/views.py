@@ -108,7 +108,6 @@ class DecreasePriority(RedirectView):
 
 class CancelReservation(RedirectView):
     permanent = False
-    #pass   
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
@@ -116,3 +115,5 @@ class CancelReservation(RedirectView):
             reservation_obj.is_active = False
             reservation_obj.save()
         return reverse('reservation_list_by_tool', args=(reservation_obj.tool,))
+
+

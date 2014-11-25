@@ -16,12 +16,13 @@ from core.views import ActiveListView
 from .models import growth, sample, readings, recipe_layer, source, Platter
 from .filters import growth_filter, RelationalFilterView
 from .forms import (sample_form, p_form, split_form, readings_form,
-                    comments_form, SampleSizeForm)
+                    comments_form, SampleSizeForm, reservation_close_form)
 from .forms import (prerun_checklist_form, start_growth_form,
                     prerun_growth_form, prerun_sources_form,
                     postrun_checklist_form)
 import afm.models
 import hall.models
+import schedule_queue.models
 
 
 class growth_list(RelationalFilterView):
@@ -378,13 +379,19 @@ class CreateGrowthStartView(TemplateView):
     def post(self, request, *args, **kwargs):
         cgsform = start_growth_form(request.POST, prefix='cgsform')
         commentsform = comments_form(request.POST, prefix='commentsform')
-        if cgsform.is_valid() and commentsform.is_valid():
+        reservation_form = reservation_close_form(request.POST, prefix='reservation_form')
+        context = self.get_context_data(**kwargs)
+        reservation_object = context['reservation_object']
+        if cgsform.is_valid() and commentsform.is_valid() and reservation_form.is_valid():
             comments = commentsform.cleaned_data['comment_field']
             cgsform.save(runcomments=comments)
+            if reservation_form.cleaned_data['is_active'] is True:
+                reservation_object.is_active = False
+                reservation_object.save()
             return HttpResponseRedirect(reverse('create_growth_prerun'))
         else:
             return render(request, self.template_name,
-                          {'cgsform': cgsform, 'commentsform': commentsform})
+                          {'cgsform': cgsform, 'commentsform': commentsform, 'reservation_form': reservation_form})
 
     def get_context_data(self, **kwargs):
         context = super(CreateGrowthStartView, self).get_context_data(**kwargs)
@@ -402,6 +409,8 @@ class CreateGrowthStartView(TemplateView):
                                                    'operator': operator.objects.get(user=self.request.user),
                                                })
         context['commentsform'] = comments_form(prefix='commentsform')
+        context['reservation_form'] = reservation_close_form(prefix='reservation_form', initial={'is_active': True})
+        context['reservation_object'] = schedule_queue.models.Reservation.objects.filter(is_active=True, tool=context['cgsform'].initial['reactor']).order_by('priority_field').first()
         return context
 
 

@@ -42,6 +42,8 @@
                 </div>
                 <div class="modal-body">
                     WARNING: If you start a new growth now you will NOT be able to return to this page!!
+                    {{ reservation_object }}
+                    {% bootstrap_form reservation_form %} Close reservation by {{ reservation_object.user.operator.name }} for XX?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

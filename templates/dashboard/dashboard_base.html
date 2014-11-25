@@ -4,6 +4,19 @@
 
 {% block content %}
 <div class="container-fluid bottom-spacer-lg">
+
+    <div>
+        {% block firstinline %}
+            {% if reservations.first.user == request.user %}
+            <div class="alert alert-success" role="alert">
+                <strong>Scheduler:</strong> You're next in line for growth on {{ reservations.first.tool }}. 
+                You can <a href={% url 'create_growth_start' %}>start growth</a> or
+                <a href={% url 'cancel_reservation' reservations.first.id %}>cancel your reservation</a>.
+            </div>
+            {% endif %}
+        {% endblock firstinline %}
+    </div>
+    
     <nav>
         <ol class="breadcrumb">
             {% block dashboard_breadcrumb %}
@@ -22,6 +35,14 @@
                 <span class="glyphicon glyphicon-search"></span>
                 Sample Lookup
             </a></li>
+            <li class="dropdown">
+                <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bookmark"></span> Reservations <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    {% for tool in tools %}
+                        <li><a href="{% url 'reservation_list_by_tool' tool %}">{{ tool }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
             <li class="dropdown">
                 <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Administration <span class="caret"></span></a>
                 <ul class="dropdown-menu">

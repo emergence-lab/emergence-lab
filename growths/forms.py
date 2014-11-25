@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from growths.models import growth, sample, readings, source
+from schedule_queue.models import Reservation
 import re
 
 from ckeditor.widgets import CKEditorWidget
@@ -193,3 +194,6 @@ class readings_form(ModelForm):
 
 class comments_form(forms.Form):
     comment_field = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)
+
+class reservation_close_form(forms.Form):    
+    is_active = forms.BooleanField(required=False)

@@ -5,6 +5,7 @@ from braces.views import LoginRequiredMixin
 from core.models import operator, Project, Investigation
 from core.streams import project_stream, investigation_stream
 from growths.models import growth
+from schedule_queue.models import Reservation, tools
 
 
 class DashboardMixin(object):
@@ -29,6 +30,8 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
         context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
+        context['reservations'] = Reservation.objects.filter(is_active=True).order_by('priority_field')
+        context['tools'] = tools.get_tool_list()
         return context
 
     def get_object(self, queryset=None):
