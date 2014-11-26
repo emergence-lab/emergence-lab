@@ -6,12 +6,26 @@
 <div class="container-fluid bottom-spacer-lg">
 
     <div>
+        {% block firstinline1 %}
+            {% for i in reservations %}
+                {% if i.user == request.user %}
+                <div class="alert alert-success" role="alert">
+                    <strong>Scheduler:</strong> You're next in line for growth on {{ i.tool.upper }}. 
+                    You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
+                    <a class="alert-link" href={% url 'cancel_reservation' i.id %}>cancel your reservation</a>.
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock firstinline1 %}
+    </div>
+
+    <div>
         {% block firstinline %}
             {% if reservations.first.user == request.user %}
             <div class="alert alert-success" role="alert">
                 <strong>Scheduler:</strong> You're next in line for growth on {{ reservations.first.tool }}. 
-                You can <a href={% url 'create_growth_start' %}>start growth</a> or
-                <a href={% url 'cancel_reservation' reservations.first.id %}>cancel your reservation</a>.
+                You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
+                <a class="alert-link" href={% url 'cancel_reservation' reservations.first.id %}>cancel your reservation</a>.
             </div>
             {% endif %}
         {% endblock firstinline %}

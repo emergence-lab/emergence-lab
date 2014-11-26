@@ -410,7 +410,6 @@ class CreateGrowthStartView(TemplateView):
                                                })
         context['commentsform'] = comments_form(prefix='commentsform')
         context['reservation_form'] = reservation_close_form(prefix='reservation_form', initial={'is_active': True})
-        context['reservation_form'].label = "TEST LABEL"
         context['reservation_object'] = schedule_queue.models.Reservation.objects.filter(is_active=True, tool=context['cgsform'].initial['reactor']).order_by('priority_field').first()
         return context
 

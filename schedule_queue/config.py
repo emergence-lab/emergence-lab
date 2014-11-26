@@ -23,17 +23,10 @@ def get_tool_list():
 
 tool = {'d180': {'max_reservations': 5}, 'd75': {'max_reservations': 3}}
 
-#def add_attributes():
-#    for name, obj in inspect.getmembers(sys.modules[__name__]):
-#        if inspect.isclass(obj):
-#            obj.add_to_dict()  
+
 
 def get_tool_info(slug):
     return tool[slug]['max_reservations']
-
-#for name, obj in inspect.getmembers(sys.modules[__name__]):
-#    if inspect.isclass(obj):
-#        tool[obj.get_slug()]['tool_name'] = obj.get_name()
 
 class d180(object):
     
