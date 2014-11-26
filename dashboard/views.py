@@ -34,7 +34,6 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
         for i in tools.get_tool_list():
             reservation_list.append(Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first())
         context['reservations'] = reservation_list
-        # context['reservations'] = Reservation.objects.filter(is_active=True).order_by('priority_field')
         context['tools'] = tools.get_tool_list()
         return context
 
