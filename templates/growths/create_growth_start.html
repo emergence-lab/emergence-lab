@@ -42,20 +42,22 @@
                 </div>
                 <div class="modal-body">
                     WARNING: If you start a new growth now you will NOT be able to return to this page!!
-                    {% bootstrap_form reservation_form %}
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>   
+                    {% if reservation_object %}
+                        {% bootstrap_form reservation_form %}
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>   
+                            </div>
+                            <div class="panel-body">
+                                <strong>Tool:</strong> {{ reservation_object.tool.upper }} <br>
+                                <strong>Operator:</strong> {{ reservation_object.user.operator.name }} <br>
+                                <strong>Run Time:</strong> {{ reservation_object.growth_length_in_hours }} hours
+                                {% if reservation_object.comment %}
+                                    <br><strong>Comment:</strong> {{ reservation_object.comment }}
+                                {% endif %}
+                            </div>                    
                         </div>
-                        <div class="panel-body">
-                            <strong>Tool:</strong> {{ reservation_object.tool.upper }} <br>
-                            <strong>Operator:</strong> {{ reservation_object.user.operator.name }} <br>
-                            <strong>Run Time:</strong> {{ reservation_object.growth_length_in_hours }} hours
-                            {% if reservation_object.comment %}
-                                <br><strong>Comment:</strong> {{ reservation_object.comment }}
-                            {% endif %}
-                        </div>                    
-                    </div>
+                    {% endif %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

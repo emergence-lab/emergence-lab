@@ -41,7 +41,7 @@
                 <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bookmark"></span> Reservations <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     {% for tool in tools %}
-                        <li><a href="{% url 'reservation_list_by_tool' tool %}">{{ tool }}</a></li>
+                        <li><a href="{% url 'reservation_list_by_tool' tool %}">{{ tool.upper }}</a></li>
                     {% endfor %}
                 </ul>
             </li>
