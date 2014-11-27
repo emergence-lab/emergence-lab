@@ -380,12 +380,13 @@ class CreateGrowthStartView(TemplateView):
         cgsform = start_growth_form(request.POST, prefix='cgsform')
         commentsform = comments_form(request.POST, prefix='commentsform')
         reservation_form = reservation_close_form(request.POST, prefix='reservation_form')
-        context = self.get_context_data(**kwargs)
-        reservation_object = context['reservation_object']
+        #context = self.get_context_data(**kwargs)
+        #reservation_object = context['reservation_object']
         if cgsform.is_valid() and commentsform.is_valid() and reservation_form.is_valid():
             comments = commentsform.cleaned_data['comment_field']
             cgsform.save(runcomments=comments)
             if reservation_form.cleaned_data['is_active'] is True:
+                reservation_object = schedule_queue.models.Reservation.objects.filter(is_active=True, tool=cgsform.cleaned_data['reactor']).order_by('priority_field').first()
                 reservation_object.is_active = False
                 reservation_object.save()
             return HttpResponseRedirect(reverse('create_growth_prerun'))
@@ -410,6 +411,7 @@ class CreateGrowthStartView(TemplateView):
                                                })
         context['commentsform'] = comments_form(prefix='commentsform')
         context['reservation_form'] = reservation_close_form(prefix='reservation_form', initial={'is_active': True})
+        ### FIX LATER WITH JS: Gets initial form context instead of "reactor" valued upon modal load
         context['reservation_object'] = schedule_queue.models.Reservation.objects.filter(is_active=True, tool=context['cgsform'].initial['reactor']).order_by('priority_field').first()
         return context
 

@@ -9,10 +9,10 @@
         {% block reservationblock %}
             {% for i in reservations %}
                 {% if i.user == request.user %}
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-info" role="alert">
                     <strong>Scheduler:</strong> You're next in line for growth on {{ i.tool.upper }}. 
                     You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
-                    <a class="alert-link" href={% url 'cancel_reservation' i.id %}>cancel your reservation</a>.
+                    <a class="alert-link" href={% url 'close_reservation' i.id %}>cancel your reservation</a>.
                 </div>
                 {% endif %}
             {% endfor %}

@@ -9,6 +9,7 @@ from django.db import models
 import time
 
 from schedule_queue import config as tools
+import dashboard.urls
 
 #def get_tools():
 #    tool_list = tools.get_tool_list()
@@ -116,4 +117,12 @@ class CancelReservation(RedirectView):
             reservation_obj.save()
         return reverse('reservation_list_by_tool', args=(reservation_obj.tool,))
 
-
+class CloseReservation(RedirectView):
+    permanent = False
+    def get_redirect_url(self, *args, **kwargs):
+        pk = kwargs.pop('pk')
+        reservation_obj = Reservation.objects.get(pk=pk)
+        if reservation_obj.is_active:
+            reservation_obj.is_active = False
+            reservation_obj.save()
+        return reverse('dashboard')
