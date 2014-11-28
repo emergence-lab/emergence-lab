@@ -380,6 +380,7 @@ class CreateGrowthStartView(TemplateView):
         cgsform = start_growth_form(request.POST, prefix='cgsform')
         commentsform = comments_form(request.POST, prefix='commentsform')
         reservation_form = reservation_close_form(request.POST, prefix='reservation_form')
+        ### FIX LATER DEPENDING ON OUTCOME OF BELOW
         #context = self.get_context_data(**kwargs)
         #reservation_object = context['reservation_object']
         if cgsform.is_valid() and commentsform.is_valid() and reservation_form.is_valid():
@@ -411,7 +412,7 @@ class CreateGrowthStartView(TemplateView):
                                                })
         context['commentsform'] = comments_form(prefix='commentsform')
         context['reservation_form'] = reservation_close_form(prefix='reservation_form', initial={'is_active': True})
-        ### FIX LATER WITH JS: Gets initial form context instead of "reactor" valued upon modal load
+        ### FIX LATER WITH NEW MODEL OR JS: Gets initial form context instead of "reactor" value upon modal load
         context['reservation_object'] = schedule_queue.models.Reservation.objects.filter(is_active=True, tool=context['cgsform'].initial['reactor']).order_by('priority_field').first()
         return context
 

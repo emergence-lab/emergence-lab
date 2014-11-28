@@ -11,18 +11,6 @@ import time
 from schedule_queue import config as tools
 import dashboard.urls
 
-#def get_tools():
-#    tool_list = tools.get_tool_list()
-#    tool_dict = {}
-#    for i in tool_list:
-#        i = getattr(tool_list, i)
-#        tool_info = {
-#            'tool_name': tools.i.get_name(),
-#            'tool_slug': tools.i.get_slug(),
-#            'max_reservations': tools.i.get_max_reservations()
-#            }
-#        tool_dict[tools.i] = tool_info
-#    return tool_dict
 
 class ReservationLanding(ListView):
     model = Reservation

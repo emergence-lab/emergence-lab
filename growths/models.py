@@ -34,10 +34,6 @@ class growth(models.Model):
     Stores information related to the growth including tagging for material
     and device properties.
     """
-    #REACTOR_CHOICES = [
-    #    ('d180', 'D180'),
-    #    ('d75', 'D75'),
-    #]
 
     # general info
     growth_number = models.SlugField(max_length=10)

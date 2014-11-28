@@ -6,19 +6,6 @@ import time
 import schedule_queue.config as tools
 
 from growths.models import Platter
-
-#class Tool(models.Model):
-#    tool_name = models.CharField(max_length=20)
-#    max_reservations = models.IntegerField(default=0)
-#    def __str__(self):              # __unicode__ on Python 2
-#        return self.tool_name
-    
-#class Platter(models.Model):
-#    platter_name = models.CharField(max_length=20)
-#    start_date = models.DateField()
-#    tool = models.ForeignKey(Tool)
-#    def __str__(self):              # __unicode__ on Python 2
-#        return self.platter_name
     
 @python_2_unicode_compatible    
 class Reservation(models.Model):
