@@ -32,7 +32,9 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
         context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
         reservation_list = []
         for i in tools.get_tool_list():
-            reservation_list.append(Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first())
+            tmp_res = Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first()
+            if tmp_res and tmp_res.user == self.request.user:
+                reservation_list.append(tmp_res)  
         context['reservations'] = reservation_list
         context['tools'] = tools.get_tool_list()
         return context
