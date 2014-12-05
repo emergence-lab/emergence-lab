@@ -39,3 +39,36 @@ PASSWORD_MANAGER = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 MOMMY_CUSTOM_FIELDS_GEN = {
     'autoslug.AutoSlugField': lambda: 'default-value',
 }
+
+# Installed Apps
+
+INSTALLED_APPS = (
+    # builtin apps
+    'django.contrib.contenttypes',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # administration
+    'grappelli',
+    'django.contrib.admin',
+    # 3rd party apps
+    'datetimewidget',
+    'django_filters',
+    'bootstrap3',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'ckeditor',
+    'django_wysiwyg',
+    'mptt',
+    # local apps
+    #'core',
+    #'dashboard',
+    #'journal',
+    #'growths',
+    #'afm',
+    #'hall',
+    'schedule_queue',
+    # misc
+    'actstream',
+)
