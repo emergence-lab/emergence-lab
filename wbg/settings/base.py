@@ -84,6 +84,7 @@ INSTALLED_APPS = (
     'growths',
     'afm',
     'hall',
+    'simulations',
     # misc
     'actstream',
 )
@@ -194,3 +195,10 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 GITLAB_HOST = get_secret('GITLAB_HOST')
 GITLAB_PRIVATE_TOKEN = get_secret('GITLAB_PRIVATE_TOKEN')
+
+# AWS EC2
+
+AWS_EC2_REGION = get_secret('AWS_EC2_REGION')
+AWS_EC2_KEY = get_secret('AWS_EC2_KEY')
+AWS_EC2_SECRET = get_secret('AWS_EC2_SECRET')
+AWS_EC2_SSH_KEY = get_secret('AWS_EC2_SSH_KEY')
