@@ -56,13 +56,15 @@
     {% for items in object_list %}
       <tr>
           <td>{{ items.id }}</td>
-          <td>{{ items.user }}</td>
+          <td>{{ items.user.operator.name }}</td>
           <td>{{ items.request_date }}</td>
           <td>{{ items.execution_node }}</td>
           <td>{% if items.priority %}<span class="glyphicon glyphicon-flag"></span>{% endif %}</td>
           <td>
+              {% if request.user = items.user %}
               <a class="glyphicon glyphicon-edit" href={% url 'simulation_edit' pk=items.id %}></a>
               <a class="glyphicon glyphicon-remove" href="{% url 'simulation_cancel' pk=items.id %}"></a>
+              {% endif %}
           </td>
       </tr>
     {% endfor %}

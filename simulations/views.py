@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.utils.timezone import activate
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.views.generic import ListView, RedirectView
@@ -38,9 +39,18 @@ class SimulationLanding(ListView):
     
 class SimulationCreate(CreateView):
     model = Simulation
-    fields = ['user', 'priority', 'execution_node', 'input_file_path', 'output_file_path']
+    fields = ['priority', 'execution_node', 'input_file_path', 'output_file_path']
     template_name = 'simulations/create_form.html'
     success_url = '/simulations'
+
+    def form_valid(self, form):
+        """
+        If the form is valid, save the associated model.
+        """
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(reverse('simulation_landing'))
     
 class SimulationCancel(RedirectView):
     permanent = False  
@@ -54,7 +64,7 @@ class SimulationCancel(RedirectView):
 
 class SimulationEdit(UpdateView):
     model = Simulation
-    fields = ['user', 'priority', 'execution_node', 'input_file_path', 'output_file_path']
+    fields = ['priority', 'execution_node', 'input_file_path', 'output_file_path']
     template_name = 'simulations/edit_form.html'
     success_url = '/simulations'
 
