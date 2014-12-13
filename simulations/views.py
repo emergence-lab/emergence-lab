@@ -7,6 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django import forms
 from django.contrib.auth.models import User
 from django.db import models
+import datetime
 import time
 
 from simulations.models import Simulation
@@ -81,14 +82,19 @@ class SimulationManagement(ListView):
             for instance in self.signals.reservation_list()[0].instances:
                 tmp.append({'instance_name': instance.id,
                             'instance_type': instance.instance_type,
-                            'instance_state': instance.state})
+                            'instance_state': instance.state,
+                            #'instance_launchtime': datetime.datetime.fromtimestamp(\
+                            #    time.mktime(time.strptime(instance.launch_time.split('.')[0],
+                            #                              "%Y-%m-%dT%H:%M:%S")))
+                            'instance_uptime': self.signals.instance_uptime(instance.id)})
             kwargs['instances'] = tmp
         if 'status' not in kwargs:
             kwargs['status'] = self.signals.instance_list()[0].state
         return super(SimulationManagement, self).get_context_data(**kwargs)
     
     def get_queryset(self):
-        return Simulation.objects.exclude(completed=True).order_by('id')
+        #return Simulation.objects.exclude(completed=True).order_by('id')
+        return Simulation.objects.order_by('-id')
     
     def index(request):
         return HttpResponse(queryset)

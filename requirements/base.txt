@@ -3,6 +3,7 @@ django-auth-ldap==1.2.2
 git+https://github.com/alex/django-filter.git@25213fbdbb40e5036e854c26dd8d34bbc2ca4592
 django-datetime-widget==0.9
 sphinx==1.2.3
+boto>=2.34.0
 sphinx_rtd_theme==0.1.6
 paramiko==1.15.1
 django-bootstrap3==4.11.0

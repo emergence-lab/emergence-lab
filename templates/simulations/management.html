@@ -20,6 +20,7 @@
           <td><strong>Instance Name</strong></td>
           <td><strong>Type</strong></td>
           <td><strong>State</strong></td>
+          <td><strong>Uptime</strong></td>
           <td><strong>Actions</strong></td>
         </tr>
         {% for instance in instances %}
@@ -35,6 +36,10 @@
             <h4><span class="label label-primary">CHANGING</span></h4>  
             {% endif %}
             </td>
+            <td>
+                {% if instance.instance_state == 'running' %}
+                {{ instance.instance_uptime }}</td>
+                {% endif %}
             <td>
             {% if instance.instance_state == 'stopped' %}
             <a class="btn btn-success" href="{% url 'start_instance' instance.instance_name %}">Start</a>
@@ -58,6 +63,7 @@
     <div class="col-md-8 col-md-offset-2">
       <table class="table">      
         <tr>
+            <td><strong>Status</strong></td>
             <td><strong>Job ID</strong></td>
             <td><strong>User</strong></td>
             <td><strong>Request Date</strong></td>
@@ -67,6 +73,7 @@
         </tr>
         {% for items in object_list %}
           <tr>
+              <td>{% if items.completed == True %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
               <td>{{ items.id }}</td>
               <td>{{ items.user.operator.name }}</td>
               <td>{{ items.request_date }}</td>
