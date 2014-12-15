@@ -75,7 +75,7 @@
           <tr>
               <td>{% if items.completed == True %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
               <td>{{ items.id }}</td>
-              <td>{{ items.user.operator.name }}</td>
+              <td>{{ items.user.full_name }}</td>
               <td>{{ items.request_date }}</td>
               <td>{{ items.execution_node }}</td>
               <td>{% if items.priority %}<span class="glyphicon glyphicon-flag"></span>{% endif %}</td>
