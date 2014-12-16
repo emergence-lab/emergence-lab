@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, render_to_response
 from django.utils.timezone import activate
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -13,12 +13,12 @@ import time
 from simulations.models import Simulation
 from simulations.aws_simulations import ec2_metal_ops as metal
 
-class SimulationLanding(ListView):
+
+class SimulationBase(ListView):
     model = Simulation
-    queryset = Simulation.objects.all()
-    template_name = 'simulations/landing.html'
+    template_name = 'simulations/management.html'
     
-    signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_EC2_KEY, settings.AWS_EC2_SECRET)
+    signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
     
     def get_context_data(self, **kwargs):
         tmp = []
@@ -26,24 +26,37 @@ class SimulationLanding(ListView):
             for instance in self.signals.reservation_list()[0].instances:
                 tmp.append({'instance_name': instance.id,
                             'instance_type': instance.instance_type,
-                            'instance_state': instance.state})
+                            'instance_state': instance.state,
+                            #'instance_launchtime': datetime.datetime.fromtimestamp(\
+                            #    time.mktime(time.strptime(instance.launch_time.split('.')[0],
+                            #                              "%Y-%m-%dT%H:%M:%S")))
+                            'instance_uptime': self.signals.instance_uptime(instance.id)})
             kwargs['instances'] = tmp
         if 'status' not in kwargs:
             kwargs['status'] = self.signals.instance_list()[0].state
-        return super(SimulationLanding, self).get_context_data(**kwargs)
+        return super(SimulationBase, self).get_context_data(**kwargs)
     
+    
+class IncompleteSimulations(SimulationBase):
     def get_queryset(self):
-        return Simulation.objects.exclude(completed=True).order_by('id')
+        return Simulation.objects.filter(finish_date=None).order_by('id')
+        #return Simulation.objects.order_by('-id')
+
+class CompletedSimulations(SimulationBase):
+    def get_queryset(self):
+        return Simulation.objects.exclude(finish_date=None).order_by('-id')
+
+class AllSimulations(SimulationBase):
+    def get_queryset(self):
+        return Simulation.objects.order_by('-id')
     
-    def index(request):
-        return HttpResponse(queryset)
     
 class SimulationCreate(CreateView):
     model = Simulation
-    fields = ['priority', 'execution_node', 'input_file_path', 'output_file_path']
+    fields = ['priority', 'execution_node', 'file_path']
     template_name = 'simulations/create_form.html'
     success_url = '/simulations'
-
+    
     def form_valid(self, form):
         """
         If the form is valid, save the associated model.
@@ -51,21 +64,19 @@ class SimulationCreate(CreateView):
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
-        return HttpResponseRedirect(reverse('simulation_landing'))
+        return HttpResponseRedirect(reverse('simulation_incomplete'))
     
 class SimulationCancel(RedirectView):
     permanent = False  
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('pk')
         simulation_obj = Simulation.objects.get(pk=pk)
-        if not simulation_obj.completed:
-            simulation_obj.completed = True
-            simulation_obj.save()
-        return reverse('simulation_landing')
+        simulation_obj.delete()
+        return reverse('simulation_incomplete')
 
 class SimulationEdit(UpdateView):
     model = Simulation
-    fields = ['priority', 'execution_node', 'input_file_path', 'output_file_path']
+    fields = ['priority', 'execution_node', 'file_path']
     template_name = 'simulations/edit_form.html'
     success_url = '/simulations'
 
@@ -74,7 +85,7 @@ class SimulationManagement(ListView):
     queryset = Simulation.objects.all()
     template_name = 'simulations/management.html'
     
-    signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_EC2_KEY, settings.AWS_EC2_SECRET)
+    signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
     
     def get_context_data(self, **kwargs):
         tmp = []
@@ -103,7 +114,7 @@ class StartInstance(RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_EC2_KEY, settings.AWS_EC2_SECRET)
+        signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         instance = kwargs.pop('instance_id')
         try:
             signals.start_instance(instance)
@@ -115,7 +126,7 @@ class StopInstance(RedirectView):
     permanent = False
     
     def get_redirect_url(self, *args, **kwargs):
-        signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_EC2_KEY, settings.AWS_EC2_SECRET)
+        signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         instance = kwargs.pop('instance_id')
         try:
             signals.stop_instance(instance)

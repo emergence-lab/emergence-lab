@@ -2,17 +2,41 @@ from django.db import models
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 import time
+import os
 from django.utils import timezone
+import storages.backends.s3boto
+from django.utils.deconstruct import deconstructible
+import datetime
 
 from core.models import Investigation
 
 from simulations.aws_simulations import ec2_metal_ops as metal
 
+@deconstructible
+class FixedS3BotoStorage(storages.backends.s3boto.S3BotoStorage):
+    pass
+
+protected_storage = FixedS3BotoStorage(
+  acl='private',
+  querystring_auth=True,
+  querystring_expire=600, # 10 minutes, try to ensure people won't/can't share
+)
+
+def content_file_name(instance, filename):
+    return ''.join(('simulations/',
+                    str(instance.user.username),
+                    str("_"),
+                    datetime.datetime.strftime(instance.request_date, '%m_%d_%Y_%H_%M_%S'),
+                    str('.'),
+                    str(os.path.splitext(filename)[1])))
+
 @python_2_unicode_compatible   
 class Simulation(models.Model):
     
     def get_instance_types():
-        m = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_EC2_KEY, settings.AWS_EC2_SECRET)
+        m = metal.EC2_Connection(settings.AWS_EC2_REGION,
+                                 settings.AWS_ACCESS_KEY_ID,
+                                 settings.AWS_SECRET_ACCESS_KEY)
         tmp = []
         for key in m.instance_detail_list().keys():
             desc = key.split('.')
@@ -34,11 +58,23 @@ class Simulation(models.Model):
 
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    investigations = models.ManyToManyField(Investigation)
+    #investigations = models.ManyToManyField(Investigation)
     request_date = models.DateTimeField(auto_now_add=True)
     start_date = models.DateTimeField(null=True, blank=True)
     finish_date = models.DateTimeField(null=True, blank=True)
+    file_path = models.FileField(
+        null=True,
+        blank=True,
+        help_text='ZIP File with all simulation data',
+        storage=protected_storage,
+        upload_to=content_file_name
+    )
     priority = models.BooleanField(default=False)
     execution_node = models.CharField(max_length=15, choices=get_instance_types())
+    
     def __str__(self):              # __unicode__ on Python 2
-        return '{0}, {1}, {2}'.format(str(self.user), str(self.completed), str(self.request_date))
+        return '{0}, {1}, {2}, {3}'.format(str(self.user),
+                                           str(self.is_completed()),
+                                           str(self.request_date),
+                                           str(self.id))
+

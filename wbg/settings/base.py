@@ -10,6 +10,7 @@ from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, PosixGroupType
 
 # Filesystem Directories
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 
 # Secrets
@@ -44,7 +45,7 @@ WSGI_APPLICATION = 'wbg.wsgi.application'
 
 # User login
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 
@@ -77,6 +78,7 @@ INSTALLED_APPS = (
     'ckeditor',
     'django_wysiwyg',
     'mptt',
+    'storages',
     # local apps
     'core',
     'dashboard',
@@ -164,6 +166,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
 MEDIA_URL = '/wsgi/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
 
+#MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
+
+
 
 # RESTful API
 
@@ -196,9 +201,12 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 GITLAB_HOST = get_secret('GITLAB_HOST')
 GITLAB_PRIVATE_TOKEN = get_secret('GITLAB_PRIVATE_TOKEN')
 
-# AWS EC2
+
+# Amazon Cloud
 
 AWS_EC2_REGION = get_secret('AWS_EC2_REGION')
-AWS_EC2_KEY = get_secret('AWS_EC2_KEY')
-AWS_EC2_SECRET = get_secret('AWS_EC2_SECRET')
+AWS_ACCESS_KEY_ID = get_secret('AWS_EC2_KEY')
+AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET')
 AWS_EC2_SSH_KEY = get_secret('AWS_EC2_SSH_KEY')
+AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET')
+S3_URL = 'https://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
