@@ -57,4 +57,4 @@ class SimSerializer(serializers.ModelSerializer):
     class Meta:
         model = Simulation
         fields = ('id', 'user', 'request_date', 'start_date', 'finish_date',
-                  'priority', 'execution_node')
+                  'priority', 'execution_node', 'file_path')
