@@ -17,6 +17,7 @@ from simulations.aws_simulations import ec2_metal_ops as metal
 class SimulationBase(ListView):
     model = Simulation
     template_name = 'simulations/management.html'
+    paginate_by = 10
     
     signals = metal.EC2_Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
     
