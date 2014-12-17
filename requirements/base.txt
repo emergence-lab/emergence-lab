@@ -20,3 +20,4 @@ django-ckeditor-updated==4.4.0
 html2text==2014.9.8
 django-grappelli>=2.6,<2.7
 django-mptt==0.6.1
+git+***REMOVED***gitlab/wbg-lab/aws-simulations.git@0.10.0

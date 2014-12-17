@@ -8,9 +8,10 @@ import storages.backends.s3boto
 from django.utils.deconstruct import deconstructible
 import datetime
 
+import aws_support as aws
+
 from core.models import Investigation
 
-from simulations.aws_simulations import ec2_metal_ops as metal
 
 @deconstructible
 class FixedS3BotoStorage(storages.backends.s3boto.S3BotoStorage):
@@ -30,11 +31,11 @@ def content_file_name(instance, filename):
                     str('.'),
                     str(os.path.splitext(filename)[1])))
 
-@python_2_unicode_compatible   
+@python_2_unicode_compatible
 class Simulation(models.Model):
-    
+
     def get_instance_types():
-        m = metal.EC2_Connection(settings.AWS_EC2_REGION,
+        m = aws.EC2Connection(settings.AWS_EC2_REGION,
                                  settings.AWS_ACCESS_KEY_ID,
                                  settings.AWS_SECRET_ACCESS_KEY)
         tmp = []
@@ -43,20 +44,20 @@ class Simulation(models.Model):
             desc = str('{0} ({1})'.format(desc[1], desc[0]))
             tmp.append((key, desc))
         return tmp
-    
+
     def is_completed(self):
         return self.finish_date is not None
-    
+
     def elapsed_time(self):
         if self.start_date is None:
             return 0
-        
+
         if self.finish_date is None:
             return timezone.now() - self.start_date
-        
+
         return self.finish_date - self.start_date
 
-    
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     #investigations = models.ManyToManyField(Investigation)
     request_date = models.DateTimeField(auto_now_add=True)
@@ -71,10 +72,9 @@ class Simulation(models.Model):
     )
     priority = models.BooleanField(default=False)
     execution_node = models.CharField(max_length=15, choices=get_instance_types())
-    
+
     def __str__(self):              # __unicode__ on Python 2
         return '{0}, {1}, {2}, {3}'.format(str(self.user),
                                            str(self.is_completed()),
                                            str(self.request_date),
                                            str(self.id))
-
