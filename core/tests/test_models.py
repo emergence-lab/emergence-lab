@@ -65,6 +65,25 @@ class TestUUIDMixin(unittest.TestCase):
         self.assertTrue(process.uuid[len(Process.prefix)])
 
 
+class TestAutoUUIDMixin(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        Sample.prefix = 'prefix'
+        Sample.padding = 6
+
+    def setUp(self):
+        substrate = mommy.make('core.Substrate')
+        self.sample = Sample.objects.create_sample(substrate=substrate)
+
+    def test_uuid_prefix(self):
+        self.assertTrue(self.sample.uuid.startswith(Sample.prefix))
+
+    def test_strip_uuid(self):
+        uuid = Sample.strip_uuid(self.sample.uuid)
+        self.assertEqual(uuid, self.sample.id)
+
+
 class TestSampleManager(unittest.TestCase):
 
     def test_create_sample(self):
@@ -79,8 +98,8 @@ class TestSampleManager(unittest.TestCase):
 class TestSample(unittest.TestCase):
 
     def setUp(self):
-        self.substrate = mommy.make('core.Substrate')
-        self.sample = Sample.objects.create_sample(substrate=self.substrate)
+        substrate = mommy.make('core.Substrate')
+        self.sample = Sample.objects.create_sample(substrate=substrate)
 
     def test_insert_node_append(self):
         """
