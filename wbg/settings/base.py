@@ -207,6 +207,5 @@ GITLAB_PRIVATE_TOKEN = get_secret('GITLAB_PRIVATE_TOKEN')
 AWS_EC2_REGION = get_secret('AWS_EC2_REGION')
 AWS_ACCESS_KEY_ID = get_secret('AWS_EC2_KEY')
 AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET')
-AWS_EC2_SSH_KEY = get_secret('AWS_EC2_SSH_KEY')
 AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET')
-S3_URL = 'https://%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+S3_URL = 'https://{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
