@@ -119,7 +119,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     def insert_process_before(self, process, uuid,
                               comment='', force_refresh=True):
         """
-        Insert a process into the tree before the specified node.
+        Insert a process into the tree before the specified node. Invalidates
+        references for affected nodes.
         """
         target = self.get_node(uuid)
         if target == self.root_node:
@@ -140,7 +141,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     def insert_process_after(self, process, uuid,
                               comment='', force_refresh=True):
         """
-        Insert a process into the tree after the specified node.
+        Insert a process into the tree after the specified node. Invalidates
+        references for affected nodes.
         """
         parent = self.get_node(uuid)
         children = list(parent.get_children())
