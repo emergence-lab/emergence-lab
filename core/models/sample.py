@@ -59,9 +59,6 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     def _get_tree_queryset(self):
         return ProcessNode.objects.filter(tree_id=self.process_tree.tree_id)
 
-    def _refresh_tree(self):
-        self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
-
     def _get_next_piece(self):
         used_piece_names = set(self._get_tree_queryset()
             .order_by('-piece').values_list('piece', flat=True))
@@ -71,6 +68,13 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     def _insert_node(self, process, piece, parent, comment=''):
         return ProcessNode.objects.create(process=process, piece=piece,
                                           comment=comment, parent_id=parent.id)
+
+    def refresh_tree(self):
+        """
+        Force the root node of the tree to refresh to correct incorrect
+        calculations or references due to it being out of date.
+        """
+        self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
 
     def split(self, number=2, piece='a', comment=None, force_refresh=True):
         """
@@ -99,7 +103,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
             #       the sample object which will force a refresh.
             nodes.append(self._insert_node(process, new_piece, branch))
         if force_refresh:  # workaround to force the root node to update
-            self._refresh_tree()
+            self.refresh_tree()
         return nodes
 
     def run_process(self, process, piece='a', comment='', force_refresh=True):
@@ -109,7 +113,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         branch = self.get_piece(piece)
         node = self._insert_node(process, piece, branch, comment)
         if force_refresh:  # workaround to force the root node to update
-            self._refresh_tree()
+            self.refresh_tree()
         return node
 
     def insert_process_before(self, process, uuid,
@@ -117,14 +121,38 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         Insert a process into the tree before the specified node.
         """
-        pass
+        target = self.get_node(uuid)
+        if target == self.root_node:
+            raise Exception('Error: Cannot insert before the root node.')
+
+        parent = target.parent
+        children = list(target.get_siblings(include_self=True))
+        node = ProcessNode.objects.create(process=process, piece=parent.piece,
+                                          comment=comment, parent_id=parent.id)
+        for child in children:
+            child.parent = node
+            child.save()
+
+        if force_refresh:
+            self.refresh_tree()
+        return node
 
     def insert_process_after(self, process, uuid,
                               comment='', force_refresh=True):
         """
         Insert a process into the tree after the specified node.
         """
-        pass
+        parent = self.get_node(uuid)
+        children = list(parent.get_children())
+        node = ProcessNode.objects.create(process=process, piece=parent.piece,
+                                          comment=comment, parent_id=parent.id)
+        for child in children:
+            child.parent = node
+            child.save()
+
+        if force_refresh:
+            self.refresh_tree()
+        return node
 
     @property
     def leaf_nodes(self):

@@ -95,7 +95,7 @@ class TestSample(unittest.TestCase):
             self.assertEqual(node.piece, piece)
             self.assertEqual(node.process_id, process.id)
             self.assertEqual(node.comment, '')
-        self.sample._refresh_tree()
+        self.sample.refresh_tree()
         self.assertEqual(len(pieces),
                          self.sample.process_tree.get_descendant_count())
 
@@ -230,7 +230,7 @@ class TestSample(unittest.TestCase):
         pieces = 'abcdefg'
         for piece in pieces:
             node = self.sample._insert_node(None, piece, root)
-        self.sample._refresh_tree()
+        self.sample.refresh_tree()
         self.assertEqual(self.sample.node_count, len(pieces) + 1)
 
     def test_run_process(self):
@@ -289,3 +289,25 @@ class TestSample(unittest.TestCase):
         for node in nodes_second:
             self.assertEqual(node.parent_id, root_second.id)
             self.assertIn(node.piece, pieces_second)
+
+    def test_insert_process_before(self):
+        root = self.sample.root_node
+        node_first = self.sample.run_process(None)
+        node_second = self.sample.insert_process_before(None, node_first.uuid)
+        node_first = self.sample.get_node(node_first.uuid)
+        node_second = self.sample.get_node(node_second.uuid)
+        self.assertEqual(node_second.parent_id, root.id)
+        self.assertEqual(node_first.parent_id, node_second.id)
+        self.assertEqual(len(self.sample.leaf_nodes), 1)
+        self.assertEqual(self.sample.leaf_nodes[0].id, node_first.id)
+
+    def test_insert_process_after(self):
+        root = self.sample.root_node
+        node_first = self.sample.run_process(None)
+        node_second = self.sample.insert_process_after(None, root.uuid)
+        node_first = self.sample.get_node(node_first.uuid)
+        node_second = self.sample.get_node(node_second.uuid)
+        self.assertEqual(node_second.parent_id, root.id)
+        self.assertEqual(node_first.parent_id, node_second.id)
+        self.assertEqual(len(self.sample.leaf_nodes), 1)
+        self.assertEqual(self.sample.leaf_nodes[0].id, node_first.id)
