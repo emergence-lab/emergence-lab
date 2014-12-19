@@ -172,7 +172,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='processnode',
             name='process',
-            field=models.ForeignKey(to='core.Process'),
+            field=models.ForeignKey(to='core.Process', null=True),
             preserve_default=True,
         ),
         migrations.AddField(
