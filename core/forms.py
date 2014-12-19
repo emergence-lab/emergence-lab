@@ -23,9 +23,9 @@ class TrackProjectForm(forms.ModelForm):
 
 
 class ChecklistForm(forms.Form):
-    fields = []
+    checklist_fields = []
 
     def __init__(self, *args, **kwargs):
         super(ChecklistForm, self).__init__(*args, **kwargs)
-        for i, label in enumerate(fields):
+        for i, label in enumerate(self.checklist_fields):
             self.fields['field_{0}'.format(i)] = forms.BooleanField(required=True, label=label)

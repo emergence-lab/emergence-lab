@@ -127,7 +127,7 @@ class PrerunGrowthForm(ModelForm):
 
 
 class PrerunChecklistForm(ChecklistForm):
-    fields = [
+    checklist_fields = [
         'Is Run Ready? Comments Updated?',
         'Engage Load Lock Routine?',
         'Load the wafers (Note Substrate number / Run number / Single side / Double side in space provided below)?',
@@ -140,8 +140,8 @@ class PrerunChecklistForm(ChecklistForm):
         'Check for Rotation?',
         'Close Gate Valve, Front VP and Shutter?',
         'System IDLE? Correct Recipe Loaded? Power Supply On? Motor on Auto? GC Pressure Remote?',
-        'Start the Run?',
-        'Start the Epimetric?',
+        'Start the Run',
+        'Start the k-space',
     ]
 
 
@@ -152,10 +152,10 @@ class PrerunSourcesForm(ModelForm):
                   'tega1', 'nh3', 'sih4',)
 
 
-class postrun_checklist_form(forms.Form):
-    fields = [
-        'Wait for system to IDLE?',
-        'Save Epimetric data?',
+class PostrunChecklistForm(ChecklistForm):
+    checklist_fields = [
+        'Wait for system to IDLE',
+        'Stop k-space collection'
         'Turn off motor',
         'Engage Gate Valve Routine? Open Front VP and Shutter?',
         'Transfer Wafer carrier from the Reactor to LL?',
