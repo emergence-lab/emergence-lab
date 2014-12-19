@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+import six
+
 from core import fields
 
 
@@ -118,4 +120,6 @@ class UUIDMixin(models.Model):
 
     @classmethod
     def strip_uuid(cls, uuid):
+        if not isinstance(uuid, six.string_types):
+            return uuid.hex
         return uuid[len(cls.prefix):]

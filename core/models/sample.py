@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+import string
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -61,13 +63,14 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
 
     def _get_next_piece(self):
-        used_piece_names = list(self._get_tree_queryset()
+        used_piece_names = set(self._get_tree_queryset()
             .order_by('-piece').values_list('piece', flat=True))
-        return chr(ord(used_piece_names[0]) + 1)
+        possible_pieces = list(set(string.ascii_lowercase) - used_piece_names)
+        return sorted(possible_pieces)[0]
 
     def _insert_node(self, process, piece, parent, comment=''):
-        ProcessNode.objects.create(process=process, piece=piece,
-                                   comment=comment, parent_id=parent.id)
+        return ProcessNode.objects.create(process=process, piece=piece,
+                                          comment=comment, parent_id=parent.id)
 
     def split(self, number=2, piece='a', comment=None, force_refresh=True):
         """
@@ -78,6 +81,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
             comment = 'Split sample into {0} pieces'.format(number)
 
         process = SplitProcess.objects.create(comment=comment)
+        nodes = []
 
         branch = self.get_piece(piece)
         for i in range(number):
@@ -93,18 +97,20 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
             #       the lft and rght items are not updated properly. Workarounds
             #       include manually updating the root node or requerying for
             #       the sample object which will force a refresh.
-            self._insert_node(process, new_piece, branch)
+            nodes.append(self._insert_node(process, new_piece, branch))
         if force_refresh:  # workaround to force the root node to update
             self._refresh_tree()
+        return nodes
 
     def run_process(self, process, piece='a', comment='', force_refresh=True):
         """
         Append a process to the specified branch.
         """
         branch = self.get_piece(piece)
-        self._insert_node(process, piece, branch, comment)
+        node = self._insert_node(process, piece, branch, comment)
         if force_refresh:  # workaround to force the root node to update
             self._refresh_tree()
+        return node
 
     def insert_process_before(self, process, uuid,
                               comment='', force_refresh=True):
@@ -139,24 +145,29 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         Returns a list of the pieces the sample is currently using.
         """
-        return [n.piece for n in self.leaf_nodes]
+        return sorted([n.piece for n in self.leaf_nodes])
+
+    @property
+    def node_count(self):
+        """
+        Returns the number of nodes in the tree including the root.
+        """
+        return self.process_tree.get_descendant_count() + 1
 
     def get_piece(self, piece):
         """
         Branch uid in the format {sample uid}{piece}
         """
-        return (self._get_tree_queryset().filter(piece=piece)
-                                         .order_by('-level')
-                                         .first())
+        return self.leaf_nodes.get(piece=piece)
 
-    def get_process_node(self, uuid):
+    def get_node(self, uuid):
         """
         Get the specific node from the tree with the specified uuid.
         """
         uuid = ProcessNode.strip_uuid(uuid)
-        return self._get_tree_queryset().filter(uuid_full__startswith=uuid)
+        return self._get_tree_queryset().get(uuid_full__startswith=uuid)
 
-    def get_process(self, uuid):
+    def get_nodes_for_process(self, uuid):
         """
         Get all nodes from the tree that have the specified process.
         """

@@ -16,7 +16,6 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     Base class for all processes.
     """
     prefix = 'p'
-    padding = 5
 
     name = 'Generic Process'
     slug = 'generic-process'

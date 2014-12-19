@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample
+from core.models import Sample, Process
 
 
 class TestActiveStateMixin(unittest.TestCase):
@@ -37,42 +37,32 @@ class TestActiveStateMixin(unittest.TestCase):
             obj.deactivate()
 
 
-class TestUIDMixin(unittest.TestCase):
+class TestUUIDMixin(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        Sample.prefix = 'prefix'
-        Sample.postfix = 'postfix'
-        Sample.padding = 6
+        Process.prefix = 'prefix'
+        Process.short_length = 10
 
-    def setUp(self):
-        self.substrate = mommy.make('core.Substrate')
+    def test_uuid_prefix(self):
+        process = mommy.make(Process)
+        self.assertTrue(process.uuid.startswith(Process.prefix))
 
-    def test_auto_both(self):
-        sample = Sample.objects.create(substrate=self.substrate,
-                                       process_tree=None)
-        expected = 'prefix{0}postfix'.format(str(sample.id).zfill(6))
-        self.assertEqual(expected, sample.uid)
+    def test_strip_uuid_short(self):
+        process = mommy.make(Process)
+        self.assertEqual(Process.strip_uuid(process.uuid),
+                         process.uuid[len(Process.prefix):])
 
-    def test_set_id_auto_uid(self):
-        sample = Sample.objects.create(id=1000, substrate=self.substrate,
-                                       process_tree=None)
-        expected = 'prefix001000postfix'
-        self.assertEqual(expected, sample.uid)
+    def test_strip_uuid_long(self):
+        process = mommy.make(Process)
+        self.assertEqual(Process.strip_uuid(process.uuid_full),
+                         process.uuid_full.hex)
 
-    def test_set_prefix(self):
-        sample = Sample.objects.create(uid='new-{id}{postfix}',
-                                       substrate=self.substrate,
-                                       process_tree=None)
-        expected = 'new-{0}postfix'.format(str(sample.id).zfill(6))
-        self.assertEqual(expected, sample.uid)
-
-    def test_set_postfix(self):
-        sample = Sample.objects.create(uid='{prefix}{id}-new',
-                                       substrate=self.substrate,
-                                       process_tree=None)
-        expected = 'prefix{0}-new'.format(str(sample.id).zfill(6))
-        self.assertEqual(expected, sample.uid)
+    def test_short_uuid(self):
+        process = mommy.make(Process)
+        self.assertEqual(len(process.uuid),
+                         len(Process.prefix) + Process.short_length)
+        self.assertTrue(process.uuid[len(Process.prefix)])
 
 
 class TestSampleManager(unittest.TestCase):
@@ -84,64 +74,218 @@ class TestSampleManager(unittest.TestCase):
         substrate = mommy.make('core.Substrate')
         sample = Sample.objects.create_sample(substrate=substrate)
         self.assertEqual(substrate.id, sample.substrate_id)
-        self.assertEqual(sample.uid + '_a.root', sample.process_tree.uid)
 
 
 class TestSample(unittest.TestCase):
 
     def setUp(self):
         self.substrate = mommy.make('core.Substrate')
+        self.sample = Sample.objects.create_sample(substrate=self.substrate)
 
-    def test_split_sample(self):
+    def test_insert_node_append(self):
         """
-        Test that splitting a sample with no other processes done on it in half
-        results in 2 child nodes.
+        Test that a node is properly appended to the end of the tree.
         """
-        split_number = 4
-        sample = Sample.objects.create_sample(substrate=self.substrate)
-        before = sample.process_tree.get_descendant_count()
-        sample.split(split_number)
-        after = sample.process_tree.get_descendant_count()
+        root = self.sample.process_tree
+        pieces = 'abc'
+        for piece in pieces:
+            process = mommy.make(Process)
+            node = self.sample._insert_node(process, piece, root)
+            self.assertEqual(node.parent_id, root.id)
+            self.assertEqual(node.piece, piece)
+            self.assertEqual(node.process_id, process.id)
+            self.assertEqual(node.comment, '')
+        self.sample._refresh_tree()
+        self.assertEqual(len(pieces),
+                         self.sample.process_tree.get_descendant_count())
+
+    def test_get_tree_queryset_single_level(self):
+        """
+        Test that the queryset returns the root node for a single level tree.
+        """
+        node = self.sample.process_tree
+        qs = self.sample._get_tree_queryset()
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs.first().uuid_full, node.uuid_full)
+
+    def test_get_tree_queryset_multiple_levels(self):
+        """
+        Test that the queryset returns all nodes for a multiple level tree.
+        """
+        node = self.sample.process_tree
+        node_uuids = [node.uuid]
+        levels = 4
+        for level in range(levels):
+            node = self.sample._insert_node(None, 'a', node)
+            node_uuids.append(node.uuid)
+        qs = self.sample._get_tree_queryset()
+        self.assertEqual(qs.count(), levels + 1)
+        for node in qs:
+            self.assertIn(node.uuid, node_uuids)
+
+    def test_leaf_nodes_single_level(self):
+        """
+        Test that the correct leaf nodes are returned when they are all on the
+        same level.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        for piece in pieces:
+            node = self.sample._insert_node(None, piece, root)
+        leaf_nodes = list(self.sample.leaf_nodes)
+        self.assertEqual(len(leaf_nodes), len(pieces))
+        for node in leaf_nodes:
+            self.assertIn(node.piece, pieces)
+
+    def test_leaf_nodes_multiple_levels(self):
+        """
+        Test that the correct leaf nodes are returned when they are on different
+        levels.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        levels = [1, 2, 4, 6, 7, 6, 2]
+        expected_leaf_nodes = []
+        for level, piece in zip(levels, pieces):
+            node = self.sample._insert_node(None, piece, root)
+            for l in range(level):
+                node = self.sample._insert_node(None, piece, node)
+            expected_leaf_nodes.append(node)
+        leaf_nodes = list(self.sample.leaf_nodes)
+        self.assertEqual(len(leaf_nodes), len(pieces))
+        for node in leaf_nodes:
+            self.assertIn(node.piece, pieces)
+            self.assertIn(node, expected_leaf_nodes)
+
+    def test_get_node_short_uuid(self):
+        """
+        Test that you can retrieve individual nodes in a complex tree using the
+        short uuid.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        levels = [1, 2, 4, 6, 7, 6, 2]
+        node_uuids = [root.uuid]
+        for level, piece in zip(levels, pieces):
+            node = self.sample._insert_node(None, piece, root)
+            for l in range(level):
+                node = self.sample._insert_node(None, piece, node)
+                node_uuids.append(node.uuid)
+        for uuid in node_uuids:
+            node = self.sample.get_node(uuid)
+            self.assertEqual(node.uuid, uuid)
+
+    def test_get_node_long_uuid(self):
+        """
+        Test that you can retrieve individual nodes in a complex tree using the
+        short uuid.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        levels = [1, 2, 4, 6, 7, 6, 2]
+        node_uuids = [root.uuid_full]
+        for level, piece in zip(levels, pieces):
+            node = self.sample._insert_node(None, piece, root)
+            for l in range(level):
+                node = self.sample._insert_node(None, piece, node)
+                node_uuids.append(node.uuid_full)
+        for uuid in node_uuids:
+            node = self.sample.get_node(uuid)
+            self.assertEqual(node.uuid_full, uuid)
+
+    def test_pieces(self):
+        """
+        Test that the correct used pieces are returned.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        for piece in pieces:
+            node = self.sample._insert_node(None, piece, root)
+        self.assertListEqual(list(pieces), self.sample.pieces)
+
+    def test_get_piece_single(self):
+        """
+        Test that the piece can be returned if there is only one piece.
+        """
+        root = self.sample.process_tree
+        node = self.sample.get_piece(root.piece)
+        self.assertEqual(root.uuid, node.uuid)
+
+    def test_get_piece_multiple(self):
+        """
+        Test that the piece can be returned if there are multiple pieces.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        node_uuids = []
+        for piece in pieces:
+            node = self.sample._insert_node(None, piece, root)
+            node_uuids.append(node.uuid)
+        for uuid, piece in zip(node_uuids, pieces):
+            node = self.sample.get_piece(piece)
+            self.assertEqual(node.uuid, uuid)
+
+    def test_node_count(self):
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        for piece in pieces:
+            node = self.sample._insert_node(None, piece, root)
+        self.sample._refresh_tree()
+        self.assertEqual(self.sample.node_count, len(pieces) + 1)
+
+    def test_run_process(self):
+        """
+        Test that running a process correctly appends it to the tree.
+        """
+        parent = self.sample.process_tree
+        number_processes = 4
+        for n in range(number_processes):
+            process = mommy.make(Process)
+            node = self.sample.run_process(process, parent.piece)
+            self.assertEqual(node.parent_id, parent.id)
+            self.assertEqual(node.process_id, process.id)
+            self.assertEqual(node.piece, parent.piece)
+            self.assertEqual(node.comment, '')
+            parent = node
+        self.assertEqual(number_processes,
+                         self.sample.process_tree.get_descendant_count())
+
+    def test_split_single(self):
+        """
+        Test that splitting a sample results in the correct number of nodes
+        being created and that they have the correct parent node.
+        """
+        pieces = 'abcd'
+        split_number = len(pieces)
+        before = self.sample.node_count
+        root = self.sample.root_node
+        nodes = self.sample.split(split_number)
+        after = self.sample.node_count
         self.assertEqual(before + split_number, after)
+        self.assertEqual(split_number, len(nodes))
+        for node in nodes:
+            self.assertEqual(node.parent_id, root.id)
+            self.assertIn(node.piece, pieces)
+        self.assertSetEqual(set(nodes), set(self.sample.leaf_nodes))
 
-    def test_multiple_split_sample(self):
+    def test_split_multiple(self):
         """
-        Test that splitting a sample multiple times correctly assigns piece
-        letters
+        Test that splitting a sample multiple times results in correctly
+        assigned parent nodes and piece identifiers.
         """
-        sample = Sample.objects.create_sample(substrate=self.substrate)
-        self.assertEqual(sample.process_tree.piece, 'a')
-        sample.split(2, 'a')
-        before_a = sample.get_piece('a')
-        before_b = sample.get_piece('b')
-        before_c = sample.get_piece('c')
-        self.assertIsNotNone(before_a)
-        self.assertIsNotNone(before_b)
-        self.assertIsNone(before_c)
-        sample.split(2, 'b')
-        after_a = sample.get_piece('a')
-        after_b = sample.get_piece('b')
-        after_c = sample.get_piece('c')
-        self.assertEqual(before_a.id, after_a.id)
-        self.assertNotEqual(before_b.id, after_b.id)
-        self.assertIsNotNone(after_c)
-        self.assertEqual(after_b.parent_id, before_b.id)
-        self.assertEqual(after_c.parent_id, before_b.id)
-
-    def test_get_piece(self):
-        sample = Sample.objects.create_sample(self.substrate)
-        sample.split(2)
-        left = sample.get_piece('a')
-        right = sample.get_piece('b')
-        self.assertEqual(left.piece, 'a')
-        self.assertEqual(right.piece, 'b')
-        self.assertEqual(left.parent, sample.process_tree)
-        self.assertEqual(right.parent, sample.process_tree)
-
-
-    def test_get_process_single(self):
-        sample = Sample.objects.create_sample(self.substrate)
-        process = sample.process_tree.process
-        result = sample.get_process(process.uid)
-        self.assertEqual(result.count(), 1)
-        self.assertEqual(result.first().id, sample.process_tree.id)
+        pieces_first = 'abcd'
+        pieces_second = 'befg'
+        split_number = 4
+        before = self.sample.node_count
+        root_first = self.sample.root_node
+        nodes_first = self.sample.split(split_number, 'a')
+        root_second = self.sample.get_piece('b')
+        nodes_second = self.sample.split(split_number, 'b')
+        after = self.sample.node_count
+        self.assertEqual(split_number * 2 + before, after)
+        for node in nodes_first:
+            self.assertEqual(node.parent_id, root_first.id)
+            self.assertIn(node.piece, pieces_first)
+        for node in nodes_second:
+            self.assertEqual(node.parent_id, root_second.id)
+            self.assertIn(node.piece, pieces_second)
