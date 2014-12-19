@@ -7,16 +7,18 @@ from django.db import models
 from mptt import models as mptt
 import polymorphic
 
-from .mixins import TimestampMixin, AutoUIDMixin, FunctionUIDMixin
+from .mixins import AutoUUIDMixin, TimestampMixin, UUIDMixin
 from core import fields
 
 
-class Process(polymorphic.PolymorphicModel, AutoUIDMixin, TimestampMixin):
+class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     """
     Base class for all processes.
     """
-    prefix = 'proc-'
-    name = 'Generic Procss'
+    prefix = 'p'
+    padding = 5
+
+    name = 'Generic Process'
     slug = 'generic-process'
     is_destructive = True
 
@@ -24,22 +26,19 @@ class Process(polymorphic.PolymorphicModel, AutoUIDMixin, TimestampMixin):
 
 
 class SplitProcess(Process):
-    prefix = 'split-'
     name = 'Split Sample'
     slug = 'split-sample'
     is_destructive = False
 
 
-class ProcessNode(mptt.MPTTModel, FunctionUIDMixin, TimestampMixin):
+class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     """
     Model representing the nodes in a tree of various processes done to
     a sample.
     """
+    prefix = 'n'
+
     comment = fields.RichTextField(blank=True)
     parent = mptt.TreeForeignKey('self', null=True, related_name='children')
-    process = models.ForeignKey(Process)
+    process = models.ForeignKey(Process, null=True)
     piece = models.CharField(max_length=5)
-
-    def _generate_uid(self):
-        return '{0}_{1}.{2}'.format(self.get_root().sample.uid, self.piece,
-                                    self.process.uid)

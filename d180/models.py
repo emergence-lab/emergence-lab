@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from core.models import ActiveStateMixin, BaseProcess, Investigation
+from core.models import ActiveStateMixin, Process, Investigation
 
 
 @python_2_unicode_compatible
@@ -24,13 +24,12 @@ class Platter(ActiveStateMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class Growth(BaseProcess):
+class Growth(Process):
     """
     Stores information related to a growth on the d180 including tagging for
     material and device properties.
     """
     # general info
-    uid = models.SlugField(max_length=10)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
     investigations = models.ManyToManyField(Investigation,

@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0006_auto_20141120_1627'),
+        ('core', '0001_initial'),
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='processnode',
-            name='uid',
-            field=models.SlugField(default='default', max_length=25, editable=False, blank=True),
-            preserve_default=False,
+            name='process',
+            field=models.ForeignKey(to='core.Process', null=True),
+            preserve_default=True,
         ),
     ]

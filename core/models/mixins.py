@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from core import fields
+
 
 class ActiveStateManager(models.Manager):
     """
@@ -70,50 +72,50 @@ class TimestampMixin(models.Model):
         abstract = True
 
 
+
 @python_2_unicode_compatible
-class FunctionUIDMixin(models.Model):
-    """
-    Mixin for models that have a custom string uid.
-    """
-    uid = models.SlugField(max_length=25, blank=True, editable=False)
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return self.uid
-
-    def _generate_uid(self):
-        return str(self.id)
-
-    def save(self, *args, **kwargs):
-        super(FunctionUIDMixin, self).save(*args, **kwargs)
-        self.uid = self._generate_uid()
-        super(FunctionUIDMixin, self).save(update_fields=['uid'])
-
-
-class AutoUIDMixin(FunctionUIDMixin):
-    """
-    Mixin for models that have a string uid based on the objects primary key id.
-    Uses the format prefix + zero-padded id + postfix.
-
-    To override the default behavior, set the uid on instance creation. Any
-    of the default elements may be used by inserting {prefix}, {id}, or
-    {postfix} into the uid string. The approriate element will be substituted.
-    """
+class AutoUUIDMixin(models.Model):
     prefix = ''
-    postfix = ''
     padding = 4
 
     class Meta:
         abstract = True
 
-    def _generate_uid(self):
-        uid = self.uid
-        if uid == '':
-            uid = '{prefix}{id}{postfix}'
-        return uid.format(
-            prefix=self.prefix,
-            id=str(self.id).zfill(self.padding),
-            postfix=self.postfix
-        )
+    def __str__(self):
+        return self.uuid
+
+    @property
+    def uuid(self):
+        return '{prefix}{uuid}'.format(prefix=self.prefix,
+                                       uuid=str(self.pk).zfill(self.padding))
+
+    @classmethod
+    def strip_uuid(cls, uuid):
+        return int(uuid[len(cls.prefix):])
+
+
+@python_2_unicode_compatible
+class UUIDMixin(models.Model):
+    """
+    Mixin for models that have a long random uuid and a short form meant
+    for human consumption.
+    """
+    short_length = 7
+    prefix = ''
+
+    uuid_full = fields.UUIDField(version=4, auto=True, hyphenate=False)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.uuid
+
+    @property
+    def uuid(self):
+        return '{prefix}{uuid}'.format(
+            prefix=self.prefix, uuid=self.uuid_full.hex[:self.short_length])
+
+    @classmethod
+    def strip_uuid(cls, uuid):
+        return uuid[len(cls.prefix):]

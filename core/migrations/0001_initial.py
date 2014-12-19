@@ -65,9 +65,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('uid', models.SlugField(max_length=25)),
+                ('uuid_full', core.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
                 ('comment', core.fields.RichTextField(blank=True)),
-                ('polymorphic_ctype', models.ForeignKey(related_name='polymorphic_core.process_set', editable=False, to='contenttypes.ContentType', null=True)),
             ],
             options={
                 'abstract': False,
@@ -80,13 +79,14 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('uuid_full', core.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
                 ('comment', core.fields.RichTextField(blank=True)),
+                ('piece', models.CharField(max_length=5)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('level', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('parent', mptt.fields.TreeForeignKey(related_name='children', to='core.ProcessNode', null=True)),
-                ('process', models.ForeignKey(to='core.Process')),
             ],
             options={
                 'abstract': False,
@@ -129,7 +129,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('uid', models.SlugField(max_length=25)),
                 ('comment', core.fields.RichTextField(blank=True)),
                 ('process_tree', mptt.fields.TreeOneToOneField(null=True, to='core.ProcessNode')),
             ],
@@ -137,6 +136,16 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
             bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SplitProcess',
+            fields=[
+                ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=('core.process',),
         ),
         migrations.CreateModel(
             name='Substrate',
@@ -158,6 +167,18 @@ class Migration(migrations.Migration):
             model_name='sample',
             name='substrate',
             field=models.OneToOneField(to='core.Substrate'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='processnode',
+            name='process',
+            field=models.ForeignKey(to='core.Process'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='process',
+            name='polymorphic_ctype',
+            field=models.ForeignKey(related_name='polymorphic_core.process_set', editable=False, to='contenttypes.ContentType', null=True),
             preserve_default=True,
         ),
         migrations.AddField(

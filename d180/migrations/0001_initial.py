@@ -16,12 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Growth',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('comment', models.TextField(blank=True)),
-                ('destructive', models.BooleanField(default=True)),
-                ('uid', models.SlugField(max_length=10)),
+                ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
                 ('has_gan', models.BooleanField(default=False)),
                 ('has_aln', models.BooleanField(default=False)),
                 ('has_inn', models.BooleanField(default=False)),
@@ -44,7 +39,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'd180 growth',
                 'verbose_name_plural': 'd180 growths',
             },
-            bases=(models.Model,),
+            bases=('core.process',),
         ),
         migrations.CreateModel(
             name='Platter',

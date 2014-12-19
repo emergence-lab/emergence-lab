@@ -8,7 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from mptt import models as mptt
 import polymorphic
 
-from .mixins import TimestampMixin, AutoUIDMixin
+from .mixins import AutoUUIDMixin, TimestampMixin
 from .process import Process, ProcessNode, SplitProcess
 from core import fields
 
@@ -33,8 +33,7 @@ class SampleManager(models.Manager):
         Creates a sample with a default 'root' processnode which makes it easy
         to refer to the root node.
         """
-        root_process = Process.objects.create(uid='root')
-        process_tree = ProcessNode(process=root_process, piece='a')
+        process_tree = ProcessNode(process=None, piece='a')
         sample = self.model(substrate=substrate, comment=comment,
                             process_tree=process_tree)
         sample.save()
@@ -45,8 +44,9 @@ class SampleManager(models.Manager):
         return sample
 
 
-class Sample(AutoUIDMixin, TimestampMixin, models.Model):
-    prefix = 'smpl-'
+class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
+    prefix = 's'
+    padding = 4
 
     comment = fields.RichTextField(blank=True)
     substrate = models.OneToOneField(Substrate)
@@ -106,15 +106,40 @@ class Sample(AutoUIDMixin, TimestampMixin, models.Model):
         if force_refresh:  # workaround to force the root node to update
             self._refresh_tree()
 
-    def insert_process(self, process, node_uid, comment='', after=True,
-                       force_refresh=True):
+    def insert_process_before(self, process, uuid,
+                              comment='', force_refresh=True):
         """
-        Insert a process into the tree before or after the specified node.
+        Insert a process into the tree before the specified node.
         """
         pass
 
-    def get_pieces(self):
+    def insert_process_after(self, process, uuid,
+                              comment='', force_refresh=True):
+        """
+        Insert a process into the tree after the specified node.
+        """
         pass
+
+    @property
+    def leaf_nodes(self):
+        """
+        Returns all of the leaf nodes of the tree as a list.
+        """
+        return self._get_tree_queryset().filter(lft=models.F('rght') - 1)
+
+    @property
+    def root_node(self):
+        """
+        Returns the root node of the tree.
+        """
+        return self.process_tree
+
+    @property
+    def pieces(self):
+        """
+        Returns a list of the pieces the sample is currently using.
+        """
+        return [n.piece for n in self.leaf_nodes]
 
     def get_piece(self, piece):
         """
@@ -124,9 +149,16 @@ class Sample(AutoUIDMixin, TimestampMixin, models.Model):
                                          .order_by('-level')
                                          .first())
 
-    def get_process_node(self, node_uid):
-        pass
+    def get_process_node(self, uuid):
+        """
+        Get the specific node from the tree with the specified uuid.
+        """
+        uuid = ProcessNode.strip_uuid(uuid)
+        return self._get_tree_queryset().filter(uuid_full__startswith=uuid)
 
-    def get_process(self, process_uid):
-        return ProcessNode.objects.filter(tree_id=self.process_tree.tree_id,
-                                          process__uid=process_uid)
+    def get_process(self, uuid):
+        """
+        Get all nodes from the tree that have the specified process.
+        """
+        uuid = Process.strip_uuid(uuid)
+        return self._get_tree_queryset().filter(process__uuid_full__startswith=uuid)
