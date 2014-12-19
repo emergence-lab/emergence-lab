@@ -54,9 +54,13 @@ class ExceptionHandlerView(LoginRequiredMixin, View):
         complaint = request.POST.get('complaint', '')
         if complaint:
             git = gitlab.Gitlab(settings.GITLAB_HOST,
-                                token=settings.GITLAB_PRIVATE_TOKEN, verify_ssl=False)
+                                token=settings.GITLAB_PRIVATE_TOKEN,
+                                verify_ssl=False)
+            description = ('User: {}\n'
+                           'Page: {}\n'
+                           'Problem: {}'.format(user, path, complaint))
             success = git.createissue(8, title=title, labels=', '.join(tags),
-                                      description='User: {0}\nPage: {1}\nProblem: {2}'.format(user, path, complaint))
+                                      description=description)
             if not success:
                 raise Exception('Error submitting issue')
         return HttpResponseRedirect(path)
@@ -251,10 +255,6 @@ class InvestigationDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailView, self).get_context_data(**kwargs)
-        if 'username' in self.kwargs:
-            userid = User.objects.filter(username=self.kwargs['username']).values('id')
-        else:
-            pass
         context['stream'] = investigation_stream(self.object)
         context['project'] = self.object.project
         context['growths'] = []

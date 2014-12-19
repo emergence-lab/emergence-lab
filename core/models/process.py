@@ -7,7 +7,7 @@ from django.db import models
 from mptt import models as mptt
 import polymorphic
 
-from .mixins import AutoUUIDMixin, TimestampMixin, UUIDMixin
+from .mixins import TimestampMixin, UUIDMixin
 from core import fields
 
 

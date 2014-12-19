@@ -74,7 +74,6 @@ class TimestampMixin(models.Model):
         abstract = True
 
 
-
 @python_2_unicode_compatible
 class AutoUUIDMixin(models.Model):
     prefix = ''
