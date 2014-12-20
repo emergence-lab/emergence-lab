@@ -86,9 +86,6 @@ class SimulationCreateInline(CreateView):
         zipout = zipfile.ZipFile(os.path.join(zipdir,
                                               str(str(self.request.user)
                                                   + '.zip')),
-                                                  #str(form.cleaned_data['my_first_name']
-                                                  #    + form.cleaned_data['my_last_name']
-                                                  #    + '.zip')),
                                      'w')
         with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
             materials.write(form.data['materials'].encode('utf-8'))
@@ -107,19 +104,10 @@ class SimulationCreateInline(CreateView):
             physics.close()
         zipout.close()
         self.object.file_path = File(open(zipout.filename, 'rb'))
-        #self.object.file_path.name = zipout.filename
         self.object.user = self.request.user
         self.object = form.save()
         return HttpResponseRedirect(reverse('simulation_incomplete'))
 
-    #def form_valid(self, form):
-    #    """
-    #    If the form is valid, save the associated model.
-    #    """
-    #    self.object = form.save(commit=False)
-    #    self.object.user = self.request.user
-    #    self.object.save()
-    #    return HttpResponseRedirect(reverse('simulation_incomplete'))
 
 class SimulationCancel(RedirectView):
     permanent = False
