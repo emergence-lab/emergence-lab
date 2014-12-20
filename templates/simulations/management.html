@@ -3,6 +3,7 @@
 {% block header %}
     {% load staticfiles %}
     <script type="text/javascript" src="{% static '/static/simulations/js/popover.js' %}"></script>
+    <script type="text/javascript" src="{% static '/static/simulations/js/tooltip.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +40,13 @@
     </tr>
     {% for items in object_list %}
       <tr>
-          <td>{% if items.finish_date %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+          <td>
+            {% if items.finish_date %}
+                <span class="glyphicon glyphicon-ok" data-toggle="tooltip" data-placement="right" title="Completed"></span>
+            {% elif items.start_date %}
+                <span class="glyphicon glyphicon-time" data-toggle="tooltip" data-placement="right" title="In Progress"></span>
+            {% endif %}
+          </td>
           <td>{{ items.id }}</td>
           <td>{{ items.user.full_name }}</td>
           <td>{{ items.request_date }}</td>
