@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 
 urlpatterns = patterns('',
-    url(r'^new/$', login_required(views.SimulationCreate.as_view()), name='create_form'),
+    url(r'^new_simple/$', login_required(views.SimulationCreateSimple.as_view()), name='create_form_simple'),
     url(r'^edit/(?P<pk>\d+)/$', login_required(never_cache(views.SimulationEdit.as_view())), name='simulation_edit'),
     url(r'^cancel/(?P<pk>\d+)/$', login_required(never_cache(views.SimulationCancel.as_view())), name='simulation_cancel'),
     url(r'^$', login_required(views.IncompleteSimulations.as_view()), name='simulation_incomplete'),

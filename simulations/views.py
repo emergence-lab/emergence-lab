@@ -13,6 +13,7 @@ import time
 import aws_support as aws
 
 from simulations.models import Simulation
+from simulations.forms import SimInlineForm
 
 
 class SimulationBase(ListView):
@@ -34,10 +35,25 @@ class AllSimulations(SimulationBase):
         return Simulation.objects.order_by('-id')
 
 
-class SimulationCreate(CreateView):
+class SimulationCreateSimple(CreateView):
     model = Simulation
     fields = ['priority', 'execution_node', 'file_path']
-    template_name = 'simulations/create_form.html'
+    template_name = 'simulations/create_form_simple.html'
+    success_url = '/simulations'
+
+    def form_valid(self, form):
+        """
+        If the form is valid, save the associated model.
+        """
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(reverse('simulation_incomplete'))
+
+class SimulationCreateInline(CreateView):
+    model = Simulation
+    form_class = SimInlineForm
+    template_name = 'simulations/create_form_simple.html'
     success_url = '/simulations'
 
     def form_valid(self, form):

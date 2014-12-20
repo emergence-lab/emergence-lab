@@ -35,6 +35,9 @@ def content_file_name(instance, filename):
 class Simulation(models.Model):
 
     def get_instance_types():
+        """
+        NOTE NOT REDUNDANT - Formats instance types for model choices.
+        """
         m = aws.EC2Connection(settings.AWS_EC2_REGION,
                                  settings.AWS_ACCESS_KEY_ID,
                                  settings.AWS_SECRET_ACCESS_KEY)
