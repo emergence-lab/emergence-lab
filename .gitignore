@@ -60,3 +60,4 @@ target/
 static/
 secrets.json
 tunnel.sh
+media/

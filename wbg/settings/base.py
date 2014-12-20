@@ -163,11 +163,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
-MEDIA_URL = '/wsgi/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
-
-#MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
-
 
 
 # RESTful API
