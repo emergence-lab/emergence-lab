@@ -20,21 +20,6 @@ class SimulationBase(ListView):
     template_name = 'simulations/management.html'
     paginate_by = 10
 
-    signals = aws.EC2Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-
-    def get_context_data(self, **kwargs):
-        tmp = []
-        if 'instances' not in kwargs:
-            for instance in self.signals.reservation_list()[0].instances:
-                tmp.append({'instance_name': instance.id,
-                            'instance_type': instance.instance_type,
-                            'instance_state': instance.state,
-                            'instance_uptime': self.signals.instance_uptime(instance.id)})
-            kwargs['instances'] = tmp
-        if 'status' not in kwargs:
-            kwargs['status'] = self.signals.instance_list()[0].state
-        return super(SimulationBase, self).get_context_data(**kwargs)
-
 
 class IncompleteSimulations(SimulationBase):
     def get_queryset(self):
