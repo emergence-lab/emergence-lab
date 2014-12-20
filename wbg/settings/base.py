@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'django_wysiwyg',
     'mptt',
     'storages',
+    'django_ace',
     # local apps
     'core',
     'dashboard',

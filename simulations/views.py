@@ -7,8 +7,13 @@ from django.views.generic.edit import CreateView, UpdateView
 from django import forms
 from django.contrib.auth.models import User
 from django.db import models
+from django.core.files.base import File
 import datetime
+import os
 import time
+import zipfile
+import tempfile
+import json
 
 import aws_support as aws
 
@@ -53,17 +58,68 @@ class SimulationCreateSimple(CreateView):
 class SimulationCreateInline(CreateView):
     model = Simulation
     form_class = SimInlineForm
-    template_name = 'simulations/create_form_simple.html'
+    template_name = 'simulations/create_form_inline.html'
     success_url = '/simulations'
 
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super(SimulationCreateInline, self).get_initial()
+        initial['materials'] = open(os.path.join(settings.MEDIA_ROOT,
+                                                 'simulations',
+                                                 'templates',
+                                                 'materials.par')).read()
+        initial['physics'] = open(os.path.join(settings.MEDIA_ROOT,
+                                                 'simulations',
+                                                 'templates',
+                                                 'pc_des.cmd')).read()
+        initial['device'] = open(os.path.join(settings.MEDIA_ROOT,
+                                                 'simulations',
+                                                 'templates',
+                                                 'pc_dvs.scm')).read()
+        return initial
+
     def form_valid(self, form):
-        """
-        If the form is valid, save the associated model.
-        """
         self.object = form.save(commit=False)
+        zipdir = tempfile.mkdtemp()
+        zipout = zipfile.ZipFile(os.path.join(zipdir,
+                                              str(str(self.request.user)
+                                                  + '.zip')),
+                                                  #str(form.cleaned_data['my_first_name']
+                                                  #    + form.cleaned_data['my_last_name']
+                                                  #    + '.zip')),
+                                     'w')
+        with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
+            materials.write(form.data['materials'].encode('utf-8'))
+            materials.seek(0)
+            zipout.write(materials.name, os.path.basename(materials.name))
+            materials.close()
+        with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as device:
+            device.write(form.data['device'].encode('utf-8'))
+            device.seek(0)
+            zipout.write(device.name, os.path.basename(device.name))
+            device.close()
+        with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name, 'w+') as physics:
+            physics.write(form.data['physics'].encode('utf-8'))
+            physics.seek(0)
+            zipout.write(physics.name, os.path.basename(physics.name))
+            physics.close()
+        zipout.close()
+        self.object.file_path = File(open(zipout.filename, 'rb'))
+        #self.object.file_path.name = zipout.filename
         self.object.user = self.request.user
-        self.object.save()
+        self.object = form.save()
         return HttpResponseRedirect(reverse('simulation_incomplete'))
+
+    #def form_valid(self, form):
+    #    """
+    #    If the form is valid, save the associated model.
+    #    """
+    #    self.object = form.save(commit=False)
+    #    self.object.user = self.request.user
+    #    self.object.save()
+    #    return HttpResponseRedirect(reverse('simulation_incomplete'))
 
 class SimulationCancel(RedirectView):
     permanent = False

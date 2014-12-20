@@ -6,15 +6,21 @@ from .models import Simulation
 
 class SimInlineForm(forms.ModelForm):
 
-    document = forms.CharField(widget=AceWidget(mode='text',
+    device = forms.CharField(widget=AceWidget(mode='text',
                                                 theme='twilight',
-                                                width="400px",
+                                                width="700px",
                                                 height="300px",
                                                 showprintmargin=True))
 
-    doc_test = forms.CharField(widget=AceWidget(mode='text',
+    materials = forms.CharField(widget=AceWidget(mode='text',
                                                 theme='twilight',
-                                                width="400px",
+                                                width="700px",
+                                                height="300px",
+                                                showprintmargin=True))
+
+    physics = forms.CharField(widget=AceWidget(mode='text',
+                                                theme='twilight',
+                                                width="700px",
                                                 height="300px",
                                                 showprintmargin=True))
 

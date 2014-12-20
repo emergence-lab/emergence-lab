@@ -27,8 +27,7 @@ def content_file_name(instance, filename):
     return ''.join(('simulations/',
                     str(instance.user.username),
                     str("_"),
-                    datetime.datetime.strftime(instance.request_date, '%m_%d_%Y_%H_%M_%S'),
-                    str('.'),
+                    datetime.datetime.strftime(instance.request_date, '%Y_%m_%d_%H_%M_%S'),
                     str(os.path.splitext(filename)[1])))
 
 @python_2_unicode_compatible
