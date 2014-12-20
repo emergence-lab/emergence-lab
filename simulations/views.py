@@ -24,7 +24,7 @@ from simulations.forms import SimInlineForm
 class SimulationBase(ListView):
     model = Simulation
     template_name = 'simulations/management.html'
-    paginate_by = 10
+    paginate_by = 8
 
 
 class IncompleteSimulations(SimulationBase):
