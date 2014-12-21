@@ -9,6 +9,25 @@
             {% block dashboard_breadcrumb %}
                 <li  class='active'>Dashboard</li>
             {% endblock dashboard_breadcrumb %}
+            <li class="dropdown pull-right">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-wrench"></span>
+                </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{% url 'project_list' %}">
+                            <span class="glyphicon glyphicon-cog"></span>
+                            Projects
+                        </a></li>
+                        <li><a href="{% url 'platter_list' %}">
+                            <span class="glyphicon glyphicon-cog"></span>
+                            Platters
+                        </a></li>
+                        <li><a href="{% url 'operator_list' %}">
+                            <span class="glyphicon glyphicon-cog"></span>
+                            Operators
+                        </a></li>
+                    </ul>
+            </li>
         </ol>
     </nav>
 
