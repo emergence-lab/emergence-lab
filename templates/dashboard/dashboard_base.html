@@ -12,31 +12,6 @@
         </ol>
     </nav>
 
-    <nav>
-        <ul class="nav nav-pills">
-            <li><a class="btn btn-link" href="{% url 'create_growth_start' %}">
-                <span class="glyphicon glyphicon-plus"></span>
-                Create Growth
-            </a></li>
-            <li><a class="btn btn-link" href="{% url 'afm_filter' %}">
-                <span class="glyphicon glyphicon-search"></span>
-                Sample Lookup
-            </a></li>
-            <li><a class="btn btn-link" href="{% url 'simulation_incomplete' %}">
-                <span class="glyphicon glyphicon-cloud"></span>
-                Simulations
-            </a></li>
-            <li class="dropdown">
-                <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Administration <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{% url 'project_list' %}">Projects</a></li>
-                    <li><a href="{% url 'platter_list' %}">Platters</a></li>
-                    <li><a href="{% url 'operator_list' %}">Operators</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-
     <div class="row top-spacer-sm">
         <nav class="col-xs-2 sidebar">
             <header class="sidebar-header">
@@ -95,7 +70,7 @@
                 {% endblock dashboard_content %}
             </div>
         </section>
-        
+
     </div>
 </div>
 
