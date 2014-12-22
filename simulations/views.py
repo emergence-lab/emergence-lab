@@ -87,21 +87,45 @@ class SimulationCreateInline(CreateView):
                                               str(str(self.request.user)
                                                   + '.zip')),
                                      'w')
-        with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
-            materials.write(form.data['materials'].encode('utf-8'))
-            materials.seek(0)
-            zipout.write(materials.name, os.path.basename(materials.name))
-            materials.close()
-        with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as device:
-            device.write(form.data['device'].encode('utf-8'))
-            device.seek(0)
-            zipout.write(device.name, os.path.basename(device.name))
-            device.close()
-        with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name, 'w+') as physics:
-            physics.write(form.data['physics'].encode('utf-8'))
-            physics.seek(0)
-            zipout.write(physics.name, os.path.basename(physics.name))
-            physics.close()
+        if self.request.FILES['materials_upload']:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as materials:
+                for chunk in self.request.FILES['materials_upload'].chunks():
+                    materials.write(chunk.encode('utf-8'))
+                materials.seek(0)
+                zipout.write(materials.name, os.path.basename(materials.name))
+                materials.close()
+        else:
+            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
+                materials.write(form.data['materials'].encode('utf-8'))
+                materials.seek(0)
+                zipout.write(materials.name, os.path.basename(materials.name))
+                materials.close()
+        if self.request.FILES['device_upload']:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as device:
+                for chunk in self.request.FILES['device_upload'].chunks():
+                    device.write(chunk.encode('utf-8'))
+                device.seek(0)
+                zipout.write(device.name, os.path.basename(device.name))
+                device.close()
+        else:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as device:
+                device.write(form.data['device'].encode('utf-8'))
+                device.seek(0)
+                zipout.write(device.name, os.path.basename(device.name))
+                device.close()
+        if self.request.FILES['physics_upload']:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as physics:
+                for chunk in self.request.FILES['physics_upload'].chunks():
+                    physics.write(chunk.encode('utf-8'))
+                physics.seek(0)
+                zipout.write(physics.name, os.path.basename(physics.name))
+                physics.close()
+        else:
+            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name, 'w+') as physics:
+                physics.write(form.data['physics'].encode('utf-8'))
+                physics.seek(0)
+                zipout.write(physics.name, os.path.basename(physics.name))
+                physics.close()
         zipout.close()
         self.object.file_path = File(open(zipout.filename, 'rb'))
         self.object.user = self.request.user
