@@ -29,4 +29,4 @@ class SimInlineForm(forms.ModelForm):
 
     class Meta:
         model = Simulation
-        fields = ['priority', 'execution_node']
+        fields = ['priority', 'execution_node', 'investigations']

@@ -61,7 +61,7 @@ class Simulation(models.Model):
 
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    #investigations = models.ManyToManyField(Investigation)
+    investigations = models.ManyToManyField(Investigation)
     request_date = models.DateTimeField(auto_now_add=True)
     start_date = models.DateTimeField(null=True, blank=True)
     finish_date = models.DateTimeField(null=True, blank=True)
