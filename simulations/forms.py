@@ -7,20 +7,20 @@ from .models import Simulation
 class SimInlineForm(forms.ModelForm):
 
     device = forms.CharField(widget=AceWidget(mode='text',
-                                                theme='twilight',
-                                                width="700px",
+                                                #theme='twilight',
+                                                width="800px",
                                                 height="300px",
                                                 showprintmargin=True))
 
     materials = forms.CharField(widget=AceWidget(mode='text',
-                                                theme='twilight',
-                                                width="700px",
+                                                #theme='twilight',
+                                                width="800px",
                                                 height="300px",
                                                 showprintmargin=True))
 
     physics = forms.CharField(widget=AceWidget(mode='text',
-                                                theme='twilight',
-                                                width="700px",
+                                                #theme='twilight',
+                                                width="800px",
                                                 height="300px",
                                                 showprintmargin=True))
 
