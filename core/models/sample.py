@@ -47,6 +47,11 @@ class SampleManager(models.Manager):
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
+    """
+    Class representing a sample, which is an organizational unit representing
+    a single piece of material, chemical mixture, etc. on which experimentation
+    is done.
+    """
     prefix = 's'
     padding = 4
 

@@ -13,7 +13,9 @@ from core import fields
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     """
-    Base class for all processes.
+    Base class for all processes. A process represents anything done to a
+    sample which results in data (numerical or visual) or alters the properties
+    of the sample.
     """
     prefix = 'p'
 
@@ -25,6 +27,9 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
 
 
 class SplitProcess(Process):
+    """
+    Process representing splitting a sample into multiple parts or pieces.
+    """
     name = 'Split Sample'
     slug = 'split-sample'
     is_destructive = False

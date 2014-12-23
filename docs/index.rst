@@ -17,8 +17,6 @@ Contents:
    process
    organization
    core
-   sample_api
-   growths
 
 Indices and tables
 ==================
