@@ -30,7 +30,7 @@ class Substrate(polymorphic.PolymorphicModel, TimestampMixin):
 
 class SampleManager(models.Manager):
 
-    def create_sample(self, substrate, comment=''):
+    def create(self, substrate, comment=''):
         """
         Creates a sample with a default 'root' processnode which makes it easy
         to refer to the root node.

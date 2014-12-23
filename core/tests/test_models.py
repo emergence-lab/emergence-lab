@@ -74,7 +74,7 @@ class TestAutoUUIDMixin(unittest.TestCase):
 
     def setUp(self):
         substrate = mommy.make('core.Substrate')
-        self.sample = Sample.objects.create_sample(substrate=substrate)
+        self.sample = Sample.objects.create(substrate=substrate)
 
     def test_uuid_prefix(self):
         self.assertTrue(self.sample.uuid.startswith(Sample.prefix))
@@ -91,7 +91,7 @@ class TestSampleManager(unittest.TestCase):
         Test that the sample is properly created with the root process.
         """
         substrate = mommy.make('core.Substrate')
-        sample = Sample.objects.create_sample(substrate=substrate)
+        sample = Sample.objects.create(substrate=substrate)
         self.assertEqual(substrate.id, sample.substrate_id)
 
 
@@ -99,7 +99,7 @@ class TestSample(unittest.TestCase):
 
     def setUp(self):
         substrate = mommy.make('core.Substrate')
-        self.sample = Sample.objects.create_sample(substrate=substrate)
+        self.sample = Sample.objects.create(substrate=substrate)
 
     def test_insert_node_append(self):
         """
