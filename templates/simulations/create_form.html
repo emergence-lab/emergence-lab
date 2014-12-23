@@ -15,6 +15,11 @@
 <p></p>
 
 <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+
+    <div class="col-md-8 col-md-offset-2">
+        <button class="btn btn-success pull-right" data-toggle="tooltip" data-placement="left" title="test" type="submit" value="Create">Create</button>
+    </div>
+
     <div class="col-md-2 col-md-offset-1">
         <div class="input-group">
         <h4 class="text-center">Configuration</h4><br>
@@ -69,23 +74,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-
-
-
-
-
-<!--            <ul class="list-group">
-                <li class="list-group-item">
-                    {% bootstrap_form form %}
-                </li>
-            </ul>-->
-    <div class="col-md-8 col-md-offset-2">
-        <button class="btn btn-success pull-right" data-toggle="tooltip" data-placement="left" title="test" type="submit" value="Create">Create</button>
-    </div>
-
-
 </form>
 
 {% endblock %}

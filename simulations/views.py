@@ -39,33 +39,33 @@ class AllSimulations(SimulationBase):
     def get_queryset(self):
         return Simulation.objects.order_by('-id')
 
+#
+#class SimulationCreateSimple(CreateView):
+#    model = Simulation
+#    fields = ['priority', 'execution_node', 'file_path']
+#    template_name = 'simulations/create_form_simple.html'
+#    success_url = '/simulations'
+#
+#    def form_valid(self, form):
+#        """
+#        If the form is valid, save the associated model.
+#        """
+#        self.object = form.save(commit=False)
+#        self.object.user = self.request.user
+#        self.object.save()
+#        return HttpResponseRedirect(reverse('simulation_incomplete'))
 
-class SimulationCreateSimple(CreateView):
-    model = Simulation
-    fields = ['priority', 'execution_node', 'file_path']
-    template_name = 'simulations/create_form_simple.html'
-    success_url = '/simulations'
-
-    def form_valid(self, form):
-        """
-        If the form is valid, save the associated model.
-        """
-        self.object = form.save(commit=False)
-        self.object.user = self.request.user
-        self.object.save()
-        return HttpResponseRedirect(reverse('simulation_incomplete'))
-
-class SimulationCreateInline(CreateView):
+class SimulationCreate(CreateView):
     model = Simulation
     form_class = SimInlineForm
-    template_name = 'simulations/create_form_inline.html'
+    template_name = 'simulations/create_form.html'
     success_url = '/simulations'
 
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
         """
-        initial = super(SimulationCreateInline, self).get_initial()
+        initial = super(SimulationCreate, self).get_initial()
         initial['materials'] = open(os.path.join(settings.MEDIA_ROOT,
                                                  'simulations',
                                                  'templates',
@@ -88,7 +88,7 @@ class SimulationCreateInline(CreateView):
                                                   + '.zip')),
                                      'w')
         if self.request.FILES['materials_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as materials:
+            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
                 for chunk in self.request.FILES['materials_upload'].chunks():
                     materials.write(chunk.encode('utf-8'))
                 materials.seek(0)
@@ -114,7 +114,7 @@ class SimulationCreateInline(CreateView):
                 zipout.write(device.name, os.path.basename(device.name))
                 device.close()
         if self.request.FILES['physics_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as physics:
+            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name, 'w+') as physics:
                 for chunk in self.request.FILES['physics_upload'].chunks():
                     physics.write(chunk.encode('utf-8'))
                 physics.seek(0)
