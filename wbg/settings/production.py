@@ -6,9 +6,9 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 
 
-# Authentication
+# Authentication - Comment out for local LDAP no-TLS
 
-AUTH_LDAP_SERVER_URI = ''
+# AUTH_LDAP_SERVER_URI = ''
 
 
 # Misc Settings
