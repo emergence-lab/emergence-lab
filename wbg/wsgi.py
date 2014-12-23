@@ -33,14 +33,14 @@ def __get_secret(setting, secrets=secrets):
 
 # End secrets
 
-site.addsitedir('{}/local/lib/python2.7/site-packages'.format(_get_secret(VIRTUAL_ENV_PATH)))
+site.addsitedir('{}/local/lib/python2.7/site-packages'.format(_get_secret('VIRTUAL_ENV_PATH')))
 
-sys.path.append(_get_secret(SYSTEM_PATH))
-sys.path.append(os.path.join(_get_secret(SYSTEM_PATH)), _get_secret(SETTINGS_REL_ROOT))
+sys.path.append(_get_secret('SYSTEM_PATH'))
+sys.path.append(os.path.join(_get_secret('SYSTEM_PATH)'), _get_secret('SETTINGS_REL_ROOT'))
 
-activate_env=os.path.expanduser('{}/bin/activate_this.py'.format(_get_secret(VIRTUAL_ENV_PATH)))
+activate_env=os.path.expanduser('{}/bin/activate_this.py'.format(_get_secret('VIRTUAL_ENV_PATH')))
 execfile(activate_env, dict(__file__=activate_env))
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', '{0}.settings.{1}'.format(_get_secret(SETTINGS_REL_ROOT), _get_secret(PRODUCTION_MODE)))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '{0}.settings.{1}'.format(_get_secret('SETTINGS_REL_ROOT'), _get_secret('PRODUCTION_MODE')))
 
 application = get_wsgi_application()
