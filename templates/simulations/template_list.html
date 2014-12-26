@@ -39,10 +39,28 @@
       <tr>
         <td>{{ template.name }}</td>
         <td>{{ template.comment }}</td>
-        <td><a class="glyphicon glyphicon-plus" href="{% url 'create_form_template' template.name %}"></a></td>
+        <td>
+            <a class="glyphicon glyphicon-plus" href="{% url 'create_form_template' template.name %}"></a>
+            <a class="glyphicon glyphicon-remove" href="{% url 'simulation_template_delete' template.name %}"></a>
+        </td>
       </tr>
     {% endfor %}
   </table>
+</div>
+
+<div class="col-md-6 col-md-offset-8">
+    {% if is_paginated %}
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}">{% if not page_obj.has_next %}<span aria-hidden="true">{% endif %}Next &raquo;</span><span class="sr-only">Next</span></a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
 </div>
 
 {% endblock %}

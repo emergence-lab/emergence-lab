@@ -55,12 +55,15 @@
           <td>
           {% if request.user == items.user %}
               {% if items.finish_date %}<a class="glyphicon glyphicon-download-alt" href="#"></a>></a>
-              {% else %}<a class="glyphicon glyphicon-edit" href={% url 'simulation_edit' pk=items.id %}></a>
-              <a class="glyphicon glyphicon-remove" href="{% url 'simulation_cancel' pk=items.id %}"></a>{% endif %}
+              {% else %}
+                  <a class="glyphicon glyphicon-edit" href="{% url 'simulation_edit' pk=items.id %}" data-toggle="tooltip" title="Edit"></a>
+                  <a class="glyphicon glyphicon-share" href="{% url 'create_form_existing' pk=items.id %}" data-toggle="tooltip" title="Use as template"></a>
+                  <a class="glyphicon glyphicon-remove" href="{% url 'simulation_cancel' pk=items.id %}" data-toggle="tooltip" title="Cancel"></a>{% endif %}
           {% elif user.is_staff %}
               {% if items.finish_date %}<a class="glyphicon glyphicon-download-alt" href="#"></a>
-              {% else %}<a class="glyphicon glyphicon-edit" href={% url 'simulation_edit' pk=items.id %}></a>
-              <a class="glyphicon glyphicon-remove" href="{% url 'simulation_cancel' pk=items.id %}"></a>{% endif %}
+              {% else %}
+                  <a class="glyphicon glyphicon-edit" href={% url 'simulation_edit' pk=items.id %}></a>
+                  <a class="glyphicon glyphicon-remove" href="{% url 'simulation_cancel' pk=items.id %}"></a>{% endif %}
           {% endif %}
           </td>
       </tr>
