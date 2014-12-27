@@ -39,3 +39,8 @@ PASSWORD_MANAGER = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 MOMMY_CUSTOM_FIELDS_GEN = {
     'autoslug.AutoSlugField': lambda: 'default-value',
 }
+
+# Media Files
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')

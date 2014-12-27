@@ -42,11 +42,15 @@ ROOT_URLCONF = 'wbg.urls'
 
 WSGI_APPLICATION = 'wbg.wsgi.application'
 
+SUB_SITE = get_secret('SUB_SITE')
+
 
 # User login
 
 AUTH_USER_MODEL = 'core.User'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '{}/dashboard/'.format('SUB_SITE')
+LOGIN_URL = "{}/accounts/login/".format('SUB_SITE')
+LOGOUT_URL = "{}/accounts/logout/".format('SUB_SITE')
 
 
 # Templates
@@ -79,6 +83,7 @@ INSTALLED_APPS = (
     'django_wysiwyg',
     'mptt',
     'storages',
+    'django_ace',
     # local apps
     'core',
     'dashboard',
@@ -163,11 +168,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
-MEDIA_URL = '/wsgi/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
-
-#MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
-
 
 
 # RESTful API

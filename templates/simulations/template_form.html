@@ -11,7 +11,7 @@
 
 {{ form.media }}
 
-<h2 class="text-center">Edit</h2>
+<h2 class="text-center">Template Builder</h2>
 <p></p>
 
 <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
@@ -23,9 +23,8 @@
     <div class="col-md-2 col-md-offset-1">
         <div class="input-group">
         <h4 class="text-center">Configuration</h4><br>
-            {% bootstrap_field form.priority %}
-            {% bootstrap_field form.execution_node %}<br></br>
-            {% bootstrap_field form.investigations %}
+            {% bootstrap_field form.template_name %}<br></br>
+            {% bootstrap_field form.comment %}
         </div>
     </div>
 
