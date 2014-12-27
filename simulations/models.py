@@ -27,14 +27,16 @@ def content_file_name(instance, filename):
     return ''.join(('simulations/',
                     str(instance.user.username),
                     str("_"),
-                    datetime.datetime.strftime(instance.request_date, '%m_%d_%Y_%H_%M_%S'),
-                    str('.'),
+                    datetime.datetime.strftime(instance.request_date, '%Y_%m_%d_%H_%M_%S'),
                     str(os.path.splitext(filename)[1])))
 
 @python_2_unicode_compatible
 class Simulation(models.Model):
 
     def get_instance_types():
+        """
+        NOTE NOT REDUNDANT - Formats instance types for model choices.
+        """
         m = aws.EC2Connection(settings.AWS_EC2_REGION,
                                  settings.AWS_ACCESS_KEY_ID,
                                  settings.AWS_SECRET_ACCESS_KEY)
@@ -59,7 +61,7 @@ class Simulation(models.Model):
 
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    #investigations = models.ManyToManyField(Investigation)
+    investigations = models.ManyToManyField(Investigation)
     request_date = models.DateTimeField(auto_now_add=True)
     start_date = models.DateTimeField(null=True, blank=True)
     finish_date = models.DateTimeField(null=True, blank=True)

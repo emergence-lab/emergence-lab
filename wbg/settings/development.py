@@ -27,3 +27,9 @@ AUTH_LDAP_SERVER_URI = 'ldap://localhost:9999'
 # Middleware
 
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
+
+
+# Media Files
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')

@@ -1,0 +1,71 @@
+{% extends "core/base.html" %}
+
+{% block header %}
+    {% load staticfiles %}
+    {% load bootstrap3 %}
+    <script type="text/javascript" src="{% static '/static/simulations/js/popover.js' %}"></script>
+    <script type="text/javascript" src="{% static '/static/simulations/js/tooltip.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-center">Simulation Management Console</h2>
+
+<div class="col-md-2">
+    <ul class="nav nav-pills nav-stacked">
+    <li role="presentation" {% if request.path == '/simulations/' %}class="active"{% endif %}><a href="{% url 'simulation_incomplete' %}"><span class="glyphicon glyphicon-import"> Incomplete</span></a></li>
+    <li role="presentation" {% if request.path == '/simulations/completed/' %}class="active"{% endif %}><a href="{% url 'simulation_complete' %}"><span class="glyphicon glyphicon-saved"> Completed</a></li>
+    <li role="presentation" {% if request.path == '/simulations/all/' %}class="active"{% endif %}><a href="{% url 'simulation_all' %}"><span class="glyphicon glyphicon-list"> All</a></li>
+    <li role="presentation" {% if request.path == '/simulations/templates/' %}class="active"{% endif %}><a href="{% url 'simulation_templates' %}"><span class="glyphicon glyphicon-star"> Templates</a></li>
+    <li role="presentation" {% if request.path == '/simulations/admin/' %}class="active"{% endif %}><a href="{% url 'simulation_admin' %}"><span class="glyphicon glyphicon-wrench"> Instances</a></li>
+    </ul>
+</div>
+
+<div class="col-md-8 text-center">
+  <h3>Template List</h3>
+  <p></p>
+
+  <p></p>
+</div>
+</br>
+
+<div class="col-md-8 text-center">
+  <table class="table">
+    <tr>
+      <td><strong>Name</strong></td>
+      <td><strong>Comment</strong></td>
+      <td><strong>Actions</strong></td>
+    </tr>
+    {% for template in template_list %}
+      <tr>
+        <td>{{ template.name }}</td>
+        <td>{{ template.comment }}</td>
+        <td>
+            <a class="glyphicon glyphicon-plus" href="{% url 'create_form_template' template.name %}"></a>
+            <a class="glyphicon glyphicon-edit" href="{% url 'simulation_template_edit' template.name %}"></a>
+            <a class="glyphicon glyphicon-remove" href="{% url 'simulation_template_delete' template.name %}"></a>
+        </td>
+      </tr>
+    {% endfor %}
+    <tr>
+        <td></td><td></td><td><a class="glyphicon glyphicon-plus" href="{% url 'simulation_template_create' %}" data-toggle="tooltip" title="Create Template"></a></td>
+    </tr>
+  </table>
+</div>
+
+<div class="col-md-6 col-md-offset-8">
+    {% if is_paginated %}
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}">{% if not page_obj.has_next %}<span aria-hidden="true">{% endif %}Next &raquo;</span><span class="sr-only">Next</span></a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+</div>
+
+{% endblock %}
