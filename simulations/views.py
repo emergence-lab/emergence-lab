@@ -39,22 +39,6 @@ class AllSimulations(SimulationBase):
     def get_queryset(self):
         return Simulation.objects.order_by('-id')
 
-#
-#class SimulationCreateSimple(CreateView):
-#    model = Simulation
-#    fields = ['priority', 'execution_node', 'file_path']
-#    template_name = 'simulations/create_form_simple.html'
-#    success_url = '/simulations'
-#
-#    def form_valid(self, form):
-#        """
-#        If the form is valid, save the associated model.
-#        """
-#        self.object = form.save(commit=False)
-#        self.object.user = self.request.user
-#        self.object.save()
-#        return HttpResponseRedirect(reverse('simulation_incomplete'))
-
 class SimulationCreate(CreateView):
     model = Simulation
     form_class = SimInlineForm
@@ -314,18 +298,6 @@ class SimulationTemplates(TemplateView):
                 kwargs['template_list'] = tmp
         return super(SimulationTemplates, self).get_context_data(**kwargs)
 
-#class SimulationTemplateCopy(RedirectView):
-#    permanent = False
-#
-#    def get_redirect_url(self, *args, **kwargs):
-#        signals = aws.EC2Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-#        instance = kwargs.pop('instance_id')
-#        try:
-#            signals.stop_instance(instance)
-#            return reverse('simulation_admin')
-#        except Exception as e:
-#            raise Exception(e)
-
 class SimulationTemplateDelete(RedirectView):
     permanent = False
 
@@ -339,19 +311,6 @@ class SimulationTemplateDelete(RedirectView):
             return reverse('simulation_templates')
         except Exception as e:
             raise Exception(e)
-
-#class SimulationTemplateCreate(RedirectView):
-#    #pass
-#    permanent = False
-#
-#    def get_redirect_url(self, *args, **kwargs):
-#        storage = aws.S3FileManager(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, True)
-#        instance = kwargs.pop('instance_id')
-#        try:
-#            signals.stop_instance(instance)
-#            return reverse('simulation_admin')
-#        except Exception as e:
-#            raise Exception(e)
 
 class SimulationTemplateCreate(FormView):
     form_class = SimTemplateForm
