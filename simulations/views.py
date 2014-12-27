@@ -477,3 +477,88 @@ class SimulationTemplateEdit(FormView):
                 comment.write(form.cleaned_data['comment'])
                 comment.close()
         return HttpResponseRedirect(reverse('simulation_templates'))
+
+class SimulationJobToTemplate(FormView):
+    model = Simulation
+    form_class = SimTemplateForm
+    template_name = 'simulations/template_form.html'
+    success_url = '/simulations/templates'
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super(SimulationJobToTemplate, self).get_initial()
+        try:
+            s3_file_path = Simulation.objects.get(pk=self.kwargs['pk']).file_path.name
+            storage = aws.S3FileManager(settings.AWS_ACCESS_KEY_ID,
+                                        settings.AWS_SECRET_ACCESS_KEY,
+                                        True)
+            zipdir = tempfile.mkdtemp()
+            os.mkdir(os.path.join(zipdir, 'simulations'))
+            zip_download = storage.downloadFileFromBucket(settings.AWS_STORAGE_BUCKET_NAME,
+                                                               s3_file_path,
+                                                               zipdir)
+            original_file = zipfile.ZipFile(os.path.join(zipdir,
+                                                         s3_file_path),
+                                            'r')
+            file_list = original_file.namelist()
+            for item in file_list:
+                if item.endswith('.par'): initial['materials'] = original_file.read(item)
+                if item.endswith('.scm'): initial['device'] = original_file.read(item)
+                if item.endswith('.cmd'): initial['physics'] = original_file.read(item)
+        except Exception as e: print(e)
+        return initial
+
+    def form_valid(self, form):
+        user = str(self.request.user)
+        base_path = os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)
+        try:
+            base_path = os.path.join(base_path, form.cleaned_data['template_name'])
+        except Exception as e: print(e)
+        if form.cleaned_data['materials_upload']:
+            with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
+                materials.truncate()
+                materials.seek(0)
+                for chunk in self.request.FILES['materials_upload'].chunks():
+                    materials.write(chunk.encode('utf-8'))
+                materials.close()
+        else:
+            with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
+                materials.truncate()
+                materials.seek(0)
+                materials.write(form.data['materials'].encode('utf-8'))
+                materials.close()
+        if form.cleaned_data['device_upload']:
+            with open(os.path.join(base_path, 'device.scm'), 'w+') as device:
+                device.truncate()
+                device.seek(0)
+                for chunk in self.request.FILES['device_upload'].chunks():
+                    device.write(chunk.encode('utf-8'))
+                device.close()
+        else:
+            with open(os.path.join(base_path, 'device.scm'), 'w+') as device:
+                device.truncate()
+                device.seek(0)
+                device.write(form.data['device'].encode('utf-8'))
+                device.close()
+        if form.cleaned_data['physics_upload']:
+            with open(os.path.join(base_path, 'physics.cmd'), 'w+') as physics:
+                physics.truncate()
+                physics.seek(0)
+                for chunk in self.request.FILES['physics_upload'].chunks():
+                    physics.write(chunk.encode('utf-8'))
+                physics.close()
+        else:
+            with open(os.path.join(base_path, 'physics.cmd'), 'w+') as physics:
+                physics.truncate()
+                physics.seek(0)
+                physics.write(form.data['physics'].encode('utf-8'))
+                physics.close()
+        if form.cleaned_data['comment']:
+            with open(os.path.join(base_path, 'comment.txt'), 'w+') as comment:
+                comment.truncate()
+                comment.seek(0)
+                comment.write(form.cleaned_data['comment'])
+                comment.close()
+        return HttpResponseRedirect(reverse('simulation_templates'))
