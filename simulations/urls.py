@@ -6,9 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 
 urlpatterns = patterns('',
-    url(r'^new/$', login_required(views.SimulationCreate.as_view()), name='create_form'),
-    url(r'^new/(?P<template_name>[a-z0-9\w-]+)$', login_required(never_cache(views.SimulationCreate.as_view())), name='create_form_template'),
-    url(r'^duplicate/(?P<pk>\d+)$', login_required(never_cache(views.SimulationCreate.as_view())), name='create_form_existing'),
+    url(r'^new/$', login_required(views.SimulationCreate.as_view()), name='sim_create_form'),
+    url(r'^new/(?P<template_name>[a-z0-9\w-]+)$', login_required(never_cache(views.SimulationCreate.as_view())), name='sim_create_form_template'),
+    url(r'^duplicate/(?P<pk>\d+)$', login_required(never_cache(views.SimulationCreate.as_view())), name='sim_create_form_existing'),
     url(r'^edit/(?P<pk>\d+)/$', login_required(never_cache(views.SimulationEdit.as_view())), name='simulation_edit'),
     url(r'^cancel/(?P<pk>\d+)/$', login_required(never_cache(views.SimulationCancel.as_view())), name='simulation_cancel'),
     url(r'^templates/$', login_required(never_cache(views.SimulationTemplates.as_view())), name='simulation_templates'),

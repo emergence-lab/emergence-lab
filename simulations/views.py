@@ -42,7 +42,7 @@ class AllSimulations(SimulationBase):
 class SimulationCreate(CreateView):
     model = Simulation
     form_class = SimInlineForm
-    template_name = 'simulations/create_form.html'
+    template_name = 'simulations/sim_create_form.html'
     success_url = '/simulations'
 
     def get_initial(self):
