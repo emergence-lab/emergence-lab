@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, HttpResponseRedirect, render_
 from django.utils.timezone import activate
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.views.generic import ListView, RedirectView, TemplateView
+from django.views.generic import ListView, RedirectView, TemplateView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from django import forms
 from django.contrib.auth.models import User
@@ -19,7 +19,7 @@ import shutil
 import aws_support as aws
 
 from simulations.models import Simulation
-from simulations.forms import SimInlineForm
+from simulations.forms import SimInlineForm, SimTemplateForm
 
 
 class SimulationBase(ListView):
@@ -171,11 +171,6 @@ class SimulationCancel(RedirectView):
         simulation_obj.delete()
         return reverse('simulation_incomplete')
 
-#class SimulationEdit(UpdateView):
-#    model = Simulation
-#    fields = ['priority', 'execution_node', 'file_path']
-#    template_name = 'simulations/edit_form.html'
-#    success_url = '/simulations'
 
 class SimulationEdit(UpdateView):
     model = Simulation
@@ -357,3 +352,128 @@ class SimulationTemplateDelete(RedirectView):
 #            return reverse('simulation_admin')
 #        except Exception as e:
 #            raise Exception(e)
+
+class SimulationTemplateCreate(FormView):
+    form_class = SimTemplateForm
+    template_name = 'simulations/template_form.html'
+    success_url = '/simulations/templates/'
+
+    def form_valid(self, form):
+        user = str(self.request.user)
+        base_path = os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)
+        try:
+            os.mkdir(os.path.join(base_path, form.cleaned_data['template_name']))
+            base_path = os.path.join(base_path, form.cleaned_data['template_name'])
+        except Exception as e: print(e)
+        if form.cleaned_data['materials_upload']:
+            with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
+                for chunk in self.request.FILES['materials_upload'].chunks():
+                    materials.write(chunk.encode('utf-8'))
+                materials.close()
+        else:
+            with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
+                materials.write(form.data['materials'].encode('utf-8'))
+                materials.close()
+        if form.cleaned_data['device_upload']:
+            with open(os.path.join(base_path, 'device.scm'), 'w+') as device:
+                for chunk in self.request.FILES['device_upload'].chunks():
+                    device.write(chunk.encode('utf-8'))
+                device.close()
+        else:
+            with open(os.path.join(base_path, 'device.scm'), 'w+') as device:
+                device.write(form.data['device'].encode('utf-8'))
+                device.close()
+        if form.cleaned_data['physics_upload']:
+            with open(os.path.join(base_path, 'physics.cmd'), 'w+') as physics:
+                for chunk in self.request.FILES['physics_upload'].chunks():
+                    physics.write(chunk.encode('utf-8'))
+                physics.close()
+        else:
+            with open(os.path.join(base_path, 'physics.cmd'), 'w+') as physics:
+                physics.write(form.data['physics'].encode('utf-8'))
+                physics.close()
+        if form.cleaned_data['comment']:
+            with open(os.path.join(base_path, 'comment.txt'), 'w+') as comment:
+                comment.write(form.cleaned_data['comment'])
+                comment.close()
+        return HttpResponseRedirect(reverse('simulation_templates'))
+
+class SimulationTemplateEdit(FormView):
+    form_class = SimTemplateForm
+    template_name = 'simulations/template_form.html'
+    success_url = '/simulations/templates/'
+    def get_initial(self):
+
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super(SimulationTemplateEdit, self).get_initial()
+        initial['template_name'] = self.kwargs['template_name']
+        template_path = os.path.join(settings.MEDIA_ROOT,
+                                     'simulations',
+                                     'templates',
+                                     str(self.request.user),
+                                     self.kwargs['template_name'])
+        self.file_list = os.listdir(template_path)
+        try:
+            for item in self.file_list:
+                if item == 'materials.par': initial['materials'] = open(os.path.join(template_path, item)).read()
+                if item == 'device.scm': initial['device'] = open(os.path.join(template_path, item)).read()
+                if item == 'physics.cmd': initial['physics'] = open(os.path.join(template_path, item)).read()
+                if item == 'comments.txt': initial['comment'] = open(os.path.join(template_path, item)).read()
+        except Exception as e: print(e)
+        initial['template_name'] = self.kwargs['template_name']
+        return initial
+
+    def form_valid(self, form):
+        user = str(self.request.user)
+        base_path = os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)
+        try:
+            base_path = os.path.join(base_path, form.cleaned_data['template_name'])
+        except Exception as e: print(e)
+        if form.cleaned_data['materials_upload']:
+            with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
+                materials.truncate()
+                materials.seek(0)
+                for chunk in self.request.FILES['materials_upload'].chunks():
+                    materials.write(chunk.encode('utf-8'))
+                materials.close()
+        else:
+            with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
+                materials.truncate()
+                materials.seek(0)
+                materials.write(form.data['materials'].encode('utf-8'))
+                materials.close()
+        if form.cleaned_data['device_upload']:
+            with open(os.path.join(base_path, 'device.scm'), 'w+') as device:
+                device.truncate()
+                device.seek(0)
+                for chunk in self.request.FILES['device_upload'].chunks():
+                    device.write(chunk.encode('utf-8'))
+                device.close()
+        else:
+            with open(os.path.join(base_path, 'device.scm'), 'w+') as device:
+                device.truncate()
+                device.seek(0)
+                device.write(form.data['device'].encode('utf-8'))
+                device.close()
+        if form.cleaned_data['physics_upload']:
+            with open(os.path.join(base_path, 'physics.cmd'), 'w+') as physics:
+                physics.truncate()
+                physics.seek(0)
+                for chunk in self.request.FILES['physics_upload'].chunks():
+                    physics.write(chunk.encode('utf-8'))
+                physics.close()
+        else:
+            with open(os.path.join(base_path, 'physics.cmd'), 'w+') as physics:
+                physics.truncate()
+                physics.seek(0)
+                physics.write(form.data['physics'].encode('utf-8'))
+                physics.close()
+        if form.cleaned_data['comment']:
+            with open(os.path.join(base_path, 'comment.txt'), 'w+') as comment:
+                comment.truncate()
+                comment.seek(0)
+                comment.write(form.cleaned_data['comment'])
+                comment.close()
+        return HttpResponseRedirect(reverse('simulation_templates'))

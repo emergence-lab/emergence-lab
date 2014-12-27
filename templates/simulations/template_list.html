@@ -16,6 +16,7 @@
     <li role="presentation" {% if request.path == '/simulations/' %}class="active"{% endif %}><a href="{% url 'simulation_incomplete' %}"><span class="glyphicon glyphicon-import"> Incomplete</span></a></li>
     <li role="presentation" {% if request.path == '/simulations/completed/' %}class="active"{% endif %}><a href="{% url 'simulation_complete' %}"><span class="glyphicon glyphicon-saved"> Completed</a></li>
     <li role="presentation" {% if request.path == '/simulations/all/' %}class="active"{% endif %}><a href="{% url 'simulation_all' %}"><span class="glyphicon glyphicon-list"> All</a></li>
+    <li role="presentation" {% if request.path == '/simulations/templates/' %}class="active"{% endif %}><a href="{% url 'simulation_templates' %}"><span class="glyphicon glyphicon-star"> Templates</a></li>
     <li role="presentation" {% if request.path == '/simulations/admin/' %}class="active"{% endif %}><a href="{% url 'simulation_admin' %}"><span class="glyphicon glyphicon-wrench"> Instances</a></li>
     </ul>
 </div>
@@ -41,10 +42,14 @@
         <td>{{ template.comment }}</td>
         <td>
             <a class="glyphicon glyphicon-plus" href="{% url 'create_form_template' template.name %}"></a>
+            <a class="glyphicon glyphicon-edit" href="{% url 'simulation_template_edit' template.name %}"></a>
             <a class="glyphicon glyphicon-remove" href="{% url 'simulation_template_delete' template.name %}"></a>
         </td>
       </tr>
     {% endfor %}
+    <tr>
+        <td></td><td></td><td><a class="glyphicon glyphicon-plus" href="{% url 'simulation_template_create' %}" data-toggle="tooltip" title="Create Template"></a></td>
+    </tr>
   </table>
 </div>
 

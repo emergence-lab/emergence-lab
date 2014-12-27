@@ -15,6 +15,7 @@
     <li role="presentation" {% if request.path == '/simulations/' %}class="active"{% endif %}><a href="{% url 'simulation_incomplete' %}"><span class="glyphicon glyphicon-import"> Incomplete</span></a></li>
     <li role="presentation" {% if request.path == '/simulations/completed/' %}class="active"{% endif %}><a href="{% url 'simulation_complete' %}"><span class="glyphicon glyphicon-saved"> Completed</a></li>
     <li role="presentation" {% if request.path == '/simulations/all/' %}class="active"{% endif %}><a href="{% url 'simulation_all' %}"><span class="glyphicon glyphicon-list"> All</a></li>
+    <li role="presentation" {% if request.path == '/simulations/templates/' %}class="active"{% endif %}><a href="{% url 'simulation_templates' %}"><span class="glyphicon glyphicon-star"> Templates</a></li>
     <li role="presentation" {% if request.path == '/simulations/admin/' %}class="active"{% endif %}><a href="{% url 'simulation_admin' %}"><span class="glyphicon glyphicon-wrench"> Instances</a></li>
     </ul>
 </div>
