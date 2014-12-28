@@ -46,7 +46,7 @@
                     <li>
                         <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="#">&nbsp&nbsp{{ user.full_name }}</a>
                     </li>
-                    <li class="dropdown">
+                    <li id="create-button" class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="New">
                             <span class="glyphicon glyphicon-plus"></span>
                         </a>
@@ -62,10 +62,10 @@
                             </a></li>
                         </ul>
                     </li>
-                    <li><a class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
-                    <li class="dropdown">
+                    <li><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
+                    <li id="apps-dropdown" class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Apps">
-                            Navigation <span class="caret"></span>
+                            <span class="glyphicon glyphicon-th"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li class="disabled"><a href="#">
