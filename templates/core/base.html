@@ -140,11 +140,8 @@
                     {% if not user.is_anonymous %}
                         <li><a class="navbar-link navbar-right" data-toggle="modal" data-target="#logout-modal" rel="tooltip" title="Logout" data-placement="bottom"><span class="glyphicon glyphicon-log-out"></span></a></li>
 
-
-
-                    {% if user.is_anonymous %}
+                    {% else %}
                         <li><a class="navbar-right navbar-link" href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                    {% endif %}
                     {% endif %}
 
                 </ul>
