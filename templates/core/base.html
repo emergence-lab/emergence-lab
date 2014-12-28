@@ -71,9 +71,13 @@
                             <li class="disabled"><a href="#">
                                 Apps
                             </a></li>
-                            <li><a href="{% url 'dashboard' %}">
-                                <span class="glyphicon glyphicon-dashboard"></span>
-                                Dashboard
+                            <li class="disabled"><a href="#">
+                                <span class="glyphicon glyphicon-book"></span>
+                                Notebook
+                            </a></li>
+                            <li><a href="{% url 'afm_filter' %}">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Search
                             </a></li>
                             <li><a href="{% url 'afm_list' %}">
                                 <span class="glyphicon glyphicon-picture"></span>
@@ -86,6 +90,10 @@
                             <li><a href="{% url 'simulation_incomplete' %}">
                                 <span class="glyphicon glyphicon-cloud"></span>
                                 Simulations
+                            </a></li>
+                            <li class="disabled"><a href="#">
+                                <span class="glyphicon glyphicon-bookmark"></span>
+                                Tool Reservations
                             </a></li>
                             {% if user.is_staff %}
                             <li><a href="{% url 'admin:index' %}">
