@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="container-fluid bottom-spacer-lg">
+    
     <nav>
         <ol class="breadcrumb">
             {% block dashboard_breadcrumb %}
@@ -26,6 +27,14 @@
                 <span class="glyphicon glyphicon-cloud"></span>
                 Simulations
             </a></li>
+            <li class="dropdown">
+                <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-bookmark"></span> Reservations <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    {% for tool in tools %}
+                        <li><a href="{% url 'reservation_list_by_tool' tool %}">{{ tool.upper }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
             <li class="dropdown">
                 <a class="btn btn-link dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Administration <span class="caret"></span></a>
                 <ul class="dropdown-menu">

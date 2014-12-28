@@ -1,0 +1,98 @@
+from django.test import TestCase
+from django.core.urlresolvers import reverse, resolve
+from django.test.client import RequestFactory
+from model_mommy import mommy
+from schedule_queue.models import Tool, Reservation, Platter
+from schedule_queue.views import ReservationLanding
+from schedule_queue.urls import urlpatterns
+from django.contrib.auth.models import User
+import time
+
+class ListByToolTestCase(TestCase):
+    
+    def test_list_view(self):
+        url = '/schedule_queue/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+
+class TestReservationCRUD(TestCase):
+    
+    def setUp(self):
+        tool_obj = mommy.make(Tool, tool_name='test_tool')
+        user_obj = mommy.make(User, username='test_user')
+        platter_obj = mommy.make(Platter, platter_name='test_platter')
+        
+    def test_create_reservation(self):       
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        res_obj = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=5)
+        res_id = Reservation.objects.all().filter(user=user_obj).first().id
+        url = '/schedule_queue/edit/{0}/'.format(res_id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_create_reservation_form(self):
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        platter_obj = Platter.objects.all().filter(platter_name='test_platter').first()
+        url = '/schedule_queue/new/'
+        response = self.client.post(url, {'tool': tool_obj, 'platter': platter_obj, 'user': user_obj,
+                                          'growth_length_in_hours': 6, 'bake_length_in_minutes': 30,
+                                          'priority_field': 10*time.time()})
+        self.assertEqual(response.status_code, 200)
+    
+    def test_edit_reservation_form(self):
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        res_obj = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=5)
+        res_id = Reservation.objects.all().filter(user=user_obj).first().id
+        url = '/schedule_queue/edit/{0}/'.format(res_id)
+        response = self.client.post(url, {'growth_length_in_hours': 6, 'bake_length_in_minutes': 30})
+        self.assertEqual(response.status_code, 200)
+        
+    def test_increase_priority(self):
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        res_obj_1 = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=5, priority_field=int(10*time.time()))
+        res_prior_1 = Reservation.objects.all().filter(user=user_obj)[0].priority_field
+        res_obj_2 = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=4, priority_field=int((10*time.time())+1))
+        res_prior_2 = Reservation.objects.all().filter(user=user_obj)[1].priority_field
+        url = '/schedule_queue/increase/{0}/'.format(Reservation.objects.all().filter(priority_field__lte=int((10*time.time())+2)).order_by('-priority_field')[1].id)
+        response = self.client.get(url)
+        res_list = Reservation.objects.all().filter(priority_field__lte=int((10*time.time())+2)).order_by('-priority_field')       
+        self.assertTrue(res_list[1].id < res_list[0].id, msg=None)
+        
+    def test_decrease_priority(self):
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        res_obj_1 = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=5, priority_field=int(10*time.time()))
+        res_prior_1 = Reservation.objects.all().filter(user=user_obj)[0].priority_field
+        res_obj_2 = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=4, priority_field=int((10*time.time())+1))
+        res_prior_2 = Reservation.objects.all().filter(user=user_obj)[1].priority_field
+        url = '/schedule_queue/decrease/{0}/'.format(Reservation.objects.all().filter(priority_field__lte=int((10*time.time())+2)).order_by('-priority_field')[1].id)
+        response = self.client.get(url)
+        res_list = Reservation.objects.all().filter(priority_field__lte=int((10*time.time())+2)).order_by('-priority_field')       
+        self.assertTrue(res_list[1].id > res_list[0].id, msg=None)        
+        
+    def test_deactivate_reservation(self):
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        res_obj = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=5)
+        res_id = Reservation.objects.all().filter(user=user_obj).first().id
+        url = '/schedule_queue/cancel/{0}/'.format(res_id)
+        response = self.client.get(url)
+        res_act_field = Reservation.objects.all().filter(user=user_obj).first().is_active
+        self.assertFalse(res_act_field, msg=None)
+    
+    def test_list_view(self):
+        tool_obj = Tool.objects.all().filter(tool_name='test_tool').first()
+        user_obj = User.objects.all().filter(username='test_user').first()
+        res_obj_1 = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=5, priority_field=int(10*time.time()))
+        res_obj_2 = mommy.make(Reservation, tool=tool_obj, user=user_obj, growth_length_in_hours=4, priority_field=int((10*time.time())+1))
+        url = '/schedule_queue/{0}/'.format(tool_obj.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'schedule_queue/reservation_list.html')
+        self.assertEqual(len(response.context['object_list']), len(Reservation.objects.all().filter(tool=tool_obj)))
+        
