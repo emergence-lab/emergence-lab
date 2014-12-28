@@ -93,13 +93,16 @@ urlpatterns = [
 
     # hall urls
     url(r'^hall/', include('hall.urls')),
-    
+
+
     # simulation urls
     url(r'^simulations/', include('simulations.urls')),
     url(r'^api/v0/simulations/$', simulations.api.SimulationListAPI.as_view()),
     url(r'^api/v0/simulations/incomplete/(?P<instance_type>.+)/$', simulations.api.SimulationToDoListAPI.as_view()),
     url(r'^api/v0/simulations/(?P<pk>\d+)/$', simulations.api.SimulationDetailAPI.as_view()),
 
+    # schedule_queue urls
+    url(r'^scheduling/', include('schedule_queue.urls')),
 
     # user-specific views
     url(r'^(?P<username>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_user'),

@@ -9,6 +9,7 @@ from ckeditor.fields import RichTextField
 
 import core.models
 
+import schedule_queue.config as lab_tools
 
 @python_2_unicode_compatible
 class Platter(core.models.ActiveStateMixin, models.Model):
@@ -33,10 +34,6 @@ class growth(models.Model):
     Stores information related to the growth including tagging for material
     and device properties.
     """
-    REACTOR_CHOICES = [
-        ('d180', 'D180'),
-        ('d75', 'D75'),
-    ]
 
     # general info
     growth_number = models.SlugField(max_length=10)
@@ -49,7 +46,7 @@ class growth(models.Model):
                                       limit_choices_to={'is_active': True})
     platter = models.ForeignKey(Platter,
                                 limit_choices_to={'is_active': True})
-    reactor = models.CharField(max_length=10, choices=REACTOR_CHOICES)
+    reactor = models.CharField(max_length=10, choices=lab_tools.get_tool_choices())
     run_comments = RichTextField(blank=True)
 
     # layer materials

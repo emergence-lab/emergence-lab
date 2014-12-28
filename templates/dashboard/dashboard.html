@@ -24,6 +24,22 @@
                 </div>
             </div>
         {% endif %}
+
+    <div>
+        {% block reservationblock %}
+            {% if reservations %}
+                <div class="alert alert-info" role="alert">
+                    <h3><span class="glyphicon glyphicon-bookmark pull-right"></span>Scheduler</h3>
+                    {% for i in reservations %}  
+                            <li>You're next in line for growth on {{ i.tool.upper }}. 
+                            You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
+                            <a class="alert-link" href={% url 'close_reservation' i.id %}>cancel your reservation</a>.</li> 
+                    {% endfor %}                       
+                </div>           
+            {% endif %}
+        {% endblock reservationblock %}
+    </div>
+    
     </section>
 
     <aside class="col-lg-3 visible-lg">

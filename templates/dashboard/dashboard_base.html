@@ -4,11 +4,13 @@
 
 {% block content %}
 <div class="container-fluid bottom-spacer-lg">
+
     <nav>
         <ol class="breadcrumb">
             {% block dashboard_breadcrumb %}
                 <li  class='active'>Dashboard</li>
             {% endblock dashboard_breadcrumb %}
+
             <li class="dropdown pull-right">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Options">
                     <span class="glyphicon glyphicon-wrench"></span>
@@ -24,9 +26,10 @@
                             Operators
                         </a></li>
                     </ul>
-            </li>
+
         </ol>
     </nav>
+
 
     <div class="row top-spacer-sm">
         <nav class="col-xs-2 sidebar">

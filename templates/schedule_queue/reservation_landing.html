@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2 class="col-md-offset-5">Reservations</h2>
+
+
+<br>
+<div class="col-md-offset-5">
+  <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" id="select_tool" data-toggle="dropdown">
+      Select Tool
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="select_tool">
+      {% for items in object_list %}
+          <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'reservation_list_by_tool' items %}"</a>{{ items }}</a></li>
+      {% endfor %}
+          <li role="presentation" class="divider hidden"></li>
+          <li role="presentation"><a role="menuitem" class="hidden" tabindex="-1" href="#">Separated link</a></li>
+    </ul>
+  </div>
+</div>      
+{% endblock %}

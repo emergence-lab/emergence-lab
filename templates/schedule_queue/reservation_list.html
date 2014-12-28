@@ -1,0 +1,51 @@
+{% extends "core/base.html" %}
+
+
+{% block content %}
+<h2 class="text-center">Reservations</h2>
+
+{% if tool_name %}
+    <h3 class="text-center">{{ tool_name }}</h3>
+{% endif %}
+
+<br>
+<div class="text-center">
+    {% if object_list|length < max_reservations %} <a class='btn btn-success' href="{% url 'reservation_create' %}">New Reservation</a>
+    {% else %} <a class='btn btn-default disabled' href="{% url 'reservation_create' %}"><strong>Reservation Limit Reached</strong></a>
+    {% endif %}
+</div>
+
+<br>
+    
+<div class="row">   
+    <div class="col-md-6 col-md-offset-3">
+            
+        <ul class="list-group">
+            {% for reservation in object_list %}
+                    <li class="list-group-item">
+                        
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                {% if reservation.user == request.user %}<a class='btn btn-warning' href={% url 'reservation_edit' pk=reservation.id %}>Edit</a>{% endif %}
+                                <a class='btn btn-primary' href="{% url 'increase_priority' pk=reservation.id %}"><span class="glyphicon glyphicon-plus"></span> Move Up</a>
+                                <a class='btn btn-primary' href="{% url 'decrease_priority' pk=reservation.id %}"><span class="glyphicon glyphicon-minus"></span> Move Down</a>
+                                {% if reservation.user == request.user %}<a class='btn btn-danger' href="{% url 'cancel_reservation' pk=reservation.id %}">Cancel</a>{% endif %}
+                            </div>
+                        </div>
+                        
+                        {{ reservation.user.operator.name }}
+                        <br>Bake <strong>{{ reservation.platter }}</strong> platter for <strong>{{ reservation.bake_length_in_minutes }} minutes </strong>
+                        <br>Expected growth duration is <strong> {{ reservation.growth_length_in_hours }}
+                        {% if reservation.growth_length_in_hours > 1 %} hours {% else %} hour {% endif %} </strong>
+                        <br> {% if reservation.comment %} <strong>Comment: </strong>{{ reservation.comment }} {% endif %}
+                    </li>
+            {% endfor %}
+            <br>
+            <br>
+
+        </ul>
+        
+    </div>    
+</div>
+    
+{% endblock %}
