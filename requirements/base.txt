@@ -6,7 +6,7 @@ sphinx==1.2.3
 sphinx_rtd_theme==0.1.6
 paramiko==1.15.1
 django-bootstrap3==4.11.0
-djangorestframework>=2.3,<3
+djangorestframework>=3,<4
 django-autoslug==1.7.2
 pyapi-gitlab==6.2.3
 django-markupfield==1.2.1
