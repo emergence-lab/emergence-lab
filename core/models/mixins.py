@@ -89,6 +89,11 @@ class AutoUUIDMixin(models.Model):
         return '{prefix}{uuid}'.format(prefix=self.prefix,
                                        uuid=str(self.pk).zfill(self.padding))
 
+    @property
+    def uuid_full(self):
+        return self.uuid
+    
+
     @classmethod
     def strip_uuid(cls, uuid):
         return int(uuid[len(cls.prefix):])
