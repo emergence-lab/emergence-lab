@@ -51,6 +51,9 @@ urlpatterns = [
     url(r'^projects/(?P<project>[\w-]+)/(?P<slug>[\w-]+)/deactivate/$', never_cache(core.views.DeactivateInvestigationRedirectView.as_view()), name='investigation_deactivate'),
     url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
 
+    # API
+    url(r'^api/', include('wbg.api')),
+
     # # growths urls
     # url(r'^growths/search/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
     # url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.GrowthDetailView.as_view()), name='growth_detail'),

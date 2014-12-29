@@ -72,7 +72,7 @@ INSTALLED_APPS = (
     # 'datetimewidget',
     # 'django_filters',
     'bootstrap3',
-    # 'rest_framework',
+    'rest_framework',
     # 'rest_framework.authtoken',
     'ckeditor',
     'django_wysiwyg',
