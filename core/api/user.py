@@ -9,7 +9,7 @@ from core.serializers import UserSerializer
 
 class UserListAPIView(generics.ListAPIView):
     """
-    API View to list all users.
+    Read-only API View to list all users.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer

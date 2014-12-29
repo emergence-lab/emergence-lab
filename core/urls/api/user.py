@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.conf.urls import include, url
+from django.conf.urls import url
+
+import core.api
 
 
 urlpatterns = [
-    url(r'^users/', include('core.urls.api.user')),
+    url(r'^$', core.api.UserListAPIView.as_view()),
 ]
