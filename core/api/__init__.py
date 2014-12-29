@@ -2,4 +2,6 @@
 from __future__ import absolute_import
 
 from .user import UserListAPIView
-from .process import ProcessListAPIView, ProcessRetrieveAPIView
+from .process import (ProcessListAPIView,
+                      ProcessRetrieveAPIView,
+                      ProcessNodeRetrieveAPIView,)
