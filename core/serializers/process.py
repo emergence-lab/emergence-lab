@@ -14,14 +14,12 @@ class ProcessSerializer(serializers.ModelSerializer):
                   'is_destructive')
 
 
-
 class ProcessRootNodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProcessNode
         fields = ('uuid_full', 'uuid', 'created', 'modified', 'comment',
                   'children')
-
 
 
 class ProcessParentNodeSerializer(serializers.ModelSerializer):
