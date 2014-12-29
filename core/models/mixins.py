@@ -92,7 +92,6 @@ class AutoUUIDMixin(models.Model):
     @property
     def uuid_full(self):
         return self.uuid
-    
 
     @classmethod
     def strip_uuid(cls, uuid):

@@ -7,6 +7,7 @@ from core.models import Process, ProcessNode
 from core.serializers import ProcessSerializer, ProcessNodeSerializer
 from .mixins import UUIDRetrieveAPIView
 
+
 class ProcessListAPIView(generics.ListAPIView):
     """
     Read-only API view to list generic details of all processes.
