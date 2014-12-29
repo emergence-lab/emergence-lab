@@ -7,4 +7,5 @@ from django.conf.urls import include, url
 urlpatterns = [
     url(r'^users/', include('core.urls.api.user')),
     url(r'^process/', include('core.urls.api.process')),
+    url(r'^sample/', include('core.urls.api.sample')),
 ]

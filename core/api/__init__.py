@@ -5,3 +5,5 @@ from .user import UserListAPIView
 from .process import (ProcessListAPIView,
                       ProcessRetrieveAPIView,
                       ProcessNodeRetrieveAPIView,)
+from .sample import (SampleListAPIView,
+                     SampleRetrieveAPIView,)
