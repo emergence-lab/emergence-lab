@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'simulations',
     'schedule_queue',
     'sem',
+    'notebooker',
     # misc
     'actstream',
 )
