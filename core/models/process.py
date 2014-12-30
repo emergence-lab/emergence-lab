@@ -15,6 +15,13 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     Base class for all processes. A process represents anything done to a
     sample which results in data (numerical or visual) or alters the properties
     of the sample.
+
+    name: The human readable name for the process
+    slug: The computer-consumed identifier to tell which type of process the
+          instance is. Used to help identify which fields are availiable.
+    is_destructive: Boolean that identifies whether the process is destructive,
+                    meaning that the sample is altered in some way and that
+                    repeating past processes may give different results.
     """
     prefix = 'p'
 
@@ -30,7 +37,7 @@ class SplitProcess(Process):
     Process representing splitting a sample into multiple parts or pieces.
     """
     name = 'Split Sample'
-    slug = 'split-sample'
+    slug = 'split-process'
     is_destructive = False
 
 
