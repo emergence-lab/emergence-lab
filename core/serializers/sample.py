@@ -4,19 +4,14 @@ from __future__ import absolute_import, unicode_literals
 from rest_framework import serializers
 
 from core.models import Substrate, Sample
-from .process import ProcessRootNodeSerializer
-from .fields import PolymorphicDataField, PolymorphicTypeField
+from .process import ProcessRootNodeSerializer, PolymorphicModelSerializer
 
 
-class SubstrateSerializer(serializers.ModelSerializer):
-    polymorphic_type = PolymorphicTypeField()
-    polymorphic_data = PolymorphicDataField()
-
+class SubstrateSerializer(PolymorphicModelSerializer):
 
     class Meta:
         model = Substrate
-        fields = ('serial', 'created', 'modified', 'comment', 'source',
-                  'polymorphic_type', 'polymorphic_data')
+        fields = ('serial', 'created', 'modified', 'comment', 'source')
 
 
 class SampleSerializer(serializers.ModelSerializer):
