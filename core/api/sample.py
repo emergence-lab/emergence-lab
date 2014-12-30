@@ -7,7 +7,6 @@ from core.models import Sample, Substrate
 from core.serializers import SampleSerializer, SubstrateSerializer
 
 
-
 class SubstrateListAPIView(generics.ListAPIView):
     """
     Read-only endpoint to list details for all substrates.

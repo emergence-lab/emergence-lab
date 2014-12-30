@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from collections import OrderedDict
-
 from django.contrib.contenttypes.models import ContentType
 
 from polymorphic.polymorphic_model import PolymorphicModel
@@ -10,7 +8,6 @@ from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_field_kwargs
 
 from core.models import Process, ProcessNode
-from .fields import PolymorphicDataField
 
 
 class PolymorphicModelSerializer(serializers.ModelSerializer):
@@ -38,7 +35,8 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
                         rest_field = serializers.ChoiceField
                     if not issubclass(rest_field, serializers.ModelField):
                         kwargs.pop('model_field', None)
-                    if not issubclass(rest_field, serializers.CharField) and not issubclass(rest_field, serializers.ChoiceField):
+                    if (not issubclass(rest_field, serializers.CharField) and
+                            not issubclass(rest_field, serializers.ChoiceField)):
                         kwargs.pop('allow_blank', None)
                     field = rest_field(**kwargs)
                     attribute = getattr(obj, field_name)
