@@ -9,4 +9,5 @@ import core.api
 urlpatterns = [
     url(r'^$', core.api.SampleListAPIView.as_view()),
     url(r'^s(?P<uuid>[0-9]+)/$', core.api.SampleRetrieveAPIView.as_view()),
+    url(r'^substrate/$', core.api.SubstrateListAPIView.as_view()),
 ]

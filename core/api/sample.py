@@ -3,13 +3,24 @@ from __future__ import absolute_import, unicode_literals
 
 from rest_framework import generics, permissions
 
-from core.models import Sample
-from core.serializers import SampleSerializer
+from core.models import Sample, Substrate
+from core.serializers import SampleSerializer, SubstrateSerializer
+
+
+
+class SubstrateListAPIView(generics.ListAPIView):
+    """
+    Read-only endpoint to list details for all substrates.
+    """
+    queryset = Substrate.objects.all()
+    serializer_class = SubstrateSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    paginate_by = 100
 
 
 class SampleListAPIView(generics.ListAPIView):
     """
-    Read-only API view to list details for all samples.
+    Read-only endpoint to list details for all samples.
     """
     queryset = Sample.objects.all()
     serializer_class = SampleSerializer
@@ -19,7 +30,7 @@ class SampleListAPIView(generics.ListAPIView):
 
 class SampleRetrieveAPIView(generics.RetrieveAPIView):
     """
-    Read-only API view to show shallow details for a sample from the uuid.
+    Read-only endpoint to show shallow details for a sample from the uuid.
     Does not retrieve the entire process tree.
     """
     queryset = Sample.objects.all()

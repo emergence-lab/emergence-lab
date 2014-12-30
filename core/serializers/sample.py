@@ -5,13 +5,18 @@ from rest_framework import serializers
 
 from core.models import Substrate, Sample
 from .process import ProcessRootNodeSerializer
+from core.fields import PolymorphicDataField, PolymorphicTypeField
 
 
 class SubstrateSerializer(serializers.ModelSerializer):
+    polymorphic_type = PolymorphicTypeField()
+    polymorphic_data = PolymorphicDataField()
+
 
     class Meta:
         model = Substrate
-        fields = ('serial', 'created', 'modified', 'comment', 'source')
+        fields = ('serial', 'created', 'modified', 'comment', 'source',
+                  'polymorphic_type', 'polymorphic_data')
 
 
 class SampleSerializer(serializers.ModelSerializer):
