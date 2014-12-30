@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from core.models import Substrate, Sample
 from .process import ProcessRootNodeSerializer
-from core.fields import PolymorphicDataField, PolymorphicTypeField
+from .fields import PolymorphicDataField, PolymorphicTypeField
 
 
 class SubstrateSerializer(serializers.ModelSerializer):

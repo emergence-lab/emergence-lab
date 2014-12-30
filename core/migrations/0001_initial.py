@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import autoslug.fields
 import mptt.fields
-import core.fields
+import core.models.fields
 import django.utils.timezone
 from django.conf import settings
 import django.core.validators
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
                 ('name', models.CharField(max_length=45, verbose_name='name')),
                 ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
-                ('description', core.fields.RichTextField(verbose_name='description', blank=True)),
+                ('description', core.models.fields.RichTextField(verbose_name='description', blank=True)),
             ],
             options={
                 'verbose_name': 'investigation',
@@ -65,8 +65,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('uuid_full', core.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
-                ('comment', core.fields.RichTextField(blank=True)),
+                ('uuid_full', core.models.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
+                ('comment', core.models.fields.RichTextField(blank=True)),
             ],
             options={
                 'abstract': False,
@@ -79,8 +79,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('uuid_full', core.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
-                ('comment', core.fields.RichTextField(blank=True)),
+                ('uuid_full', core.models.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
+                ('comment', core.models.fields.RichTextField(blank=True)),
                 ('piece', models.CharField(max_length=5)),
                 ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
                 ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
                 ('name', models.CharField(max_length=45, verbose_name='name')),
                 ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
-                ('description', core.fields.RichTextField(verbose_name='description', blank=True)),
+                ('description', core.models.fields.RichTextField(verbose_name='description', blank=True)),
             ],
             options={
                 'verbose_name': 'project',
@@ -129,7 +129,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('comment', core.fields.RichTextField(blank=True)),
+                ('comment', core.models.fields.RichTextField(blank=True)),
                 ('process_tree', mptt.fields.TreeOneToOneField(null=True, to='core.ProcessNode')),
             ],
             options={
@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('comment', core.fields.RichTextField(blank=True)),
+                ('comment', core.models.fields.RichTextField(blank=True)),
                 ('source', models.CharField(max_length=100, blank=True)),
                 ('serial', models.CharField(max_length=25, blank=True)),
                 ('polymorphic_ctype', models.ForeignKey(related_name='polymorphic_core.substrate_set', editable=False, to='contenttypes.ContentType', null=True)),

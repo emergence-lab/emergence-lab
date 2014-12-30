@@ -9,7 +9,7 @@ import autoslug
 
 from .mixins import ActiveStateMixin, TimestampMixin
 from .user import User
-from core import fields
+from . import fields
 
 
 @python_2_unicode_compatible

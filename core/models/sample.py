@@ -11,7 +11,7 @@ import polymorphic
 
 from .mixins import AutoUUIDMixin, TimestampMixin
 from .process import Process, ProcessNode, SplitProcess
-from core import fields
+from . import fields
 
 
 @python_2_unicode_compatible

@@ -7,7 +7,7 @@ from mptt import models as mptt
 import polymorphic
 
 from .mixins import TimestampMixin, UUIDMixin
-from core import fields
+from . import fields
 
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):

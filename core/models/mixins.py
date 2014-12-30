@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import six
 
-from core import fields
+from . import fields
 
 
 class ActiveStateManager(models.Manager):

@@ -4,10 +4,10 @@ from __future__ import absolute_import, unicode_literals
 from rest_framework import serializers
 
 from core.models import Process, ProcessNode
-import core.fields
+from .fields import PolymorphicDataField
 
 class ProcessSerializer(serializers.ModelSerializer):
-    polymorphic_data = core.fields.PolymorphicDataField()
+    polymorphic_data = PolymorphicDataField()
 
     class Meta:
         model = Process

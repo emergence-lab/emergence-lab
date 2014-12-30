@@ -3,27 +3,10 @@ from __future__ import absolute_import, unicode_literals
 
 from collections import OrderedDict
 
-from django.db import models
 from django.contrib.contenttypes.models import ContentType
 
 from polymorphic.polymorphic_model import PolymorphicModel
 from rest_framework import serializers
-import uuidfield
-
-
-class RichTextField(models.TextField):
-    """
-    Field to handle rich text with the hallojs editor.
-    """
-    pass
-
-
-class UUIDField(uuidfield.UUIDField):
-    """
-    Passthrough to allow Django 1.7 migrations
-    """
-    def deconstruct(self):
-        return models.Field.deconstruct(self)
 
 
 class PolymorphicDataField(serializers.Field):
