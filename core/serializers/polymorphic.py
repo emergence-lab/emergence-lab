@@ -32,6 +32,43 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         self._build_polymorphic_field_mapping()
         self.fields['polymorphic_type'] = PolymorphicTypeField()
 
+    @property
+    def polymorphic_fields(self):
+        """
+        A dictionary of {field_name: field_instance} for polymorphic fields.
+        """
+        if not hasattr(self, '_polymorphic_fields'):
+            self._polymorphic_fields = {}
+            for key, value in six.iteritems(self.get_polymorphic_fields()):
+                self._polymorphic_fields[key] = value
+        return self._polymorphic_fields
+
+    def get_polymorphic_fields(self):
+        """
+        returns a dictionary of {field_name: field_instance} for polymorphic
+        fields.
+        """
+        if not self.polymorphic_class_mapping:
+            self._build_polymorphic_field_mapping()
+
+        polymorphic_fields = OrderedDict()
+
+        for name, subclass in six.iteritems(self.polymorphic_class_mapping):
+            for field in subclass.fields:
+                rest_field = self._field_mapping[field]
+                kwargs = get_field_kwargs(field.name, field)
+                if 'choices' in kwargs:
+                    rest_field = serializers.ChoiceField
+                if not issubclass(rest_field, serializers.ModelField):
+                    kwargs.pop('model_field', None)
+                if (not issubclass(rest_field, serializers.CharField) and
+                        not issubclass(rest_field, serializers.ChoiceField)):
+                    kwargs.pop('allow_blank', None)
+
+                polymorphic_fields[field.name] = rest_field(**kwargs)
+
+        return polymorphic_fields
+
     def to_representation(self, obj):
         if not self.polymorphic_class_mapping:
             self._build_polymorphic_field_mapping()
@@ -48,42 +85,14 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
 
         return super(PolymorphicModelSerializer, self).to_representation(obj)
 
-    @property
-    def polymorphic_fields(self):
-        if not hasattr(self, '_polymorphic_fields'):
-            self._polymorphic_fields = {}
-            for key, value in six.iteritems(self.get_polymorphic_fields()):
-                self._polymorphic_fields[key] = value
-        return self._polymorphic_fields
-
-    def get_polymorphic_fields(self):
-        if not self.polymorphic_class_mapping:
-            self._build_polymorphic_field_mapping()
-
-        polymorphic_fields = OrderedDict()
-
-        for name, subclass in six.iteritems(self.polymorphic_class_mapping):
-            local_fields = [field for field in subclass.model._meta.local_fields
-                            if field.serialize and not field.rel]
-            for field in local_fields:
-                rest_field = self._field_mapping[field]
-                kwargs = get_field_kwargs(field.name, field)
-                if 'choices' in kwargs:
-                    rest_field = serializers.ChoiceField
-                if not issubclass(rest_field, serializers.ModelField):
-                    kwargs.pop('model_field', None)
-                if (not issubclass(rest_field, serializers.CharField) and
-                        not issubclass(rest_field, serializers.ChoiceField)):
-                    kwargs.pop('allow_blank', None)
-
-                polymorphic_fields[field.name] = rest_field(**kwargs)
-
-        return polymorphic_fields
-
     def to_internal_value(self, data):
         pass
 
     def _build_polymorphic_field_mapping(self):
+        """
+        Creates several helper attributes on the serializer and builds a
+        mapping of subclasses to the fields included on each.
+        """
         model = self.Meta.model
         self.polymorphic_base_model = model
         self.polymorphic_derived_models = self._all_subclasses(model)
@@ -97,7 +106,9 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         }
 
     def _all_subclasses(self, cls):
-
+        """
+        Recursively creates a list of all subclasses of the provided class.
+        """
         return cls.__subclasses__() + [sub
                                        for direct in cls.__subclasses__()
                                        for sub in self._all_subclasses(direct)]
