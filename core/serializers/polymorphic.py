@@ -86,7 +86,16 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         return super(PolymorphicModelSerializer, self).to_representation(obj)
 
     def to_internal_value(self, data):
-        pass
+        return data
+
+    def create(self, validated_data):
+        if not self.polymorphic_class_mapping:
+            self._build_polymorphic_field_mapping()
+
+        model_name = validated_data.pop('polymorphic_type')
+        model_class = self.polymorphic_class_mapping[model_name].model
+        instance = model_class.objects.create(**validated_data)
+        return instance
 
     def _build_polymorphic_field_mapping(self):
         """
