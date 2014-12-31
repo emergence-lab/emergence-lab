@@ -15,6 +15,7 @@ Contents:
    migrations
    design
    process
+   rest_helpers
    organization
    core
 
