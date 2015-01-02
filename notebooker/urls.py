@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     #url(r'^increase/(?P<pk>\d+)/$', login_required(never_cache(views.IncreasePriority.as_view())), name='increase_priority'),
     #url(r'^decrease/(?P<pk>\d+)/$', login_required(never_cache(views.DecreasePriority.as_view())), name='decrease_priority'),
     #url(r'^(?P<tool_slug>[a-z0-9\-]+)/$', login_required(never_cache(views.ReservationListByTool.as_view())), name='reservation_list_by_tool'),
+    url(r'^edit/(?P<notebook_name>[a-z0-9\w-]+)/(?P<cell>\d+)$', login_required(views.CellEdit.as_view()), name='notebook_cell_edit'),
     url(r'^inttest/(?P<notebook_name>[a-z0-9\w-]+)$', login_required(views.NotebookIntDemo.as_view()), name='notebook_int_demo'),
 
     url(r'^test/(?P<notebook_name>[a-z0-9\w-]+)$', login_required(views.NotebookDemo.as_view()), name='notebook_demo'),

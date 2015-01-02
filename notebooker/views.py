@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, render_to_response
+from django.core.urlresolvers import reverse
 import os
 from django.conf import settings
 from django.views.generic import ListView, RedirectView, TemplateView, FormView
@@ -7,6 +8,9 @@ import json
 
 from IPython.nbconvert.exporters.html import HTMLExporter
 from IPython.config import Config
+from runipy.notebook_runner import NotebookRunner
+from IPython.nbformat.current import read, write
+from .forms import NBCellEdit
 
 
 # Create your views here.
@@ -128,3 +132,57 @@ class NotebookIntDemo(TemplateView):
                     tmp.append(comments[i])
             kwargs['comments'] = tmp
         return super(NotebookIntDemo, self).get_context_data(**kwargs)
+
+class CellEdit(FormView):
+    template_name = 'notebooker/cell_edit_form.html'
+    form_class = NBCellEdit
+    success_url = '/ipython'
+    def get_initial(self):
+        initial = super(CellEdit, self).get_initial()
+        cell_num = int(self.kwargs['cell'])
+        user = str(self.request.user)
+        nb = json.load(open(os.path.join(settings.MEDIA_ROOT, 'notebooks', user, str(self.kwargs['notebook_name'] + '.ipynb')), 'r'))
+        if nb['worksheets'][0]['cells'][cell_num]['cell_type'] == 'code':
+            tmp = nb['worksheets'][0]['cells'][cell_num]['input']
+        elif nb['worksheets'][0]['cells'][cell_num]['cell_type'] == 'markdown':
+            tmp = nb['worksheets'][0]['cells'][cell_num]['source']
+        #initial['cell'] = nb['worksheets'][0]['cells'][cell_num]['input']
+        with open(tempfile.NamedTemporaryFile().name, 'wb+') as output:
+            for i in tmp:
+                output.write(i)
+            output.flush()
+            output.seek(0)
+            initial['cell'] = output.read()
+            output.close
+        return initial
+
+    def form_valid(self, form):
+        user = str(self.request.user)
+        cell_num = int(self.kwargs['cell'])
+        nb_path = os.path.join(settings.MEDIA_ROOT, 'notebooks', user, str(self.kwargs['notebook_name'] + '.ipynb'))
+        nb = json.load(open(nb_path, 'r'))
+        if nb['worksheets'][0]['cells'][cell_num]['cell_type'] == 'code':
+            nb['worksheets'][0]['cells'][cell_num]['input'] = form.cleaned_data['cell']
+        elif nb['worksheets'][0]['cells'][cell_num]['cell_type'] == 'markdown':
+            nb['worksheets'][0]['cells'][cell_num]['source'] = form.cleaned_data['cell']
+        with open(os.path.join(settings.MEDIA_ROOT, 'notebooks', user, str(self.kwargs['notebook_name'] + '.ipynb')), 'wb+') as output:
+            try:
+                output.truncate()
+                output.seek(0)
+                json.dump(nb, output)
+                output.close()
+            except Exception as e: print(e)
+        nb = read(open(nb_path), 'json')
+        r = NotebookRunner(nb)
+        for i, cell in enumerate(r.iter_code_cells()):
+            if i == cell_num:
+                try:
+                    r.run_cell(cell)
+                except NotebookError:
+                    if not skip_exceptions:
+                        raise
+                #if progress_callback:
+                #    progress_callback(i)
+        #r.run_notebook(skip_exceptions=True)
+        write(r.nb, open(nb_path, 'w'), 'json')
+        return HttpResponseRedirect(reverse('notebook_int_demo', kwargs = {'notebook_name': self.kwargs['notebook_name']}))
