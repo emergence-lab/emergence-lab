@@ -43,6 +43,15 @@
                 text-align: left;
                 vertical-align: top;
               }
+/*              .form-control {
+                padding-right: 0px;
+              }
+
+              .form-control + .glyphicon {
+                position: absolute;
+                right: 0;
+                padding: 8px 27px;
+              }*/
         </style>
         <script type="text/javascript">
             // When your page loads
@@ -102,7 +111,7 @@
 </div>
 <br></br>
 <div id="nb_content" class="container-fluid">
-    <div class="comment_area">
+    <div id="comment_area" class="comment_area">
         <h3><span class="glyphicon glyphicon-comment"></span>&emsp;Comments:</h3>
         <div>
             {% for i in comments %}
@@ -113,8 +122,8 @@
     <div class="nb_content">
         <form id="cell_form" action="" method="post">{% csrf_token %}
             {% for i in notebook_content %}
-                <a class="btn btn-primary edit_{{forloop.counter}}" id="edit_button_{{forloop.counter}}">Edit</a>
-                <input class="btn btn-warning" type="submit" name="upd_cell_{{forloop.counter}}" value="Update Cell">
+                <a class="btn glyphicon glyphicon-edit edit_{{forloop.counter}}" title="Edit" id="edit_button_{{forloop.counter}}"></a>
+                <button class="btn glyphicon glyphicon-repeat" type="submit" title="Update Cell" name="upd_cell_{{forloop.counter}}" value=""></button>
                 <div id="cell_block_{{forloop.counter}}">
                     {{ i|safe }}
                 </div>

@@ -64,12 +64,12 @@ class NotebookDemo(TemplateView):
             kwargs['comments'] = tmp
         return super(NotebookDemo, self).get_context_data(**kwargs)
 
-class NotebookIntDemo(FormView):
-    template_name = 'notebooker/demo_interactive_nb.html'
+class NotebookInteractive(FormView):
+    template_name = 'notebooker/interactive_nb.html'
     form_class = NBCellEdit
 
     def get_form_kwargs(self):
-        kwargs = super(NotebookIntDemo, self).get_form_kwargs()
+        kwargs = super(NotebookInteractive, self).get_form_kwargs()
         user = str(self.request.user)
         if 'cell_count' not in kwargs:
             nb = json.load(open(os.path.join(settings.MEDIA_ROOT, 'notebooks', user, str(self.kwargs['notebook_name'] + '.ipynb')), 'r'))
@@ -77,7 +77,7 @@ class NotebookIntDemo(FormView):
         return kwargs
 
     def get_initial(self):
-        initial = super(NotebookIntDemo, self).get_initial()
+        initial = super(NotebookInteractive, self).get_initial()
         #cell_num = int(self.kwargs['cell'])
         user = str(self.request.user)
         nb = json.load(open(os.path.join(settings.MEDIA_ROOT, 'notebooks', user, str(self.kwargs['notebook_name'] + '.ipynb')), 'r'))
@@ -142,7 +142,7 @@ class NotebookIntDemo(FormView):
             kwargs['cell_count'] = range(int(len(nb['worksheets'][0]['cells'])))
         if 'notebook_name' not in kwargs:
             kwargs['notebook_name'] = 'Untitled0'
-        return super(NotebookIntDemo, self).get_context_data(**kwargs)
+        return super(NotebookInteractive, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
         user = str(self.request.user)
@@ -188,7 +188,7 @@ class NotebookIntDemo(FormView):
             write(r.nb, open(nb_path, 'w'), 'json')
         except Exception as e: print(e)
 
-        return HttpResponseRedirect(reverse('notebook_int_demo', kwargs = {'notebook_name': self.kwargs['notebook_name']}))
+        return HttpResponseRedirect(reverse('notebook_int', kwargs = {'notebook_name': self.kwargs['notebook_name']}))
 
 #class NotebookIntDemo(TemplateView):
 #    template_name = 'notebooker/demo_int_nb.html'
