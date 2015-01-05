@@ -177,7 +177,10 @@ class NotebookInteractive(FormView):
                 except Exception as e: print(e)
             nb = read(open(nb_path), 'json')
             r = NotebookRunner(nb)
-            r.run_notebook(skip_exceptions=True)
+
+            #r.run_notebook()
+            #except Exception as e: print(e)
+            #except NotebookError as e: print(e)
             #for i, cell in enumerate(r.iter_code_cells()):
             #    if i == cell_num:
             #        try:
@@ -185,8 +188,10 @@ class NotebookInteractive(FormView):
             #        except NotebookError:
             #            if not skip_exceptions:
             #                raise
-            write(r.nb, open(nb_path, 'w'), 'json')
+            #write(r.nb, open(nb_path, 'w'), 'json')
         except Exception as e: print(e)
+        r.run_notebook()
+        write(r.nb, open(nb_path, 'w'), 'json')
 
         return HttpResponseRedirect(reverse('notebook_int', kwargs = {'notebook_name': self.kwargs['notebook_name']}))
 
