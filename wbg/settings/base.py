@@ -48,9 +48,9 @@ SUB_SITE = get_secret('SUB_SITE')
 # User login
 
 AUTH_USER_MODEL = 'core.User'
-LOGIN_REDIRECT_URL = '{}/dashboard/'.format(SUB_SITE)
-LOGIN_URL = "{}/accounts/login/".format(SUB_SITE)
-LOGOUT_URL = "{}/accounts/logout/".format(SUB_SITE)
+LOGIN_REDIRECT_URL = '/{}/dashboard/'.format(SUB_SITE)
+LOGIN_URL = "/{}/accounts/login/".format(SUB_SITE)
+LOGOUT_URL = "/{}/accounts/logout/".format(SUB_SITE)
 
 
 # Templates
