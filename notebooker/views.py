@@ -25,7 +25,7 @@ class NotebookList(TemplateView):
             if 'template_list' not in kwargs:
                 for template in os.listdir(os.path.join(settings.MEDIA_ROOT, 'notebooks', user)):
                     if template.endswith('.ipynb'):
-                        tmp.append({'name': template,
+                        tmp.append({'name': template.split('.ipynb')[0],
                                     'path': os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template),
                                     #'files': os.listdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)),
                                     #'comment': comment
