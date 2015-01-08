@@ -1,10 +1,43 @@
 {% extends "dashboard/dashboard_base.html" %}
 
-{% block dashboard_content %}
+
+{% block newsfeed_content %}
 
 <div class="row">
     <section class="col-lg-9 col-xs-12">
 
+
+
+    <div>
+        {% block reservationblock %}
+            {% if reservations %}
+                <div class="alert alert-info" role="alert">
+                    <h3><span class="glyphicon glyphicon-bookmark pull-right"></span>Scheduler</h3>
+                    {% for i in reservations %}
+                            <li>You're next in line for growth on {{ i.tool.upper }}.
+                            You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
+                            <a class="alert-link" href={% url 'close_reservation' i.id %}>cancel your reservation</a>.</li>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endblock reservationblock %}
+    </div>
+
+    </section>
+    <aside class="col-lg-3 visible-lg">
+        <header><h4>Recent Growths</h4></header>
+        <div class="list-group">
+        {% for growth in growths %}
+            <a class="list-group-item" href="{% url 'growth_detail' growth.growth_number %}">{{growth}} <p class="pull-right">{{growth.date}}</p></a>
+        {% endfor %}
+        </div>
+    </aside>
+</div>
+{% endblock newsfeed_content %}
+
+{% block dashboard_content %}
+<div class="row">
+    <section class="col-lg-9 col-xs-12">
         {% if active_projects %}
 
         {# No projects being tracked #}
@@ -24,32 +57,9 @@
                 </div>
             </div>
         {% endif %}
-
-    <div>
-        {% block reservationblock %}
-            {% if reservations %}
-                <div class="alert alert-info" role="alert">
-                    <h3><span class="glyphicon glyphicon-bookmark pull-right"></span>Scheduler</h3>
-                    {% for i in reservations %}  
-                            <li>You're next in line for growth on {{ i.tool.upper }}. 
-                            You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
-                            <a class="alert-link" href={% url 'close_reservation' i.id %}>cancel your reservation</a>.</li> 
-                    {% endfor %}                       
-                </div>           
-            {% endif %}
-        {% endblock reservationblock %}
-    </div>
-    
     </section>
 
-    <aside class="col-lg-3 visible-lg">
-        <header><h4>Recent Growths</h4></header>
-        <div class="list-group">
-        {% for growth in growths %}
-            <a class="list-group-item" href="{% url 'growth_detail' growth.growth_number %}">{{growth}} <p class="pull-right">{{growth.date}}</p></a>
-        {% endfor %}
-        </div>
-    </aside>
+
 
 </div>
 

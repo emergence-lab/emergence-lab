@@ -29,12 +29,12 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
-        context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:25]
+        context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:10]
         reservation_list = []
         for i in tools.get_tool_list():
             tmp_res = Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first()
             if tmp_res and tmp_res.user == self.request.user:
-                reservation_list.append(tmp_res)  
+                reservation_list.append(tmp_res)
         context['reservations'] = reservation_list
         context['tools'] = tools.get_tool_list()
         return context

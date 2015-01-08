@@ -2,6 +2,11 @@
 
 {% block title %}Dashboard{% endblock %}
 
+{% block dash_header %}
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static '/static/dashboard/js/show_hide_helper.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid bottom-spacer-lg">
 
@@ -30,67 +35,102 @@
         </ol>
     </nav>
 
+    <nav>
+        <div role="tabpanel">
+            <ul id="dash_tabs" class="nav nav-tabs nav-justified">
+                <li role="presentation">
+                    <a href="#newsfeed" aria-controls="newsfeed" role="tab" data-toggle="tab">Newsfeed</a>
+                </li>
+                <li role="presentation" class="active">
+                    <a href="#projects" aria-controls="projects" role="tab" data-toggle="tab">Projects</a>
+                </li>
+                <li role="presentation">
+                    <a href="#action_items" aria-controls="action_items" role="tab" data-toggle="tab">Action Items</a>
+                </li>
+            </ul>
 
-    <div class="row top-spacer-sm">
-        <nav class="col-xs-2 sidebar">
-            <header class="sidebar-header">
-                <a href="{% url 'track_project' %}">
-                    <h4>
-                        Projects
-                        <span class="glyphicon glyphicon-plus pull-right right-spacer-sm"></span>
-                    </h4>
-                </a>
-            </header>
-            <div class="list-group">
-                {% if not project %}
-                    <a href="{% url 'dashboard' %}" class="list-group-item active">All</a>
-                {% else %}
-                    <a href="{% url 'dashboard' %}" class="list-group-item">All</a>
-                {% endif %}
 
-                {% for p in active_projects %}
-                    {% if project and p.id == project.id %}
-                        {% if not investigation %}
-                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active">{{p}}</a>
-                        {% else %}
-                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active-parent">{{p}}</a>
-                        {% endif %}
-                        {% for i in p.investigation_set.all %}
-                            {% if investigation and i.id == investigation.id %}
-                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem active">{{i}}</a>
-                            {% else %}
-                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem">{{i}}</a>
-                            {% endif %}
-                        {% endfor %}
-                        <a href="{% url 'investigation_create' slug=p.slug %}" class="list-group-item subitem">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            Add Investigation
-                        </a>
-                    {% else %}
-                        <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item">{{p}}</a>
-                    {% endif %}
-                {% endfor %}
 
-                {% if inactive_projects %}
-                    <div class="list-group-item dropdown">
-                        <a href="" class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            {% for p in inactive_projects %}
-                                <li><a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{p}}</a></li>
-                            {% endfor %}
-                        </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="projects">
+                    <div class="row top-spacer-sm">
+                        <nav class="col-xs-2 sidebar">
+                            <header class="sidebar-header">
+                                <a href="{% url 'track_project' %}">
+                                    <h4>
+                                        Projects
+                                        <span class="glyphicon glyphicon-plus pull-right right-spacer-sm"></span>
+                                    </h4>
+                                </a>
+                            </header>
+                            <div class="list-group">
+                                {% if not project %}
+                                    <a href="{% url 'dashboard' %}" class="list-group-item active">All</a>
+                                {% else %}
+                                    <a href="{% url 'dashboard' %}" class="list-group-item">All</a>
+                                {% endif %}
+
+                                {% for p in active_projects %}
+                                    {% if project and p.id == project.id %}
+                                        {% if not investigation %}
+                                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active">{{p}}</a>
+                                        {% else %}
+                                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active-parent">{{p}}</a>
+                                        {% endif %}
+                                        {% for i in p.investigation_set.all %}
+                                            {% if investigation and i.id == investigation.id %}
+                                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem active">{{i}}</a>
+                                            {% else %}
+                                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem">{{i}}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <a href="{% url 'investigation_create' slug=p.slug %}" class="list-group-item subitem">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                            Add Investigation
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item">{{p}}</a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if inactive_projects %}
+                                    <div class="list-group-item dropdown">
+                                        <a href="" class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            {% for p in inactive_projects %}
+                                                <li><a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{p}}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </nav>
+                        <section class="col-xs-10">
+                            <div class="container-fluid">
+                                {% block dashboard_content %}
+                                {% endblock dashboard_content %}
+                            </div>
+                        </section>
                     </div>
-                {% endif %}
+                </div>
+                <div role="tabpanel" class="tab-pane" id="newsfeed">
+                    <div class="row top-spacer-sm">
+                        <section class="col-xs-12">
+                            <div class="container-fluid">
+                                {% block newsfeed_content %}
+                                {% endblock newsfeed_content %}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="action_items">
+                    AI TEST
+                </div>
             </div>
-        </nav>
-        <section class="col-xs-10">
-            <div class="container-fluid">
-                {% block dashboard_content %}
-                {% endblock dashboard_content %}
-            </div>
-        </section>
 
-    </div>
+        </div>
+    </nav>
+
 </div>
 
 {% endblock %}
