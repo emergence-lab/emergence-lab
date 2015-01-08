@@ -63,4 +63,21 @@
 
 </div>
 
-{% endblock %}
+{% endblock dashboard_content %}
+
+{% block action_items_content %}
+
+<h2>Action Items</h2>
+    <ul class="list-group">
+        {% for item in action_items %}
+        <li class="list-group-item">
+            <h4 class=list-group-item-heading">Due: {{ item.due_date }}</h4>
+            <p class="list-group-item-text">Comment: {{ item.comment }}</p>
+            <p class="list-group-item-text">Created: {{ item.created }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+
+
+
+{% endblock action_items_content%}

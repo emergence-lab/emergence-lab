@@ -1,6 +1,8 @@
 from django.views.generic import DetailView
+from django.conf import settings
 
 from braces.views import LoginRequiredMixin
+from redis import StrictRedis
 
 from core.models import operator, Project, Investigation
 from core.streams import project_stream, investigation_stream
@@ -36,7 +38,10 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
             if tmp_res and tmp_res.user == self.request.user:
                 reservation_list.append(tmp_res)
         context['reservations'] = reservation_list
-        context['tools'] = tools.get_tool_list()
+        r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
+        context['action_items'] = []
+        for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
+            context['action_items'].append(eval(i))
         return context
 
     def get_object(self, queryset=None):

@@ -31,7 +31,6 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="projects">
                     <div class="row top-spacer-sm">
-
                         <nav>
                             <ol class="breadcrumb">
                                 {% block dashboard_breadcrumb %}
@@ -128,7 +127,14 @@
                     </div>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="action_items">
-                    AI TEST
+                    <div class="row top-spacer-sm">
+                        <section class="col-xs-12">
+                            <div class="container-fluid">
+                                {% block action_items_content %}
+                                {% endblock action_items_content %}
+                            </div>
+                        </section>
+                    </div>
                 </div>
             </div>
 
