@@ -10,30 +10,7 @@
 {% block content %}
 <div class="container-fluid bottom-spacer-lg">
 
-    <nav>
-        <ol class="breadcrumb">
-            {% block dashboard_breadcrumb %}
-                <li  class='active'>Dashboard</li>
-            {% endblock dashboard_breadcrumb %}
 
-            <li class="dropdown pull-right">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Options">
-                    <span class="glyphicon glyphicon-wrench"></span>
-                </a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="{% url 'project_list' %}">
-                            Projects
-                        </a></li>
-                        <li><a href="{% url 'platter_list' %}">
-                            Platters
-                        </a></li>
-                        <li><a href="{% url 'operator_list' %}">
-                            Operators
-                        </a></li>
-                    </ul>
-
-        </ol>
-    </nav>
 
     <nav>
         <div role="tabpanel">
@@ -53,6 +30,33 @@
 
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="projects">
+                    <div class="row top-spacer-sm">
+
+                        <nav>
+                            <ol class="breadcrumb">
+                                {% block dashboard_breadcrumb %}
+                                    <li  class='active'>Dashboard</li>
+                                {% endblock dashboard_breadcrumb %}
+
+                                <li class="dropdown pull-right">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Options">
+                                        <span class="glyphicon glyphicon-wrench"></span>
+                                    </a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a href="{% url 'project_list' %}">
+                                                Projects
+                                            </a></li>
+                                            <li><a href="{% url 'platter_list' %}">
+                                                Platters
+                                            </a></li>
+                                            <li><a href="{% url 'operator_list' %}">
+                                                Operators
+                                            </a></li>
+                                        </ul>
+
+                            </ol>
+                        </nav>
+                    </div>
                     <div class="row top-spacer-sm">
                         <nav class="col-xs-2 sidebar">
                             <header class="sidebar-header">
