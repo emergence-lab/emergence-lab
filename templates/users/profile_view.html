@@ -21,6 +21,20 @@
             <h4 class="list-group-item-heading">User ID</h4>
             <p class="list-group-item-text">{{ thisuser.id }}</p>
         </li>
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">Email</h4>
+            <p class="list-group-item-text">{{ thisuser.email }}</p>
+        </li>
+        {% if thisuser.username = user.username %}
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">Gitlab Info</h4>
+            {% if thisuser.gitlab_token %}
+                <p class="list-group-item-text">{{ thisuser.gitlab_token }}</p>
+            {% else %}
+                <a href="{% url 'git_token_form' user.username %}">Link with Git</a>
+            {% endif %}
+        </li>
+        {% endif %}
     </ul>
 
 </div>
