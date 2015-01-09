@@ -69,6 +69,15 @@
 
 <h2>Action Items</h2>
     <ul class="list-group">
+        <li id="new_item_form" class="list-group-item">
+            <form method="post" action="{% url 'add_action_item' %}">{% csrf_token %}
+                <div>
+                    <h4 class=list-group-item-heading">Due:</h4>
+                    <p class="list-group-item-text"><input id="new_action_comment" type="text" placeholder="Comment" name="comment" class="form-control"></p>
+                    <p class="list-group-item-text">Created:</p>
+                </div>
+            </form>
+        </li>
         {% for item in action_items %}
         <li class="list-group-item">
             <h4 class=list-group-item-heading">Due: {{ item.due_date }}</h4>
@@ -77,7 +86,5 @@
         </li>
         {% endfor %}
     </ul>
-
-
 
 {% endblock action_items_content%}

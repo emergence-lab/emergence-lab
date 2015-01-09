@@ -1,5 +1,6 @@
-from django.views.generic import DetailView
+from django.views.generic import DetailView, RedirectView
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from braces.views import LoginRequiredMixin
 from redis import StrictRedis
@@ -85,3 +86,14 @@ class InvestigationDetailDashboardView(LoginRequiredMixin, DashboardMixin, Detai
         context['project'] = self.object.project
         context['stream'] = investigation_stream(self.object)
         return context
+
+class AddActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
+    """
+    View for adding action item via Redis
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        comment = self.request.POST.get('comment')
+        item = {'comment': comment, 'due_date': '', 'created': ''}
+        r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
+        r.lpush('users:{0}:action.items'.format(self.request.user.id), item)
+        return reverse('dashboard')
