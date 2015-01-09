@@ -67,22 +67,23 @@
 
 {% block action_items_content %}
 
-<h2>Action Items</h2>
+<h2>Action Items<a id="add_item_button" class="pull-right glyphicon glyphicon-plus"></a></h2>
     <ul class="list-group">
         <li id="new_item_form" class="list-group-item">
             <form method="post" action="{% url 'add_action_item' %}">{% csrf_token %}
                 <div>
-                    <h4 class=list-group-item-heading">Due:</h4>
-                    <p class="list-group-item-text"><input id="new_action_comment" type="text" placeholder="Comment" name="comment" class="form-control"></p>
-                    <p class="list-group-item-text">Created:</p>
+                    <p class="list-group-item-text"><input id="new_action_comment"
+                                                           type="text"
+                                                           placeholder="Type item text here... click outside to cancel or press enter to submit."
+                                                           name="comment"
+                                                           class="form-control"></p>
                 </div>
             </form>
         </li>
         {% for item in action_items %}
         <li class="list-group-item">
-            <h4 class=list-group-item-heading">Due: {{ item.due_date }}</h4>
-            <p class="list-group-item-text">Comment: {{ item.comment }}</p>
-            <p class="list-group-item-text">Created: {{ item.created }}</p>
+            <h4 class=list-group-item-heading">{{ item.created }}</h4>
+            <p class="list-group-item-text">{{ item.comment }}</p>
         </li>
         {% endfor %}
     </ul>

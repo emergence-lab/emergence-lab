@@ -1,6 +1,8 @@
 from django.views.generic import DetailView, RedirectView
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils import timezone, formats
+import ast
 
 from braces.views import LoginRequiredMixin
 from redis import StrictRedis
@@ -42,7 +44,7 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
         r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
         context['action_items'] = []
         for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
-            context['action_items'].append(eval(i))
+            context['action_items'].append(ast.literal_eval(i))
         return context
 
     def get_object(self, queryset=None):
@@ -93,7 +95,8 @@ class AddActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
     """
     def get_redirect_url(self, *args, **kwargs):
         comment = self.request.POST.get('comment')
-        item = {'comment': comment, 'due_date': '', 'created': ''}
+        created = str(formats.date_format(timezone.datetime.now(), "SHORT_DATETIME_FORMAT"))
+        item = {'comment': comment, 'due_date': '', 'created': created}
         r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
         r.lpush('users:{0}:action.items'.format(self.request.user.id), item)
         return reverse('dashboard')
