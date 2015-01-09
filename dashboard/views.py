@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone, formats
 from django.shortcuts import HttpResponseRedirect
 import ast
+import uuid
 
 from braces.views import LoginRequiredMixin
 from redis import StrictRedis
@@ -108,3 +109,14 @@ class AddActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
             r.lpush('users:{0}:action.items'.format(self.request.user.id), item)
         return str(reverse('dashboard') + "#action_items")
 
+class RemoveActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
+    """
+    View for adding action item via Redis
+    """
+    def get_redirect_url(self, *args, **kwargs):
+        r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
+        index = kwargs['action_item']
+        tmp = uuid.uuid4().hex
+        r.lset('users:{0}:action.items'.format(self.request.user.id), index, tmp)
+        r.lrem('users:{0}:action.items'.format(self.request.user.id), 0, tmp)
+        return str(reverse('dashboard') + "#action_items")

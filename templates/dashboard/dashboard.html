@@ -84,14 +84,15 @@
         <li class="list-group-item">
             <h4 class=list-group-item-heading">
                 {{ item.created }}
+                <a class="pull-right glyphicon glyphicon-remove" id="remove_item_{{forloop.counter0}}" href="{% url 'remove_action_item' forloop.counter0 %}"></a>&emsp;
                 <a class="pull-right glyphicon glyphicon-edit" id="edit_item_{{forloop.counter0}}"></a>
             </h4>
             <form method="post" action="{% url 'add_action_item' %}">{% csrf_token %}
-                <p class="list-group-item-text">{{ item.comment }}</p>
+                <p id="current_item_{{forloop.counter0}}" class="list-group-item-text">{{ item.comment }}</p>
                 <div id="update_item_{{forloop.counter0}}">
-                    <p class="list-group-item-text"><input id="new_action_comment"
+                    <p class="list-group-item-text"><input id="edit_action_comment"
                                                        type="text"
-                                                       placeholder="Type item text here... click outside to cancel or press enter to submit."
+                                                       placeholder="Type item text here... click edit to cancel or press enter to submit."
                                                        name="comment"
                                                        class="form-control"></p>
                 </div>
