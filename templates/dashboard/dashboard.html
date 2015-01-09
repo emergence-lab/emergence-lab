@@ -82,8 +82,22 @@
         </li>
         {% for item in action_items %}
         <li class="list-group-item">
-            <h4 class=list-group-item-heading">{{ item.created }}</h4>
-            <p class="list-group-item-text">{{ item.comment }}</p>
+            <h4 class=list-group-item-heading">
+                {{ item.created }}
+                <a class="pull-right glyphicon glyphicon-edit" id="edit_item_{{forloop.counter0}}"></a>
+            </h4>
+            <form method="post" action="{% url 'add_action_item' %}">{% csrf_token %}
+                <p class="list-group-item-text">{{ item.comment }}</p>
+                <div id="update_item_{{forloop.counter0}}">
+                    <p class="list-group-item-text"><input id="new_action_comment"
+                                                       type="text"
+                                                       placeholder="Type item text here... click outside to cancel or press enter to submit."
+                                                       name="comment"
+                                                       class="form-control"></p>
+                </div>
+                <input id="update_field_{{ forloop.conter0 }}" name="update_field" type="hidden" value="{{ forloop.counter0 }}">
+            </form>
+
         </li>
         {% endfor %}
     </ul>

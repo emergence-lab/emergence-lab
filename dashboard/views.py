@@ -2,6 +2,7 @@ from django.views.generic import DetailView, RedirectView
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone, formats
+from django.shortcuts import HttpResponseRedirect
 import ast
 
 from braces.views import LoginRequiredMixin
@@ -95,8 +96,15 @@ class AddActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
     """
     def get_redirect_url(self, *args, **kwargs):
         comment = self.request.POST.get('comment')
-        created = str(formats.date_format(timezone.datetime.now(), "SHORT_DATETIME_FORMAT"))
-        item = {'comment': comment, 'due_date': '', 'created': created}
         r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
-        r.lpush('users:{0}:action.items'.format(self.request.user.id), item)
-        return reverse('dashboard')
+        if self.request.POST.get('update_field'):
+            index = self.request.POST.get('update_field')
+            original = eval(r.lindex('users:{0}:action.items'.format(self.request.user.id), index))
+            original['comment'] = comment
+            r.lset('users:{0}:action.items'.format(self.request.user.id), index, original)
+        else:
+            created = str(formats.date_format(timezone.datetime.now(), "SHORT_DATETIME_FORMAT"))
+            item = {'comment': comment, 'due_date': '', 'created': created}
+            r.lpush('users:{0}:action.items'.format(self.request.user.id), item)
+        return str(reverse('dashboard') + "#action_items")
+
