@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+
+{% block content %}
+<h2 class="text-center">User Profile</h2>
+
+<div class="col-md-6 col-md-offset-3">
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">Full Name</h4>
+            <p class="list-group-item-text">{{ thisuser.full_name }}</p>
+        </li>
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">Login</h4>
+            <p class="list-group-item-text">{{ thisuser.username }}</p>
+        </li>
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">User ID</h4>
+            <p class="list-group-item-text">{{ thisuser.id }}</p>
+        </li>
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">Email</h4>
+            <p class="list-group-item-text">{{ thisuser.email }}</p>
+        </li>
+        {% if thisuser.username = user.username %}
+        <li class="list-group-item">
+            <h4 class="list-group-item-heading">Gitlab Info</h4>
+            {% if thisuser.gitlab_token %}
+                <p class="list-group-item-text">{{ thisuser.gitlab_token }}</p>
+            {% else %}
+                <a href="{% url 'git_token_form' user.username %}">Link with Git</a>
+            {% endif %}
+        </li>
+        {% endif %}
+    </ul>
+
+</div>
+
+
+
+
+{% endblock %}

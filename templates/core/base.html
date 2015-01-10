@@ -44,7 +44,7 @@
                 <ul class="nav navbar-nav">
                     {% if not user.is_anonymous %}
                     <li>
-                        <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="#">&nbsp&nbsp{{ user.full_name }}</a>
+                        <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="{% url 'users_profile' user.username %}">&nbsp&nbsp{{ user.full_name }}</a>
                     </li>
                     <li id="create-button" class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="New">
