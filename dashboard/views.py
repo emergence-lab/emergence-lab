@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import timezone, formats
 from django.shortcuts import HttpResponseRedirect
-import ast
+import pickle
 import uuid
 
 from braces.views import LoginRequiredMixin
@@ -13,6 +13,7 @@ from core.models import operator, Project, Investigation
 from core.streams import project_stream, investigation_stream
 from growths.models import growth
 from schedule_queue.models import Reservation, tools
+from users.redis import ActionItem
 
 
 class DashboardMixin(object):
@@ -46,7 +47,7 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
         r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
         context['action_items'] = []
         for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
-            context['action_items'].append(ast.literal_eval(i))
+            context['action_items'].append(pickle.loads(i))
         return context
 
     def get_object(self, queryset=None):
@@ -96,17 +97,17 @@ class AddActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
     View for adding action item via Redis
     """
     def get_redirect_url(self, *args, **kwargs):
-        comment = self.request.POST.get('comment')
+        action_item = ActionItem()
+        action_item.comment = str(self.request.POST.get('comment'))
         r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
         if self.request.POST.get('update_field'):
             index = self.request.POST.get('update_field')
-            original = eval(r.lindex('users:{0}:action.items'.format(self.request.user.id), index))
-            original['comment'] = comment
-            r.lset('users:{0}:action.items'.format(self.request.user.id), index, original)
+            original = pickle.loads(r.lindex('users:{0}:action.items'.format(self.request.user.id), index))
+            original.comment = action_item.comment
+            r.lset('users:{0}:action.items'.format(self.request.user.id), index, pickle.dumps(original))
         else:
-            created = str(formats.date_format(timezone.datetime.now(), "SHORT_DATETIME_FORMAT"))
-            item = {'comment': comment, 'due_date': '', 'created': created}
-            r.lpush('users:{0}:action.items'.format(self.request.user.id), item)
+            action_item.created = timezone.datetime.now()
+            r.lpush('users:{0}:action.items'.format(self.request.user.id), pickle.dumps(action_item))
         return str(reverse('dashboard') + "#action_items")
 
 class RemoveActionItemView(LoginRequiredMixin, DashboardMixin, RedirectView):
