@@ -13,7 +13,7 @@ from core.models import operator, Project, Investigation
 from core.streams import project_stream, investigation_stream
 from growths.models import growth
 from schedule_queue.models import Reservation, tools
-from users.redis import ActionItem
+from users.redis_config import ActionItem
 
 
 class DashboardMixin(object):

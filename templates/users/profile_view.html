@@ -29,7 +29,10 @@
         <li class="list-group-item">
             <h4 class="list-group-item-heading">Gitlab Info</h4>
             {% if thisuser.gitlab_token %}
-                <p class="list-group-item-text">{{ thisuser.gitlab_token }}</p>
+                <p class="list-group-item-text">
+                    <strong>Git ID: &emsp;</strong>{{ thisuser.gitlab_id }} &mdash;
+                    <strong>Token: &emsp;</strong>{{ thisuser.gitlab_token }}
+                </p>
             {% else %}
                 <a href="{% url 'git_token_form' user.username %}">Link with Git</a>
             {% endif %}

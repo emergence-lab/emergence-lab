@@ -7,3 +7,10 @@ class ActionItem(object):
     """
     created = ''
     comment = ''
+
+class GitCredential(object):
+    """
+    Credentials for a user's Git account.
+    Type is string with name users:<user_id>:git.credential
+    """
+    account_type = ''
