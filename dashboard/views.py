@@ -44,7 +44,7 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
             if tmp_res and tmp_res.user == self.request.user:
                 reservation_list.append(tmp_res)
         context['reservations'] = reservation_list
-        r = StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
+        r=StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
         context['action_items'] = []
         for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
             context['action_items'].append(pickle.loads(i))
