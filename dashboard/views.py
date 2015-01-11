@@ -18,12 +18,23 @@ from users.redis_config import ActionItem
 
 class DashboardMixin(object):
     """
-    Mixin that populates the context with active and inactive projects.
+    Mixin that populates the context with active and inactive projects,
+    as well as user-context items.
     """
     def get_context_data(self, **kwargs):
         projects = operator.objects.filter(user=self.request.user).values_list('projects__id', flat=True)
         kwargs['active_projects'] = Project.active_objects.filter(id__in=projects)
         kwargs['inactive_projects'] = Project.inactive_objects.filter(id__in=projects)
+        reservation_list = []
+        for i in tools.get_tool_list():
+            tmp_res = Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first()
+            if tmp_res and tmp_res.user == self.request.user:
+                reservation_list.append(tmp_res)
+        kwargs['reservations'] = reservation_list
+        r=StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
+        kwargs['action_items'] = []
+        for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
+            kwargs['action_items'].append(pickle.loads(i))
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 
@@ -38,16 +49,6 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
         context['growths'] = growth.objects.filter(operator=self.object).order_by('-growth_number')[:10]
-        reservation_list = []
-        for i in tools.get_tool_list():
-            tmp_res = Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first()
-            if tmp_res and tmp_res.user == self.request.user:
-                reservation_list.append(tmp_res)
-        context['reservations'] = reservation_list
-        r=StrictRedis(settings.REDIS_HOST,settings.REDIS_PORT,settings.REDIS_DB)
-        context['action_items'] = []
-        for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
-            context['action_items'].append(pickle.loads(i))
         return context
 
     def get_object(self, queryset=None):

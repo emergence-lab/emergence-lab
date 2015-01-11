@@ -55,8 +55,8 @@
 {% endblock newsfeed_content %}
 
 {% block dashboard_content %}
-<div class="row">
-    <div class="row top-spacer-sm">
+<div>
+    <div class="top-spacer-sm">
         <nav>
             <ol class="breadcrumb">
                 {% block dashboard_breadcrumb %}
@@ -82,110 +82,41 @@
             </ol>
         </nav>
     </div>
-    <div class="row top-spacer-sm">
-        <nav class="col-xs-2 sidebar">
-            <header class="sidebar-header">
-                <a href="{% url 'track_project' %}">
-                    <h4>
-                        Projects
-                        <span class="glyphicon glyphicon-plus pull-right right-spacer-sm"></span>
-                    </h4>
-                </a>
-            </header>
-            <div class="list-group">
-                {% if not project %}
-                    <a href="{% url 'dashboard' %}" class="list-group-item active">All</a>
-                {% else %}
-                    <a href="{% url 'dashboard' %}" class="list-group-item">All</a>
-                {% endif %}
-
-                {% for p in active_projects %}
-                    {% if project and p.id == project.id %}
-                        {% if not investigation %}
-                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active">{{p}}</a>
-                        {% else %}
-                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active-parent">{{p}}</a>
-                        {% endif %}
-                        {% for i in p.investigation_set.all %}
-                            {% if investigation and i.id == investigation.id %}
-                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem active">{{i}}</a>
-                            {% else %}
-                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem">{{i}}</a>
-                            {% endif %}
-                        {% endfor %}
-                        <a href="{% url 'investigation_create' slug=p.slug %}" class="list-group-item subitem">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            Add Investigation
-                        </a>
-                    {% else %}
-                        <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item">{{p}}</a>
-                    {% endif %}
-                {% endfor %}
-
-                {% if inactive_projects %}
-                    <div class="list-group-item dropdown">
-                        <a href="" class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            {% for p in inactive_projects %}
-                                <li><a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{p}}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
+    <div class="top-spacer-sm">
+        <div class="col-md-12">
+            <div>
+                <h2>
+                    Projects
+                    <a  href="{% url 'track_project' %}" class="pull-right glyphicon glyphicon-plus pull-right right-spacer-sm"></a>
+                </h2>
             </div>
-        </nav>
-        <nav class="col-xs-2 sidebar">
-            <header class="sidebar-header">
-                <a href="{% url 'track_project' %}">
-                    <h4>
-                        Projects
-                        <span class="glyphicon glyphicon-plus pull-right right-spacer-sm"></span>
-                    </h4>
-                </a>
-            </header>
-            <div class="list-group">
-                {% if not project %}
-                    <a href="{% url 'dashboard' %}" class="list-group-item active">All</a>
-                {% else %}
-                    <a href="{% url 'dashboard' %}" class="list-group-item">All</a>
-                {% endif %}
+        </div>
+        <div class="col-md-12">
+            {% for p in active_projects %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
+                        {% if p.core %}&emsp;<span class="label label-primary">Core</span>{% endif %}
+                        {% if p.modified|timesince < '30 days' %}&emsp;<span class="label label-info">Updated</span>{% endif %}
+                        <a class="glyphicon glyphicon-chevron-down pull-right" id="expand_proj_{{p.id}}"></a>
+                    </h3>
 
-                {% for p in active_projects %}
-                    {% if project and p.id == project.id %}
-                        {% if not investigation %}
-                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active">{{p}}</a>
-                        {% else %}
-                            <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item active-parent">{{p}}</a>
-                        {% endif %}
-                        {% for i in p.investigation_set.all %}
-                            {% if investigation and i.id == investigation.id %}
-                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem active">{{i}}</a>
-                            {% else %}
-                                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}" class="list-group-item subitem">{{i}}</a>
-                            {% endif %}
-                        {% endfor %}
-                        <a href="{% url 'investigation_create' slug=p.slug %}" class="list-group-item subitem">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            Add Investigation
-                        </a>
-                    {% else %}
-                        <a href="{% url 'project_detail_dashboard' slug=p.slug %}" class="list-group-item">{{p}}</a>
-                    {% endif %}
-                {% endfor %}
-
-                {% if inactive_projects %}
-                    <div class="list-group-item dropdown">
-                        <a href="" class="dropdown-toggle link-pointer" data-toggle="dropdown">Inactive Projects <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            {% for p in inactive_projects %}
-                                <li><a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{p}}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
+                </div>
+                <div class="panel-body">
+                    {{ p.description|safe|truncatewords:50 }}
+                </div>
+                <ul id="invest_list_{{p.id}}" class="list-group">
+                    {% for i in p.investigation_set.all %}
+                    <li class="list-group-item">
+                        <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}"> {{ i }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
-        </nav>
-        <section class="col-lg-10 col-xs-12">
+            {% endfor %}
+        </div>
+        <section class="col-lg-12 col-xs-12">
             {% if active_projects %}
 
             {# No projects being tracked #}
