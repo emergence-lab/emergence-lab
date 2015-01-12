@@ -11,6 +11,7 @@
     <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
     <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'core/js/nav_search_helper.js' %}"></script>
+    <script src="{% static 'core/js/popover.js' %}"></script>
     <script src="{% static 'core/js/tooltip.js' %}"></script>
     <script src="{% static 'core/js/tooltip_rel.js' %}"></script>
     {% block header %}
@@ -122,6 +123,13 @@
                             </a></li>
                         </ul>
                     </li>
+                    <li><a class="navbar-link navbar-right"
+                           data-toggle="popover"
+                           rel="tooltip"
+                           title="<strong>Notifications</strong>"
+                           data-html="true"
+                           data-content="TEST"
+                           data-placement="bottom"><span class="glyphicon glyphicon-bell"></span></a></li>
                     <li><a class="navbar-link" id="search-button" rel="tooltip" data-placement="bottom" title="Search"><span class="glyphicon glyphicon-search"></span></a></li>
                     <li><a class="navbar-link" id="search-close" rel="tooltip" data-placement="bottom" title="Close"><span class="glyphicon glyphicon-remove"></span></a></li>
 
@@ -142,8 +150,14 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if not user.is_anonymous %}
+                        <li><a class="navbar-link navbar-right"
+                               data-toggle="popover"
+                               rel="tooltip"
+                               title="<strong>Notifications</strong>"
+                               data-html="true"
+                               data-content="TEST"
+                               data-placement="bottom"><span class="glyphicon glyphicon-inbox"></span></a></li>
                         <li><a class="navbar-link navbar-right" data-toggle="modal" data-target="#logout-modal" rel="tooltip" title="Logout" data-placement="bottom"><span class="glyphicon glyphicon-log-out"></span></a></li>
-
                     {% else %}
                         <li><a class="navbar-right navbar-link" href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                     {% endif %}

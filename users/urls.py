@@ -21,6 +21,6 @@ urlpatterns = patterns('',
     #url(r'^admin/$', login_required(never_cache(views.SimulationAdmin.as_view())), name='simulation_admin'),
     #url(r'^start_instance/(?P<instance_id>[a-z0-9\-]+)$', staff_member_required(never_cache(views.StartInstance.as_view())), name='start_instance'),
     #url(r'^stop_instance/(?P<instance_id>[a-z0-9\-]+)$', staff_member_required(never_cache(views.StopInstance.as_view())), name='stop_instance'),
-    url(r'^(?P<username>[\w-]+)/add_git_token$', login_required(views._GetGitLabToken.as_view()), name='git_token_form'),
-    url(r'^(?P<username>[\w-]+)$', login_required(views.UserProfile.as_view()), name='users_profile')
+    url(r'^users/(?P<username>[\w-]+)/add_git_token$', login_required(views._GetGitLabToken.as_view()), name='git_token_form'),
+    url(r'^users/(?P<username>[\w-]+)$', login_required(views.UserProfile.as_view()), name='users_profile')
 )
