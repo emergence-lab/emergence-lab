@@ -1,22 +1,21 @@
 // When your page loads
-$(document).ready(function(){
-  $('.navbar-search').hide();
+$(document).ready(function() {
 
   $('#search-button').click(function(e) {
-    $('.navbar-search').show();
+    $('.navbar-search').removeClass('hidden')
     $('#search-entry').focus();
-    $('.navbar-button').hide();
+    $('.navbar-button').addClass('hidden')
   });
 
   $('#search-entry').focusout(function(e) {
-    $('.navbar-search').hide();
-    $('.navbar-button').show();
+    $('.navbar-search').addClass('hidden')
+    $('.navbar-button').removeClass('hidden')
   });
 
   $('#search-close').click(function(e) {
     e.preventDefault();
-    $('.navbar-button').show();
-    $('.navbar-search').hide();
+    $('.navbar-button').removeClass('hidden')
+    $('.navbar-search').addClass('hidden')
   });
 
 });

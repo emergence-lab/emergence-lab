@@ -10,7 +10,6 @@
     <link href="{% static 'core/css/wbg.css' %}" rel="stylesheet">
     <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
     <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'core/js/nav_search_helper.js' %}"></script>
     {% block header %}
     {% endblock %}
 
@@ -129,13 +128,13 @@
                             <span class="glyphicon glyphicon-search"></span>
                         </a>
                     </li>
-                    <li class="navbar-search">
+                    <li class="navbar-search hidden">
                         <a class="navbar-link" id="search-close" rel="tooltip" data-placement="bottom" title="Close" href="#">
                             <span class="glyphicon glyphicon-remove"></span>
                         </a>
                     </li>
 
-                    <form class="navbar-form navbar-right navbar-search" role="search" action="{% url 'quicksearch' %}">
+                    <form class="navbar-form navbar-right navbar-search hidden" role="search" action="{% url 'quicksearch' %}">
                         <div id="search-form " class="input-group">
                             <div class="form-group pull-right">
                                 <input id="search-entry" type="text" name="growth" class="form-control" placeholder="Growth Number" autofocus="autofocus">
@@ -266,6 +265,7 @@
     <script src="{% static 'core/js/popover.js' %}"></script>
     <script src="{% static 'core/js/tooltip.js' %}"></script>
     <script src="{% static 'core/js/tooltip_rel.js' %}"></script>
+    <script src="{% static 'core/js/nav_search_helper.js' %}"></script>
     {% endblock %}
 
 </body>
