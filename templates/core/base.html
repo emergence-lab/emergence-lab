@@ -11,9 +11,6 @@
     <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
     <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'core/js/nav_search_helper.js' %}"></script>
-    <script src="{% static 'core/js/popover.js' %}"></script>
-    <script src="{% static 'core/js/tooltip.js' %}"></script>
-    <script src="{% static 'core/js/tooltip_rel.js' %}"></script>
     {% block header %}
     {% endblock %}
 
@@ -31,11 +28,6 @@
     <nav class="navbar navbar-default" role="navigation">
         <section class="container-fluid">
             <header class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#wbg-navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
                 <a href="{% url 'home' %}" class="logo navbar-left">
                     <img src="{% static 'core/img/logo.png' %}" alt="WBG">
                 </a>
@@ -47,7 +39,7 @@
                     <li>
                         <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="{% url 'users_profile' user.username %}">&nbsp&nbsp{{ user.full_name }}</a>
                     </li>
-                    <li id="create-button" class="dropdown">
+                    <li id="create-button" class="dropdown navbar-button">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="New">
                             <span class="glyphicon glyphicon-plus"></span>
                         </a>
@@ -66,8 +58,8 @@
                             </a></li>
                         </ul>
                     </li>
-                    <li><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
-                    <li id="apps-dropdown" class="dropdown">
+                    <li class="navbar-button"><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
+                    <li id="apps-dropdown" class="dropdown navbar-button">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Apps">
                             <span class="glyphicon glyphicon-th"></span>
                         </a>
@@ -123,7 +115,7 @@
                             </a></li>
                         </ul>
                     </li>
-                    <li><a class="navbar-link navbar-right"
+                    <li class="navbar-button"><a class="navbar-link navbar-right"
                            id="notifications"
                            data-toggle="popover"
                            rel="tooltip"
@@ -132,11 +124,19 @@
                            data-container="body"
                            data-content="{% include 'core/notifications.html' %}"
                            data-placement="bottom"><span class="glyphicon glyphicon-bell"></span></a></li>
-                    <li><a class="navbar-link" id="search-button" rel="tooltip" data-placement="bottom" title="Search"><span class="glyphicon glyphicon-search"></span></a></li>
-                    <li><a class="navbar-link" id="search-close" rel="tooltip" data-placement="bottom" title="Close"><span class="glyphicon glyphicon-remove"></span></a></li>
+                    <li class="navbar-button">
+                        <a class="navbar-link" id="search-button" rel="tooltip" data-placement="bottom" title="Search" href="#">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </a>
+                    </li>
+                    <li class="navbar-search">
+                        <a class="navbar-link" id="search-close" rel="tooltip" data-placement="bottom" title="Close" href="#">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    </li>
 
-                    <form class="navbar-form navbar-right" role="search" action="{% url 'quicksearch' %}">
-                        <div id="search-form" class="input-group">
+                    <form class="navbar-form navbar-right navbar-search" role="search" action="{% url 'quicksearch' %}">
+                        <div id="search-form " class="input-group">
                             <div class="form-group pull-right">
                                 <input id="search-entry" type="text" name="growth" class="form-control" placeholder="Growth Number" autofocus="autofocus">
                                 <span class="input-group-btn">
@@ -263,6 +263,9 @@
     </script>
 
     {% block scripts %}
+    <script src="{% static 'core/js/popover.js' %}"></script>
+    <script src="{% static 'core/js/tooltip.js' %}"></script>
+    <script src="{% static 'core/js/tooltip_rel.js' %}"></script>
     {% endblock %}
 
 </body>
