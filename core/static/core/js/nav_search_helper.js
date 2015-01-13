@@ -13,6 +13,8 @@ $(document).ready(function(){
        $("#homelink").toggle();
        $("#create-button").toggle();
        $("#apps-dropdown").toggle();
+       $("#notifications").toggle();
+
        $("#search-button").toggle();
 
        $("#search-form").focusout(function(f){
@@ -22,6 +24,8 @@ $(document).ready(function(){
          $("#create-button").toggle();
          $("#apps-dropdown").toggle();
          $("#search-close").toggle();
+         $("#notifications").toggle();
+
          $("#search-button").toggle();
        });
 
@@ -32,6 +36,7 @@ $(document).ready(function(){
       $("#create-button").toggle();
       $("#apps-dropdown").toggle();
       $("#search-close").hide();
+      $("#notifications").toggle();
       $("#search-button").toggle();
     });
 })
