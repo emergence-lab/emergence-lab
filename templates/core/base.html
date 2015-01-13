@@ -124,12 +124,19 @@
                         </ul>
                     </li>
                     <li><a class="navbar-link navbar-right"
+                           id="notifications"
                            data-toggle="popover"
                            rel="tooltip"
-                           title="<strong>Notifications</strong>"
+                           title="Notifications"
                            data-html="true"
-                           data-content="TEST"
+                           data-container="body"
+                           data-content="{% include 'core/notifications.html' %}"
                            data-placement="bottom"><span class="glyphicon glyphicon-bell"></span></a></li>
+
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if not user.is_anonymous %}
                     <li><a class="navbar-link" id="search-button" rel="tooltip" data-placement="bottom" title="Search"><span class="glyphicon glyphicon-search"></span></a></li>
                     <li><a class="navbar-link" id="search-close" rel="tooltip" data-placement="bottom" title="Close"><span class="glyphicon glyphicon-remove"></span></a></li>
 
@@ -146,18 +153,17 @@
 
                         </div>
                     </form>
-                    {% endif %}
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {% if not user.is_anonymous %}
-                        <li><a class="navbar-link navbar-right"
-                               data-toggle="popover"
-                               rel="tooltip"
-                               title="<strong>Notifications</strong>"
-                               data-html="true"
-                               data-content="TEST"
-                               data-placement="bottom"><span class="glyphicon glyphicon-inbox"></span></a></li>
-                        <li><a class="navbar-link navbar-right" data-toggle="modal" data-target="#logout-modal" rel="tooltip" title="Logout" data-placement="bottom"><span class="glyphicon glyphicon-log-out"></span></a></li>
+                    <li><a class="navbar-link navbar-right"
+                           id="notifications"
+                           data-toggle="popover"
+                           rel="tooltip"
+                           title="Notifications"
+                           data-html="true"
+                           data-container="body"
+                           data-content="{% include 'core/notifications.html' %}"
+                           data-placement="bottom"><span class="glyphicon glyphicon-inbox"></span></a>
+                    </li>
+                    <li><a class="navbar-link navbar-right" data-toggle="modal" data-target="#logout-modal" rel="tooltip" title="Logout" data-placement="bottom"><span class="glyphicon glyphicon-log-out"></span></a></li>
                     {% else %}
                         <li><a class="navbar-right navbar-link" href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                     {% endif %}

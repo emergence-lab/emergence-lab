@@ -14,6 +14,7 @@ from core.streams import project_stream, investigation_stream
 from growths.models import growth
 from schedule_queue.models import Reservation, tools
 from users.redis_config import ActionItem
+from messaging.redis_config import Helper
 
 
 class DashboardMixin(object):
@@ -35,6 +36,8 @@ class DashboardMixin(object):
         kwargs['action_items'] = []
         for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
             kwargs['action_items'].append(pickle.loads(i))
+        helper = Helper()
+        kwargs['notifications'] = helper.get_notifications(self.request.user.id)
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 

@@ -1,0 +1,11 @@
+<html>
+    <div class='col-md-12 list-group' style='max-width: 600px; width: 500px; left: -15px;'>
+    {% if notifications %}
+        {% for i in notifications %}
+            <li class='list-group-item' style='width: 274px; border: none;'>{{i}}</li>
+        {% endfor %}
+    {% else %}
+        <li class='list-group-item col-md-12'><strong>No new alerts!</strong></li>
+    {% endif %}
+    </div>
+</html>
