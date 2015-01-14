@@ -58,6 +58,7 @@ LOGOUT_URL = "/{}/accounts/logout/".format(SUB_SITE)
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
+    'core.context_processors.notifications',
 )
 
 
@@ -93,6 +94,7 @@ INSTALLED_APPS = (
     'hall',
     'simulations',
     'schedule_queue',
+    'users',
     # misc
     'actstream',
 )
@@ -210,3 +212,9 @@ AWS_ACCESS_KEY_ID = get_secret('AWS_EC2_KEY')
 AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET')
 AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET')
 S3_URL = 'https://{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
+
+# Redis
+
+REDIS_HOST = get_secret('REDIS_HOST')
+REDIS_PORT = get_secret('REDIS_PORT')
+REDIS_DB = get_secret('REDIS_DB')

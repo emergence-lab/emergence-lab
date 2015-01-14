@@ -1,10 +1,14 @@
 {% extends "dashboard/dashboard_base.html" %}
 
-{% block dashboard_content %}
+
+{% block newsfeed_content %}
 
 <div class="row">
     <section class="col-lg-9 col-xs-12">
-
+    <div>
+        <h2>Newsfeed</h2>
+    </div>
+    <div>
         {% if active_projects %}
 
         {# No projects being tracked #}
@@ -24,24 +28,24 @@
                 </div>
             </div>
         {% endif %}
+    </div>
 
     <div>
         {% block reservationblock %}
             {% if reservations %}
                 <div class="alert alert-info" role="alert">
                     <h3><span class="glyphicon glyphicon-bookmark pull-right"></span>Scheduler</h3>
-                    {% for i in reservations %}  
-                            <li>You're next in line for growth on {{ i.tool.upper }}. 
+                    {% for i in reservations %}
+                            <li>You're next in line for growth on {{ i.tool.upper }}.
                             You can <a class="alert-link" href={% url 'create_growth_start' %}>start growth</a> or
-                            <a class="alert-link" href={% url 'close_reservation' i.id %}>cancel your reservation</a>.</li> 
-                    {% endfor %}                       
-                </div>           
+                            <a class="alert-link" href={% url 'close_reservation' i.id %}>cancel your reservation</a>.</li>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endblock reservationblock %}
     </div>
-    
-    </section>
 
+    </section>
     <aside class="col-lg-3 visible-lg">
         <header><h4>Recent Growths</h4></header>
         <div class="list-group">
@@ -50,7 +54,137 @@
         {% endfor %}
         </div>
     </aside>
+</div>
+{% endblock newsfeed_content %}
+
+{% block dashboard_content %}
+<div>
+    <div class="top-spacer-sm">
+        <nav>
+            <ol class="breadcrumb">
+                {% block dashboard_breadcrumb %}
+                    <li  class='active'>Projects</li>
+                {% endblock dashboard_breadcrumb %}
+
+                <li class="dropdown pull-right">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Options">
+                        <span class="glyphicon glyphicon-wrench"></span>
+                    </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{% url 'project_list' %}">
+                                Projects
+                            </a></li>
+                            <li><a href="{% url 'platter_list' %}">
+                                Platters
+                            </a></li>
+                            <li><a href="{% url 'operator_list' %}">
+                                Operators
+                            </a></li>
+                        </ul>
+
+            </ol>
+        </nav>
+    </div>
+    <div class="top-spacer-sm">
+        <div class="col-md-12">
+            <div>
+                <h2>
+                    Projects
+                    <a  href="{% url 'track_project' %}" class="pull-right glyphicon glyphicon-plus pull-right right-spacer-sm"></a>
+                </h2>
+            </div>
+        </div>
+        <div class="col-md-12">
+            {% for p in active_projects %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
+                        {% if p.core %}&emsp;<span class="label label-primary">Core</span>{% endif %}
+                        {% if p.modified|timesince < '30 days' %}&emsp;<span class="label label-info">Updated</span>{% endif %}
+                        <a class="glyphicon glyphicon-chevron-down pull-right" id="expand_proj_{{p.id}}"></a>
+                    </h3>
+
+                </div>
+                <div class="panel-body">
+                    {{ p.description|safe|truncatewords:50 }}
+                </div>
+                <ul id="invest_list_{{p.id}}" class="list-group">
+                    {% for i in p.investigation_set.all %}
+                    <li class="list-group-item">
+                        <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}"> {{ i }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+        <section class="col-lg-12 col-xs-12">
+            {% if active_projects %}
+
+            {# No projects being tracked #}
+            {% else %}
+                <div class="alert alert-info">
+                    <h3>You don't have any active projects</h3>
+                    <p>Get started by creating a new project or tracking an existing one.</p>
+                    <div class="top-spacer-sm">
+                        <a href="{% url 'project_create' %}" class="btn btn-success right-spacer-xs">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            New Project
+                        </a>
+                        <a href="{% url 'track_project' %}" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-star"></span>
+                            Track Project
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+
+    </div>
+
+
+
 
 </div>
 
-{% endblock %}
+{% endblock dashboard_content %}
+
+{% block action_items_content %}
+
+<h2>Action Items<a id="add_item_button" class="pull-right glyphicon glyphicon-plus"></a></h2>
+    <ul class="list-group">
+        <li id="new_item_form" class="list-group-item">
+            <form method="post" action="{% url 'add_action_item' %}">{% csrf_token %}
+                <div>
+                    <p class="list-group-item-text"><input id="new_action_comment"
+                                                           type="text"
+                                                           placeholder="Type item text here... click outside to cancel or press enter to submit."
+                                                           name="comment"
+                                                           class="form-control"></p>
+                </div>
+            </form>
+        </li>
+        {% for item in action_items %}
+        <li class="list-group-item">
+            <h4 class=list-group-item-heading">
+                {{ item.created }}
+                <a class="pull-right glyphicon glyphicon-remove" id="remove_item_{{forloop.counter0}}" href="{% url 'remove_action_item' forloop.counter0 %}"></a>&emsp;
+                <a class="pull-right glyphicon glyphicon-edit" id="edit_item_{{forloop.counter0}}"></a>
+            </h4>
+            <form method="post" action="{% url 'add_action_item' %}">{% csrf_token %}
+                <p id="current_item_{{forloop.counter0}}" class="list-group-item-text">{{ item.comment }}</p>
+                <div id="update_item_{{forloop.counter0}}">
+                    <p class="list-group-item-text"><input id="edit_action_comment"
+                                                       type="text"
+                                                       placeholder="Type item text here... click edit to cancel or press enter to submit."
+                                                       name="comment"
+                                                       class="form-control"></p>
+                </div>
+                <input id="update_field_{{ forloop.conter0 }}" name="update_field" type="hidden" value="{{ forloop.counter0 }}">
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+{% endblock action_items_content%}

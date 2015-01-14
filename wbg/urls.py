@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^exception/', core.views.ExceptionHandlerView.as_view(), name='exception'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
+    url(r'^accounts/', include('users.urls')),
     url(r'^wbg-admin/', include(admin.site.urls)),
 
     # core urls
