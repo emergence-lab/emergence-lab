@@ -3,8 +3,6 @@
 import sys
 import inspect
 
-from .models import Reservation
-
 # Function calls for pseudo-model
 
 def get_tool_choices():
