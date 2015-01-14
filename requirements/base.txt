@@ -23,3 +23,4 @@ django-mptt==0.6.1
 git+***REMOVED***gitlab/wbg-lab/aws-simulations.git@0.10.0#egg=aws_support
 django-storages==1.1.8
 django-ace==1.0.2
+redis==2.10.3
