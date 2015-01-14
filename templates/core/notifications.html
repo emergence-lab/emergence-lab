@@ -1,7 +1,15 @@
 <div class='list-group'>
 {% if notifications %}
     {% for i in notifications %}
-        <li class='list-group-item' >{{i}}</li>
+        <li class='list-group-item {% if i.severity %}list-group-item-{{i.severity}}{%endif%}'>
+            <p class='list-group-item-text'>{{ i.payload|truncatechars:53 }}</p>
+            <p class='list-group-item-text'>
+                <small>
+                    {% if i.app %}{{ i.app }} &mdash; {% endif %}
+                    {{ i.created|timesince }} ago
+                </small>
+            </p>
+        </li>
     {% endfor %}
 {% else %}
     <li class='list-group-item'><strong>No new alerts!</strong></li>

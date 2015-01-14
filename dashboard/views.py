@@ -36,8 +36,6 @@ class DashboardMixin(object):
         kwargs['action_items'] = []
         for i in r.lrange('users:{0}:action.items'.format(self.request.user.id), 0, -1):
             kwargs['action_items'].append(pickle.loads(i))
-        helper = Helper()
-        kwargs['notifications'] = helper.get_notifications(self.request.user.id)
         return super(DashboardMixin, self).get_context_data(**kwargs)
 
 
