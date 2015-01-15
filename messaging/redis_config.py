@@ -44,6 +44,7 @@ class Helper(object):
         self.r.set(notification_id, pickle.dumps(item))
         self.r.expire(notification_id, expiration*24*3600)
         self.r.lpush('users:{0}:notifications'.format(target), notification_id)
+        return item
 
 
 class Notification(object):

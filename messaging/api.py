@@ -1,74 +1,33 @@
-from rest_framework import generics, permissions
+from __future__ import unicode_literals
 
-from .filters import growth_filter
-from .models import growth, readings
-from .serializers import GrowthSerializer, ReadingsSerializer
+import json
 
-    
-class GrowthListAPI(generics.ListCreateAPIView):
-    """
-    List all growths or create a new one via api.
-    """
-    queryset = growth.objects.all()
-    serializer_class = GrowthSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-    filter_class = growth_filter
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from rest_framework.settings import api_settings
+
+from messaging.redis_config import Helper
 
 
-class GrowthDetailAPI(generics.RetrieveUpdateAPIView):
-    """
-    Show details or update a growth.
-    """
-    queryset = growth.objects.all()
-    serializer_class = GrowthSerializer
+class NotificationCreateAPI(APIView):
+
     permission_classes = (permissions.IsAuthenticated, )
 
+    def create(self, request, *args, **kwargs):
+        r = request.POST.get('_content')
+        r = json.loads(r)
+        h = Helper()
+        try:
+            notification = h.new_notification(int(r['target']),
+                               r['payload'],
+                               r['app'],
+                               r['url'],
+                               r['severity'],
+                               int(r['expiration']))
 
-class GrowthFetchObjectAPI(generics.ListAPIView):
-    """
-    Show ID of a growth.
-    """
-    def get_queryset(self):
-        growth_number = self.kwargs['growth_number']
-        return growth.objects.filter(growth_number=growth_number)
-        
-    serializer_class = GrowthSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+        except Exception as e: raise e
+        return Response('Created notification!')
 
-
-class GrowthFetchCurrentAPI(generics.ListAPIView):
-    """
-    Show ID of latest growth.
-    """
-    def get_queryset(self):
-        growth_id = growth.objects.order_by('-id').first().id
-        return growth.objects.filter(id=growth_id)
-        
-    serializer_class = GrowthSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-
-
-class ReadingsListAPI(generics.ListCreateAPIView):
-    """
-    List all readings or create a new one via api.
-    """
-    queryset = readings.objects.all()
-    serializer_class = ReadingsSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-
-
-class ReadingsCreateAPI(generics.CreateAPIView):
-    """
-    Create a new reading via api.
-    """
-    serializer_class = ReadingsSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-
-
-class ReadingsDetailAPI(generics.RetrieveUpdateAPIView):
-    """
-    Show details or update readings.
-    """
-    queryset = readings.objects.all()
-    serializer_class = ReadingsSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
