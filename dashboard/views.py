@@ -23,7 +23,7 @@ class DashboardMixin(object):
     as well as user-context items.
     """
     def get_context_data(self, **kwargs):
-        projects = User.objects.get(pk=self.request.user_id).values_list('projects__id', flat=True)
+        projects = User.objects.filter(pk=self.request.user.id).values_list('projects__id', flat=True)
         kwargs['active_projects'] = Project.active_objects.filter(id__in=projects)
         kwargs['inactive_projects'] = Project.inactive_objects.filter(id__in=projects)
         reservation_list = []
@@ -49,12 +49,12 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
-        context['growths'] = D180Growth.objects.filter(user=self.object).order_by('-uuid')[:25]
+        context['growths'] = D180Growth.objects.filter(user=self.object).order_by('-uuid_full')[:25]
         reservation_list = []
         for i in tools.get_tool_list():
             tmp_res = Reservation.objects.filter(is_active=True, tool=i).order_by('priority_field').first()
             if tmp_res and tmp_res.user == self.request.user:
-                reservation_list.append(tmp_res)  
+                reservation_list.append(tmp_res)
         context['reservations'] = reservation_list
         context['tools'] = tools.get_tool_list()
         return context

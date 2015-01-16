@@ -87,7 +87,7 @@ INSTALLED_APPS = (
     'django_ace',
     # local apps
     'core',
-    # 'dashboard',
+    'dashboard',
     'journal',
     'd180',
     'afm',
@@ -138,7 +138,7 @@ AUTH_LDAP_USER_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_USER_SEARCH'),
                                    ldap.SCOPE_SUBTREE, '(uid=%(user)s)')
 AUTH_LDAP_USER_ATTR_MAP = {
     'email': 'mail',
-    'first_name': 'sn',
+    'full_name': 'sn',
 }
 
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_GROUP_SEARCH'),
