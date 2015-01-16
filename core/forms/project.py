@@ -7,7 +7,7 @@ from core.models import Project, ProjectTracking
 
 
 class TrackProjectForm(forms.ModelForm):
-    project = forms.ModelChoiceField(queryset=Project.active.all())
+    project = forms.ModelChoiceField(queryset=Project.active_objects.all())
 
     def save(self, **kwargs):
         commit = kwargs.pop('commit', True)
