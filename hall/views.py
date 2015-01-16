@@ -1,13 +1,16 @@
-from django.views.generic import ListView, DetailView
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
-from .models import hall
+from django.views import generic
+
+from .models import Hall
 
 
-class hall_list(ListView):
-    model = hall
+class HallListView(generic.ListView):
+    model = Hall
     template_name = 'hall/hall_list.html'
 
 
-class hall_detail(DetailView):
-    model = hall
+class HallDetailView(generic.DetailView):
+    model = Hall
     template_name = 'hall/hall_detail.html'

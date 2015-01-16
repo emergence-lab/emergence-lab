@@ -91,7 +91,7 @@ INSTALLED_APPS = (
     # 'journal',
     # 'growths',
     'afm',
-    # 'hall',
+    'hall',
     # 'simulations',
     # 'schedule_queue',
     # misc

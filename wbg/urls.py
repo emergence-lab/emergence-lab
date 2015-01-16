@@ -50,10 +50,10 @@ urlpatterns = [
     url(r'^investigations/$', core.views.InvestigationListView.as_view(), name='investigation_list'),
 
     # afm urls
-    # url(r'^afm/', include('afm.urls')),
+    url(r'^afm/', include('afm.urls')),
 
     # hall urls
-    # url(r'^hall/', include('hall.urls')),
+    url(r'^hall/', include('hall.urls')),
 
     # API
     url(r'^api/', include('wbg.api')),
