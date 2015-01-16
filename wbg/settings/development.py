@@ -16,7 +16,7 @@ logger.propogate = True
 
 # Installed Apps
 
-# INSTALLED_APPS += ('debug_toolbar', )
+INSTALLED_APPS += ('debug_toolbar', )
 
 
 # Authentication

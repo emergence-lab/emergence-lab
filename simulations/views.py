@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect, render_to_response
 from django.utils.timezone import activate
 from django.core.urlresolvers import reverse
