@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^exception/', core.views.ExceptionHandlerView.as_view(), name='exception'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
+    url(r'^accounts/', include('users.urls')),
     url(r'^wbg-admin/', include(admin.site.urls)),
 
     # core urls
@@ -94,6 +95,9 @@ urlpatterns = [
 
     # schedule_queue urls
     url(r'^scheduling/', include('schedule_queue.urls')),
+
+    # messaging urls
+    url(r'^api/v0/messaging/notifications/create/$', messaging.api.NotificationCreateAPI.as_view()),
 
     # user-specific views
     url(r'^(?P<username>[\w-]+)/(?P<slug>[\w-]+)/$', login_required(core.views.ProjectDetailView.as_view()), name='project_detail_user'),

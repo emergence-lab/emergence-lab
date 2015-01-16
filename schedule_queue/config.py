@@ -28,21 +28,21 @@ def get_tool_info(slug):
 # Tool definitions
 
 class d180(object):
-    
+
     @staticmethod
     def get_name():
         return 'D180'
-    
+
     @staticmethod
     def get_slug():
         return 'd180'
 
 class d75(object):
-    
+
     @staticmethod
     def get_name():
         return 'D75'
-    
+
     @staticmethod
     def get_slug():
         return 'd75'

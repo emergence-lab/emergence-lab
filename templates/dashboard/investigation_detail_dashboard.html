@@ -1,20 +1,44 @@
 {% extends "dashboard/dashboard.html" %}
 
-{% block dashboard_breadcrumb %}
-    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    <li><a href="{% url 'project_detail_dashboard' slug=project.slug %}">{{project}}</a></li>
-    <li class='active'>{{investigation}}</li>
-{% endblock dashboard_breadcrumb %}
+
 
 {% block dashboard_content %}
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#home" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-        <li><a href="#feed" data-toggle="tab"><span class="glyphicon glyphicon-list"></span> Feed</a></li>
-        <li><a href="#growths" data-toggle="tab"><span class="glyphicon glyphicon-file"></span> Growths</a></li>
-        <li><a href="#characterization" data-toggle="tab"><span class="glyphicon glyphicon-signal"></span> Characterization</a></li>
-    </ul>
+    <nav class="top-spacer-sm">
+        <ol class="breadcrumb">
+        {% block dashboard_breadcrumb %}
+            <li><a href="{% url 'dashboard' %}#projects">Projects</a></li>
+            <li><a href="{% url 'project_detail_dashboard' slug=project.slug %}">{{project}}</a></li>
+            <li class='active'>{{investigation}}</li>
+        {% endblock dashboard_breadcrumb %}
 
-    <div class="row tab-content">
+            <li class="dropdown pull-right">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Options">
+                    <span class="glyphicon glyphicon-wrench"></span>
+                </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{% url 'project_list' %}">
+                            Projects
+                        </a></li>
+                        <li><a href="{% url 'platter_list' %}">
+                            Platters
+                        </a></li>
+                        <li><a href="{% url 'operator_list' %}">
+                            Operators
+                        </a></li>
+                    </ul>
+
+        </ol>
+    </nav>
+
+    <div class="col-md-2 top-spacer-sm">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#home" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+            <li><a href="#feed" data-toggle="tab"><span class="glyphicon glyphicon-list"></span> Feed</a></li>
+            <li><a href="#growths" data-toggle="tab"><span class="glyphicon glyphicon-file"></span> Growths</a></li>
+            <li><a href="#characterization" data-toggle="tab"><span class="glyphicon glyphicon-signal"></span> Characterization</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10 tab-content">
         <div class="tab-pane fade in active" id="home">
             <header>
                 <div class="pull-right">

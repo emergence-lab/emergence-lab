@@ -268,7 +268,7 @@ class SimulationAdmin(TemplateView):
     def get_context_data(self, **kwargs):
         tmp = []
         if 'instances' not in kwargs:
-            for instance in self.signals.reservation_list()[0].instances:
+            for instance in self.signals.instance_list():
                 tmp.append({'instance_name': instance.id,
                             'instance_type': instance.instance_type,
                             'instance_state': instance.state,
