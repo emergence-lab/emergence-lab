@@ -8,7 +8,6 @@ import d180.models
 
 class GrowthAdmin(admin.ModelAdmin):
     list_display = ('uuid', 'created', 'user',)
-    ordering = ('-uuid',)
     list_filter = ('user', 'investigations',)
 
 

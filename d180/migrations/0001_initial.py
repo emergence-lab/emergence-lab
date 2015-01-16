@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Growth',
+            name='D180Growth',
             fields=[
                 ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
                 ('has_gan', models.BooleanField(default=False)),
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('has_algan', models.BooleanField(default=False)),
                 ('has_ingan', models.BooleanField(default=False)),
                 ('other_material', models.CharField(max_length=50, blank=True)),
-                ('orientation', models.CharField(default=b'0001', max_length=10)),
+                ('orientation', models.CharField(default='0001', max_length=10)),
                 ('is_template', models.BooleanField(default=False)),
                 ('is_buffer', models.BooleanField(default=False)),
                 ('has_pulsed', models.BooleanField(default=False)),
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('has_n', models.BooleanField(default=False)),
                 ('has_p', models.BooleanField(default=False)),
                 ('has_u', models.BooleanField(default=False)),
-                ('investigations', models.ManyToManyField(related_query_name=b'growth', related_name='growths', to='core.Investigation')),
+                ('investigations', models.ManyToManyField(related_query_name='growth', related_name='growths', to='core.Investigation')),
             ],
             options={
                 'verbose_name': 'd180 growth',
@@ -42,23 +42,7 @@ class Migration(migrations.Migration):
             bases=('core.process',),
         ),
         migrations.CreateModel(
-            name='Platter',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('is_active', models.BooleanField(default=True, verbose_name='active')),
-                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
-                ('name', models.CharField(max_length=45, verbose_name='name')),
-                ('serial', models.CharField(max_length=20, verbose_name='serial number', blank=True)),
-                ('start_date', models.DateField(auto_now_add=True, verbose_name='date started')),
-            ],
-            options={
-                'verbose_name': 'platter',
-                'verbose_name_plural': 'platters',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='Readings',
+            name='D180Readings',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('layer', models.IntegerField()),
@@ -105,7 +89,7 @@ class Migration(migrations.Migration):
                 ('silane_dilution', models.DecimalField(max_digits=7, decimal_places=2)),
                 ('silane_mix', models.DecimalField(max_digits=7, decimal_places=2)),
                 ('silane_pressure', models.DecimalField(max_digits=7, decimal_places=2)),
-                ('growth', models.ForeignKey(to='d180.Growth')),
+                ('growth', models.ForeignKey(to='d180.D180Growth')),
             ],
             options={
                 'verbose_name': 'reading',
@@ -114,7 +98,7 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='RecipeLayer',
+            name='D180RecipeLayer',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('layer_num', models.IntegerField()),
@@ -168,7 +152,7 @@ class Migration(migrations.Migration):
                 ('alk_push_inner', models.IntegerField()),
                 ('alk_push_middle', models.IntegerField()),
                 ('alk_push_outer', models.IntegerField()),
-                ('growth', models.ForeignKey(to='d180.Growth')),
+                ('growth', models.ForeignKey(to='d180.D180Growth')),
             ],
             options={
                 'verbose_name': 'layer',
@@ -177,7 +161,7 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='Source',
+            name='D180Source',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
@@ -197,14 +181,30 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        migrations.CreateModel(
+            name='Platter',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('is_active', models.BooleanField(default=True, verbose_name='active')),
+                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
+                ('name', models.CharField(max_length=45, verbose_name='name')),
+                ('serial', models.CharField(max_length=20, verbose_name='serial number', blank=True)),
+                ('start_date', models.DateField(auto_now_add=True, verbose_name='date started')),
+            ],
+            options={
+                'verbose_name': 'platter',
+                'verbose_name_plural': 'platters',
+            },
+            bases=(models.Model,),
+        ),
         migrations.AddField(
-            model_name='growth',
+            model_name='d180growth',
             name='platter',
             field=models.ForeignKey(to='d180.Platter'),
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='growth',
+            model_name='d180growth',
             name='user',
             field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
             preserve_default=True,
