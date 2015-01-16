@@ -5,7 +5,7 @@ from .utility import (ActiveListView,
                       ActionReloadView,
                       ExceptionHandlerView,
                       HomepageView,
-                      protected_media,
+                      ProtectedMediaView,
                       QuickSearchRedirectView)
 from .user import (ActivateUserRedirectView,
                    DeactivateUserRedirectView,
