@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from .misc import (ActiveListView,
-                   ExceptionHandlerView,
-                   HomepageView,
-                   protected_media,
-                   QuickSearchRedirectView)
+from .utility import (ActiveListView,
+                      ActionReloadView,
+                      ExceptionHandlerView,
+                      HomepageView,
+                      protected_media,
+                      QuickSearchRedirectView)
 from .user import (ActivateUserRedirectView,
                    DeactivateUserRedirectView,
                    UserListView)

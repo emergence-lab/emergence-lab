@@ -29,10 +29,6 @@ urlpatterns = [
     url(r'^operators/$', core.views.UserListView.as_view(), name='operator_list'),
     url(r'^operators/(?P<id>\d+)/activate$', never_cache(core.views.ActivateUserRedirectView.as_view()), name='operator_activate'),
     url(r'^operators/(?P<id>\d+)/deactivate$', never_cache(core.views.DeactivateUserRedirectView.as_view()), name='operator_deactivate'),
-    # url(r'^platters/$', growths.views.PlatterListView.as_view(), name='platter_list'),
-    # url(r'^platters/create/$', growths.views.PlatterCreateView.as_view(), name='platter_create'),
-    # url(r'^platters/(?P<id>\d+)/activate/$', never_cache(growths.views.ActivatePlatterRedirectView.as_view()), name='platter_activate'),
-    # url(r'^platters/(?P<id>\d+)/deactivate/$', never_cache(growths.views.DeactivatePlatterRedirectView.as_view()), name='platter_deactivate'),
     url(r'^projects/$', core.views.ProjectListView.as_view(), name='project_list'),
     url(r'^projects/create/$', core.views.ProjectCreateView.as_view(), name='project_create'),
     url(r'^projects/track/$', core.views.TrackProjectView.as_view(), name='track_project'),
@@ -58,24 +54,8 @@ urlpatterns = [
     # API
     url(r'^api/', include('wbg.api')),
 
-    # # growths urls
-    # url(r'^growths/search/$', login_required(growths.views.growth_list.as_view()), name='afm_filter'),
-    # url(r'^(?P<slug>[gt][1-9][0-9]{3,})/$', login_required(growths.views.GrowthDetailView.as_view()), name='growth_detail'),
-    # url(r'^(?P<slug>[gt][1-9][0-9]{3,})/update/$', login_required(growths.views.GrowthUpdateView.as_view()), name='growth_update'),
-    # url(r'^(?P<slug>[gt][1-9][0-9]{3,})/recipe/$', login_required(growths.views.recipe_detail.as_view()), name='recipe_detail'),
-    # url(r'^(?P<growth>[gt][1-9][0-9]{3,})/(?P<pocket>\d+\-?\d*)/$', login_required(growths.views.SampleFamilyDetailView.as_view()), name='sample_family_detail'),
-    # url(r'^(?P<growth>[gt][1-9][0-9]{3,})/(?P<pocket>\d+\-?\d*)/size/$', never_cache(login_required(growths.views.ChangeSizeView.as_view())), name='sample_change_size'),
-    # url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/$', login_required(growths.views.readings_detail.as_view()), name='readings_detail'),
-    # url(r'^(?P<slug>[gt][1-9][0-9]{3,})/readings/update/$', login_required(growths.views.update_readings.as_view()), name='update_readings'),
-    # url(r'^sample/(?P<pk>\d+)/$', login_required(growths.views.SampleDetailView.as_view()), name='sample_detail'),
-    # url(r'^sample/(?P<pk>\d+)/update/$', login_required(growths.views.SampleUpdateView.as_view()), name='sample_update'),
-    # url(r'^sample/split/$', login_required(growths.views.SplitSampleView.as_view()), name='split_sample'),
-    # url(r'^api/v0/growths/$', growths.api.GrowthListAPI.as_view()),
-    # url(r'^api/v0/growths/(?P<pk>\d+)/$', growths.api.GrowthDetailAPI.as_view()),
-    # url(r'^api/v0/growths/(?P<growth_number>.+)/$', growths.api.GrowthFetchObjectAPI.as_view()),
-    # url(r'^api/v0/readings/$', growths.api.ReadingsListAPI.as_view()),
-    # url(r'^api/v0/readings/(?P<pk>\d+)/$', growths.api.ReadingsDetailAPI.as_view()),
-    # url(r'^api/v0/readings/create/$', growths.api.ReadingsCreateAPI.as_view()),
+    # d180
+    url(r'^d180/', include('d180.urls')),
 
     # # dashboard views
     url(r'^dashboard/', include('dashboard.urls')),

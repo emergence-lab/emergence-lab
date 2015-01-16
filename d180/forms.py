@@ -1,84 +1,32 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import re
-
 from django import forms
 
 from ckeditor.widgets import CKEditorWidget
 
-from .models import DGrowth, Readings, Source
+from .models import D180Growth, D180Source
 from core.forms import ChecklistForm
-from core.models import ProcessNode
 
 
-# Create the form class.
-class SampleForm(forms.ModelForm):
-    parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
+class GrowthForm(forms.ModelForm):
 
     class Meta:
-        model = SampleNode
-        fields = ['parent', 'substrate_type', 'substrate_serial', 'substrate_orientation',
-                  'substrate_miscut', 'size', 'location', 'comment']
-
-    def clean_parent(self):
-        parent_name = self.cleaned_data['parent']
-
-        if parent_name == '':  # no parent specified, on substrate
-            return None
-
-        try:
-            parent_sample = sample.get_sample(parent_name)
-        except Exception as e:
-            raise forms.ValidationError(str(e))
-
-        return parent_sample
-
-    def save(self, **kwargs):
-        commit = kwargs.pop('commit', True)
-        growth_obj = kwargs.pop('growth')
-        pocket = kwargs.pop('pocket')
-
-        instance = super(sample_form, self).save(commit=False)
-        instance.growth = growth_obj
-        instance.pocket = pocket
-
-        if commit:
-            instance.save()
-
-        if instance.parent is None:
-            instance.parent = instance
-        else:
-            instance.parent.location = 'Consumed'
-            instance.substrate_type = 'growth'
-            instance.substrate_serial = instance.parent.substrate_serial
-            instance.substrate_orientation = instance.parent.substrate_orientation
-            instance.substrate_miscut = instance.parent.substrate_miscut
-            instance.size = instance.parent.size
-
-        if commit:
-            instance.save()
-            if instance.parent != instance:
-                instance.parent.save()
-        return instance
+        model = D180Growth
+        fields = ('uuid', 'created', 'modified', 'user',
+                  'investigations', 'platter', 'comment',
+                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
+                  'has_ingan', 'other_material', 'orientation',
+                  'is_template', 'is_buffer', 'has_pulsed',
+                  'has_superlattice', 'has_mqw', 'has_graded',
+                  'has_n', 'has_p', 'has_u',)
 
 
-class GrowthForm(ModelForm):
-    class Meta:
-        model = Growth
-        fields = ['uid', 'user', 'comment', 'investigations', 'platter',
-                  'has_gan', 'has_aln', 'has_inn', 'has_algan', 'has_ingan',
-                  'other_material', 'orientation',
-                  'is_template', 'is_buffer', 'has_pulsed', 'has_superlattice',
-                  'has_mqw', 'has_graded', 'has_n', 'has_u', 'has_p',]
-
-
-class p_form(forms.Form):
+class AddSampleForm(forms.Form):
     add_sample = forms.BooleanField(required=False)
 
 
-
-class StartGrowthForm(ModelForm):
+class StartGrowthForm(forms.ModelForm):
     class Meta:
         model = D180Growth
         fields = ['uuid', 'user', 'platter']
@@ -93,14 +41,15 @@ class StartGrowthForm(ModelForm):
         return instance
 
 
-class PrerunGrowthForm(ModelForm):
+class PrerunGrowthForm(forms.ModelForm):
+
     class Meta:
         model = D180Growth
-        fields = ['uuid', 'user', 'comment', 'investigations', 'platter',
+        fields = ('uuid', 'user', 'comment', 'investigations', 'platter',
                   'has_gan', 'has_aln', 'has_inn', 'has_algan', 'has_ingan',
                   'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_pulsed', 'has_superlattice',
-                  'has_mqw', 'has_graded', 'has_n', 'has_u', 'has_p',]
+                  'has_mqw', 'has_graded', 'has_n', 'has_u', 'has_p',)
 
     def clean(self):
         cleaned_data = super(PrerunGrowthForm, self).clean()
@@ -136,14 +85,15 @@ class PrerunChecklistForm(ChecklistForm):
     ]
 
 
-class PrerunSourcesForm(ModelForm):
+class PrerunSourcesForm(forms.ModelForm):
+
     class Meta:
         model = D180Source
         fields = ('cp2mg', 'tmin1', 'tmin2', 'tmga1', 'tmga2', 'tmal1',
                   'tega1', 'nh3', 'sih4',)
 
 
-class PostrunChecklistForm(ChecklistForm):
+class PostrunChecklistForm(forms.ChecklistForm):
     checklist_fields = [
         'Wait for system to IDLE',
         'Stop k-space collection'
@@ -158,42 +108,5 @@ class PostrunChecklistForm(ChecklistForm):
     ]
 
 
-class split_form(ModelForm):
-    pieces = forms.IntegerField(label="Number of pieces")
-    parent = forms.CharField(label="Sample to split")
-
-    class Meta:
-        model = sample
-        fields = ['parent', 'pieces']
-
-    def clean_pieces(self):
-        if self.cleaned_data['pieces'] <= 1:
-            raise forms.ValidationError('Number of pieces must be greater than 1')
-        return self.cleaned_data['pieces']
-
-    def clean_parent(self):
-        try:
-            obj = sample.get_sample(self.cleaned_data['parent'])
-            return obj
-        except Exception as e:
-            raise forms.ValidationError(str(e))
-
-
-class SampleSizeForm(forms.Form):
-
-    def __init__(self, *args, **kwargs):
-        samples = kwargs.pop('samples', [])
-        super(SampleSizeForm, self).__init__(*args, **kwargs)
-
-        for i, sample_name in enumerate(samples):
-            self.fields['{0}'.format(sample_name)] = forms.ChoiceField(choices=sample.SIZE_CHOICES)
-
-
-class readings_form(ModelForm):
-    class Meta:
-        model = readings
-        exclude = ['growth']
-
-
-class comments_form(forms.Form):
+class CommentsForm(forms.Form):
     comment_field = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)

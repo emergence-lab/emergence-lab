@@ -7,13 +7,40 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView, RedirectView, TemplateView, View
+from django.utils.cache import add_never_cache_headers
+from django.views import generic
 
 from braces.views import LoginRequiredMixin
 import gitlab
 
 
-class ActiveListView(ListView):
+class NeverCacheMixin(object):
+    """
+    Mixin to ensure the results of requests are never cached.
+    Class-based alternative to django.views.decorators.never_cache
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super(NeverCacheMixin, self).dispatch(request, *args, **kwargs)
+        add_never_cache_headers(response)
+        return response
+
+
+class ActionReloadView(NeverCacheMixin, generic.RedirectView):
+    """
+    View to perform an action and reload the page.
+    """
+    permanent = False
+
+    def perform_action(self, request, *args, **kwargs):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        self.perform_action(request, *args, **kwargs)
+        return super(ActionReloadView, self).get(request, *args, **kwargs)
+
+
+class ActiveListView(generic.ListView):
     """
     View to handle models using the active and inactive manager.
     """
@@ -35,7 +62,7 @@ def protected_media(request, filename):
     return response
 
 
-class ExceptionHandlerView(LoginRequiredMixin, View):
+class ExceptionHandlerView(LoginRequiredMixin, generic.View):
     """
     Handles creating an exception via ajax.
     """
@@ -60,7 +87,7 @@ class ExceptionHandlerView(LoginRequiredMixin, View):
         return HttpResponseRedirect(path)
 
 
-class QuickSearchRedirectView(LoginRequiredMixin, RedirectView):
+class QuickSearchRedirectView(LoginRequiredMixin, generic.RedirectView):
     """
     View to handle redirection to the correct growth or sample from the
     quicksearch bar in the page header.
@@ -71,8 +98,10 @@ class QuickSearchRedirectView(LoginRequiredMixin, RedirectView):
         return reverse('home')
 
 
-class HomepageView(TemplateView):
+class HomepageView(generic.TemplateView):
     """
     View for the homepage of the application.
     """
     template_name = "core/index.html"
+
+

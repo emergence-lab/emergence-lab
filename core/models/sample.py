@@ -44,6 +44,10 @@ class SampleManager(models.Manager):
 
         return sample
 
+    def get_by_uuid(self, uuid):
+        uuid = Sample.strip_uuid(uuid)
+        return Sample.objects.get(pk=uuid)
+
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     """
