@@ -45,4 +45,4 @@ class JournalListView(LoginRequiredMixin, ListView):
     context_object_name = 'entries'
 
     def get_queryset(self):
-        return journal_entry.objects.filter(author=self.request.user.operator).order_by('-date')
+        return journal_entry.objects.filter(author=self.request.user).order_by('-date')
