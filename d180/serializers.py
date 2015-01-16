@@ -15,30 +15,13 @@ class D180GrowthSerializer(ProcessSerializer):
     class Meta:
         model = D180Growth
         fields = ('uuid', 'created', 'modified', 'user',
-                  'investigations', 'platter', 'comment')
+                  'investigations', 'platter', 'comment',
+                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
+                  'has_ingan', 'other_material', 'orientation',
+                  'is_template', 'is_buffer', 'has_pulsed',
+                  'has_superlattice', 'has_mqw', 'has_graded',
+                  'has_n', 'has_p', 'has_u',)
 
-    has_gan = models.BooleanField(default=False)
-    has_aln = models.BooleanField(default=False)
-    has_inn = models.BooleanField(default=False)
-    has_algan = models.BooleanField(default=False)
-    has_ingan = models.BooleanField(default=False)
-    other_material = models.CharField(max_length=50, blank=True)
-
-    # layer orientation
-    orientation = models.CharField(max_length=10, default='0001')
-
-    # growth features
-    is_template = models.BooleanField(default=False)
-    is_buffer = models.BooleanField(default=False)
-    has_pulsed = models.BooleanField(default=False)
-    has_superlattice = models.BooleanField(default=False)
-    has_mqw = models.BooleanField(default=False)
-    has_graded = models.BooleanField(default=False)
-
-    # doping features
-    has_n = models.BooleanField(default=False)
-    has_p = models.BooleanField(default=False)
-    has_u = models.BooleanField(default=False)
 
 class D180ReadingsSerializer(serializers.ModelSerializer):
     """
@@ -53,7 +36,7 @@ class D180ReadingsSerializer(serializers.ModelSerializer):
                   'voltage_in', 'current_in', 'voltage_out', 'current_out',
                   'top_vp_flow', 'hydride_inner', 'hydride_outer',
                   'alkyl_flow_inner', 'alkyl_push_inner', 'alkyl_flow_middle',
-                  'alkyl_push_middle', 'alkyl_flow_outer',  'alkyl_push_outer',
+                  'alkyl_push_middle', 'alkyl_flow_outer', 'alkyl_push_outer',
                   'n2_flow', 'h2_flow', 'nh3_flow', 'hydride_pressure',
                   'tmga1_flow', 'tmga1_pressure', 'tmga2_flow',
                   'tmga2_pressure', 'tega2_flow', 'tega2_pressure',
