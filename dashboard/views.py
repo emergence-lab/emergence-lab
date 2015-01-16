@@ -72,8 +72,8 @@ class ProjectDetailDashboardView(LoginRequiredMixin, DashboardMixin, DetailView)
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailDashboardView, self).get_context_data(**kwargs)
-        context['growths'] = (D180Growth.objects.filter(project=self.object)
-                                                .order_by('-uuid')[:25])
+        #context['growths'] = (D180Growth.objects.filter(project=self.object)
+        #                                        .order_by('-uuid_full')[:25])
         context['stream'] = project_stream(self.object)
         return context
 
@@ -87,8 +87,8 @@ class InvestigationDetailDashboardView(LoginRequiredMixin, DashboardMixin, Detai
 
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailDashboardView, self).get_context_data(**kwargs)
-        context['growths'] = (D180Growth.objects.filter(investigation=self.object)
-                                                .order_by('-uuid')[:25])
+        #context['growths'] = (D180Growth.objects.filter(investigation=self.object)
+        #                                        .order_by('-uuid_full')[:25])
         context['project'] = self.object.project
         context['stream'] = investigation_stream(self.object)
         return context
