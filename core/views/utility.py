@@ -103,5 +103,3 @@ class HomepageView(generic.TemplateView):
     View for the homepage of the application.
     """
     template_name = "core/index.html"
-
-
