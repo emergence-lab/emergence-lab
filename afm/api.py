@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals
 
 from rest_framework import generics, permissions
 
-from .filters import AFMFilter
 from .models import AFMScan
 from .serializers import AFMSerializer
 

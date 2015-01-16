@@ -13,7 +13,7 @@ class D180GrowthListAPI(generics.ListCreateAPIView):
     List all growths or create a new one via api.
     """
     queryset = D180Growth.objects.all()
-    serializer_class = D180rowthSerializer
+    serializer_class = D180GrowthSerializer
     permission_classes = (permissions.IsAuthenticated,)
     filter_class = growth_filter
 
