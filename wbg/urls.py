@@ -17,7 +17,7 @@ urlpatterns = [
 
     # misc urls
     url(r'^$', core.views.HomepageView.as_view(), name='home'),
-    url(r'^media/(?P<filename>.*)$', core.views.protected_media),
+    url(r'^media/(?P<filename>.*)$', core.views.ProtectedMediaView.as_view()),
     url(r'^quicksearch/', core.views.QuickSearchRedirectView.as_view(), name='quicksearch'),
     url(r'^exception/', core.views.ExceptionHandlerView.as_view(), name='exception'),
     url(r'^accounts/login/', login, {'template_name': 'core/login.html'}, name='login'),

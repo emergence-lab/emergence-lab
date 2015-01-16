@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 import os
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.cache import add_never_cache_headers
@@ -51,15 +50,16 @@ class ActiveListView(generic.ListView):
         return context
 
 
-@login_required
-def protected_media(request, filename):
+class ProtectedMediaView(LoginRequiredMixin, generic.View):
     """
     Allows media files to be protected via Django authentication
     """
-    fullpath = os.path.join(settings.MEDIA_ROOT, filename)
-    response = HttpResponse(mimetype='image/jpeg')
-    response['X-Sendfile'] = fullpath
-    return response
+
+    def get(self, request, filename, *args, **kwargs):
+        fullpath = os.path.join(settings.MEDIA_ROOT, filename)
+        response = HttpResponse(mimetype='image/jpeg')
+        response['X-Sendfile'] = fullpath
+        return response
 
 
 class ExceptionHandlerView(LoginRequiredMixin, generic.View):
