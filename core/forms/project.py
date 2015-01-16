@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django import forms
 
-from .models import ProjectTracking
+from core.models import ProjectTracking
 
 
 class TrackProjectForm(forms.ModelForm):
@@ -23,12 +23,3 @@ class TrackProjectForm(forms.ModelForm):
     class Meta:
         model = ProjectTracking
         fields = ['project', 'is_owner']
-
-
-class ChecklistForm(forms.Form):
-    checklist_fields = []
-
-    def __init__(self, *args, **kwargs):
-        super(ChecklistForm, self).__init__(*args, **kwargs)
-        for i, label in enumerate(self.checklist_fields):
-            self.fields['field_{0}'.format(i)] = forms.BooleanField(required=True, label=label)
