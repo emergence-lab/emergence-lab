@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 import django_filters as filters
 from django_filters.views import FilterView
 from datetimewidget.widgets import DateTimeWidget
 
-from core.models import operator, Project, Investigation
-from growths.models import growth
+from core.models import User, Project, Investigation
+from .models import D180Growth
 
 
 # TODO: don't hardcode names as <model>__<field>, get name from FilterSet class
@@ -40,25 +43,33 @@ class RelationalFilterView(FilterView):
         return self.render_to_response(context)
 
 
-class growth_filter(filters.FilterSet):
-    operator = filters.ModelMultipleChoiceFilter(queryset=operator.active_objects.all())
+class D180GrowthFilter(filters.FilterSet):
+    operator = filters.ModelMultipleChoiceFilter(queryset=User.objects.all())
     project = filters.ModelMultipleChoiceFilter(queryset=Project.objects.all())
     investigation = filters.ModelMultipleChoiceFilter(queryset=Investigation.objects.all())
-    date = filters.DateFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                              widget=DateTimeWidget(attrs={'class': 'datetime'},
-                                                    options={'minView': '2',
-                                                             'startView': '3',
-                                                             'todayBtn': 'true',
-                                                             'clearBtn': 'true',
-                                                             'format': 'yyyy-mm-dd'}))
-    afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    hall__sheet_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    hall__sheet_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    hall__mobility = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    hall__bulk_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
-    hall__bulk_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'], distinct=True)
+    created = filters.DateFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                 widget=DateTimeWidget(attrs={'class': 'datetime'},
+                                                       options={'minView': '2',
+                                                                'startView': '3',
+                                                                'todayBtn': 'true',
+                                                                'clearBtn': 'true',
+                                                                'format': 'yyyy-mm-dd'}))
+    afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                    distinct=True)
+    afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                       distinct=True)
+    afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                     distinct=True)
+    hall__sheet_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                                     distinct=True)
+    hall__sheet_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                                  distinct=True)
+    hall__mobility = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                          distinct=True)
+    hall__bulk_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                                    distinct=True)
+    hall__bulk_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+                                                 distinct=True)
 
     # TODO: break this out into RelationalFilterSet class
     def __init__(self, *args, **kwargs):
@@ -66,15 +77,15 @@ class growth_filter(filters.FilterSet):
         for k, v in self.Meta.relational_fields.iteritems():
             for r in v:
                 self.Meta.fields.append(k + '__' + r)
-        super(growth_filter, self).__init__(*args, **kwargs)
+        super(D180GrowthFilter, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = growth
-        fields = ['growth_number', 'date', 'operator', 'project', 'investigation', 'platter',
-                  'reactor', 'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan', 'has_aln',
-                  'is_template', 'is_buffer', 'has_graded', 'has_superlattice', 'has_mqw', ]
+        model = D180Growth
+        fields = ['uuid', 'created', 'user', 'project', 'investigations', 'platter',
+                  'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan', 'has_aln',
+                  'is_template', 'is_buffer', 'has_pulsed', 'has_graded', 'has_superlattice', 'has_mqw', ]
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
             'hall': ['sheet_concentration', 'sheet_resistance', 'mobility', 'bulk_concentration', 'bulk_resistance']
         }
-        order_by = ['-growth_number']
+        order_by = ['-uuid']

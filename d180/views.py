@@ -1,6 +1,8 @@
-from __future__ import print_function
-import time
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 import datetime
+import time
 
 from django.shortcuts import render
 from django.views.generic import (DetailView, ListView, UpdateView, CreateView,

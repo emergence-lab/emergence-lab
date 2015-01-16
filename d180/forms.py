@@ -1,17 +1,19 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 import re
 
 from django import forms
-from django.forms import ModelForm
 
 from ckeditor.widgets import CKEditorWidget
 
-from .models import Growth, Readings, Source
+from .models import DGrowth, Readings, Source
 from core.forms import ChecklistForm
-from core.modles import SampleNode
+from core.models import ProcessNode
 
 
 # Create the form class.
-class SampleForm(ModelForm):
+class SampleForm(forms.ModelForm):
     parent = forms.CharField(label="Parent Sample (leave empty if there is no parent)", required=False)
 
     class Meta:
@@ -78,34 +80,23 @@ class p_form(forms.Form):
 
 class StartGrowthForm(ModelForm):
     class Meta:
-        model = Growth
-        fields = ['uid', 'user', 'platter']
-
-    def clean_uid(self):
-        uid = self.cleaned_data['uid']
-        m = re.match('^([gt][1-9][0-9]{3,})$', uid)
-        if not m:
-            raise forms.ValidationError('Growth {0} improperly formatted. '
-                                        'Did you accidently include the growth '
-                                        'tag?'.format(uid))
-
-        return uid
+        model = D180Growth
+        fields = ['uuid', 'user', 'platter']
 
     def save(self, *args, **kwargs):
         commit = kwargs.pop('commit', True)
         comments = kwargs.pop('comments')
         instance = super(StartGrowthForm, self).save(*args, commit=False, **kwargs)
+        instance.comments = comments
         if commit:
             instance.save()
-        instance.comments = comments
-        instance.save()
         return instance
 
 
 class PrerunGrowthForm(ModelForm):
     class Meta:
-        model = growth
-        fields = ['uid', 'user', 'comment', 'investigations', 'platter',
+        model = D180Growth
+        fields = ['uuid', 'user', 'comment', 'investigations', 'platter',
                   'has_gan', 'has_aln', 'has_inn', 'has_algan', 'has_ingan',
                   'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_pulsed', 'has_superlattice',
@@ -128,26 +119,26 @@ class PrerunGrowthForm(ModelForm):
 
 class PrerunChecklistForm(ChecklistForm):
     checklist_fields = [
-        'Is Run Ready? Comments Updated?',
-        'Engage Load Lock Routine?',
-        'Load the wafers (Note Substrate number / Run number / Single side / Double side in space provided below)?',
-        'Close LL?',
-        'Check from recipe the required Alkyl Sources and make sure they are open?',
-        'Check from recipe the required Hydrides(including Silane) and make sure they are open?',
-        'Check and note LL Pressure (must be < 1E-5)?',
-        'Engage Gate Valve Routing? Open Front VP and Shutter?',
-        'Transfer wafer carrier to the reactor?',
-        'Check for Rotation?',
-        'Close Gate Valve, Front VP and Shutter?',
-        'System IDLE? Correct Recipe Loaded? Power Supply On? Motor on Auto? GC Pressure Remote?',
-        'Start the Run',
-        'Start the k-space',
+        'Verify the correct recipe is loaded and comments are updated',
+        'Engage load lock routine',
+        'Load the wafers',
+        'Close load lock',
+        'Check required Alkyl Sources (including Cp2Mg) and make sure they are open',
+        'Check required Hydrides (including Silane) and make sure they are working',
+        'Check load lock pressure (must be < 1E-5)?',
+        'Engage gate valve routine, open front viewport and shutter',
+        'Transfer platter from load lock to reactor',
+        'Check for platter rotation',
+        'Close gate valve, front viewport and shutter',
+        'Turn on power supplies, set the motor to Auto, and pressure control to Remote',
+        'Verify the system is in IDLE',
+        'Start the Run and k-space',
     ]
 
 
 class PrerunSourcesForm(ModelForm):
     class Meta:
-        model = Source
+        model = D180Source
         fields = ('cp2mg', 'tmin1', 'tmin2', 'tmga1', 'tmga2', 'tmal1',
                   'tega1', 'nh3', 'sih4',)
 
@@ -157,13 +148,13 @@ class PostrunChecklistForm(ChecklistForm):
         'Wait for system to IDLE',
         'Stop k-space collection'
         'Turn off motor',
-        'Engage Gate Valve Routine? Open Front VP and Shutter?',
-        'Transfer Wafer carrier from the Reactor to LL?',
-        'Close Gate Valve?',
-        'Check and note LL Pressure(must be < 1E-5)?',
-        'Engage LL Routine?',
-        'Unload the wafers and updated comments and observations in the space provided below? Close LL?',
-        'Close Bubblers if done using them?',
+        'Engage gate valve routine, open front viewport and shutter',
+        'Transfer platter from reactor to load lock',
+        'Close gate valve',
+        'Check load lock pressure (must be < 1E-5)?',
+        'Engage load lock routine',
+        'Unload the wafers, update comments and close the load lock',
+        'Close Bubblers if done using them',
     ]
 
 

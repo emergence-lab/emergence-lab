@@ -1,41 +1,53 @@
-from django import forms
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 from rest_framework import serializers
 
-from .models import growth, readings
+from core.serializers import ProcessSerializer
+from .models import D180Growth, D180Readings
 
 
-class GrowthSerializer(serializers.ModelSerializer):
+class D180GrowthSerializer(ProcessSerializer):
     """
     Serializes the growth model.
     """
-    growth = serializers.CharField(max_length=50)
-
-    def transform_growth(self, obj, value):
-        return value
-
-    def validate_growth(self, attrs, source):
-        try:
-            growth = growths.models.growth.get_growth(attrs[source])
-        except Exception as e:
-            raise serializers.ValidationError(str(e))
-
-        attrs[source] = growth
-        return attrs
 
     class Meta:
-        model = growth
-        fields = ('id', 'growth_number', 'date', 'operator', 'project',
-                  'investigation', 'platter', 'reactor', 'run_comments')
+        model = D180Growth
+        fields = ('uuid', 'created', 'modified', 'user',
+                  'investigations', 'platter', 'comment')
 
-class ReadingsSerializer(serializers.ModelSerializer):
+    has_gan = models.BooleanField(default=False)
+    has_aln = models.BooleanField(default=False)
+    has_inn = models.BooleanField(default=False)
+    has_algan = models.BooleanField(default=False)
+    has_ingan = models.BooleanField(default=False)
+    other_material = models.CharField(max_length=50, blank=True)
+
+    # layer orientation
+    orientation = models.CharField(max_length=10, default='0001')
+
+    # growth features
+    is_template = models.BooleanField(default=False)
+    is_buffer = models.BooleanField(default=False)
+    has_pulsed = models.BooleanField(default=False)
+    has_superlattice = models.BooleanField(default=False)
+    has_mqw = models.BooleanField(default=False)
+    has_graded = models.BooleanField(default=False)
+
+    # doping features
+    has_n = models.BooleanField(default=False)
+    has_p = models.BooleanField(default=False)
+    has_u = models.BooleanField(default=False)
+
+class D180ReadingsSerializer(serializers.ModelSerializer):
     """
     Serializes the readings model.
     """
     growthid = serializers.IntegerField()
 
     class Meta:
-        model = readings
+        model = D180Readings
         fields = ('id', 'growth', 'layer', 'layer_desc', 'pyro_out', 'pyro_in',
                   'tc_in', 'tc_out', 'motor_rpm', 'gc_pressure', 'gc_position',
                   'voltage_in', 'current_in', 'voltage_out', 'current_out',

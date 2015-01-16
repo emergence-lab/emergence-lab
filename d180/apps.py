@@ -1,10 +1,8 @@
-from django.apps import AppConfig
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
-# from core.models import registry
+from django.apps import AppConfig
 
 
 class D180AppConfig(AppConfig):
     name = 'd180'
-
-    # def ready(self):
-        # registry.register(self.get_model('growth'))

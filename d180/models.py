@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -24,11 +27,15 @@ class Platter(ActiveStateMixin, models.Model):
 
 
 @python_2_unicode_compatible
-class Growth(Process):
+class D180Growth(Process):
     """
     Stores information related to a growth on the d180 including tagging for
     material and device properties.
     """
+    name = 'D180 Growth'
+    slug = 'd180-growth'
+    is_destructive = True
+
     # general info
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
@@ -66,16 +73,16 @@ class Growth(Process):
         verbose_name_plural = _('d180 growths')
 
     def __str__(self):
-        return self.uid
+        return self.uuid
 
 
 @python_2_unicode_compatible
-class Readings(models.Model):
+class D180Readings(models.Model):
     """
     Stores readings (i.e. temperature) from a d180 growth.
     """
     # growth and layer info
-    growth = models.ForeignKey(Growth)
+    growth = models.ForeignKey(D180Growth)
     layer = models.IntegerField()
     layer_desc = models.CharField(max_length=45, blank=True)
 
@@ -132,11 +139,11 @@ class Readings(models.Model):
 
 
 @python_2_unicode_compatible
-class RecipeLayer(models.Model):
+class D180RecipeLayer(models.Model):
     """
     Stores layers used in the recipes for a d180 growth.
     """
-    growth = models.ForeignKey(Growth)
+    growth = models.ForeignKey(D180Growth)
 
     layer_num = models.IntegerField()
     loop_num = models.IntegerField()
@@ -200,7 +207,7 @@ class RecipeLayer(models.Model):
 
 
 @python_2_unicode_compatible
-class Source(models.Model):
+class D180Source(models.Model):
     """
     Stores information on source consumption
     """
