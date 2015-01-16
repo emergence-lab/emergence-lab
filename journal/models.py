@@ -15,7 +15,7 @@ class journal_entry(models.Model):
     title = models.CharField(max_length=100)
     entry = RichTextField(blank=True)
     date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(core.models.operator)
+    author = models.ForeignKey(core.models.user.User)
     slug = AutoSlugField(populate_from='title', unique_with=('author'))
     investigations = models.ManyToManyField(core.models.Investigation)
 

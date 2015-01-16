@@ -1,23 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, render_to_response
-from django.utils.timezone import activate
+from django.shortcuts import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.views.generic import ListView, RedirectView, TemplateView, FormView
 from django.views.generic.edit import CreateView, UpdateView
-from django import forms
-from django.contrib.auth.models import User
-from django.db import models
 from django.core.files.base import File
-import datetime
 import os
-import time
 import zipfile
 import tempfile
-import json
-import shutil
 
 import aws_support as aws
 
@@ -30,17 +22,21 @@ class SimulationBase(ListView):
     template_name = 'simulations/management.html'
     paginate_by = 8
 
+
 class IncompleteSimulations(SimulationBase):
     def get_queryset(self):
         return Simulation.objects.filter(finish_date=None).order_by('id')
+
 
 class CompletedSimulations(SimulationBase):
     def get_queryset(self):
         return Simulation.objects.exclude(finish_date=None).order_by('-id')
 
+
 class AllSimulations(SimulationBase):
     def get_queryset(self):
         return Simulation.objects.order_by('-id')
+
 
 class SimulationCreate(CreateView):
     model = Simulation
@@ -53,29 +49,22 @@ class SimulationCreate(CreateView):
         Returns the initial data to use for forms on this view.
         """
         initial = super(SimulationCreate, self).get_initial()
-        #try:
-        #    template_name = self.kwargs['template_name']
-        #except KeyError: template_name = None
-
 
         try:
             s3_file_path = Simulation.objects.get(pk=self.kwargs['pk']).file_path.name
-            storage = aws.S3FileManager(settings.AWS_ACCESS_KEY_ID,
-                                        settings.AWS_SECRET_ACCESS_KEY,
-                                        True)
             zipdir = tempfile.mkdtemp()
             os.mkdir(os.path.join(zipdir, 'simulations'))
-            zip_download = storage.downloadFileFromBucket(settings.AWS_STORAGE_BUCKET_NAME,
-                                                               s3_file_path,
-                                                               zipdir)
             original_file = zipfile.ZipFile(os.path.join(zipdir,
                                                          s3_file_path),
                                             'r')
             file_list = original_file.namelist()
             for item in file_list:
-                if item.endswith('.par'): initial['materials'] = original_file.read(item)
-                if item.endswith('.scm'): initial['device'] = original_file.read(item)
-                if item.endswith('.cmd'): initial['physics'] = original_file.read(item)
+                if item.endswith('.par'):
+                    initial['materials'] = original_file.read(item)
+                if item.endswith('.scm'):
+                    initial['device'] = original_file.read(item)
+                if item.endswith('.cmd'):
+                    initial['physics'] = original_file.read(item)
         except KeyError:
             try:
                 base_path = os.path.join(settings.MEDIA_ROOT,
@@ -105,40 +94,46 @@ class SimulationCreate(CreateView):
                                                   + '.zip')),
                                      'w')
         if form.cleaned_data['materials_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
+            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name,
+                      'w+') as materials:
                 for chunk in self.request.FILES['materials_upload'].chunks():
                     materials.write(chunk.encode('utf-8'))
                 materials.seek(0)
                 zipout.write(materials.name, os.path.basename(materials.name))
                 materials.close()
         else:
-            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name, 'w+') as materials:
+            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=zipdir).name,
+                      'w+') as materials:
                 materials.write(form.data['materials'].encode('utf-8'))
                 materials.seek(0)
                 zipout.write(materials.name, os.path.basename(materials.name))
                 materials.close()
         if form.cleaned_data['device_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as device:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name,
+                      'w+') as device:
                 for chunk in self.request.FILES['device_upload'].chunks():
                     device.write(chunk.encode('utf-8'))
                 device.seek(0)
                 zipout.write(device.name, os.path.basename(device.name))
                 device.close()
         else:
-            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name, 'w+') as device:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=zipdir).name,
+                      'w+') as device:
                 device.write(form.data['device'].encode('utf-8'))
                 device.seek(0)
                 zipout.write(device.name, os.path.basename(device.name))
                 device.close()
         if form.cleaned_data['physics_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name, 'w+') as physics:
+            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name,
+                      'w+') as physics:
                 for chunk in self.request.FILES['physics_upload'].chunks():
                     physics.write(chunk.encode('utf-8'))
                 physics.seek(0)
                 zipout.write(physics.name, os.path.basename(physics.name))
                 physics.close()
         else:
-            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name, 'w+') as physics:
+            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=zipdir).name,
+                      'w+') as physics:
                 physics.write(form.data['physics'].encode('utf-8'))
                 physics.seek(0)
                 zipout.write(physics.name, os.path.basename(physics.name))
@@ -152,6 +147,7 @@ class SimulationCreate(CreateView):
 
 class SimulationCancel(RedirectView):
     permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('pk')
         simulation_obj = Simulation.objects.get(pk=pk)
@@ -176,17 +172,17 @@ class SimulationEdit(UpdateView):
         Returns the initial data to use for forms on this view.
         """
         initial = super(SimulationEdit, self).get_initial()
-        zip_download = self.storage.downloadFileFromBucket(settings.AWS_STORAGE_BUCKET_NAME,
-                                                           self.object.file_path.name,
-                                                           self.zipdir)
         original_file = zipfile.ZipFile(os.path.join(self.zipdir,
                                                      self.object.file_path.name),
                                         'r')
         self.file_list = original_file.namelist()
         for item in self.file_list:
-            if item.endswith('.par'): initial['materials'] = original_file.read(item)
-            if item.endswith('.scm'): initial['device'] = original_file.read(item)
-            if item.endswith('.cmd'): initial['physics'] = original_file.read(item)
+            if item.endswith('.par'):
+                initial['materials'] = original_file.read(item)
+            if item.endswith('.scm'):
+                initial['device'] = original_file.read(item)
+            if item.endswith('.cmd'):
+                initial['physics'] = original_file.read(item)
         return initial
 
     def form_valid(self, form):
@@ -196,40 +192,46 @@ class SimulationEdit(UpdateView):
                                                   + '.zip')),
                                      'w')
         if form.cleaned_data['materials_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=self.zipdir).name, 'w+') as materials:
+            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=self.zipdir).name,
+                      'w+') as materials:
                 for chunk in self.request.FILES['materials_upload'].chunks():
                     materials.write(chunk.encode('utf-8'))
                 materials.seek(0)
                 zipout.write(materials.name, os.path.basename(materials.name))
                 materials.close()
         else:
-            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=self.zipdir).name, 'w+') as materials:
+            with open(tempfile.NamedTemporaryFile(suffix='.par', dir=self.zipdir).name,
+                      'w+') as materials:
                 materials.write(form.data['materials'].encode('utf-8'))
                 materials.seek(0)
                 zipout.write(materials.name, os.path.basename(materials.name))
                 materials.close()
         if form.cleaned_data['device_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=self.zipdir).name, 'w+') as device:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=self.zipdir).name,
+                      'w+') as device:
                 for chunk in self.request.FILES['device_upload'].chunks():
                     device.write(chunk.encode('utf-8'))
                 device.seek(0)
                 zipout.write(device.name, os.path.basename(device.name))
                 device.close()
         else:
-            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=self.zipdir).name, 'w+') as device:
+            with open(tempfile.NamedTemporaryFile(suffix='.scm', dir=self.zipdir).name,
+                      'w+') as device:
                 device.write(form.data['device'].encode('utf-8'))
                 device.seek(0)
                 zipout.write(device.name, os.path.basename(device.name))
                 device.close()
         if form.cleaned_data['physics_upload']:
-            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=self.zipdir).name, 'w+') as physics:
+            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=self.zipdir).name,
+                      'w+') as physics:
                 for chunk in self.request.FILES['physics_upload'].chunks():
                     physics.write(chunk.encode('utf-8'))
                 physics.seek(0)
                 zipout.write(physics.name, os.path.basename(physics.name))
                 physics.close()
         else:
-            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=self.zipdir).name, 'w+') as physics:
+            with open(tempfile.NamedTemporaryFile(suffix='.cmd', dir=self.zipdir).name,
+                      'w+') as physics:
                 physics.write(form.data['physics'].encode('utf-8'))
                 physics.seek(0)
                 zipout.write(physics.name, os.path.basename(physics.name))
@@ -239,11 +241,14 @@ class SimulationEdit(UpdateView):
         self.object = form.save()
         return HttpResponseRedirect(reverse('simulation_incomplete'))
 
+
 class StartInstance(RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        signals = aws.EC2Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+        signals = aws.EC2Connection(settings.AWS_EC2_REGION,
+                                    settings.AWS_ACCESS_KEY_ID,
+                                    settings.AWS_SECRET_ACCESS_KEY)
         instance = kwargs.pop('instance_id')
         try:
             signals.start_instance(instance)
@@ -251,11 +256,14 @@ class StartInstance(RedirectView):
         except Exception as e:
             raise Exception(e)
 
+
 class StopInstance(RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        signals = aws.EC2Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+        signals = aws.EC2Connection(settings.AWS_EC2_REGION,
+                                    settings.AWS_ACCESS_KEY_ID,
+                                    settings.AWS_SECRET_ACCESS_KEY)
         instance = kwargs.pop('instance_id')
         try:
             signals.stop_instance(instance)
@@ -263,10 +271,13 @@ class StopInstance(RedirectView):
         except Exception as e:
             raise Exception(e)
 
+
 class SimulationAdmin(TemplateView):
     template_name = 'simulations/admin.html'
 
-    signals = aws.EC2Connection(settings.AWS_EC2_REGION, settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+    signals = aws.EC2Connection(settings.AWS_EC2_REGION,
+                                settings.AWS_ACCESS_KEY_ID,
+                                settings.AWS_SECRET_ACCESS_KEY)
 
     def get_context_data(self, **kwargs):
         tmp = []
@@ -279,6 +290,7 @@ class SimulationAdmin(TemplateView):
             kwargs['instances'] = tmp
         return super(SimulationAdmin, self).get_context_data(**kwargs)
 
+
 class SimulationTemplates(TemplateView):
     template_name = 'simulations/template_list.html'
 
@@ -287,19 +299,44 @@ class SimulationTemplates(TemplateView):
         tmp = []
         if os.path.isdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)):
             if 'template_list' not in kwargs:
-                for template in os.listdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)):
-                    if os.path.isdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template)):
-                #for template in [x[0] for x in os.walk(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user))]:
-                        if os.path.isfile(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template, 'comment.txt')):
-                            with open(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template, 'comment.txt'), 'r') as f:
+                for template in os.listdir(os.path.join(settings.MEDIA_ROOT,
+                                                        'simulations',
+                                                        'templates',
+                                                        user)):
+                    if os.path.isdir(os.path.join(settings.MEDIA_ROOT,
+                                                  'simulations',
+                                                  'templates',
+                                                  user,
+                                                  template)):
+                        if os.path.isfile(os.path.join(settings.MEDIA_ROOT,
+                                                       'simulations',
+                                                       'templates',
+                                                       user,
+                                                       template,
+                                                       'comment.txt')):
+                            with open(os.path.join(settings.MEDIA_ROOT,
+                                                   'simulations',
+                                                   'templates',
+                                                   user,
+                                                   template,
+                                                   'comment.txt'), 'r') as f:
                                 comment = f.read()
-                        else: comment = None
+                        else:
+                            comment = None
                         tmp.append({'name': template,
-                                    'path': os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template),
-                                    'files': os.listdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)),
+                                    'path': os.path.join(settings.MEDIA_ROOT,
+                                                         'simulations',
+                                                         'templates',
+                                                         user,
+                                                         template),
+                                    'files': os.listdir(os.path.join(settings.MEDIA_ROOT,
+                                                                     'simulations',
+                                                                     'templates',
+                                                                     user)),
                                     'comment': comment})
                 kwargs['template_list'] = tmp
         return super(SimulationTemplates, self).get_context_data(**kwargs)
+
 
 class SimulationTemplateDelete(RedirectView):
     permanent = False
@@ -308,12 +345,26 @@ class SimulationTemplateDelete(RedirectView):
         template_name = kwargs.pop('template_name')
         user = str(self.request.user)
         try:
-            for item in os.listdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template_name)):
-                os.remove(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template_name, item))
-            os.rmdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template_name))
+            for item in os.listdir(os.path.join(settings.MEDIA_ROOT,
+                                                'simulations',
+                                                'templates',
+                                                user,
+                                                template_name)):
+                os.remove(os.path.join(settings.MEDIA_ROOT,
+                                       'simulations',
+                                       'templates',
+                                       user,
+                                       template_name,
+                                       item))
+            os.rmdir(os.path.join(settings.MEDIA_ROOT,
+                                  'simulations',
+                                  'templates',
+                                  user,
+                                  template_name))
             return reverse('simulation_templates')
         except Exception as e:
             raise Exception(e)
+
 
 class SimulationTemplateCreate(FormView):
     form_class = SimTemplateForm
@@ -326,7 +377,8 @@ class SimulationTemplateCreate(FormView):
         try:
             os.mkdir(os.path.join(base_path, form.cleaned_data['template_name']))
             base_path = os.path.join(base_path, form.cleaned_data['template_name'])
-        except Exception as e: print(e)
+        except Exception as e:
+            print(e)
         if form.cleaned_data['materials_upload']:
             with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
                 for chunk in self.request.FILES['materials_upload'].chunks():
@@ -360,12 +412,13 @@ class SimulationTemplateCreate(FormView):
                 comment.close()
         return HttpResponseRedirect(reverse('simulation_templates'))
 
+
 class SimulationTemplateEdit(FormView):
     form_class = SimTemplateForm
     template_name = 'simulations/template_form.html'
     success_url = '/simulations/templates/'
-    def get_initial(self):
 
+    def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
         """
@@ -379,11 +432,16 @@ class SimulationTemplateEdit(FormView):
         self.file_list = os.listdir(template_path)
         try:
             for item in self.file_list:
-                if item == 'materials.par': initial['materials'] = open(os.path.join(template_path, item)).read()
-                if item == 'device.scm': initial['device'] = open(os.path.join(template_path, item)).read()
-                if item == 'physics.cmd': initial['physics'] = open(os.path.join(template_path, item)).read()
-                if item == 'comments.txt': initial['comment'] = open(os.path.join(template_path, item)).read()
-        except Exception as e: print(e)
+                if item == 'materials.par':
+                    initial['materials'] = open(os.path.join(template_path, item)).read()
+                if item == 'device.scm':
+                    initial['device'] = open(os.path.join(template_path, item)).read()
+                if item == 'physics.cmd':
+                    initial['physics'] = open(os.path.join(template_path, item)).read()
+                if item == 'comments.txt':
+                    initial['comment'] = open(os.path.join(template_path, item)).read()
+        except Exception as e:
+            print(e)
         initial['template_name'] = self.kwargs['template_name']
         return initial
 
@@ -392,7 +450,8 @@ class SimulationTemplateEdit(FormView):
         base_path = os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)
         try:
             base_path = os.path.join(base_path, form.cleaned_data['template_name'])
-        except Exception as e: print(e)
+        except Exception as e:
+            print(e)
         if form.cleaned_data['materials_upload']:
             with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
                 materials.truncate()
@@ -440,6 +499,7 @@ class SimulationTemplateEdit(FormView):
                 comment.close()
         return HttpResponseRedirect(reverse('simulation_templates'))
 
+
 class SimulationJobToTemplate(FormView):
     model = Simulation
     form_class = SimTemplateForm
@@ -453,23 +513,21 @@ class SimulationJobToTemplate(FormView):
         initial = super(SimulationJobToTemplate, self).get_initial()
         try:
             s3_file_path = Simulation.objects.get(pk=self.kwargs['pk']).file_path.name
-            storage = aws.S3FileManager(settings.AWS_ACCESS_KEY_ID,
-                                        settings.AWS_SECRET_ACCESS_KEY,
-                                        True)
             zipdir = tempfile.mkdtemp()
             os.mkdir(os.path.join(zipdir, 'simulations'))
-            zip_download = storage.downloadFileFromBucket(settings.AWS_STORAGE_BUCKET_NAME,
-                                                               s3_file_path,
-                                                               zipdir)
             original_file = zipfile.ZipFile(os.path.join(zipdir,
                                                          s3_file_path),
                                             'r')
             file_list = original_file.namelist()
             for item in file_list:
-                if item.endswith('.par'): initial['materials'] = original_file.read(item)
-                if item.endswith('.scm'): initial['device'] = original_file.read(item)
-                if item.endswith('.cmd'): initial['physics'] = original_file.read(item)
-        except Exception as e: print(e)
+                if item.endswith('.par'):
+                    initial['materials'] = original_file.read(item)
+                if item.endswith('.scm'):
+                    initial['device'] = original_file.read(item)
+                if item.endswith('.cmd'):
+                    initial['physics'] = original_file.read(item)
+        except Exception as e:
+            print(e)
         return initial
 
     def form_valid(self, form):
@@ -477,7 +535,8 @@ class SimulationJobToTemplate(FormView):
         base_path = os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)
         try:
             base_path = os.path.join(base_path, form.cleaned_data['template_name'])
-        except Exception as e: print(e)
+        except Exception as e:
+            print(e)
         if form.cleaned_data['materials_upload']:
             with open(os.path.join(base_path, 'materials.par'), 'w+') as materials:
                 materials.truncate()

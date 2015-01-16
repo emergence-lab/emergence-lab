@@ -58,7 +58,7 @@ LOGOUT_URL = "/{}/accounts/logout/".format(SUB_SITE)
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
-    'core.context_processors.notifications',
+    'messaging.context_processors.notifications',
 )
 
 
@@ -88,12 +88,12 @@ INSTALLED_APPS = (
     # local apps
     'core',
     # 'dashboard',
-    # 'journal',
+    'journal',
     'd180',
     'afm',
     'hall',
     'simulations',
-    # 'schedule_queue',
+    'schedule_queue',
     # misc
     'actstream',
 )
