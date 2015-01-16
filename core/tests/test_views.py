@@ -35,7 +35,7 @@ class TestHomepage(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestOperatorCRUD(TestCase):
+class TestUserCRUD(TestCase):
 
     @classmethod
     def setUpClass(cls):
