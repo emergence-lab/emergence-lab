@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
-import time
 import os
 from django.utils import timezone
 import storages.backends.s3boto
@@ -17,11 +16,12 @@ from core.models import Investigation
 class FixedS3BotoStorage(storages.backends.s3boto.S3BotoStorage):
     pass
 
-protected_storage = FixedS3BotoStorage(
-  acl='private',
-  querystring_auth=True,
-  querystring_expire=600, # 10 minutes, try to ensure people won't/can't share
-)
+protected_storage = FixedS3BotoStorage(acl='private',
+                                       querystring_auth=True,
+                                       querystring_expire=600,
+                                       # 10 minutes, try to ensure people won't/can't share
+                                       )
+
 
 def content_file_name(instance, filename):
     return ''.join(('simulations/',
@@ -29,6 +29,7 @@ def content_file_name(instance, filename):
                     str("_"),
                     datetime.datetime.strftime(instance.request_date, '%Y_%m_%d_%H_%M_%S'),
                     str(os.path.splitext(filename)[1])))
+
 
 @python_2_unicode_compatible
 class Simulation(models.Model):
@@ -58,7 +59,6 @@ class Simulation(models.Model):
             return timezone.now() - self.start_date
 
         return self.finish_date - self.start_date
-
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     investigations = models.ManyToManyField(Investigation)
