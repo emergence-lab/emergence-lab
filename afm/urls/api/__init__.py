@@ -7,6 +7,6 @@ import afm.api
 
 
 urlpatterns = [
-    url(r'^$', afm.api.AFMListAPI.as_view()),
-    url(r'^(?P<pk>\d+)/$', afm.api.AFMDetailAPI.as_view()),
+    url(r'^$', afm.api.AFMListCreateAPIView.as_view()),
+    url(r'^(?P<pk>\d+)/$', afm.api.AFMRetrieveUpdateAPIView.as_view()),
 ]

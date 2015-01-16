@@ -1,27 +1,33 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.db import models
-from django.core.urlresolvers import reverse
 from django.core.files.storage import default_storage as labshare
 
-import d180.models
+from core.models import Process
 
 
 def get_afm_path(instance, filename):
-    return '/'.join(['growths' + instance.growth.growth_number[1],
-                     instance.growth.growth_number, 'afm', filename])
+    """
+    Stores afm scans in /:sample_uuid/:afm_uuid/
+    """
+    return '/'.join(['growths' + instance.sample.uuid, instance.uuid, filename])
 
 
-class afm(models.Model):
+class AFMScan(Process):
     """
     Stores afm characterization information.
     """
+    name = 'AFM Scan'
+    slug = 'afm'
+    is_destructive = False
+
     LOCATION_CHOICES = [
         ('c', 'Center'),
         ('r', 'Round'),
         ('f', 'Flat'),
     ]
 
-    growth = models.ForeignKey(growths.models.growth)
-    sample = models.ForeignKey(growths.models.sample)
     scan_number = models.IntegerField(default=0)
 
     rms = models.DecimalField(max_digits=7, decimal_places=3)
@@ -33,15 +39,3 @@ class afm(models.Model):
                                max_length=150, blank=True, null=True)
     amplitude = models.ImageField(upload_to=get_afm_path, storage=labshare,
                                   max_length=150, blank=True, null=True)
-
-    def __unicode__(self):
-        return '{0}_{1}{2}_{3}.{4}'.format(self.growth.growth_number,
-                                           self.sample.pocket, self.sample.piece,
-                                           self.location, str(self.scan_number).zfill(3))
-
-    def get_absolute_url(self):
-        return reverse('afm_detail', args=(self.id, ))
-
-    class Meta:
-        db_table = 'afm'
-        unique_together = ('growth', 'sample', 'scan_number', 'location')

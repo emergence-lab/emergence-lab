@@ -90,7 +90,7 @@ INSTALLED_APPS = (
     # 'dashboard',
     # 'journal',
     # 'growths',
-    # 'afm',
+    'afm',
     # 'hall',
     # 'simulations',
     # 'schedule_queue',
