@@ -16,14 +16,14 @@
 </div>
 
 <br>
-    
-<div class="row">   
+
+<div class="row">
     <div class="col-md-6 col-md-offset-3">
-            
+
         <ul class="list-group">
             {% for reservation in object_list %}
                     <li class="list-group-item">
-                        
+
                         <div class="pull-right">
                             <div class="btn-group">
                                 {% if reservation.user == request.user %}<a class='btn btn-warning' href={% url 'reservation_edit' pk=reservation.id %}>Edit</a>{% endif %}
@@ -32,8 +32,8 @@
                                 {% if reservation.user == request.user %}<a class='btn btn-danger' href="{% url 'cancel_reservation' pk=reservation.id %}">Cancel</a>{% endif %}
                             </div>
                         </div>
-                        
-                        {{ reservation.user.operator.name }}
+
+                        {{ reservation.user.full_name }}
                         <br>Bake <strong>{{ reservation.platter }}</strong> platter for <strong>{{ reservation.bake_length_in_minutes }} minutes </strong>
                         <br>Expected growth duration is <strong> {{ reservation.growth_length_in_hours }}
                         {% if reservation.growth_length_in_hours > 1 %} hours {% else %} hour {% endif %} </strong>
@@ -44,8 +44,8 @@
             <br>
 
         </ul>
-        
-    </div>    
+
+    </div>
 </div>
-    
+
 {% endblock %}
