@@ -5,7 +5,8 @@ import time
 
 import schedule_queue.config as tools
 
-from growths.models import Platter
+from d180.models import Platter
+
 
 @python_2_unicode_compatible
 class Reservation(models.Model):

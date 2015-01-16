@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.contrib import admin
 
 import core.models
@@ -14,16 +17,10 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 class ProjectTrackingInline(admin.TabularInline):
-    model = core.models.project_tracking
+    model = core.models.ProjectTracking
     extra = 1
 
 
-class OperatorAdmin(admin.ModelAdmin):
-    inlines = (ProjectTrackingInline, )
-    fields = ('name', 'is_active', 'user')
-
-
-admin.site.register(core.models.operator, OperatorAdmin)
 admin.site.register(core.models.Project, ProjectAdmin)
 admin.site.register(core.models.Investigation, InvestigationAdmin)
 admin.site.register(core.models.ProjectTracking)

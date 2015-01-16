@@ -2,7 +2,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.core.files.storage import default_storage as labshare
 
-import growths.models
+import d180.models
 
 
 def get_afm_path(instance, filename):

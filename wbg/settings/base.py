@@ -73,12 +73,12 @@ INSTALLED_APPS = (
     # administration
     'grappelli',
     'django.contrib.admin',
-    # 3rd party apps
-    'datetimewidget',
-    'django_filters',
+    # # 3rd party apps
+    # 'datetimewidget',
+    # 'django_filters',
     'bootstrap3',
     'rest_framework',
-    'rest_framework.authtoken',
+    # 'rest_framework.authtoken',
     'ckeditor',
     'django_wysiwyg',
     'mptt',
@@ -86,13 +86,13 @@ INSTALLED_APPS = (
     'django_ace',
     # local apps
     'core',
-    'dashboard',
-    'journal',
-    'growths',
-    'afm',
-    'hall',
-    'simulations',
-    'schedule_queue',
+    # 'dashboard',
+    # 'journal',
+    # 'growths',
+    # 'afm',
+    # 'hall',
+    # 'simulations',
+    # 'schedule_queue',
     # misc
     'actstream',
 )

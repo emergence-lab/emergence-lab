@@ -7,7 +7,7 @@ boto>=2.34.0
 sphinx_rtd_theme==0.1.6
 paramiko==1.15.1
 django-bootstrap3==4.11.0
-djangorestframework>=2.3,<3
+djangorestframework>=3,<4
 django-autoslug==1.7.2
 pyapi-gitlab==6.2.3
 django-markupfield==1.2.1
@@ -23,3 +23,5 @@ django-mptt==0.6.1
 git+***REMOVED***gitlab/wbg-lab/aws-simulations.git@0.10.0#egg=aws_support
 django-storages==1.1.8
 django-ace==1.0.2
+django-polymorphic==0.6
+django-uuidfield==0.5.0

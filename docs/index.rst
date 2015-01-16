@@ -15,9 +15,9 @@ Contents:
    migrations
    design
    process
+   rest_helpers
    organization
    core
-   growths
 
 Indices and tables
 ==================
