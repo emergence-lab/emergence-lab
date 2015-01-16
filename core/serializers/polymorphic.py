@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict
 from copy import copy
 
 from django.contrib.contenttypes.models import ContentType
@@ -12,12 +12,7 @@ from rest_framework.utils.field_mapping import get_field_kwargs
 import six
 
 from .fields import PolymorphicTypeField
-
-
-PolymorphicClassInfo = namedtuple('PolymorphicClassInfo', [
-    'model',
-    'fields',
-])
+from core.polymorphic import get_subclasses, get_polymorphic_field_mapping
 
 
 class PolymorphicModelSerializer(serializers.ModelSerializer):
@@ -98,26 +93,7 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         return instance
 
     def _build_polymorphic_field_mapping(self):
-        """
-        Creates several helper attributes on the serializer and builds a
-        mapping of subclasses to the fields included on each.
-        """
         model = self.Meta.model
         self.polymorphic_base_model = model
-        self.polymorphic_derived_models = self._all_subclasses(model)
-
-        self.polymorphic_class_mapping = {
-            subclass.__name__: PolymorphicClassInfo(
-                model=subclass,
-                fields=[field for field in subclass._meta.local_fields
-                        if field.serialize and not field.rel])
-            for subclass in self.polymorphic_derived_models
-        }
-
-    def _all_subclasses(self, cls):
-        """
-        Recursively creates a list of all subclasses of the provided class.
-        """
-        return cls.__subclasses__() + [sub
-                                       for direct in cls.__subclasses__()
-                                       for sub in self._all_subclasses(direct)]
+        self.polymorphic_derived_models = get_subclasses(model)
+        self.polymorphic_class_mapping = get_polymorphic_field_mapping(model)
