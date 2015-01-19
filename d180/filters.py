@@ -81,11 +81,11 @@ class D180GrowthFilter(filters.FilterSet):
 
     class Meta:
         model = D180Growth
-        fields = ['uuid', 'created', 'user', 'project', 'investigations', 'platter',
+        fields = ['uuid_full', 'created', 'user', 'project', 'investigations', 'platter',
                   'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan', 'has_aln',
                   'is_template', 'is_buffer', 'has_pulsed', 'has_graded', 'has_superlattice', 'has_mqw', ]
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
             'hall': ['sheet_concentration', 'sheet_resistance', 'mobility', 'bulk_concentration', 'bulk_resistance']
         }
-        order_by = ['-uuid']
+        order_by = ['-uuid_full']

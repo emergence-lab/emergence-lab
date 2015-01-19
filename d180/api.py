@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from rest_framework import generics, permissions
 
-from .filters import growth_filter
+from .filters import D180GrowthFilter
 from .models import D180Growth, D180Readings
 from .serializers import D180GrowthSerializer, D180ReadingsSerializer
 
@@ -15,7 +15,7 @@ class D180GrowthListAPI(generics.ListCreateAPIView):
     queryset = D180Growth.objects.all()
     serializer_class = D180GrowthSerializer
     permission_classes = (permissions.IsAuthenticated,)
-    filter_class = growth_filter
+    filter_class = D180GrowthFilter
 
 
 class D180GrowthDetailAPI(generics.RetrieveUpdateAPIView):

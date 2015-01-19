@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^afm/', include('afm.urls.api')),
     url(r'^simulations/', include('simulations.urls.api')),
     url(r'^messaging/', include('messaging.urls.api')),
+    url(r'^d180/', include('d180.urls.api')),
 ]

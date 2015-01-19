@@ -27,11 +27,11 @@ class D180ReadingsSerializer(serializers.ModelSerializer):
     """
     Serializes the readings model.
     """
-    growthid = serializers.IntegerField()
+    growth_id = serializers.IntegerField()
 
     class Meta:
         model = D180Readings
-        fields = ('id', 'growth', 'layer', 'layer_desc', 'pyro_out', 'pyro_in',
+        fields = ('id', 'growth_id', 'layer', 'layer_desc', 'pyro_out', 'pyro_in',
                   'tc_in', 'tc_out', 'motor_rpm', 'gc_pressure', 'gc_position',
                   'voltage_in', 'current_in', 'voltage_out', 'current_out',
                   'top_vp_flow', 'hydride_inner', 'hydride_outer',
