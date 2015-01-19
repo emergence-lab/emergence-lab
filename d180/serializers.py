@@ -7,14 +7,14 @@ from core.serializers import ProcessSerializer
 from .models import D180Growth, D180Readings
 
 
-class D180GrowthSerializer(ProcessSerializer):
+class D180GrowthSerializer(serializers.ModelSerializer):
     """
     Serializes the growth model.
     """
 
     class Meta:
         model = D180Growth
-        fields = ('uuid', 'created', 'modified', 'user',
+        fields = ('id', 'uuid', 'created', 'modified', 'user',
                   'investigations', 'platter', 'comment',
                   'has_gan', 'has_aln', 'has_inn', 'has_algan',
                   'has_ingan', 'other_material', 'orientation',
