@@ -12,6 +12,9 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 import gitlab
 
+from core.models.mixins import UUIDMixin, AutoUUIDMixin
+from core.models import Sample, Process
+
 
 class NeverCacheMixin(object):
     """
@@ -95,7 +98,19 @@ class QuickSearchRedirectView(LoginRequiredMixin, generic.RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('home')
+        query = self.request.GET.get('search_query', None)
+        if query.startswith('s'):
+            print('sample_id = {}'.format(AutoUUIDMixin.strip_uuid(query.strip('s'))))
+            obj = sample.SampleManager().get_by_uuid(AutoUUIDMixin.strip_uuid(query.strip('s')))
+            print(obj.id)
+        elif query.startswith('p'):
+            print('process = {}'.format(UUIDMixin.strip_uuid(query)))
+            obj = Process.objects.get(uuid_full__startswith=(Process.strip_uuid(query)))
+            print(obj.uuid_full)
+        elif query.startswith('@'):
+            print('user = {}'.format(query.strip('@')))
+            return reverse('users_profile', kwargs={'username': query.strip('@')})
+        return reverse('dashboard')
 
 
 class HomepageView(generic.TemplateView):
