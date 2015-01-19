@@ -5,7 +5,7 @@ from .models import Simulation
 from .serializers import SimSerializer
 
 
-class SimulationListAPI(generics.ListCreateAPIView):
+class SimulationListAPIView(generics.ListCreateAPIView):
     """
     List all afm scans or create a new one via api.
     """
@@ -15,7 +15,7 @@ class SimulationListAPI(generics.ListCreateAPIView):
     filter_class = SimFilter
 
 
-class SimulationDetailAPI(generics.RetrieveUpdateAPIView):
+class SimulationDetailAPIView(generics.RetrieveUpdateAPIView):
     """
     Show details or update an afm scan.
     """
@@ -24,7 +24,7 @@ class SimulationDetailAPI(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated, )
 
 
-class SimulationToDoListAPI(generics.ListAPIView):
+class SimulationToDoListAPIView(generics.ListAPIView):
     """
     Show ID of Simulatios in line.
     """
