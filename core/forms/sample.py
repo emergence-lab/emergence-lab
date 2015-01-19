@@ -17,7 +17,7 @@ class SampleForm(forms.ModelForm):
 
     class Meta:
         model = Sample
-        fields = ('comment', 'substrate',)
+        fields = ('substrate','comment',)
 
     def save(self, commit=True):
         substrate = self.cleaned_data.get('substrate', None)

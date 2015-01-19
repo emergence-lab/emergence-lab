@@ -2,97 +2,208 @@
 {% load bootstrap3 %}
 {% load wysiwyg %}
 
-{% block title %}Start Growth{%endblock%}
+{% block title %}Start Growth{%endblock title%}
+
 {% block header %}
     {% load staticfiles %}
-    {{commentsform.media}}
-{% endblock %}
+    {{comment_form.media}}
+{% endblock header %}
+
 
 {% block content %}
 
 <div class="container">
+
     <div class="row">
         <div class="col-xs-6 col-xs-offset-3">
             <img class="img-wizard" src="{% static 'growths/img/start-progress.png' %}" />
         </div>
     </div>
+
     <h1 class="page-header">
         Start Growth
         <div class="pull-right">
-            <a href="{% url 'dashboard' %}" class="btn btn-danger">Cancel Growth</a>
-            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button>
+            <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
+                <span class="glyphicon glyphicon-remove"></span>
+                Cancel Growth
+            </button>
+            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
+                <span class="glyphicon glyphicon-pencil"></span>
+                Edit Comments
+            </button>
+            <button class="btn btn-success next-tab-main" type="button">
+                Next Step
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </button>
         </div>
     </h1>
 
-    <form action="" method="POST">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-xs-5">
-        <ul>
-        {% bootstrap_form cgsform %}
+    {# Main Tabs #}
+    <div class="tabbable">
+        <ul class="nav nav-tabs" id="main-tab-list">
+            <li class="active"><a role="tab" data-toggle="tab" href="#info">Basic Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#growth">Growth Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#samples">Sample Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#checklist">Checklist</a></li>
+            <li><a role="tab" data-toggle="tab" href="#source">Source Info</a></li>
         </ul>
-        </div>
-    </div>       
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
+    </div>
+
+    <form action="" method="POST">
+        {% csrf_token %}
+
+        <div class="tab-content">
+
+            {# Basic Information Tab #}
+            <div class="tab-pane fade active in" id='info'>
+                <h2>Basic Information</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form info_form %}
+                    </div>
                 </div>
-                <div class="modal-body">
-                    WARNING: If you start a new growth now you will NOT be able to return to this page!!
-                    {% if reservation_object %}
-                        {% bootstrap_form reservation_form %}
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>   
+            </div>
+
+
+            {# Growth Information Tab #}
+            <div class="tab-pane fade" id="growth">
+                <h2>Growth Information</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form growth_form %}
+                    </div>
+                </div>
+            </div>
+
+
+            {# Sample Information Tab #}
+            <div class="tab-pane fade" id="samples">
+                <h2>Sample Information</h2>
+                <div class="tabbable" id="sample-tab-list">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">
+                            Sample 1
+                            <button class="close close-tab" type="button">
+                                <span>&times;</span>
+                            </button>
+                        </a></li>
+                        <li id="new"><a href="#"><span class="glyphicon glyphicon-plus"></span></a></li>
+                    </ul>
+                </div>
+                <div class="row">
+                    <div class="col-xs-5">
+                    </div>
+                </div>
+            </div>
+
+
+            {# Checklist Tab #}
+            <div class="tab-pane fade" id="checklist">
+                <h2>Pre-run Checklist</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form checklist_form %}
+                    </div>
+                </div>
+            </div>
+
+
+            {# Source Consumption Tab #}
+            <div class="tab-pane fade" id="source">
+                <h2>Source Consumption</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form source_form %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        {# Comment Modal #}
+        <div class="modal fade" id="comment-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title">Edit Comments</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% bootstrap_form comment_form %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>  
+
+
+        {# Cancel Modal #}
+        <div class="modal fade" id="cancel-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <header class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h1 class="modal-title">Cancel Growth</h1>
+                    </header>
+                    <div class="modal-body">
+                        <strong>Warning:</strong> This will cancel the current growth. You should do this if you needed to abort the growth prior to any readings being taken.
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-danger">Cancel Growth</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {# Submit Modal #}
+        <div class="modal fade" id="submit-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
+                    </div>
+                    <div class="modal-body">
+                        WARNING: If you start a new growth now you will NOT be able to return to this page!!
+                        {% if reservation_object %}
+                            {% bootstrap_form reservation_form %}
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>   
+                                </div>
+                                <div class="panel-body">
+                                    <strong>Tool:</strong> {{ reservation_object.tool.upper }} <br>
+                                    <strong>Operator:</strong> {{ reservation_object.user.operator.name }} <br>
+                                    <strong>Run Time:</strong> {{ reservation_object.growth_length_in_hours }} hours
+                                    {% if reservation_object.comment %}
+                                        <br><strong>Comment:</strong> {{ reservation_object.comment }}
+                                    {% endif %}
+                                </div>                    
                             </div>
-                            <div class="panel-body">
-                                <strong>Tool:</strong> {{ reservation_object.tool.upper }} <br>
-                                <strong>Operator:</strong> {{ reservation_object.user.operator.name }} <br>
-                                <strong>Run Time:</strong> {{ reservation_object.growth_length_in_hours }} hours
-                                {% if reservation_object.comment %}
-                                    <br><strong>Comment:</strong> {{ reservation_object.comment }}
-                                {% endif %}
-                            </div>                    
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="commentsmodal" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="commentsModalLabel">Edit comments</h4>
-                </div>
-                <div class="modal-body">
-                    {% bootstrap_form commentsform %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        
     </form>
 
-    <button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal">
-    Start New Growth
-    </button>
-    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
-
 </div>
-<br>
-{% endblock %}
 
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'growths/js/create_growth.js' %}"></script>
+{% endblock scripts %}
