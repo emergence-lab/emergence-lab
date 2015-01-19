@@ -2,6 +2,9 @@
 from __future__ import absolute_import, unicode_literals
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
+
+from ckeditor.widgets import CKEditorWidget
 
 from core.models import Substrate, Sample
 
@@ -29,6 +32,45 @@ class SampleForm(forms.ModelForm):
 
         return instance
 
+
+class SampleSelectOrCreateForm(forms.Form):
+    # use existing sample
+    sample_uuid = forms.CharField(required=False)
+
+    # create new sample
+    sample_comment = forms.CharField(widget=CKEditorWidget(), required=False)
+    substrate_comment = forms.CharField(widget=CKEditorWidget(), required=False)
+    substrate_source = forms.CharField(required=False)
+    substrate_serial = forms.CharField(required=False)
+
+    def clean(self):
+        cleaned_data = super(SampleSelectOrCreateForm, self).clean()
+        uuid = cleaned_data['sample_uuid']
+
+        if uuid:
+            try:
+                sample = Sample.objects.get_by_uuid(uuid)
+                cleaned_data['sample'] = sample
+                self.instance = sample
+            except ObjectNotFoundError:
+                raise ValidationError('Sample {} not found'.format(uuid))
+        else:
+            cleaned_data['sample'] = None
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        if self.cleaned_data['sample'] is None:
+            substrate_kwargs = {
+                'comment': self.cleaned_data['substrate_comment'],
+                'serial': self.cleaned_data['substrate_serial'],
+                'source': self.cleaned_data['substrate_source'],
+            }
+            substrate = Substrate.objects.create(**substrate_kwargs)
+            comment = self.cleaned_data['sample_comment']
+            sample = Sample.objects.create(substrate=substrate, comment=comment)
+            self.instance = sample
+        return self.instance
 
 class SplitSampleForm(forms.ModelForm):
     pieces = forms.IntegerField(label="Number of pieces")

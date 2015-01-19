@@ -14,7 +14,7 @@ from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                     WizardGrowthInfoForm, WizardFullForm,
                     WizardPrerunChecklistForm)
 from core.views import ActionReloadView, ActiveListView
-from core.forms import SampleForm
+from core.forms import SampleForm, SampleSelectOrCreateForm
 
 
 class PlatterListView(LoginRequiredMixin, ActiveListView):
@@ -82,6 +82,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         except ObjectDoesNotExist:
             previous_source = None
 
+        SampleFormSet = formset_factory(SampleSelectOrCreateForm, extra=2)
+
         return {
             'info_form': WizardBasicInfoForm(initial={'user': self.request.user},
                                              prefix='growth'),
@@ -90,6 +92,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             'source_form': SourcesForm(instance=previous_source,
                                        prefix='source'),
             'comment_form': CommentsForm(prefix='growth'),
+            'sample_formset': SampleFormSet(prefix='sample'),
         }
 
     def get(self, request, *args, **kwargs):
@@ -103,10 +106,17 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         checklist_form = WizardPrerunChecklistForm(request.POST,
                                                    prefix='checklist')
         source_form = SourcesForm(request.POST, prefix='source')
+        SampleFormSet = formset_factory(SampleSelectOrCreateForm)
+        sample_formset = SampleFormSet(request.POST, prefix='sample')
 
-        if growth_form.is_valid() and source_form.is_valid() and checklist_form.is_valid():
+        if growth_form.is_valid() and source_form.is_valid() and checklist_form.is_valid() and sample_formset.is_valid():
             self.object = growth_form.save()
+            print('growth uuid: {}'.format(self.object.uuid))
             source_form.save()
+            for s in sample_formset:
+                sample = s.save()
+                print('sample uuid: {}'.format(sample.uuid))
+                sample.run_process(self.object)
             return HttpResponseRedirect(reverse('create_growth_d180_start'))
         else:
             basic_info_form = WizardBasicInfoForm(request.POST, prefix='growth')
@@ -117,4 +127,5 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 growth_form=growth_info_form,
                 checklist_form=checklist_form,
                 source_form=source_form,
-                comment_form=comment_form))
+                comment_form=comment_form,
+                sample_formset=sample_formset))

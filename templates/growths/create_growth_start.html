@@ -25,7 +25,7 @@
         <div class="pull-right">
             <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
                 <span class="glyphicon glyphicon-remove"></span>
-                Cancel Growth
+                Cancel
             </button>
             <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
                 <span class="glyphicon glyphicon-pencil"></span>
@@ -51,6 +51,8 @@
 
     <form action="" method="POST">
         {% csrf_token %}
+        {{sample_formset.management_form}}
+
 
         <div class="tab-content">
 
@@ -75,23 +77,43 @@
                 </div>
             </div>
 
-
             {# Sample Information Tab #}
             <div class="tab-pane fade" id="samples">
                 <h2>Sample Information</h2>
                 <div class="tabbable" id="sample-tab-list">
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#">
-                            Sample 1
-                            <button class="close close-tab" type="button">
-                                <span>&times;</span>
-                            </button>
-                        </a></li>
-                        <li id="new"><a href="#"><span class="glyphicon glyphicon-plus"></span></a></li>
+                        {% for sample_form in sample_formset %}
+                            <li{% if forloop.first %} class="active"{% endif %}><a href="#sample-{{forloop.counter}}">
+                                Sample {{forloop.counter}}
+                                {% if not forloop.first %}
+                                    <button class="close close-tab" type="button">
+                                        <span>&times;</span>
+                                    </button>
+                                {% endif %}
+                            </a></li>
+                        {% endfor %}
+                        <li id="new-sample"><a href="#"><span class="glyphicon glyphicon-plus"></span></a></li>
                     </ul>
-                </div>
-                <div class="row">
-                    <div class="col-xs-5">
+
+                    {# Sample Tabs #}
+                    <div class="tab-content">
+                        <div class="tab-pane fade in hidden" id="sample-blank">
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    {% bootstrap_form sample_formset.empty_form %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% for sample_form in sample_formset %}
+                            <div class="tab-pane fade active in sample-tab" id="sample-{{forloop.counter}}">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        {% bootstrap_form sample_form %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
