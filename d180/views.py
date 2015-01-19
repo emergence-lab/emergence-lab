@@ -107,7 +107,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         if growth_form.is_valid() and source_form.is_valid() and checklist_form.is_valid():
             self.object = growth_form.save()
             source_form.save()
-            return HttpResponseRedirect(reverse('create_growth_start'))
+            return HttpResponseRedirect(reverse('create_growth_d180_start'))
         else:
             basic_info_form = WizardBasicInfoForm(request.POST, prefix='growth')
             growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')

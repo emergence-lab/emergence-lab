@@ -8,5 +8,5 @@ import d180.views
 
 urlpatterns = [
     url(r'^create/start/$',
-        d180.views.WizardStartView.as_view(), name='create_growth_start'),
+        d180.views.WizardStartView.as_view(), name='create_growth_d180_start'),
 ]
