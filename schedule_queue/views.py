@@ -100,7 +100,7 @@ class CancelReservation(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
-        if reservation_obj.is_active:
+        if reservation_obj.is_active and reservation_obj.user == self.request.user:
             reservation_obj.is_active = False
             reservation_obj.save()
         return reverse('reservation_list_by_tool', args=(reservation_obj.tool,))
@@ -110,7 +110,7 @@ class CloseReservation(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
-        if reservation_obj.is_active:
+        if reservation_obj.is_active and reservation_obj.user == self.request.user:
             reservation_obj.is_active = False
             reservation_obj.save()
         return reverse('dashboard')
