@@ -24,5 +24,3 @@ class Reservation(models.Model):
     def __str__(self):              # __unicode__ on Python 2
         return '{0}, {1}, {2}'.format(str(self.tool), str(self.user), str(self.growth_length_in_hours))
 
-    def get_process_start_url():
-        return tools.get_tool_info(tool)['process_start_url']
