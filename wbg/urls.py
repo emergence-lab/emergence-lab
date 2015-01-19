@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^accounts/logout/', logout, {'template_name': 'core/logout.html'}, name='logout'),
     url(r'^accounts/', include('users.urls')),
     url(r'^wbg-admin/', include(admin.site.urls)),
+    url(r'^about/', core.views.utility.AboutView.as_view()),
 
     # core urls
     url(r'^operators/$', core.views.UserListView.as_view(), name='operator_list'),
