@@ -44,9 +44,6 @@ class ReservationCreate(CreateView):
     fields = ['tool', 'platter', 'growth_length_in_hours', 'comment', 'bake_length_in_minutes']
     template_name = 'schedule_queue/reservation_form.html'
 
-    #def get_initial(self):
-    #    self.object.user = self.request.user
-
     def form_valid(self, form):
         """
         If the form is valid, save the associated model.
