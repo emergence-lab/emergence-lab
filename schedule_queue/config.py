@@ -12,18 +12,25 @@ def get_tool_choices():
             tool_choices.append((obj.get_slug(), obj.get_name()))
     return tuple(tool_choices)
 
-def get_tool_list():
-    tool_list = []
-    for name, obj in inspect.getmembers(sys.modules[__name__]):
-        if inspect.isclass(obj):
-            tool_list.append(obj.get_slug())
-    return tuple(tool_list)
 
 # custom attributes for tools
-tool = {'d180': {'max_reservations': 5}, 'd75': {'max_reservations': 3}}
+tool = {
+            'd180': {
+                        'max_reservations': 5 ,
+                        'process_start_url': 'create_growth_d180_start'
+                    },
+            'd75': {
+                        'max_reservations': 3
+                    }
+        }
+
+def get_tool_list():
+    tool_list = [x for x in tool]
+    return tool_list
 
 def get_tool_info(slug):
-    return tool[slug]['max_reservations']
+    return tool[slug]
+
 
 # Tool definitions
 

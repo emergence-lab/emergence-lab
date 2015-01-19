@@ -16,22 +16,22 @@ class ReservationLanding(ListView):
     model = Reservation
     queryset = tools.get_tool_list()
     template_name = 'schedule_queue/reservation_landing.html'
-    
+
     def index(request):
         return HttpResponse(queryset)
-    
+
 class ReservationListByTool(ListView):
     model = Reservation
     template_name = 'schedule_queue/reservation_list.html'
-    
+
     def get_queryset(self):
         tool_slug = self.kwargs['tool_slug']
         return Reservation.objects.exclude(is_active=False).filter(tool=tool_slug).order_by('priority_field')
-    
+
     def get_context_data(self, **kwargs):
         tool_slug = self.kwargs['tool_slug']
         if 'max_reservations' not in kwargs:
-            kwargs['max_reservations'] = tools.get_tool_info(tool_slug)
+            kwargs['max_reservations'] = tools.get_tool_info(tool_slug)['max_reservations']
         if 'tool_name' not in kwargs:
             kwargs['tool_name'] = tool_slug
         return super(ReservationListByTool, self).get_context_data(**kwargs)
@@ -46,7 +46,7 @@ class ReservationCreate(CreateView):
 
     #def get_initial(self):
     #    self.object.user = self.request.user
-    
+
     def form_valid(self, form):
         """
         If the form is valid, save the associated model.
@@ -54,21 +54,21 @@ class ReservationCreate(CreateView):
         self.object = form.save(commit=False)
         self.object.priority_field = int(10*time.time())
         self.object.user = self.request.user
-        
-        if len(Reservation.objects.exclude(is_active=False).filter(tool=self.object.tool)) < tools.get_tool_info(self.object.tool) :
+
+        if len(Reservation.objects.exclude(is_active=False).filter(tool=self.object.tool)) < tools.get_tool_info(self.object.tool)['max_reservations'] :
             self.object.save()
             return HttpResponseRedirect(reverse('reservation_list_by_tool', args=(self.object.tool,)))
         else:
             raise Exception("Reservation List Full")
-    
+
 class ReservationEdit(UpdateView):
     model = Reservation
     fields = ['tool', 'platter', 'growth_length_in_hours', 'comment', 'bake_length_in_minutes']
     template_name = 'schedule_queue/reservation_edit.html'
-    
+
     def get_success_url(self):
         return reverse('reservation_list_by_tool', args=(self.object.tool,))
-    
+
 class IncreasePriority(RedirectView):
     permanent = False
     def get_redirect_url(self, *args, **kwargs):
