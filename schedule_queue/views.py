@@ -9,7 +9,6 @@ from django.db import models
 import time
 
 from schedule_queue import config as tools
-import dashboard.urls
 
 
 class ReservationLanding(ListView):

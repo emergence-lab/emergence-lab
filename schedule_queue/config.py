@@ -12,18 +12,6 @@ def get_tool_choices():
             tool_choices.append((obj.get_slug(), obj.get_name()))
     return tuple(tool_choices)
 
-
-# custom attributes for tools
-tool = {
-            'd180': {
-                        'max_reservations': 5 ,
-                        'process_start_url': 'create_growth_d180_start'
-                    },
-            'd75': {
-                        'max_reservations': 3
-                    }
-        }
-
 def get_tool_list():
     tool_list = [x for x in tool]
     return tool_list
@@ -53,3 +41,16 @@ class d75(object):
     @staticmethod
     def get_slug():
         return 'd75'
+
+# custom attributes for tools
+tool = {
+            'd180': {
+                        'slug': d180.get_slug(),
+                        'max_reservations': 5 ,
+                        'process_start_url': 'create_growth_d180_start'
+                    },
+            'd75': {
+                        'slug': d75.get_slug(),
+                        'max_reservations': 3
+                    }
+        }

@@ -7,7 +7,7 @@ from django.views.generic import RedirectView
 from braces.views import LoginRequiredMixin
 
 from core.models import User
-from .misc import ActiveListView
+from .utility import ActiveListView
 
 
 class UserListView(LoginRequiredMixin, ActiveListView):
