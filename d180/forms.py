@@ -180,4 +180,7 @@ class PostrunChecklistForm(ChecklistForm):
 
 
 class CommentsForm(forms.Form):
-    comment = forms.CharField(widget=forms.Textarea(attrs={'class': 'hallo'}), label="Run Comments", required=False)
+    comment = forms.CharField(
+        label="Run Comments",
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'hallo'}))

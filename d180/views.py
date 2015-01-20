@@ -105,7 +105,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         source_form = SourcesForm(request.POST, prefix='source')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
 
-        if growth_form.is_valid() and source_form.is_valid() and checklist_form.is_valid() and sample_formset.is_valid():
+        if all([growth_form.is_valid(), source_form.is_valid(),
+                checklist_form.is_valid(), sample_formset.is_valid()]):
             self.object = growth_form.save()
             print('growth uuid: {}'.format(self.object.uuid))
             source_form.save()

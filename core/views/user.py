@@ -2,12 +2,11 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
-from django.views.generic import RedirectView
 
 from braces.views import LoginRequiredMixin
 
 from core.models import User
-from .utility import ActiveListView
+from .utility import ActiveListView, ActionReloadView
 
 
 class UserListView(LoginRequiredMixin, ActiveListView):
@@ -18,27 +17,29 @@ class UserListView(LoginRequiredMixin, ActiveListView):
     model = User
 
 
-class ActivateUserRedirectView(LoginRequiredMixin, RedirectView):
+class ActivateUserRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified user to active.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('id')
         user = User.objects.get(pk=pk)
         user.activate()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('operator_list')
 
 
-class DeactivateUserRedirectView(LoginRequiredMixin, RedirectView):
+class DeactivateUserRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified user to inactive.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('id')
         user = User.objects.get(pk=pk)
         user.deactivate()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('operator_list')

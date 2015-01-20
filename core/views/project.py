@@ -3,12 +3,11 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.views.generic import (CreateView, DetailView, RedirectView,
-                                  UpdateView)
+from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from .utility import ActiveListView
+from .utility import ActiveListView, ActionReloadView
 from core.models import Investigation, Project, ProjectTracking, User
 from core.forms import TrackProjectForm
 from core.streams import project_stream, investigation_stream
@@ -23,12 +22,13 @@ class ProjectListView(LoginRequiredMixin, ActiveListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
-        context['tracking'] = (ProjectTracking.objects.filter(user=self.request.user)
-                                                      .values_list('project_id', flat=True))
+        context['tracking'] = (ProjectTracking.objects
+            .filter(user=self.request.user)
+            .values_list('project_id', flat=True))
         return context
 
 
-class ProjectDetailView(LoginRequiredMixin, DetailView):
+class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
     """
     View for details of a project.
     """
@@ -37,22 +37,23 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
-        if 'username' in self.kwargs:
-            userid = User.objects.filter(username=self.kwargs['username']).values('id')
-            context['tracking'] = (ProjectTracking.objects.filter(user_id=userid,
-                                                                  project=self.object)
-                                                          .exists())
+        username = self.kwargs.pop('username')
+        if username is not None:
+            userid = User.objects.filter(username=username).values('id')
+            context['tracking'] = (ProjectTracking.objects
+                .filter(user_id=userid, project=self.object)
+                .exists())
         else:
-            context['tracking'] = (ProjectTracking.objects.filter(user=self.request.user,
-                                                                  project=self.object)
-                                                          .exists())
+            context['tracking'] = (ProjectTracking.objects
+                .filter(user=self.request.user, project=self.object)
+                .exists())
         context['growths'] = []
         context['entries'] = []
         context['stream'] = project_stream(self.object)
         return context
 
 
-class ProjectCreateView(LoginRequiredMixin, CreateView):
+class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     """
     View for creating a project.
     """
@@ -68,7 +69,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         return reverse('project_detail_all', kwargs={'slug': self.object.slug})
 
 
-class ProjectUpdateView(LoginRequiredMixin, UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, generic.UpdateView):
     """
     View for editing information about a project.
     """
@@ -80,65 +81,69 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('project_detail_all', kwargs={'slug': self.object.slug})
 
 
-class TrackProjectRedirectView(LoginRequiredMixin, RedirectView):
+class TrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified project as tracked for the logged in user.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         slug = kwargs.pop('slug')
         project = Project.objects.get(slug=slug)
         user = self.request.user
         ProjectTracking.objects.get_or_create(project=project,
                                               user=user,
                                               defaults={'is_owner': False})
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('project_list')
 
 
-class UntrackProjectRedirectView(LoginRequiredMixin, RedirectView):
+class UntrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified project as not tracked for the logged in user.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         slug = kwargs.pop('slug')
         project = Project.objects.get(slug=slug)
         user = self.request.user
         tracking = ProjectTracking.objects.filter(project=project, user=user)
         if tracking.count():
             tracking.delete()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('project_list')
 
 
-class ActivateProjectRedirectView(LoginRequiredMixin, RedirectView):
+class ActivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified project to active.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         slug = kwargs.pop('slug')
         project = Project.objects.get(slug=slug)
         project.activate()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('project_list')
 
 
-class DeactivateProjectRedirectView(LoginRequiredMixin, RedirectView):
+class DeactivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified project to inactive.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         slug = kwargs.pop('slug')
         project = Project.objects.get(slug=slug)
         project.deactivate()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('project_list')
 
 
-class InvestigationDetailView(LoginRequiredMixin, DetailView):
+class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
     """
     View for details of an investigation.
     """
@@ -154,7 +159,7 @@ class InvestigationDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class InvestigationCreateView(LoginRequiredMixin, CreateView):
+class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
     """
     View for creating an investigation.
     """
@@ -176,7 +181,7 @@ class InvestigationCreateView(LoginRequiredMixin, CreateView):
                                                            'slug': self.object.slug})
 
 
-class InvestigationUpdateView(LoginRequiredMixin, UpdateView):
+class InvestigationUpdateView(LoginRequiredMixin, generic.UpdateView):
     """
     View for editing information about a project.
     """
@@ -197,33 +202,35 @@ class InvestigationListView(LoginRequiredMixin, ActiveListView):
     model = Investigation
 
 
-class ActivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
+class ActivateInvestigationRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified investigation to active.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         slug = kwargs.pop('slug')
         investigation = Investigation.objects.get(slug=slug)
         investigation.activate()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('project_list')
 
 
-class DeactivateInvestigationRedirectView(LoginRequiredMixin, RedirectView):
+class DeactivateInvestigationRedirectView(LoginRequiredMixin, ActionReloadView):
     """
     Sets the specified investigation to inactive.
     """
-    permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         slug = kwargs.pop('slug')
         investigation = Investigation.objects.get(slug=slug)
         investigation.deactivate()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('project_list')
 
 
-class TrackProjectView(LoginRequiredMixin, CreateView):
+class TrackProjectView(LoginRequiredMixin, generic.CreateView):
     """
     View to handle tracking projects.
     """

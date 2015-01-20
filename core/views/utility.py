@@ -13,8 +13,7 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 import gitlab
 
-from core.models.mixins import UUIDMixin, AutoUUIDMixin
-from core.models import Sample, Process
+from core.models import Process, Sample
 
 
 class NeverCacheMixin(object):
@@ -99,18 +98,17 @@ class QuickSearchRedirectView(LoginRequiredMixin, generic.RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        query = self.request.GET.get('search_query', None)
+        query = self.request.GET.get('search_query', '')
         if query.startswith('s'):
-            print('sample_id = {}'.format(AutoUUIDMixin.strip_uuid(query.strip('s'))))
-            obj = sample.SampleManager().get_by_uuid(AutoUUIDMixin.strip_uuid(query.strip('s')))
-            print(obj.id)
+            sample = Sample.objects.get_by_uuid(query)
+            print('sample: {}'.format(sample.uuid))
         elif query.startswith('p'):
-            print('process = {}'.format(UUIDMixin.strip_uuid(query)))
-            obj = Process.objects.get(uuid_full__startswith=(Process.strip_uuid(query)))
-            print(obj.uuid_full)
+            uuid = Process.strip_uuid(query)
+            process = Process.objects.get(uuid_full__startswith=uuid)
+            print('process: {}'.format(process.uuid))
         elif query.startswith('@'):
-            print('user = {}'.format(query.strip('@')))
-            return reverse('users_profile', kwargs={'username': query.strip('@')})
+            return reverse('users_profile',
+                           kwargs={'username': query.strip('@')})
         return reverse('dashboard')
 
 
@@ -119,6 +117,7 @@ class HomepageView(generic.TemplateView):
     View for the homepage of the application.
     """
     template_name = "core/index.html"
+
 
 class AboutView(generic.TemplateView):
     """

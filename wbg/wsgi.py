@@ -11,6 +11,7 @@ import os
 import site
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application
 
 # Secrets
@@ -29,21 +30,27 @@ def _get_secret(setting, secrets=secrets):
     try:
         return secrets[setting]
     except KeyError:
-        error_msg = 'Setting {0} is missing from the secrets file'.format(setting)
+        error_msg = ('Setting {0} is missing from the '
+                     'secrets file'.format(setting))
         raise ImproperlyConfigured(error_msg)
 
 # End secrets
 
 if _get_secret('PRODUCTION_MODE') == 'production':
-    site.addsitedir('{}/local/lib/python2.7/site-packages'.format(_get_secret('VIRTUAL_ENV_PATH')))
+    venv_path = _get_secret('VIRTUAL_ENV_PATH')
+    sys_path = _get_secret('SYSTEM_PATH')
 
-    sys.path.append(_get_secret('SYSTEM_PATH'))
-    sys.path.append(os.path.join(_get_secret('SYSTEM_PATH'), _get_secret('SETTINGS_REL_ROOT')))
+    site.addsitedir('{}/local/lib/python2.7/site-packages'.format(venv_path))
 
-    activate_env = os.path.expanduser('{}/bin/activate_this.py'.format(_get_secret('VIRTUAL_ENV_PATH')))
+    sys.path.append(sys_path)
+    sys.path.append(os.path.join(sys_path, _get_secret('SETTINGS_REL_ROOT')))
+
+    activate_env = os.path.expanduser('{}/bin/activate_this.py'.format(venv_path))
     execfile(activate_env, dict(__file__=activate_env))
 
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', '{0}.settings.{1}'.format(_get_secret('SETTINGS_REL_ROOT'), _get_secret('PRODUCTION_MODE')))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+        '{0}.settings.{1}'.format(_get_secret('SETTINGS_REL_ROOT'),
+                                  _get_secret('PRODUCTION_MODE')))
 
     application = get_wsgi_application()
 else:

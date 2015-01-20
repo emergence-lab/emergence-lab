@@ -2,7 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from core.models import Substrate, Sample
 
@@ -18,7 +18,7 @@ class SampleForm(forms.ModelForm):
 
     class Meta:
         model = Sample
-        fields = ('substrate','comment',)
+        fields = ('substrate', 'comment',)
 
     def save(self, commit=True):
         substrate = self.cleaned_data.get('substrate', None)
@@ -36,8 +36,10 @@ class SampleSelectOrCreateForm(forms.Form):
     sample_uuid = forms.CharField(required=False)
 
     # create new sample
-    sample_comment = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
-    substrate_comment = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
+    sample_comment = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
+    substrate_comment = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
     substrate_source = forms.CharField(required=False)
     substrate_serial = forms.CharField(required=False)
 
@@ -50,7 +52,7 @@ class SampleSelectOrCreateForm(forms.Form):
                 sample = Sample.objects.get_by_uuid(uuid)
                 cleaned_data['sample'] = sample
                 self.instance = sample
-            except ObjectNotFoundError:
+            except ObjectDoesNotExist:
                 raise ValidationError('Sample {} not found'.format(uuid))
         else:
             cleaned_data['sample'] = None
