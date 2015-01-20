@@ -38,6 +38,7 @@ class TestProcessAPI(TestCase):
             mommy.make(Process),
         ]
         response = self.client.get('/api/v0/process/')
+        self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
         self.assertEqual(results.get('count'), len(processes))
         for process, result in zip(processes, results.get('results')):
@@ -81,3 +82,26 @@ class TestProcessAPI(TestCase):
             elif polymorphic_ctype == 'ChildProcess':
                 self.assertIsNotNone(result.get('parent_field'))
                 self.assertIsNotNone(result.get('child_field'))
+
+    def test_retrieve_view_get_full_uuid(self):
+        """
+        Test retrieval of a process using the full uuid.
+        """
+        process = mommy.make(ChildProcess)
+        response = self.client.get(
+            '/api/v0/process/{}/'.format(process.uuid_full.hex))
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+        self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
+        self.assertIsNotNone(results.get('comment'))
+
+    def test_retrieve_view_get_short_uuid(self):
+        """
+        Test retrieval of a process using the short uuid.
+        """
+        process = mommy.make(ChildProcess)
+        response = self.client.get(
+            '/api/v0/process/{}/'.format(process.uuid))
+        results = json.loads(response.content)
+        self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
+        self.assertIsNotNone(results.get('comment'))

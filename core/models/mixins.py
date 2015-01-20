@@ -124,4 +124,6 @@ class UUIDMixin(models.Model):
     def strip_uuid(cls, uuid):
         if not isinstance(uuid, six.string_types):
             return uuid.hex
-        return uuid[len(cls.prefix):]
+        elif len(uuid) == len(cls.prefix) + cls.short_length:
+            return uuid[len(cls.prefix):]
+        return uuid
