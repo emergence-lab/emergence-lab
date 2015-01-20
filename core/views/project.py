@@ -8,7 +8,7 @@ from django.views.generic import (CreateView, DetailView, RedirectView,
 
 from braces.views import LoginRequiredMixin
 
-from .misc import ActiveListView
+from .utility import ActiveListView
 from core.models import Investigation, Project, ProjectTracking, User
 from core.forms import TrackProjectForm
 from core.streams import project_stream, investigation_stream

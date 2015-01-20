@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
-import time
 
 import schedule_queue.config as tools
 
@@ -21,8 +20,8 @@ class Reservation(models.Model):
     max_integer_value = 9223372036854775807
     priority_field = models.BigIntegerField(default=max_integer_value)
     is_active = models.BooleanField(default=True)
-    def __str__(self):              # __unicode__ on Python 2
-        return '{0}, {1}, {2}'.format(str(self.tool), str(self.user), str(self.growth_length_in_hours))
 
-    def get_process_start_url():
-        return tools.get_tool_info(tool)['process_start_url']
+    def __str__(self):              # __unicode__ on Python 2
+        return '{0}, {1}, {2}'.format(str(self.tool),
+                                      str(self.user),
+                                      str(self.growth_length_in_hours))

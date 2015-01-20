@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+import subprocess
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -118,3 +119,15 @@ class HomepageView(generic.TemplateView):
     View for the homepage of the application.
     """
     template_name = "core/index.html"
+
+class AboutView(generic.TemplateView):
+    """
+    View to show information about running build of the code.
+    """
+    template_name = "core/about.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(AboutView, self).get_context_data(**kwargs)
+        context['commit'] = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        context['tags'] = subprocess.check_output(["git", "describe", "--tags"])
+        return context
