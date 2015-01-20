@@ -4,8 +4,6 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from ckeditor.widgets import CKEditorWidget
-
 from .models import D180Growth, D180Source
 from core.forms import ChecklistForm
 
@@ -182,4 +180,4 @@ class PostrunChecklistForm(ChecklistForm):
 
 
 class CommentsForm(forms.Form):
-    comment = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)
+    comment = forms.CharField(widget=forms.Textarea(attrs={'class': 'hallo'}), label="Run Comments", required=False)

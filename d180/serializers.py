@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals
 
 from rest_framework import serializers
 
-from core.serializers import ProcessSerializer
 from .models import D180Growth, D180Readings
 
 

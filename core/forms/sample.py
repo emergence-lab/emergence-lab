@@ -4,8 +4,6 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from ckeditor.widgets import CKEditorWidget
-
 from core.models import Substrate, Sample
 
 
@@ -38,8 +36,8 @@ class SampleSelectOrCreateForm(forms.Form):
     sample_uuid = forms.CharField(required=False)
 
     # create new sample
-    sample_comment = forms.CharField(widget=CKEditorWidget(), required=False)
-    substrate_comment = forms.CharField(widget=CKEditorWidget(), required=False)
+    sample_comment = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
+    substrate_comment = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
     substrate_source = forms.CharField(required=False)
     substrate_serial = forms.CharField(required=False)
 
@@ -71,6 +69,10 @@ class SampleSelectOrCreateForm(forms.Form):
             sample = Sample.objects.create(substrate=substrate, comment=comment)
             self.instance = sample
         return self.instance
+
+
+SampleFormSet = forms.formsets.formset_factory(SampleSelectOrCreateForm)
+
 
 class SplitSampleForm(forms.ModelForm):
     pieces = forms.IntegerField(label="Number of pieces")

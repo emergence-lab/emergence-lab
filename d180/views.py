@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect
 from django.views import generic
 
@@ -14,7 +13,7 @@ from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                     WizardGrowthInfoForm, WizardFullForm,
                     WizardPrerunChecklistForm)
 from core.views import ActionReloadView, ActiveListView
-from core.forms import SampleForm, SampleSelectOrCreateForm
+from core.forms import SampleFormSet
 
 
 class PlatterListView(LoginRequiredMixin, ActiveListView):
@@ -82,8 +81,6 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         except ObjectDoesNotExist:
             previous_source = None
 
-        SampleFormSet = formset_factory(SampleSelectOrCreateForm, extra=2)
-
         return {
             'info_form': WizardBasicInfoForm(initial={'user': self.request.user},
                                              prefix='growth'),
@@ -106,7 +103,6 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         checklist_form = WizardPrerunChecklistForm(request.POST,
                                                    prefix='checklist')
         source_form = SourcesForm(request.POST, prefix='source')
-        SampleFormSet = formset_factory(SampleSelectOrCreateForm)
         sample_formset = SampleFormSet(request.POST, prefix='sample')
 
         if growth_form.is_valid() and source_form.is_valid() and checklist_form.is_valid() and sample_formset.is_valid():
