@@ -31,10 +31,10 @@ class D180GrowthFetchLatestAPI(generics.ListCreateAPIView):
     """
     Returns latest growth.
     """
-    
+
     def get_queryset(self):
-        growth_id = D180Growth.objects.order_by('-id').first().id
-        return D180Growth.objects.filter(id=growth_id)
+        growth = D180Growth.objects.order_by('-created').first()
+        return D180Growth.objects.filter(id=growth.id)
 
     serializer_class = D180GrowthSerializer
     permission_classes = (permissions.IsAuthenticated,)
