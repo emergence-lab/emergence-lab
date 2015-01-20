@@ -182,4 +182,4 @@ class PostrunChecklistForm(ChecklistForm):
 
 
 class CommentsForm(forms.Form):
-    comment_field = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)
+    comment = forms.CharField(widget=CKEditorWidget(), label="Run Comments", required=False)
