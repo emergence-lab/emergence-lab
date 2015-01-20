@@ -37,7 +37,7 @@ class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
-        username = self.kwargs.pop('username')
+        username = self.kwargs.get('username')
         if username is not None:
             userid = User.objects.filter(username=username).values('id')
             context['tracking'] = (ProjectTracking.objects
