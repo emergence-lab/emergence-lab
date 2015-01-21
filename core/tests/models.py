@@ -25,9 +25,7 @@ class ActiveStateModel(mixins.ActiveStateMixin, models.Model):
     """
     Test-only model to test ActiveStateMixin.
     """
-    objects = models.Manager()
-    active = mixins.ActiveStateManager(active_test=True)
-    inactive = mixins.ActiveStateManager(active_test=False)
+    pass
 
 
 class UUIDModel(mixins.UUIDMixin, models.Model):

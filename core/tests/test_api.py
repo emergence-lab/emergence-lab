@@ -9,7 +9,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from rest_framework.test import APIClient
 
-from core.models import Process, Sample, SplitProcess
+from core.models import Process, ProcessNode, Sample, SplitProcess
 from .models import ChildProcess, ParentProcess
 
 
@@ -104,4 +104,27 @@ class TestProcessAPI(TestCase):
             '/api/v0/process/{}/'.format(process.uuid))
         results = json.loads(response.content)
         self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
+        self.assertIsNotNone(results.get('comment'))
+
+    def test_retrieve_node_view_get_full_uuid(self):
+        """
+        Test retrieval of a process node using the full uuid.
+        """
+        node = mommy.make(ProcessNode)
+        response = self.client.get(
+            '/api/v0/process/node/{}/'.format(node.uuid_full.hex))
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+        self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
+        self.assertIsNotNone(results.get('comment'))
+
+    def test_retrieve_node_view_get_short_uuid(self):
+        """
+        Test retrieval of a process node using the short uuid.
+        """
+        node = mommy.make(ProcessNode)
+        response = self.client.get(
+            '/api/v0/process/node/{}/'.format(node.uuid))
+        results = json.loads(response.content)
+        self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))

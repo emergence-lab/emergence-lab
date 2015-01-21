@@ -39,10 +39,10 @@ class TestActiveStateMixin(unittest.TestCase):
     def test_manager_get_qs(self):
         active_obj = mommy.make(ActiveStateModel, is_active=True)
         inactive_obj = mommy.make(ActiveStateModel, is_active=False)
-        self.assertIn(active_obj, ActiveStateModel.active.all())
-        self.assertNotIn(active_obj, ActiveStateModel.inactive.all())
-        self.assertIn(inactive_obj, ActiveStateModel.inactive.all())
-        self.assertNotIn(inactive_obj, ActiveStateModel.active.all())
+        self.assertIn(active_obj, ActiveStateModel.active_objects.all())
+        self.assertNotIn(active_obj, ActiveStateModel.inactive_objects.all())
+        self.assertIn(inactive_obj, ActiveStateModel.inactive_objects.all())
+        self.assertNotIn(inactive_obj, ActiveStateModel.active_objects.all())
 
 
 class TestUUIDMixin(unittest.TestCase):
