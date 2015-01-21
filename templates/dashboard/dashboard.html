@@ -100,14 +100,13 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
-                        {% if p.core %}&emsp;<span class="label label-primary">Core</span>{% endif %}
-                        {% if p.modified|timesince < '30 days' %}&emsp;<span class="label label-info">Updated</span>{% endif %}
                         <a class="glyphicon glyphicon-chevron-down pull-right" id="expand_proj_{{p.id}}"></a>
                     </h3>
 
                 </div>
                 <div class="panel-body">
                     {{ p.description|safe|truncatewords:50 }}
+                    {{ p.modified|timesince }}
                 </div>
                 <ul id="invest_list_{{p.id}}" class="list-group">
                     {% for i in p.investigation_set.all %}
