@@ -154,3 +154,10 @@ class TestSampleAPI(TestCase):
         self.assertEqual(results.get('count'), len(samples))
         for sample, result in zip(samples, results.get('results')):
             self.assertEqual(result.get('uuid'), sample.uuid)
+
+    def test_retrieve_view_get(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        response = self.client.get('/api/v0/sample/{}/'.format(sample.uuid))
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+        self.assertEqual(results.get('uuid'), sample.uuid)
