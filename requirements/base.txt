@@ -1,4 +1,4 @@
-Django>=1.7,<1.8,<1.8a
+Django>=1.7,<1.8,!=1.8a1
 django-auth-ldap==1.2.2
 django-filter==0.9.1
 git+https://github.com/alex/django-filter.git@25213fbdbb40e5036e854c26dd8d34bbc2ca4592
