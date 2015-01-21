@@ -51,3 +51,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
 INSTALLED_APPS += (
     'core.tests',
 )
+
+REDIS_DB = 1
