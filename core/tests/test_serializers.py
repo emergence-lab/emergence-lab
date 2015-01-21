@@ -5,10 +5,11 @@ import json
 import unittest
 
 from model_mommy import mommy
+from rest_framework.renderers import JSONRenderer
 
-from core.models import Process
+from core.models import Process, Sample, Substrate
 from .models import ChildProcess, ParentProcess
-from core.serializers import ProcessSerializer
+from core.serializers import ProcessSerializer, SampleSerializer
 
 
 class TestProcessSerializer(unittest.TestCase):
@@ -72,3 +73,27 @@ class TestProcessSerializer(unittest.TestCase):
         self.assertIsNotNone(representation.get('comment'))
         self.assertIsNotNone(representation.get('parent_field'))
         self.assertIsNotNone(representation.get('child_field'))
+
+
+class TestSampleSerializer(unittest.TestCase):
+
+    def test_serialization_sample(self):
+        """
+        Test serialization of only the sample fields.
+        """
+        sample = Sample.objects.create(substrate=mommy.make(Substrate),
+                                       comment='comment')
+        serializer = SampleSerializer(sample)
+        self.assertEqual(serializer.data.get('uuid'), sample.uuid)
+        self.assertEqual(serializer.data.get('comment'), sample.comment)
+
+    def test_serialization_substrate(self):
+        """
+        Test serialization of the embedded substrate fields.
+        """
+        substrate = mommy.make(Substrate)
+        sample = Sample.objects.create(substrate=substrate)
+        serializer = SampleSerializer(sample)
+        serialized_substrate = serializer.data.get('substrate')
+        self.assertIsNotNone(serialized_substrate)
+        self.assertEqual(serialized_substrate.get('serial'), substrate.serial)
