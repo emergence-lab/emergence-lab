@@ -161,3 +161,27 @@ class TestSampleAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
         self.assertEqual(results.get('uuid'), sample.uuid)
+
+class TestUserAPI(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        User = get_user_model()
+        user1 = User.objects.create_user('username1', password='')
+
+    @classmethod
+    def tearDownClass(cls):
+        get_user_model().objects.all().delete()
+
+    def setUp(self):
+        self.client = APIClient()
+        self.client.login(username='username1', password='')
+
+    def test_list_view_get(self):
+        response = self.client.get('/api/v0/users/')
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+        self.assertEqual(results.get('count'), 1)
+        user = results.get('results')[0]
+        self.assertIsNotNone(user)
+        self.assertEqual(user.get('username'), 'username1')
