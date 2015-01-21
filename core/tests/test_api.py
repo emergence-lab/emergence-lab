@@ -9,7 +9,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from rest_framework.test import APIClient
 
-from core.models import Process, ProcessNode, Sample, SplitProcess
+from core.models import Process, ProcessNode, Sample, SplitProcess, Substrate
 from .models import ChildProcess, ParentProcess
 
 
@@ -128,3 +128,29 @@ class TestProcessAPI(TestCase):
         results = json.loads(response.content)
         self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
+
+
+class TestSampleAPI(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        User = get_user_model()
+        user1 = User.objects.create_user('username1', password='')
+
+    @classmethod
+    def tearDownClass(cls):
+        get_user_model().objects.all().delete()
+
+    def setUp(self):
+        self.client = APIClient()
+        self.client.login(username='username1', password='')
+
+    def test_list_view_get(self):
+        samples = [Sample.objects.create(substrate=mommy.make(Substrate))
+                   for i in range(5)]
+        response = self.client.get('/api/v0/sample/')
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+        self.assertEqual(results.get('count'), len(samples))
+        for sample, result in zip(samples, results.get('results')):
+            self.assertEqual(result.get('uuid'), sample.uuid)
