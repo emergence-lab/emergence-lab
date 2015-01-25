@@ -5,6 +5,7 @@ import json
 import unittest
 
 from model_mommy import mommy
+from rest_framework.serializers import ValidationError
 from rest_framework.renderers import JSONRenderer
 
 from core.models import Process, Sample, Substrate
@@ -73,6 +74,24 @@ class TestProcessSerializer(unittest.TestCase):
         self.assertIsNotNone(representation.get('comment'))
         self.assertIsNotNone(representation.get('parent_field'))
         self.assertIsNotNone(representation.get('child_field'))
+
+    def test_to_internal_value_valid(self):
+        """
+        Test that passing the name of a derived class properly returns the
+        class instance.
+        """
+        serializer = ProcessSerializer()
+        model_class = serializer.to_internal_value('ChildProcess')
+        self.assertEqual(model_class, ChildProcess)
+
+    def test_to_internal_value_invalid(self):
+        """
+        Test that passing the name of a non-existant or non-derived class
+        properly raises an exception.
+        """
+        serializer = ProcessSerializer()
+        with self.assertRaises(ValidationError):
+            serializer.to_internal_value('NonExistantClass')
 
 
 class TestSampleSerializer(unittest.TestCase):

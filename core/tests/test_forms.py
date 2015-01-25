@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+import unittest
+
 from django.contrib.auth import get_user_model
+from django import forms
 from django.test import TestCase
 
 from model_mommy import mommy
+import six
 
-from core.forms import SampleSelectOrCreateForm, TrackProjectForm
+from core.forms import ChecklistForm, SampleSelectOrCreateForm, TrackProjectForm
 from core.models import Project, Sample, Substrate
 
 
@@ -76,3 +80,26 @@ class TestTrackProjectForm(TestCase):
         self.assertEqual(project.id, tracking.project_id)
         self.assertEqual(self.user.id, tracking.user_id)
         self.assertTrue(tracking.is_owner)
+
+
+class TestChecklistForm(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        class TestChecklistForm(ChecklistForm):
+            checklist_fields = [
+                'first',
+                'second',
+                'third',
+                'fourth',
+            ]
+        cls.form_class = TestChecklistForm
+
+    def test_init(self):
+        form = self.form_class()
+        for i, ((name, field), label) in enumerate(zip(six.iteritems(form.fields),
+                                                   self.form_class.checklist_fields)):
+            self.assertEqual('field_{}'.format(i), name)
+            self.assertEqual(field.label, label)
+            self.assertTrue(field.required)
+            self.assertEqual(field.__class__, forms.BooleanField)
