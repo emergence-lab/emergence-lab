@@ -11,7 +11,7 @@ class TrackProjectForm(forms.ModelForm):
 
     def save(self, **kwargs):
         commit = kwargs.pop('commit', True)
-        user = kwargs.pop('user')
+        user = kwargs.pop('user', None)
 
         instance = super(TrackProjectForm, self).save(commit=False)
         instance.user = user
@@ -23,4 +23,4 @@ class TrackProjectForm(forms.ModelForm):
 
     class Meta:
         model = ProjectTracking
-        fields = ['project', 'is_owner']
+        fields = ('project', 'is_owner',)

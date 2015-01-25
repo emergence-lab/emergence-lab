@@ -61,7 +61,7 @@ class SampleSelectOrCreateForm(forms.Form):
             if any([cleaned_data.get('sample_comment'),
                     cleaned_data.get('substrate_comment'),
                     cleaned_data.get('substrate_source'),
-                    cleaned_data.get('substrate_serial'),]):
+                    cleaned_data.get('substrate_serial')]):
                 raise ValidationError('Existing sample cannot be specified in '
                                       'addition to creating a new sample')
         else:

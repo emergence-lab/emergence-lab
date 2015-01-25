@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from model_mommy import mommy
 
-from core.forms import SampleSelectOrCreateForm
-from core.models import Sample, Substrate
+from core.forms import SampleSelectOrCreateForm, TrackProjectForm
+from core.models import Project, Sample, Substrate
 
 
 class TestSampleSelectOrCreateForm(TestCase):
@@ -52,3 +53,26 @@ class TestSampleSelectOrCreateForm(TestCase):
         })
         errors = dict(form.errors)
         self.assertDictEqual(errors, {})
+
+
+class TestTrackProjectForm(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        User = get_user_model()
+        cls.user = User.objects.create_user('username', password='')
+
+    @classmethod
+    def tearDownClass(cls):
+        get_user_model().objects.all().delete()
+
+    def test_save(self):
+        project = mommy.make(Project)
+        form = TrackProjectForm(data={
+            'project': project.id,
+            'is_owner': True,
+        })
+        tracking = form.save(user=self.user)
+        self.assertEqual(project.id, tracking.project_id)
+        self.assertEqual(self.user.id, tracking.user_id)
+        self.assertTrue(tracking.is_owner)

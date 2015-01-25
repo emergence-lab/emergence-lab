@@ -127,6 +127,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 comment_form=comment_form,
                 sample_formset=sample_formset))
 
+
 class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'growths/create_growth_readings.html'
 
@@ -164,5 +165,5 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
         if comment_form.is_valid() and readings_formset.is_valid():
             self.object.update(comment=comment_form.cleaned_data['comment'])
             for reading_form in readings_formset:
-                reading = reading_form.save()
+                reading_form.save()
             return HttpResponseRedirect(reverse('create_growth_d180_start'))
