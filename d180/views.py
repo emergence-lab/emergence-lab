@@ -8,10 +8,10 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from .models import D180Source, Platter
+from .models import D180Growth, D180Source, Platter
 from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                     WizardGrowthInfoForm, WizardFullForm,
-                    WizardPrerunChecklistForm)
+                    WizardPrerunChecklistForm, D180ReadingsFormSet)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
 
@@ -114,7 +114,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 sample = s.save()
                 print('sample uuid: {}'.format(sample.uuid))
                 sample.run_process(self.object)
-            return HttpResponseRedirect(reverse('create_growth_d180_start'))
+            return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
             basic_info_form = WizardBasicInfoForm(request.POST, prefix='growth')
             growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')
@@ -126,3 +126,43 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 source_form=source_form,
                 comment_form=comment_form,
                 sample_formset=sample_formset))
+
+class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'growths/create_growth_readings.html'
+
+    def get_object(self):
+        return D180Growth.objects.latest('created')
+
+    def build_forms(self, **kwargs):
+        comment_form = CommentsForm(prefix='comment',
+                                    initial={'comment': self.object.comment})
+        readings = self.object.readings.get_queryset()
+        readings_formset = D180ReadingsFormSet(queryset=readings,
+                                               prefix='reading')
+        return {
+            'comment_form': comment_form,
+            'readings_formset': readings_formset,
+        }
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return self.render_to_response(
+            self.get_context_data(**self.build_forms()))
+
+    def get_context_data(self, **kwargs):
+        context_data = super(WizardReadingsView, self).get_context_data(**kwargs)
+        context_data['growth'] = self.object
+        return context_data
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        comment_form = CommentsForm(request.POST, prefix='comment')
+        readings = self.object.readings.get_queryset()
+        readings_formset = D180ReadingsFormSet(request.POST, queryset=readings,
+                                               prefix='reading')
+
+        if comment_form.is_valid() and readings_formset.is_valid():
+            self.object.update(comment=comment_form.cleaned_data['comment'])
+            for reading_form in readings_formset:
+                reading = reading_form.save()
+            return HttpResponseRedirect(reverse('create_growth_d180_start'))

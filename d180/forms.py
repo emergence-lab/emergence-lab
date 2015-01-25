@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import D180Growth, D180Source
+from .models import D180Growth, D180Readings, D180Source
 from core.forms import ChecklistForm
 
 
@@ -86,46 +86,6 @@ class WizardFullForm(forms.ModelForm):
         return cleaned_data
 
 
-class StartGrowthForm(forms.ModelForm):
-    class Meta:
-        model = D180Growth
-        fields = ['user', 'platter']
-
-    def save(self, *args, **kwargs):
-        commit = kwargs.pop('commit', True)
-        comments = kwargs.pop('comments')
-        instance = super(StartGrowthForm, self).save(*args, commit=False, **kwargs)
-        instance.comments = comments
-        if commit:
-            instance.save()
-        return instance
-
-
-class PrerunGrowthForm(forms.ModelForm):
-
-    class Meta:
-        model = D180Growth
-        fields = ('user', 'comment', 'investigations', 'platter',
-                  'has_gan', 'has_aln', 'has_inn', 'has_algan', 'has_ingan',
-                  'other_material', 'orientation',
-                  'is_template', 'is_buffer', 'has_pulsed', 'has_superlattice',
-                  'has_mqw', 'has_graded', 'has_n', 'has_u', 'has_p',)
-
-    def clean(self):
-        cleaned_data = super(PrerunGrowthForm, self).clean()
-        material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
-        materials = [field for field in material_fields if cleaned_data[field]]
-        if not materials:
-            raise forms.ValidationError('At least one material must be specified')
-
-        doping_fields = ['has_n', 'has_p', 'has_u']
-        doping = [field for field in doping_fields if cleaned_data[field]]
-        if not doping:
-            raise forms.ValidationError('At least one doping type must be specified')
-
-        return cleaned_data
-
-
 class WizardPrerunChecklistForm(ChecklistForm):
     checklist_fields = [
         'Verify the correct recipe is loaded and comments are updated',
@@ -162,6 +122,73 @@ class SourcesForm(forms.ModelForm):
             'nh3': _('NH3'),
             'sih4': _('SiH4'),
         }
+
+
+class D180ReadingsForm(forms.ModelForm):
+
+    class Meta:
+        model = D180Readings
+        fields = ('pyro_out', 'pyro_in', 'ecp_temp', 'tc_out', 'tc_in',
+                  'motor_rpm', 'gc_pressure', 'gc_position', 'voltage_in',
+                  'voltage_out', 'current_in', 'current_out', 'top_vp_flow',
+                  'hydride_inner', 'hydride_outer', 'alkyl_flow_inner',
+                  'alkyl_push_inner', 'alkyl_flow_middle', 'alkyl_push_middle',
+                  'alkyl_flow_outer', 'alkyl_push_outer', 'n2_flow', 'h2_flow',
+                  'nh3_flow', 'hydride_pressure', 'tmga1_flow',
+                  'tmga1_pressure', 'tmga2_flow', 'tmga2_pressure',
+                  'tega2_flow', 'tega2_pressure', 'tmin1_flow',
+                  'tmin1_pressure', 'tmal1_flow', 'tmal1_pressure',
+                  'cp2mg_flow', 'cp2mg_pressure', 'cp2mg_dilution',
+                  'silane_flow', 'silane_dilution', 'silane_mix',
+                  'silane_pressure',)
+        labels = {
+            'pyro_out': _('Outer pyro [°C]'),
+            'pyro_in': _('Inner pyro [°C]'),
+            'ecp_temp': _('ECP temperature [°C]'),
+            'tc_out': _('Outer thermocouple temperature [°C]'),
+            'tc_in': _('Inner thermocouple temperature [°C]'),
+            'motor_rpm': _('Motor speed [RPM]'),
+            'gc_pressure': _('Growth chamber pressure [torr]'),
+            'gc_position': _('Throttle valve position [%]'),
+            'voltage_in': _('Inner filament voltage [V]'),
+            'voltage_out': _('Outer filament voltage [V]'),
+            'current_in': _('Inner filament current [A]'),
+            'current_out': _('Outer filament current [A]'),
+            'top_vp_flow': _('Top viewport flow [sccm]'),
+            'hydride_inner': _('Inner hydride flow [sccm]'),
+            'hydride_outer': _('Outer hydride flow [sccm]'),
+            'alkyl_flow_inner': _('Inner alkyl flow [sccm]'),
+            'alkyl_push_inner': _('Inner alkyl push [sccm]'),
+            'alkyl_flow_middle': _('Middle alkyl flow [sccm]'),
+            'alkyl_push_middle': _('Middle alkyl push [sccm]'),
+            'alkyl_flow_outer': _('Outer alkyl flow [sccm]'),
+            'alkyl_push_outer': _('Outer alkyl push [sccm]'),
+            'n2_flow': _('N2 flow [sccm]'),
+            'h2_flow': _('H2 flow [sccm]'),
+            'nh3_flow': _('NH3 flow [sccm]'),
+            'hydride_pressure': _('Hydride pressure [torr]'),
+            'tmga1_flow': _('TMGa #1 flow [sccm]'),
+            'tmga1_pressure': _('TMGa #1 pressure [torr]'),
+            'tmga2_flow': _('TMGa #2 flow [sccm]'),
+            'tmga2_pressure': _('TMGa #2 pressure [torr]'),
+            'tega2_flow': _('TEGa #1 flow [sccm]'),
+            'tega2_pressure': _('TEGa #1 pressure [torr]'),
+            'tmin1_flow': _('TMIn #1 flow [sccm]'),
+            'tmin1_pressure': _('TMIn #1 pressure [torr]'),
+            'tmal1_flow': _('TMAl #1 flow [sccm]'),
+            'tmal1_pressure': _('TMAl #1 pressure [torr]'),
+            'cp2mg_flow': _('Cp2Mg flow [sccm]'),
+            'cp2mg_pressure': _('Cp2Mg pressure [torr]'),
+            'cp2mg_dilution': _('Cp2Mg dilution [sccm]'),
+            'silane_flow': _('Silane flow [sccm]'),
+            'silane_dilution': _('Silane dilution [sccm]'),
+            'silane_mix': _('Silane mix [sccm]'),
+            'silane_pressure': _('Silane pressure [torr]'),
+        }
+
+
+D180ReadingsFormSet = forms.models.modelformset_factory(D180Readings,
+                                                        D180ReadingsForm)
 
 
 class PostrunChecklistForm(ChecklistForm):
