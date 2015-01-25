@@ -93,6 +93,57 @@ class TestProcessSerializer(unittest.TestCase):
         with self.assertRaises(ValidationError):
             serializer.to_internal_value('NonExistantClass')
 
+    def test_create_base(self):
+        """
+        Test that the base instance of the class can be created.
+        """
+        serializer = ProcessSerializer()
+        data = {
+            'polymorphic_type': 'Process',
+            'comment': 'Test comment',
+        }
+        process = serializer.create(data)
+        self.assertIsNotNone(process)
+        self.assertEqual(process.__class__, Process)
+        self.assertEqual(process.comment, data['comment'])
+        self.assertIsNotNone(process.uuid)
+
+    def test_create_single(self):
+        """
+        Test that a singly derived instance of the class can be created.
+        """
+        serializer = ProcessSerializer()
+        data = {
+            'polymorphic_type': 'ParentProcess',
+            'comment': 'Test comment',
+            'parent_field': 111,
+        }
+        process = serializer.create(data)
+        self.assertIsNotNone(process)
+        self.assertEqual(process.__class__, ParentProcess)
+        self.assertEqual(process.comment, data['comment'])
+        self.assertEqual(process.parent_field, data['parent_field'])
+        self.assertIsNotNone(process.uuid)
+
+    def test_create_double(self):
+        """
+        Test that a doubly derived instance of the class can be created.
+        """
+        serializer = ProcessSerializer()
+        data = {
+            'polymorphic_type': 'ChildProcess',
+            'comment': 'Test comment',
+            'parent_field': 111,
+            'child_field': 222,
+        }
+        process = serializer.create(data)
+        self.assertIsNotNone(process)
+        self.assertEqual(process.__class__, ChildProcess)
+        self.assertEqual(process.comment, data['comment'])
+        self.assertEqual(process.parent_field, data['parent_field'])
+        self.assertEqual(process.child_field, data['child_field'])
+        self.assertIsNotNone(process.uuid)
+
 
 class TestSampleSerializer(unittest.TestCase):
 
