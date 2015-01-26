@@ -5,10 +5,12 @@ import json
 import unittest
 
 from model_mommy import mommy
+from rest_framework.serializers import ValidationError
+from rest_framework.renderers import JSONRenderer
 
-from core.models import Process
+from core.models import Process, Sample, Substrate
 from .models import ChildProcess, ParentProcess
-from core.serializers import ProcessSerializer
+from core.serializers import ProcessSerializer, SampleSerializer
 
 
 class TestProcessSerializer(unittest.TestCase):
@@ -72,3 +74,96 @@ class TestProcessSerializer(unittest.TestCase):
         self.assertIsNotNone(representation.get('comment'))
         self.assertIsNotNone(representation.get('parent_field'))
         self.assertIsNotNone(representation.get('child_field'))
+
+    def test_to_internal_value_valid(self):
+        """
+        Test that passing the name of a derived class properly returns the
+        class instance.
+        """
+        serializer = ProcessSerializer()
+        model_class = serializer.to_internal_value('ChildProcess')
+        self.assertEqual(model_class, ChildProcess)
+
+    def test_to_internal_value_invalid(self):
+        """
+        Test that passing the name of a non-existant or non-derived class
+        properly raises an exception.
+        """
+        serializer = ProcessSerializer()
+        with self.assertRaises(ValidationError):
+            serializer.to_internal_value('NonExistantClass')
+
+    def test_create_base(self):
+        """
+        Test that the base instance of the class can be created.
+        """
+        serializer = ProcessSerializer()
+        data = {
+            'polymorphic_type': 'Process',
+            'comment': 'Test comment',
+        }
+        process = serializer.create(data)
+        self.assertIsNotNone(process)
+        self.assertEqual(process.__class__, Process)
+        self.assertEqual(process.comment, data['comment'])
+        self.assertIsNotNone(process.uuid)
+
+    def test_create_single(self):
+        """
+        Test that a singly derived instance of the class can be created.
+        """
+        serializer = ProcessSerializer()
+        data = {
+            'polymorphic_type': 'ParentProcess',
+            'comment': 'Test comment',
+            'parent_field': 111,
+        }
+        process = serializer.create(data)
+        self.assertIsNotNone(process)
+        self.assertEqual(process.__class__, ParentProcess)
+        self.assertEqual(process.comment, data['comment'])
+        self.assertEqual(process.parent_field, data['parent_field'])
+        self.assertIsNotNone(process.uuid)
+
+    def test_create_double(self):
+        """
+        Test that a doubly derived instance of the class can be created.
+        """
+        serializer = ProcessSerializer()
+        data = {
+            'polymorphic_type': 'ChildProcess',
+            'comment': 'Test comment',
+            'parent_field': 111,
+            'child_field': 222,
+        }
+        process = serializer.create(data)
+        self.assertIsNotNone(process)
+        self.assertEqual(process.__class__, ChildProcess)
+        self.assertEqual(process.comment, data['comment'])
+        self.assertEqual(process.parent_field, data['parent_field'])
+        self.assertEqual(process.child_field, data['child_field'])
+        self.assertIsNotNone(process.uuid)
+
+
+class TestSampleSerializer(unittest.TestCase):
+
+    def test_serialization_sample(self):
+        """
+        Test serialization of only the sample fields.
+        """
+        sample = Sample.objects.create(substrate=mommy.make(Substrate),
+                                       comment='comment')
+        serializer = SampleSerializer(sample)
+        self.assertEqual(serializer.data.get('uuid'), sample.uuid)
+        self.assertEqual(serializer.data.get('comment'), sample.comment)
+
+    def test_serialization_substrate(self):
+        """
+        Test serialization of the embedded substrate fields.
+        """
+        substrate = mommy.make(Substrate)
+        sample = Sample.objects.create(substrate=substrate)
+        serializer = SampleSerializer(sample)
+        serialized_substrate = serializer.data.get('substrate')
+        self.assertIsNotNone(serialized_substrate)
+        self.assertEqual(serialized_substrate.get('serial'), substrate.serial)

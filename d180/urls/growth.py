@@ -9,4 +9,7 @@ import d180.views
 urlpatterns = [
     url(r'^create/start/$',
         d180.views.WizardStartView.as_view(), name='create_growth_d180_start'),
+    url(r'^create/readings/$',
+        d180.views.WizardReadingsView.as_view(),
+        name='create_growth_d180_readings'),
 ]

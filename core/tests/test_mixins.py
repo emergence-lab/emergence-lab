@@ -7,78 +7,78 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample, Process
+from core.tests.models import ActiveStateModel, AutoUUIDModel, UUIDModel
 
 
 class TestActiveStateMixin(unittest.TestCase):
 
     def test_activate_valid(self):
-        obj = mommy.prepare('core.Project', is_active=False)
+        obj = mommy.prepare(ActiveStateModel, is_active=False)
         self.assertFalse(obj.is_active)
         obj.activate()
         self.assertTrue(obj.is_active)
         self.assertEqual(obj.status_changed.date(), timezone.now().date())
 
     def test_activate_invalid(self):
-        obj = mommy.prepare('core.Project', is_active=True)
+        obj = mommy.prepare(ActiveStateModel, is_active=True)
         with self.assertRaises(Exception):
             obj.activate()
 
     def test_deactivate_valid(self):
-        obj = mommy.prepare('core.Project', is_active=True)
+        obj = mommy.prepare(ActiveStateModel, is_active=True)
         self.assertTrue(obj.is_active)
         obj.deactivate()
         self.assertFalse(obj.is_active)
         self.assertEqual(obj.status_changed.date(), timezone.now().date())
 
     def test_deactivate_invalid(self):
-        obj = mommy.prepare('core.Project', is_active=False)
+        obj = mommy.prepare(ActiveStateModel, is_active=False)
         with self.assertRaises(Exception):
             obj.deactivate()
+
+    def test_manager_get_qs(self):
+        active_obj = mommy.make(ActiveStateModel, is_active=True)
+        inactive_obj = mommy.make(ActiveStateModel, is_active=False)
+        self.assertIn(active_obj, ActiveStateModel.active_objects.all())
+        self.assertNotIn(active_obj, ActiveStateModel.inactive_objects.all())
+        self.assertIn(inactive_obj, ActiveStateModel.inactive_objects.all())
+        self.assertNotIn(inactive_obj, ActiveStateModel.active_objects.all())
 
 
 class TestUUIDMixin(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        Process.prefix = 'prefix'
-        Process.short_length = 10
+    def setUp(self):
+        self.obj = mommy.make(UUIDModel)
 
     def test_uuid_prefix(self):
-        process = mommy.make(Process)
-        self.assertTrue(process.uuid.startswith(Process.prefix))
+        self.assertTrue(self.obj.uuid.startswith(UUIDModel.prefix))
 
     def test_strip_uuid_short(self):
-        process = mommy.make(Process)
-        self.assertEqual(Process.strip_uuid(process.uuid),
-                         process.uuid[len(Process.prefix):])
+        self.assertEqual(UUIDModel.strip_uuid(self.obj.uuid),
+                         self.obj.uuid[len(UUIDModel.prefix):])
 
     def test_strip_uuid_long(self):
-        process = mommy.make(Process)
-        self.assertEqual(Process.strip_uuid(process.uuid_full),
-                         process.uuid_full.hex)
+        self.assertEqual(UUIDModel.strip_uuid(self.obj.uuid_full),
+                         self.obj.uuid_full.hex)
+
+    def test_strip_uuid_long_string(self):
+        self.assertEqual(UUIDModel.strip_uuid(self.obj.uuid_full.hex),
+                         self.obj.uuid_full.hex)
 
     def test_short_uuid(self):
-        process = mommy.make(Process)
-        self.assertEqual(len(process.uuid),
-                         len(Process.prefix) + Process.short_length)
-        self.assertTrue(process.uuid[len(Process.prefix)])
+        self.assertEqual(len(self.obj.uuid),
+                         len(UUIDModel.prefix) + UUIDModel.short_length)
+        self.assertTrue(self.obj.uuid[len(UUIDModel.prefix)])
 
 
 class TestAutoUUIDMixin(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        Sample.prefix = 'prefix'
-        Sample.padding = 6
-
     def setUp(self):
-        substrate = mommy.make('core.Substrate')
-        self.sample = Sample.objects.create(substrate=substrate)
+        self.obj = mommy.make(AutoUUIDModel)
 
     def test_uuid_prefix(self):
-        self.assertTrue(self.sample.uuid.startswith(Sample.prefix))
+        self.assertTrue(self.obj.uuid.startswith(AutoUUIDModel.prefix))
 
     def test_strip_uuid(self):
-        uuid = Sample.strip_uuid(self.sample.uuid)
-        self.assertEqual(uuid, self.sample.id)
+        uuid = AutoUUIDModel.strip_uuid(self.obj.uuid)
+        self.assertEqual(uuid, self.obj.id)

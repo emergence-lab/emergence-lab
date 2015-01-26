@@ -82,7 +82,7 @@ class D180Readings(models.Model):
     Stores readings (i.e. temperature) from a d180 growth.
     """
     # growth and layer info
-    growth = models.ForeignKey(D180Growth)
+    growth = models.ForeignKey(D180Growth, related_name='readings')
     layer = models.IntegerField()
     layer_desc = models.CharField(max_length=45, blank=True)
 

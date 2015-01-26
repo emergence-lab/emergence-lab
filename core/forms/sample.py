@@ -45,17 +45,34 @@ class SampleSelectOrCreateForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(SampleSelectOrCreateForm, self).clean()
-        uuid = cleaned_data['sample_uuid']
 
+        # check if existing sample specified
+        uuid = cleaned_data['sample_uuid']
         if uuid:
             try:
-                sample = Sample.objects.get_by_uuid(uuid)
-                cleaned_data['sample'] = sample
-                self.instance = sample
+                cleaned_data['sample'] = Sample.objects.get_by_uuid(uuid)
             except ObjectDoesNotExist:
                 raise ValidationError('Sample {} not found'.format(uuid))
         else:
             cleaned_data['sample'] = None
+
+        # cannot create new sample and specify existing sample
+        if cleaned_data.get('sample') is not None:
+            if any([cleaned_data.get('sample_comment'),
+                    cleaned_data.get('substrate_comment'),
+                    cleaned_data.get('substrate_source'),
+                    cleaned_data.get('substrate_serial')]):
+                raise ValidationError('Existing sample cannot be specified in '
+                                      'addition to creating a new sample')
+        else:
+            substrate_data = {
+                'comment': cleaned_data.get('substrate_comment'),
+                'serial': cleaned_data.get('substrate_serial'),
+                'source': cleaned_data.get('substrate_source'),
+            }
+            substrate_form = SubstrateForm(data=substrate_data)
+            if not substrate_form.is_valid():
+                    self.add_error(None, substrate_form.errors)
 
         return cleaned_data
 

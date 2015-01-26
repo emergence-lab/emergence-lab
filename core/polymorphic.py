@@ -29,5 +29,5 @@ def get_polymorphic_field_mapping(cls):
             model=subclass,
             fields=[field for field in subclass._meta.local_fields
                     if field.serialize and not field.rel])
-        for subclass in get_subclasses(cls)
+        for subclass in get_subclasses(cls) + [cls]
     }
