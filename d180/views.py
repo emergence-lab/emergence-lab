@@ -108,11 +108,9 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         if all([growth_form.is_valid(), source_form.is_valid(),
                 checklist_form.is_valid(), sample_formset.is_valid()]):
             self.object = growth_form.save()
-            print('growth uuid: {}'.format(self.object.uuid))
             source_form.save()
             for s in sample_formset:
                 sample = s.save()
-                print('sample uuid: {}'.format(sample.uuid))
                 sample.run_process(self.object)
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:

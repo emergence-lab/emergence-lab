@@ -70,7 +70,9 @@ class SampleSelectOrCreateForm(forms.Form):
             try:
                 cleaned_data['sample'] = Sample.objects.get_by_uuid(uuid)
             except ObjectDoesNotExist:
-                raise ValidationError('Sample {} not found'.format(uuid))
+                self.add_error('sample_uuid',
+                               'Sample {} not found'.format(uuid))
+                return
         else:
             cleaned_data['sample'] = None
 

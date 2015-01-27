@@ -53,8 +53,8 @@ class TestSampleSelectOrCreateForm(TestCase):
             'sample_uuid': 's0001',
         })
         errors = dict(form.errors)
-        self.assertIsNotNone(errors.get('__all__'))
-        self.assertListEqual(errors.get('__all__'),
+        self.assertIsNotNone(errors.get('sample_uuid'))
+        self.assertListEqual(errors.get('sample_uuid'),
                              ['Sample s0001 not found'])
 
     def test_clean_specify_existing(self):
