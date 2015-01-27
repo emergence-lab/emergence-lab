@@ -9,6 +9,7 @@ from django.test import TestCase
 from model_mommy import mommy
 
 from d180.models import D180Growth, Platter
+from core.models import Investigation
 
 
 class TestPlatterCRUD(TestCase):
@@ -120,7 +121,7 @@ class TestD180Wizard(TestCase):
         """
         Test a post where no data is sent.
         """
-        url = '/d180/growth/create/start/'
+        url = reverse('create_growth_d180_start')
         with self.assertRaises(ValidationError) as cm:
             self.client.post(url, {})
         exception = cm.exception
@@ -131,7 +132,7 @@ class TestD180Wizard(TestCase):
         """
         Test a post where only managementform data is passed.
         """
-        url = '/d180/growth/create/start/'
+        url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '0',
             'sample-MAX_NUM_FORMS': '',
@@ -148,3 +149,95 @@ class TestD180Wizard(TestCase):
             'This field is required.')
         self.assertFormsetError(response, 'sample_formset', 0, None,
             'Cannot leave all fields blank.')
+
+    def test_start_sample_formset_mixed_valid(self):
+        """
+        Test a post where one sample form is valid and one is not.
+        """
+        mommy.make(Investigation)
+        mommy.make(Platter)
+        url = reverse('create_growth_d180_start')
+        data = {
+            'sample-INITIAL_FORMS': '0',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '2',
+            'checklist-field_0': 'on',
+            'checklist-field_1': 'on',
+            'checklist-field_2': 'on',
+            'checklist-field_3': 'on',
+            'checklist-field_4': 'on',
+            'checklist-field_5': 'on',
+            'checklist-field_6': 'on',
+            'checklist-field_7': 'on',
+            'checklist-field_8': 'on',
+            'checklist-field_9': 'on',
+            'checklist-field_10': 'on',
+            'checklist-field_11': 'on',
+            'checklist-field_12': 'on',
+            'checklist-field_13': 'on',
+            'growth-has_gan': 'on',
+            'growth-has_u': 'on',
+            'growth-orientation': '0001',
+            'growth-investigations': '1',
+            'growth-platter': '1',
+            'growth-user': '1',
+            'source-cp2mg': '0.00',
+            'source-nh3': '0.00',
+            'source-sih4': '0.00',
+            'source-tega1': '0.00',
+            'source-tmal1': '0.00',
+            'source-tmga1': '0.00',
+            'source-tmga2': '0.00',
+            'source-tmin1': '0.00',
+            'source-tmin2': '0.00',
+            'sample-0-substrate_comment': 'test',
+            'sample-1-sample_uuid': 's0000',
+        }
+        response = self.client.post(url, data)
+        self.assertFormsetError(response, 'sample_formset', 1, 'sample_uuid',
+            'Sample s0000 not found')
+
+    def test_start_valid(self):
+        """
+        Test a post where the form is valid.
+        """
+        mommy.make(Investigation)
+        mommy.make(Platter)
+        url = reverse('create_growth_d180_start')
+        data = {
+            'sample-INITIAL_FORMS': '0',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1',
+            'checklist-field_0': 'on',
+            'checklist-field_1': 'on',
+            'checklist-field_2': 'on',
+            'checklist-field_3': 'on',
+            'checklist-field_4': 'on',
+            'checklist-field_5': 'on',
+            'checklist-field_6': 'on',
+            'checklist-field_7': 'on',
+            'checklist-field_8': 'on',
+            'checklist-field_9': 'on',
+            'checklist-field_10': 'on',
+            'checklist-field_11': 'on',
+            'checklist-field_12': 'on',
+            'checklist-field_13': 'on',
+            'growth-has_gan': 'on',
+            'growth-has_u': 'on',
+            'growth-orientation': '0001',
+            'growth-investigations': '1',
+            'growth-platter': '1',
+            'growth-user': '1',
+            'source-cp2mg': '0.00',
+            'source-nh3': '0.00',
+            'source-sih4': '0.00',
+            'source-tega1': '0.00',
+            'source-tmal1': '0.00',
+            'source-tmga1': '0.00',
+            'source-tmga2': '0.00',
+            'source-tmin1': '0.00',
+            'source-tmin2': '0.00',
+            'sample-0-substrate_comment': 'test',
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('create_growth_d180_readings'))
