@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from .utility import (ActiveListView,
+from .utility import (AboutView,
+                      ActiveListView,
                       ActionReloadView,
                       ExceptionHandlerView,
                       HomepageView,

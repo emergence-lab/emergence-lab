@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-import unittest
-
+from django.core.exceptions import ObjectDoesNotExist
+from django.test import TestCase
 from django.utils import timezone
 
 from model_mommy import mommy
@@ -10,7 +10,7 @@ from model_mommy import mommy
 from core.models import Sample, Process
 
 
-class TestSampleManager(unittest.TestCase):
+class TestSampleManager(TestCase):
 
     def test_create_sample(self):
         """
@@ -20,8 +20,47 @@ class TestSampleManager(unittest.TestCase):
         sample = Sample.objects.create(substrate=substrate)
         self.assertEqual(substrate.id, sample.substrate_id)
 
+    def test_get_by_uuid_nonexistant(self):
+        with self.assertRaises(ObjectDoesNotExist):
+            Sample.objects.get_by_uuid('s0000')
+        
+    def test_get_by_uuid_short(self):
+        substrate = mommy.make('core.Substrate')
+        sample = Sample.objects.create(substrate=substrate)
+        result = Sample.objects.get_by_uuid(sample.uuid)
+        self.assertEqual(sample.uuid, result.uuid)
+    
+    def test_get_by_uuid_long(self):
+        substrate = mommy.make('core.Substrate')
+        sample = Sample.objects.create(substrate=substrate)
+        result = Sample.objects.get_by_uuid(sample.uuid_full)
+        self.assertEqual(sample.uuid, result.uuid)
 
-class TestSample(unittest.TestCase):
+    def test_get_by_process_nonexistant(self):
+        process_uuid = Process.prefix + ''.zfill(Process.short_length)
+        results = Sample.objects.get_by_process(process_uuid)
+        self.assertListEqual(results, [])
+
+    def test_get_by_process_multiple(self):
+        process = mommy.make(Process)
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        for sample in samples:
+            sample.run_process(process)
+        extra_process = mommy.make(Process)
+        extra_sample = Sample.objects.create(
+            substrate=mommy.make('core.Substrate'))
+        extra_sample.run_process(extra_process)
+        results = Sample.objects.get_by_process(process.uuid)
+        for sample in samples:
+            self.assertIn(sample, results)
+        self.assertNotIn(extra_sample, results)
+
+
+class TestSample(TestCase):
 
     def setUp(self):
         substrate = mommy.make('core.Substrate')
@@ -256,3 +295,28 @@ class TestSample(unittest.TestCase):
         self.assertEqual(node_first.parent_id, node_second.id)
         self.assertEqual(len(self.sample.leaf_nodes), 1)
         self.assertEqual(self.sample.leaf_nodes[0].id, node_first.id)
+
+    def test_get_nodes_for_process_invalid(self):
+        process_uuid = Process.prefix + ''.zfill(Process.short_length)
+        results = list(self.sample.get_nodes_for_process(process_uuid))
+        self.assertListEqual(results, [])
+
+    def test_get_nodes_for_process_valid(self):
+        process_1 = mommy.make(Process)
+        process_2 = mommy.make(Process)
+        self.sample.run_process(process_1)
+        self.sample.run_process(process_2)
+        results = list(self.sample.get_nodes_for_process(process_1.uuid))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].process, process_1)
+
+    def test_has_nodes_for_process_invalid(self):
+        process_uuid = Process.prefix + ''.zfill(Process.short_length)
+        result = self.sample.has_nodes_for_process(process_uuid)
+        self.assertFalse(result)
+
+    def test_has_nodes_for_process_valid(self):
+        process_1 = mommy.make(Process)
+        self.sample.run_process(process_1)
+        result = self.sample.has_nodes_for_process(process_1.uuid)
+        self.assertTrue(result)
