@@ -23,7 +23,7 @@ class SubstrateForm(forms.ModelForm):
         cleaned_data = super(SubstrateForm, self).clean()
         data = [cleaned_data.get('comment'),
                 cleaned_data.get('source'),
-                cleaned_data.get('serial'),]
+                cleaned_data.get('serial')]
 
         if not any(data):
             raise ValidationError(_('Cannot leave all fields blank.'))

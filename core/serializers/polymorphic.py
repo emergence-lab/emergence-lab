@@ -85,8 +85,8 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
             return self.polymorphic_class_mapping.get(data).model
         except:
             raise serializers.ValidationError(
-                'Invalid class name given: {} is not a subclass of {}'
-                    .format(data, self.polymorphic_base_model.__name__))
+                'Invalid class name given: {} is not a subclass of {}'.format(
+                    data, self.polymorphic_base_model.__name__))
 
     def create(self, validated_data):
         if not self.polymorphic_class_mapping:
