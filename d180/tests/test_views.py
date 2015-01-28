@@ -227,7 +227,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': str(self.user.id),
+            'growth-user': '1',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
