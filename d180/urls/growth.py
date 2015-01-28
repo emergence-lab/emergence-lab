@@ -12,4 +12,7 @@ urlpatterns = [
     url(r'^create/readings/$',
         d180.views.WizardReadingsView.as_view(),
         name='create_growth_d180_readings'),
+    url(r'^create/postrun/$',
+        d180.views.WizardPostrunView.as_view(),
+        name='create_growth_d180_postrun'),
 ]

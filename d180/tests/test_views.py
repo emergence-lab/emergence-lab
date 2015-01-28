@@ -205,7 +205,7 @@ class TestD180Wizard(TestCase):
         mommy.make(Platter)
         url = reverse('create_growth_d180_start')
         data = {
-            'sample-INITIAL_FORMS': '0',
+            'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',
             'sample-TOTAL_FORMS': '1',
             'checklist-field_0': 'on',

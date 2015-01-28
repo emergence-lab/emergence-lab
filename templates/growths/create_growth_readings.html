@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 {% load wysiwyg %}
 
-{% block title %}Create Growth Readings{% endblock title %}
+{% block title %}Growth Readings{% endblock title %}
 
 {% block header %}
     {% load staticfiles %}
@@ -24,34 +24,44 @@
         </div>
     </div>
 
-    <h1 class="page-header">
-        Readings for {{growth}}
-        <div class="pull-right">
-            <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
-                {% bootstrap_icon 'remove' %}
-                Cancel
-            </button>
-            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#sample-modal">
-                Samples
-                {% bootstrap_icon 'file' %}
-            </button>
-            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
-                {% bootstrap_icon 'pencil' %}
-                Edit Comments
-            </button>
-            <button class="btn btn-success next-tab-main" type="button" data-toggle="modal" data-target="#submit-modal">
-                Submit
-                {% bootstrap_icon 'ok' %}
-            </button>
-        </div>
-    </h1>
 
 
     <form action="" method="POST">
+        <h1 class="page-header">
+            Readings for {{growth}}
+            <div class="pull-right">
+                <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
+                    {% bootstrap_icon 'remove' %}
+                    Cancel
+                </button>
+                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#sample-modal">
+                    {% bootstrap_icon 'file' %}
+                    Samples
+                </button>
+                <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
+                    {% bootstrap_icon 'pencil' %}
+                    Comments
+                </button>
+                <button class="btn btn-success next-tab-main" type="submit" id="submit-button">
+                    Submit
+                    {% bootstrap_icon 'ok' %}
+                </button>
+                <a class="btn btn-warning" href="{% url 'create_growth_d180_postrun' %}">
+                    Finish Readings
+                    {% bootstrap_icon 'chevron-right' %}
+                </a>
+            </div>
+        </h1>
         {% csrf_token %}
         {{readings_formset.management_form}}
 
-        {% bootstrap_formset readings_formset layout='inline' %}
+        <div class="row">
+            {% for form in readings_formset %}
+                <div class="col-xs-2">
+                    {% bootstrap_form form %}
+                </div>
+            {% endfor %}
+        </div>
 
         {# submit form modal #}
         <div class="modal fade" id="submit-modal" tabindex="-1" role="dialog">
@@ -93,6 +103,44 @@
 
     </form>
 
+    {# samples modal #}
+    <div class="modal fade" id="sample-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Samples</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <td><strong>UUID</strong></td>
+                                <td><strong>Substrate</strong></td>
+                                <td><strong>Serial</strong></td>
+                                <td><strong>Comment</strong></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sample in samples %}
+                                <tr>
+                                    <td>{{sample.uuid}}</td>
+                                    <td>{{sample.substrate.comment|safe}}</td>
+                                    <td>{{sample.substrate.serial}}</td>
+                                    <td>{{sample.comment|safe}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# cancel modal #}
     <div class="modal fade" id="cancel-modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -114,3 +162,12 @@
 </div>
 
 {% endblock content %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'growths/js/growth_wizard.js' %}"></script>
+    <script type="text/javascript">
+        $(function() {
+            growth_wizard.enable_rich_text('.hallo', 'form');
+        });
+    </script>
+{% endblock scripts %}

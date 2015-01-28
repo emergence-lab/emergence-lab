@@ -28,16 +28,16 @@
         Start Growth
         <div class="pull-right">
             <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
-                <span class="glyphicon glyphicon-remove"></span>
+                {% bootstrap_icon 'remove' %}
                 Cancel
             </button>
             <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
-                <span class="glyphicon glyphicon-pencil"></span>
-                Edit Comments
+                {% bootstrap_icon 'pencil' %}
+                Comments
             </button>
             <button class="btn btn-success next-tab-main" type="button">
                 Next Step
-                <span class="glyphicon glyphicon-chevron-right"></span>
+                {% bootstrap_icon 'chevron-right' %}
             </button>
         </div>
     </h1>
@@ -173,7 +173,7 @@
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
 
 
         {# Cancel Modal #}
