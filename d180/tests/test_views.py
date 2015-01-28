@@ -91,7 +91,7 @@ class TestD180Wizard(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        get_user_model().objects.create_user('default', password='')
+        cls.user = get_user_model().objects.create_user('default', password='')
 
     @classmethod
     def tearDownClass(cls):
@@ -227,7 +227,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
+            'growth-user': str(self.user.id),
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
