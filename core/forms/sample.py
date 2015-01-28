@@ -112,8 +112,8 @@ class SampleSelectOrCreateForm(forms.Form):
         return self.instance
 
 
-SampleFormSet = forms.formsets.formset_factory(SampleSelectOrCreateForm,
-                                               min_num=1, validate_min=True)
+SampleFormSet = forms.formsets.formset_factory(
+    SampleSelectOrCreateForm, min_num=1, extra=0, validate_min=True)
 
 
 class SplitSampleForm(forms.ModelForm):
