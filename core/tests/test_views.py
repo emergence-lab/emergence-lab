@@ -63,11 +63,10 @@ class TestUserCRUD(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user1 = User.objects.create_user('username1', password='')
-        user2 = User.objects.create_user('username2', password='')
-        user2.is_active = False
-        user2.save()
+        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username2', password='')
+        user.is_active = False
+        user.save()
 
     @classmethod
     def tearDownClass(cls):
@@ -242,6 +241,15 @@ class TestProjectCRUD(TestCase):
 
 class TestInvestigationCRUD(TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        get_user_model().objects.create_user('username1', password='')
+
+    @classmethod
+    def tearDownClass(cls):
+        get_user_model().objects.all().delete()
+
+
     def setUp(self):
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
@@ -252,8 +260,6 @@ class TestInvestigationCRUD(TestCase):
                    slug='investigation-1', is_active=True, project=project1)
         mommy.make(Investigation, name='investigation 2',
                    slug='investigation-2', is_active=False, project=project2)
-
-        user = get_user_model().objects.create_user('username1', password='')
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):
