@@ -31,5 +31,5 @@ class AFMSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AFMScan
-        fields = ('uuid', 'sample', 'scan_number', 'rms', 'zrange',
+        fields = ('uuid', 'scan_number', 'rms', 'zrange',
                   'location', 'size', 'height', 'amplitude')
