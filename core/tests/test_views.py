@@ -16,6 +16,10 @@ class TestHomepageAbout(TestCase):
     def setUpClass(cls):
         get_user_model().objects.create_user('default', password='')
 
+    @classmethod
+    def tearDownClass(cls):
+        get_user_model().objects.all().delete()
+
     def test_homepage_url_resolution(self):
         match = resolve('/')
         self.assertEqual(match.url_name, 'home')

@@ -17,8 +17,7 @@ class TestProcessAPI(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user1 = User.objects.create_user('username1', password='')
+        get_user_model().objects.create_user('username1', password='')
 
     @classmethod
     def tearDownClass(cls):
@@ -134,8 +133,7 @@ class TestSampleAPI(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user1 = User.objects.create_user('username1', password='')
+        get_user_model().objects.create_user('username1', password='')
 
     @classmethod
     def tearDownClass(cls):
@@ -166,8 +164,7 @@ class TestUserAPI(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User = get_user_model()
-        user1 = User.objects.create_user('username1', password='')
+        get_user_model().objects.create_user('username1', password='')
 
     @classmethod
     def tearDownClass(cls):
