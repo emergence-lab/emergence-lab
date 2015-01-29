@@ -14,15 +14,8 @@ from core.models import Investigation
 
 class TestPlatterCRUD(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('default', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def setUp(self):
+        get_user_model().objects.create_user('default', password='')
         self.client.login(username='default', password='')
 
     def test_platter_list_resolution_template(self):
@@ -89,15 +82,8 @@ class TestPlatterCRUD(TestCase):
 
 class TestD180Wizard(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.user = get_user_model().objects.create_user('default', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def setUp(self):
+        get_user_model().objects.create_user('default', password='')
         self.client.login(username='default', password='')
 
     def test_start_resolution_template(self):

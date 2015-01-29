@@ -100,24 +100,16 @@ class TestSampleSelectOrCreateForm(TestCase):
 
 class TestTrackProjectForm(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        User = get_user_model()
-        cls.user = User.objects.create_user('username', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def test_save(self):
+        user = get_user_model().objects.create_user('username', password='')
         project = mommy.make(Project)
         form = TrackProjectForm(data={
             'project': project.id,
             'is_owner': True,
         })
-        tracking = form.save(user=self.user)
+        tracking = form.save(user=user)
         self.assertEqual(project.id, tracking.project_id)
-        self.assertEqual(self.user.id, tracking.user_id)
+        self.assertEqual(user.id, tracking.user_id)
         self.assertTrue(tracking.is_owner)
 
 

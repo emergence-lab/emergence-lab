@@ -12,14 +12,6 @@ from core.models import Investigation, Project, ProjectTracking
 
 class TestHomepageAbout(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('default', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def test_homepage_url_resolution(self):
         match = resolve('/')
         self.assertEqual(match.url_name, 'home')
@@ -32,6 +24,7 @@ class TestHomepageAbout(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_homepage_access_login(self):
+        get_user_model().objects.create_user('default', password='')
         result = self.client.login(username='default', password='')
         self.assertTrue(result)
 
@@ -52,6 +45,7 @@ class TestHomepageAbout(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_about_access_login(self):
+        get_user_model().objects.create_user('default', password='')
         result = self.client.login(username='default', password='')
         self.assertTrue(result)
 
@@ -61,18 +55,11 @@ class TestHomepageAbout(TestCase):
 
 class TestUserCRUD(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(self):
         get_user_model().objects.create_user('username1', password='')
         user = get_user_model().objects.create_user('username2', password='')
         user.is_active = False
         user.save()
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
-    def setUp(self):
         self.client.login(username='username1', password='')
 
     def test_operator_list_url_resolution(self):
@@ -241,16 +228,8 @@ class TestProjectCRUD(TestCase):
 
 class TestInvestigationCRUD(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('username1', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
-
     def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
         project2 = mommy.make(Project, name='project 2', slug='project-2',

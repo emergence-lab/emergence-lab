@@ -15,15 +15,8 @@ from .models import ChildProcess, ParentProcess
 
 class TestProcessAPI(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('username1', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
         self.client = APIClient()
         self.client.login(username='username1', password='')
 
@@ -131,15 +124,8 @@ class TestProcessAPI(TestCase):
 
 class TestSampleAPI(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('username1', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
         self.client = APIClient()
         self.client.login(username='username1', password='')
 
@@ -162,15 +148,8 @@ class TestSampleAPI(TestCase):
 
 class TestUserAPI(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('username1', password='')
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
         self.client = APIClient()
         self.client.login(username='username1', password='')
 
