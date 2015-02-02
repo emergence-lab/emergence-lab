@@ -48,6 +48,11 @@ class SampleManager(models.Manager):
         uuid = Sample.strip_uuid(uuid)
         return Sample.objects.get(pk=uuid)
 
+    def get_by_process(self, uuid):
+        uuid = Process.strip_uuid(uuid)
+        nodes = ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
+        return [node.get_sample() for node in nodes]
+
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     """
@@ -204,6 +209,13 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         uuid = ProcessNode.strip_uuid(uuid)
         return self._get_tree_queryset().get(uuid_full__startswith=uuid)
+
+    def has_nodes_for_process(self, uuid):
+        """
+        Returns if the sample has any nodes corresponding to the specified
+        process.
+        """
+        return self.get_nodes_for_process(uuid).exists()
 
     def get_nodes_for_process(self, uuid):
         """

@@ -10,7 +10,7 @@ from model_mommy import mommy
 from core.models import Investigation, Project, ProjectTracking
 
 
-class TestHomepage(TestCase):
+class TestHomepageAbout(TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -22,6 +22,7 @@ class TestHomepage(TestCase):
 
     def test_homepage_access_anonymous(self):
         self.client.logout()
+
         response = self.client.get(reverse('home'))
         self.assertTemplateUsed(response, 'core/index.html')
         self.assertEqual(response.status_code, 200)
@@ -34,6 +35,25 @@ class TestHomepage(TestCase):
         self.assertTemplateUsed(response, 'core/index.html')
         self.assertEqual(response.status_code, 200)
 
+    def test_about_url_resolution(self):
+        url = '/about/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'about')
+
+    def test_about_access_anonymous(self):
+        self.client.logout()
+
+        response = self.client.get(reverse('about'))
+        self.assertTemplateUsed(response, 'core/about.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_about_access_login(self):
+        result = self.client.login(username='default', password='')
+        self.assertTrue(result)
+
+        response = self.client.get(reverse('about'))
+        self.assertTemplateUsed(response, 'core/about.html')
+        self.assertEqual(response.status_code, 200)
 
 class TestUserCRUD(TestCase):
 

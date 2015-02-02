@@ -10,8 +10,40 @@ from django.test import TestCase
 from model_mommy import mommy
 import six
 
-from core.forms import ChecklistForm, SampleSelectOrCreateForm, TrackProjectForm
+from core.forms import (ChecklistForm, SampleForm, SampleSelectOrCreateForm,
+                        SubstrateForm, TrackProjectForm)
 from core.models import Project, Sample, Substrate
+
+
+class TestSubstrateForm(unittest.TestCase):
+
+    def test_clean_empty(self):
+        form = SubstrateForm(data={})
+        errors = dict(form.errors)
+        self.assertIsNotNone(errors.get('__all__'))
+        self.assertListEqual(errors.get('__all__'),
+            ['Cannot leave all fields blank.'])
+
+    def test_clean_single_specified(self):
+        form = SubstrateForm(data={
+            'comment': 'test',
+        })
+        errors = dict(form.errors)
+        self.assertDictEqual(errors, {})
+
+
+class TestSampleForm(TestCase):
+
+    def test_save(self):
+        substrate = mommy.make(Substrate)
+        form = SampleForm(data={
+            'substrate': substrate.id,
+            'comment': 'test',
+        })
+        self.assertDictEqual(dict(form.errors), {})
+        sample = form.save()
+        self.assertEqual(sample.substrate_id, substrate.id)
+        self.assertEqual(sample.comment, 'test')
 
 
 class TestSampleSelectOrCreateForm(TestCase):
@@ -21,8 +53,8 @@ class TestSampleSelectOrCreateForm(TestCase):
             'sample_uuid': 's0001',
         })
         errors = dict(form.errors)
-        self.assertIsNotNone(errors.get('__all__'))
-        self.assertListEqual(errors.get('__all__'),
+        self.assertIsNotNone(errors.get('sample_uuid'))
+        self.assertListEqual(errors.get('sample_uuid'),
                              ['Sample s0001 not found'])
 
     def test_clean_specify_existing(self):
@@ -57,6 +89,13 @@ class TestSampleSelectOrCreateForm(TestCase):
         })
         errors = dict(form.errors)
         self.assertDictEqual(errors, {})
+
+    def test_clean_empty(self):
+        form = SampleSelectOrCreateForm(data={})
+        errors = dict(form.errors)
+        self.assertIsNotNone(errors.get('__all__'))
+        self.assertListEqual(errors.get('__all__'),
+            ['Cannot leave all fields blank.'])
 
 
 class TestTrackProjectForm(TestCase):

@@ -127,6 +127,11 @@ class AboutView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutView, self).get_context_data(**kwargs)
-        context['commit'] = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-        context['tags'] = subprocess.check_output(["git", "describe", "--tags"])
+        context['branch'] = subprocess.check_output(
+            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+        tag, ahead, commit = subprocess.check_output(
+            ['git', 'describe', '--tag']).split('-')
+        context['tag'] = tag
+        context['commits_ahead'] = ahead
+        context['commit'] = commit[1:]
         return context

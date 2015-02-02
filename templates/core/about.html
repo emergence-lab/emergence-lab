@@ -1,12 +1,16 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
+
 <h2 class="text-center">About</h2>
 
-<h4 class="text-center">WBG-DJANGO SW</h4>
+<h4 class="text-center">Emergence Lab</h4>
 
 <div class="text-center">
-    <p><strong>Tags: </strong>{{ tags|linebreaks }}</p>
-    <p><strong>Commit: </strong>{{ commit|linebreaks }}</p>
+    <p>
+        on commit {{commit}} <br>
+        {{commits_ahead}} commits ahead of {{tag}} on branch {{branch}} <br>
+    </p>
 </div>
-{% endblock %}
+
+{% endblock content %}
