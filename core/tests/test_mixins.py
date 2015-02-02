@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-import unittest
-
+from django.test import TestCase
 from django.utils import timezone
 
 from model_mommy import mommy
@@ -10,7 +9,7 @@ from model_mommy import mommy
 from core.tests.models import ActiveStateModel, AutoUUIDModel, UUIDModel
 
 
-class TestActiveStateMixin(unittest.TestCase):
+class TestActiveStateMixin(TestCase):
 
     def test_activate_valid(self):
         obj = mommy.prepare(ActiveStateModel, is_active=False)
@@ -45,7 +44,7 @@ class TestActiveStateMixin(unittest.TestCase):
         self.assertNotIn(inactive_obj, ActiveStateModel.active_objects.all())
 
 
-class TestUUIDMixin(unittest.TestCase):
+class TestUUIDMixin(TestCase):
 
     def setUp(self):
         self.obj = mommy.make(UUIDModel)
@@ -71,7 +70,7 @@ class TestUUIDMixin(unittest.TestCase):
         self.assertTrue(self.obj.uuid[len(UUIDModel.prefix)])
 
 
-class TestAutoUUIDMixin(unittest.TestCase):
+class TestAutoUUIDMixin(TestCase):
 
     def setUp(self):
         self.obj = mommy.make(AutoUUIDModel)
