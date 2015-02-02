@@ -83,9 +83,22 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         except ObjectDoesNotExist:
             previous_source = None
 
+        try:
+            previous_growth = D180Growth.objects.latest('created')
+            growth_number = 'g{}'.format(
+                str(int(previous_growth.growth_number[1:]) + 1).zfill(4))
+        except ObjectDoesNotExist:
+            growth_number = 'g1000'
+        except ValueError:
+            growth_number = 'g1000'
+
         return {
-            'info_form': WizardBasicInfoForm(initial={'user': self.request.user},
-                                             prefix='growth'),
+            'info_form': WizardBasicInfoForm(
+                initial={
+                    'user': self.request.user,
+                    'growth_number': growth_number
+                },
+                prefix='growth'),
             'growth_form': WizardGrowthInfoForm(prefix='growth'),
             'checklist_form': WizardPrerunChecklistForm(prefix='checklist'),
             'source_form': SourcesForm(instance=previous_source,

@@ -223,6 +223,7 @@ class TestD180Wizard(TestCase):
             'growth-investigations': '1',
             'growth-platter': '1',
             'growth-user': '1',
+            'growth-growth_number': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
