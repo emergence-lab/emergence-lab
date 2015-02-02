@@ -5,38 +5,27 @@
 
 <h2 class="text-center">Simulation Management Console</h2>
 
-<div class="col-md-2">
-    <ul class="nav nav-pills nav-stacked">
-    <li role="presentation" {% if request.path == '/simulations/' %}class="active"{% endif %}><a href="{% url 'simulation_incomplete' %}"><span class="glyphicon glyphicon-import"> Incomplete</span></a></li>
-    <li role="presentation" {% if request.path == '/simulations/completed/' %}class="active"{% endif %}><a href="{% url 'simulation_complete' %}"><span class="glyphicon glyphicon-saved"> Completed</a></li>
-    <li role="presentation" {% if request.path == '/simulations/all/' %}class="active"{% endif %}><a href="{% url 'simulation_all' %}"><span class="glyphicon glyphicon-list"> All</a></li>
-    <li role="presentation" {% if request.path == '/simulations/templates/' %}class="active"{% endif %}><a href="{% url 'simulation_templates' %}"><span class="glyphicon glyphicon-star"> Templates</a></li>
-    <li role="presentation" {% if request.path == '/simulations/admin/' %}class="active"{% endif %}><a href="{% url 'simulation_admin' %}"><span class="glyphicon glyphicon-wrench"> Instances</a></li>
-    </ul>
-</div>
-
-<div class="col-md-8 text-center">
+<div class="text-center">
   <h3>Execution Nodes <a class="glyphicon glyphicon-refresh" href="{% url 'simulation_admin' %}"></a></h3>
   <p></p>
-
   <p></p>
 </div>
 </br>
 
-<div class="col-md-8 text-center">
+<div class="text-center">
   <table class="table">
     <tr>
       <td><strong>Instance Name</strong></td>
+      <td><strong>IP Address</strong></td>
       <td><strong>Type</strong></td>
       <td><strong>State</strong></td>
       <td><strong>Uptime</strong></td>
-      {% if user.is_staff %}
-          <td><strong>Actions</strong></td>
-      {% endif %}
+      <td><strong>Actions</strong></td>
     </tr>
     {% for instance in instances %}
       <tr>
         <td>{{ instance.instance_name }}</td>
+        <td>{{ instance.instance_address }}</td>
         <td>{{ instance.instance_type }}</td>
         <td>
         {% if instance.instance_state == 'stopped' %}
@@ -51,18 +40,25 @@
             {% if instance.instance_state == 'running' %}
             {{ instance.instance_uptime }}</td>
             {% endif %}
-        {% if user.is_staff %}
-            <td>
+        <td>
+        {% if instance.instance_type != 't2.micro' %}
             {% if instance.instance_state == 'stopped' %}
             <a class="glyphicon glyphicon-off" href="{% url 'start_instance' instance.instance_name %}"></a>
             {% elif instance.instance_state == 'running' %}
             <a class="glyphicon glyphicon-off" href="{% url 'stop_instance' instance.instance_name %}"></a>
             {% endif %}
-            </td>
+        {% elif user.is_staff %}
+            {% if instance.instance_state == 'stopped' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'start_instance' instance.instance_name %}"></a>
+            {% elif instance.instance_state == 'running' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'stop_instance' instance.instance_name %}"></a>
+            {% endif %}
         {% endif %}
+        </td>
       </tr>
     {% endfor %}
   </table>
 </div>
+
 
 {% endblock %}
