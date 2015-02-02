@@ -20,9 +20,7 @@
       <td><strong>Type</strong></td>
       <td><strong>State</strong></td>
       <td><strong>Uptime</strong></td>
-      {% if user.is_staff %}
-          <td><strong>Actions</strong></td>
-      {% endif %}
+      <td><strong>Actions</strong></td>
     </tr>
     {% for instance in instances %}
       <tr>
@@ -42,15 +40,21 @@
             {% if instance.instance_state == 'running' %}
             {{ instance.instance_uptime }}</td>
             {% endif %}
-        {% if user.is_staff %}
-            <td>
+        <td>
+        {% if instance.instance_type != 't2.micro' %}
             {% if instance.instance_state == 'stopped' %}
             <a class="glyphicon glyphicon-off" href="{% url 'start_instance' instance.instance_name %}"></a>
             {% elif instance.instance_state == 'running' %}
             <a class="glyphicon glyphicon-off" href="{% url 'stop_instance' instance.instance_name %}"></a>
             {% endif %}
-            </td>
+        {% elif user.is_staff %}
+            {% if instance.instance_state == 'stopped' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'start_instance' instance.instance_name %}"></a>
+            {% elif instance.instance_state == 'running' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'stop_instance' instance.instance_name %}"></a>
+            {% endif %}
         {% endif %}
+        </td>
       </tr>
     {% endfor %}
   </table>
