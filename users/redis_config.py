@@ -1,4 +1,5 @@
-### Classes for Redis objects associated with this app
+# Classes for Redis objects associated with this app
+
 
 class ActionItem(object):
     """
@@ -7,6 +8,7 @@ class ActionItem(object):
     """
     created = ''
     comment = ''
+
 
 class GitCredential(object):
     """
