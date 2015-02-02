@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.shortcuts import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.views.generic import RedirectView, TemplateView
