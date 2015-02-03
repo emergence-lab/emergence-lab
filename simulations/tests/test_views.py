@@ -28,10 +28,8 @@ class TestSimulationViews(TestCase):
     def test_ec2_connection(self):
         """
         Tests boto connection. Instance list should not be empty.
-        Instance list should contain the base instance t2.micro
         """
         signals = aws.EC2Connection(settings.AWS_EC2_REGION,
                                     settings.AWS_ACCESS_KEY_ID,
                                     settings.AWS_SECRET_ACCESS_KEY)
         self.assertNotEqual(signals.instance_list(), [])
-        self.assertIn('t2.micro', [x.instance_type for x in signals.instance_list()])
