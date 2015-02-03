@@ -64,7 +64,8 @@ class WizardFullForm(forms.ModelForm):
 
     class Meta:
         model = D180Growth
-        fields = ('user', 'investigations', 'platter', 'comment',
+        fields = ('user', 'growth_number', 'investigations', 'platter',
+                  'comment',
                   'has_gan', 'has_aln', 'has_inn', 'has_algan',
                   'has_ingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_pulsed',
@@ -128,7 +129,8 @@ class D180ReadingsForm(forms.ModelForm):
 
     class Meta:
         model = D180Readings
-        fields = ('pyro_out', 'pyro_in', 'ecp_temp', 'tc_out', 'tc_in',
+        fields = ('layer', 'layer_desc',
+                  'pyro_out', 'pyro_in', 'ecp_temp', 'tc_out', 'tc_in',
                   'motor_rpm', 'gc_pressure', 'gc_position', 'voltage_in',
                   'voltage_out', 'current_in', 'current_out', 'top_vp_flow',
                   'hydride_inner', 'hydride_outer', 'alkyl_flow_inner',
@@ -142,6 +144,8 @@ class D180ReadingsForm(forms.ModelForm):
                   'silane_flow', 'silane_dilution', 'silane_mix',
                   'silane_pressure',)
         labels = {
+            'layer': _('Layer number'),
+            'layer_desc': _('Layer description'),
             'pyro_out': _('Outer pyro [°C]'),
             'pyro_in': _('Inner pyro [°C]'),
             'ecp_temp': _('ECP temperature [°C]'),
@@ -186,12 +190,20 @@ class D180ReadingsForm(forms.ModelForm):
             'silane_pressure': _('Silane pressure [torr]'),
         }
 
+    def save(self, growth, commit=True):
+        self.instance = super(D180ReadingsForm, self).save(commit=False)
+        self.instance.growth = growth
+        if commit:
+            self.instance.save()
+
+        return self.instance
+
 
 D180ReadingsFormSet = forms.models.modelformset_factory(D180Readings,
                                                         D180ReadingsForm)
 
 
-class PostrunChecklistForm(ChecklistForm):
+class WizardPostrunChecklistForm(ChecklistForm):
     checklist_fields = [
         'Wait for system to IDLE',
         'Stop k-space collection'

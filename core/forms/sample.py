@@ -23,7 +23,7 @@ class SubstrateForm(forms.ModelForm):
         cleaned_data = super(SubstrateForm, self).clean()
         data = [cleaned_data.get('comment'),
                 cleaned_data.get('source'),
-                cleaned_data.get('serial'),]
+                cleaned_data.get('serial')]
 
         if not any(data):
             raise ValidationError(_('Cannot leave all fields blank.'))
@@ -112,8 +112,8 @@ class SampleSelectOrCreateForm(forms.Form):
         return self.instance
 
 
-SampleFormSet = forms.formsets.formset_factory(SampleSelectOrCreateForm,
-                                               min_num=1, validate_min=True)
+SampleFormSet = forms.formsets.formset_factory(
+    SampleSelectOrCreateForm, min_num=1, extra=0, validate_min=True)
 
 
 class SplitSampleForm(forms.ModelForm):

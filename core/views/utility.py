@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import mimetypes
 import os
 import subprocess
 
@@ -59,9 +60,14 @@ class ProtectedMediaView(LoginRequiredMixin, generic.View):
     """
 
     def get(self, request, filename, *args, **kwargs):
-        fullpath = os.path.join(settings.MEDIA_ROOT, filename)
-        response = HttpResponse(mimetype='image/jpeg')
-        response['X-Sendfile'] = fullpath
+        response = HttpResponse()
+        response['X-Sendfile'] = os.path.join(settings.MEDIA_ROOT, filename)
+        content_type, encoding = mimetypes.guess_type(filename)
+        if not content_type:
+            content_type = 'application/octet-stream'  # assume binary file
+        response['Content-Type'] = content_type
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(
+            os.path.basename(filename))
         return response
 
 
