@@ -33,3 +33,4 @@ MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
+SENDFILE_BACKEND = 'sendfile.backends.development'
