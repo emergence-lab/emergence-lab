@@ -19,3 +19,4 @@ ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS')
 
 MEDIA_URL = '/wsgi/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
+SENDFILE_BACKEND = 'sendfile.backends.xsendfile'

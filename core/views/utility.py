@@ -13,6 +13,7 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 import gitlab
+from sendfile import sendfile
 
 from core.models import Process, Sample
 
@@ -60,15 +61,7 @@ class ProtectedMediaView(LoginRequiredMixin, generic.View):
     """
 
     def get(self, request, filename, *args, **kwargs):
-        response = HttpResponse()
-        response['X-Sendfile'] = os.path.join(settings.MEDIA_ROOT, filename)
-        content_type, encoding = mimetypes.guess_type(filename)
-        if not content_type:
-            content_type = 'application/octet-stream'  # assume binary file
-        response['Content-Type'] = content_type
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(
-            os.path.basename(filename))
-        return response
+        return sendfile(request, os.path.join(settings.MEDIA_ROOT, filename))
 
 
 class ExceptionHandlerView(LoginRequiredMixin, generic.View):
