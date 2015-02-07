@@ -1,19 +1,22 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, DetailView, ListView
+from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from .models import journal_entry
+from .models import JournalEntry
 from .forms import JournalEntryForm
 
 
-class JournalCreateView(LoginRequiredMixin, CreateView):
+class JournalCreateView(LoginRequiredMixin, generic.CreateView):
     """
     View for creating a journal entry.
     """
     template_name = 'journal/entry_create.html'
-    model = journal_entry
+    model = JournalEntry
     form_class = JournalEntryForm
 
     def form_valid(self, form):
@@ -24,25 +27,27 @@ class JournalCreateView(LoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('journal_list', kwargs={'username': self.request.user.username})
+        return reverse('journal_list',
+                       kwargs={'username': self.request.user.username})
 
 
-class JournalDetailView(LoginRequiredMixin, DetailView):
+class JournalDetailView(LoginRequiredMixin, generic.DetailView):
     """
     View for details of a journal entry.
     """
     template_name = 'journal/entry_detail.html'
-    model = journal_entry
+    model = JournalEntry
     context_object_name = 'entry'
 
 
-class JournalListView(LoginRequiredMixin, ListView):
+class JournalListView(LoginRequiredMixin, generic.ListView):
     """
     View a list of recent journal entries.
     """
     template_name = 'journal/entry_list.html'
-    model = journal_entry
+    model = JournalEntry
     context_object_name = 'entries'
 
     def get_queryset(self):
-        return journal_entry.objects.filter(author=self.request.user).order_by('-date')
+        return (JournalEntry.objects.filter(author=self.request.user)
+                                    .order_by('-date'))
