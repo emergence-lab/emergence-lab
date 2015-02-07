@@ -1,14 +1,18 @@
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.conf import settings
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 import schedule_queue.config as tools
 
+from core.models import ActiveStateMixin
 from d180.models import Platter
 
 
 @python_2_unicode_compatible
-class Reservation(models.Model):
+class Reservation(ActiveStateMixin, models.Model):
 
     tool = models.CharField(max_length=10, choices=tools.get_tool_choices())
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -19,9 +23,8 @@ class Reservation(models.Model):
     bake_length_in_minutes = models.IntegerField()
     max_integer_value = 9223372036854775807
     priority_field = models.BigIntegerField(default=max_integer_value)
-    is_active = models.BooleanField(default=True)
 
-    def __str__(self):              # __unicode__ on Python 2
+    def __str__(self):
         return '{0}, {1}, {2}'.format(str(self.tool),
                                       str(self.user),
                                       str(self.growth_length_in_hours))

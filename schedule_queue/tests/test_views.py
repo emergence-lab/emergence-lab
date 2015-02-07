@@ -1,14 +1,20 @@
-from django.test import TestCase
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
+import time
+
 from django.core.urlresolvers import reverse, resolve
+from django.test import TestCase
 from django.test.client import RequestFactory
+from django.contrib.auth import get_user_model
+
 from model_mommy import mommy
+
+from d180.models import Platter
+import schedule_queue.config as tools
 from schedule_queue.models import Reservation
 from schedule_queue.views import ReservationLanding
 from schedule_queue.urls import urlpatterns
-from d180.models import Platter
-import schedule_queue.config as tools
-from django.contrib.auth import get_user_model
-import time
 
 
 class TestReservationCRUD(TestCase):
