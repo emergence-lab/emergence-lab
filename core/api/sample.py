@@ -30,8 +30,8 @@ class SampleListAPIView(generics.ListAPIView):
 
 class SampleRetrieveAPIView(views.APIView):
     """
-    Read-only endpoint to show shallow details for a sample from the uuid.
-    Does not retrieve the entire process tree.
+    Read-only endpoint to show details for a sample from the uuid.
+    Retrieves the entire process tree.
     """
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -49,4 +49,22 @@ class SampleRetrieveAPIView(views.APIView):
         data = serializer.data
         node = sample.process_tree
         data['process_tree'] = self._recurse_tree(node)
+        return Response(data)
+
+class SampleLeafNodesAPIView(views.APIView):
+    """
+    Read-only endpoint to show the leaf nodes for a sample from the uuid.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        sample = Sample.objects.get_by_uuid(kwargs.get('uuid'))
+        serializer = SampleSerializer(sample)
+        data = serializer.data
+        del data['process_tree']
+        data['leaf_nodes'] = []
+        for node in sample.leaf_nodes:
+            process = ProcessSerializer(node.process).data
+            process['piece'] = node.piece
+            data['leaf_nodes'].append(process)
         return Response(data)

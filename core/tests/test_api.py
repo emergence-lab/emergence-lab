@@ -183,6 +183,29 @@ class TestSampleAPI(TestCase):
             self.assertEqual(len(c.get('children')), 1)
             self.assertEqual(c.get('children')[0].get('uuid'), process.uuid)
 
+    def test_retrieve_view_tree(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        processes = {
+            'step-1': [
+                mommy.make(Process),
+                mommy.make(Process),
+            ],
+            'step-2': [
+                mommy.make(Process),
+                mommy.make(Process),
+                mommy.make(Process),
+            ],
+        }
+        for process in processes['step-1']:
+            sample.run_process(process)
+        sample.split(3)
+        for piece, process in zip(['a', 'b', 'c'], processes['step-2']):
+            sample.run_process(process, piece)
+
+        response = self.client.get('/api/v0/sample/{}/leaf/'.format(sample.uuid))
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+
 
 class TestUserAPI(TestCase):
 

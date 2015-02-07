@@ -7,4 +7,5 @@ from .process import (ProcessListAPIView,
                       ProcessNodeRetrieveAPIView,)
 from .sample import (SampleListAPIView,
                      SampleRetrieveAPIView,
+                     SampleLeafNodesAPIView,
                      SubstrateListAPIView,)
