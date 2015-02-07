@@ -146,6 +146,44 @@ class TestSampleAPI(TestCase):
         results = json.loads(response.content)
         self.assertEqual(results.get('uuid'), sample.uuid)
 
+    def test_retrieve_view_tree(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        processes = {
+            'step-1': [
+                mommy.make(Process),
+                mommy.make(Process),
+            ],
+            'step-2': [
+                mommy.make(Process),
+                mommy.make(Process),
+                mommy.make(Process),
+            ],
+        }
+        for process in processes['step-1']:
+            sample.run_process(process)
+        sample.split(3)
+        for piece, process in zip(['a', 'b', 'c'], processes['step-2']):
+            sample.run_process(process, piece)
+
+        response = self.client.get('/api/v0/sample/{}/'.format(sample.uuid))
+        self.assertEqual(response.status_code, 200)
+        results = json.loads(response.content)
+        children = results.get('process_tree').get('children')
+        self.assertEqual(len(children), 1)
+        child = children[0]
+        self.assertEqual(child.get('uuid'), processes['step-1'][0].uuid)
+        self.assertEqual(len(child.get('children')), 1)
+        child = child.get('children')[0]
+        self.assertEqual(child.get('uuid'), processes['step-1'][1].uuid)
+        self.assertEqual(len(child.get('children')), 3)
+        for c, process, piece in zip(child.get('children'),
+                                     processes['step-2'],
+                                     ['a', 'b', 'c']):
+            self.assertEqual(c.get('piece'), piece)
+            self.assertEqual(len(c.get('children')), 1)
+            self.assertEqual(c.get('children')[0].get('uuid'), process.uuid)
+
+
 class TestUserAPI(TestCase):
 
     def setUp(self):
