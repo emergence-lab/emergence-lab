@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, views
+from rest_framework.response import Response
 
 from core.models import Sample, Substrate
-from core.serializers import SampleSerializer, SubstrateSerializer
+from core.serializers import SampleSerializer, SubstrateSerializer, ProcessSerializer
 
 
 class SubstrateListAPIView(generics.ListAPIView):
@@ -27,27 +28,25 @@ class SampleListAPIView(generics.ListAPIView):
     paginate_by = 100
 
 
-class SampleRetrieveAPIView(generics.RetrieveAPIView):
+class SampleRetrieveAPIView(views.APIView):
     """
     Read-only endpoint to show shallow details for a sample from the uuid.
     Does not retrieve the entire process tree.
     """
-    queryset = Sample.objects.all()
-    serializer_class = SampleSerializer
     permission_classes = (permissions.IsAuthenticated,)
-    lookup_url_kwarg = 'uuid'
 
-    def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
+    def _recurse_tree(self, node):
+        print('processing node {}'.format(node.uuid))
+        data = ProcessSerializer(node.process).data
+        data['piece'] = node.piece
+        data['children'] = [self._recurse_tree(child)
+                            for child in node.get_children()]
+        return data
 
-        assert self.lookup_url_kwarg in self.kwargs, (
-            'Expected view {} to be called with a URL keyword argument '
-            'named "{}". Fix your URL conf.'.format(self.__class__.__name__,
-                                                    self.lookup_url_kwarg))
-        uuid = Sample.strip_uuid(self.kwargs[self.lookup_url_kwarg])
-
-        obj = generics.get_object_or_404(queryset, id=uuid)
-
-        self.check_object_permissions(self.request, obj)
-
-        return obj
+    def get(self, request, *args, **kwargs):
+        sample = Sample.objects.get_by_uuid(kwargs.get('uuid'))
+        serializer = SampleSerializer(sample)
+        data = serializer.data
+        node = sample.process_tree
+        data['process_tree'] = self._recurse_tree(node)
+        return Response(data)
