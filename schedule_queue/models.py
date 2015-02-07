@@ -10,6 +10,15 @@ from d180.models import Platter
 @python_2_unicode_compatible
 class Reservation(models.Model):
 
+    @staticmethod
+    def get_latest(user, tool_name):
+        item = Reservation.objects.filter(is_active=True,
+                                          tool=tool_name).order_by('priority_field').first()
+        if item and item.user == user:
+            return item
+        else:
+            return None
+
     tool = models.CharField(max_length=10, choices=tools.get_tool_choices())
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     platter = models.ForeignKey(Platter)
