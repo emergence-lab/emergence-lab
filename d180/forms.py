@@ -224,5 +224,8 @@ class CommentsForm(forms.Form):
         required=False,
         widget=forms.Textarea(attrs={'class': 'hallo'}))
 
+
 class ReservationCloseForm(forms.Form):
-    hold_open = forms.BooleanField(required=False, label="Hold the reservation!")
+    hold_open = forms.BooleanField(
+        required=False,
+        label=_('Hold the reservation'))

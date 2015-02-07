@@ -16,7 +16,6 @@ from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
 from core.models import Sample
-
 from schedule_queue.models import Reservation
 
 
@@ -112,9 +111,10 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
 
     def get(self, request, *args, **kwargs):
         self.object = None
-        reservation = Reservation.get_latest(user=self.request.user, tool_name='d180')
-        return self.render_to_response(self.get_context_data(reservation_object=reservation,
-                                                             **self.build_forms()))
+        reservation = Reservation.get_latest(user=self.request.user,
+                                             tool_name='d180')
+        return self.render_to_response(self.get_context_data(
+            reservation=reservation, **self.build_forms()))
 
     def post(self, request, *args, **kwargs):
         self.object = None
@@ -133,12 +133,11 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             for s in sample_formset:
                 sample = s.save()
                 sample.run_process(self.object)
-            reservation_object = Reservation.get_latest(user=self.request.user,
-                                                        tool_name='d180')
-            if reservation_object is not None:
-                if reservation_form.hold_open == False:
-                    reservation_object.is_active = False
-                    reservation_object.save()
+            reservation = Reservation.get_latest(user=self.request.user,
+                                                 tool_name='d180')
+            if reservation is not None and reservation_form.hold_open:
+                reservation.deactivate()
+
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
             basic_info_form = WizardBasicInfoForm(request.POST, prefix='growth')
@@ -152,8 +151,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 comment_form=comment_form,
                 sample_formset=sample_formset,
                 reservation_form=reservation_form,
-                reservation_object = Reservation().get_latest(user=self.request.user,
-                                                              tool_name='d180')))
+                reservation=Reservation.get_latest(user=self.request.user,
+                                                   tool_name='d180')))
 
 
 class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
