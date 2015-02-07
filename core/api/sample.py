@@ -36,7 +36,6 @@ class SampleRetrieveAPIView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def _recurse_tree(self, node):
-        print('processing node {}'.format(node.uuid))
         data = ProcessSerializer(node.process).data
         data['piece'] = node.piece
         data['children'] = [self._recurse_tree(child)
