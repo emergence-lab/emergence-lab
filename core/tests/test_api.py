@@ -183,7 +183,7 @@ class TestSampleAPI(TestCase):
             self.assertEqual(len(c.get('children')), 1)
             self.assertEqual(c.get('children')[0].get('uuid'), process.uuid)
 
-    def test_retrieve_view_tree(self):
+    def test_retrieve_view_leaf(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         processes = {
             'step-1': [
@@ -205,6 +205,10 @@ class TestSampleAPI(TestCase):
         response = self.client.get('/api/v0/sample/{}/leaf/'.format(sample.uuid))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
+        leaf_nodes = results.get('leaf_nodes')
+        leaf_uuids = [p.uuid for p in processes['step-2']]
+        for node in leaf_nodes:
+            self.assertIn(node.get('uuid'), leaf_uuids)
 
 
 class TestUserAPI(TestCase):
