@@ -6,12 +6,13 @@ import subprocess
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.utils.cache import add_never_cache_headers
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
 import gitlab
+from sendfile import sendfile
 
 from core.models import Process, Sample
 
@@ -59,10 +60,7 @@ class ProtectedMediaView(LoginRequiredMixin, generic.View):
     """
 
     def get(self, request, filename, *args, **kwargs):
-        fullpath = os.path.join(settings.MEDIA_ROOT, filename)
-        response = HttpResponse(mimetype='image/jpeg')
-        response['X-Sendfile'] = fullpath
-        return response
+        return sendfile(request, os.path.join(settings.MEDIA_ROOT, filename))
 
 
 class ExceptionHandlerView(LoginRequiredMixin, generic.View):
@@ -127,6 +125,11 @@ class AboutView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutView, self).get_context_data(**kwargs)
-        context['commit'] = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-        context['tags'] = subprocess.check_output(["git", "describe", "--tags"])
+        context['branch'] = subprocess.check_output(
+            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+        tag, ahead, commit = subprocess.check_output(
+            ['git', 'describe', '--tag']).split('-')
+        context['tag'] = tag
+        context['commits_ahead'] = ahead
+        context['commit'] = commit[1:]
         return context

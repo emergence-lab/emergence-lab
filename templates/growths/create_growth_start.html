@@ -28,16 +28,16 @@
         Start Growth
         <div class="pull-right">
             <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
-                <span class="glyphicon glyphicon-remove"></span>
+                {% bootstrap_icon 'remove' %}
                 Cancel
             </button>
             <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
-                <span class="glyphicon glyphicon-pencil"></span>
-                Edit Comments
+                {% bootstrap_icon 'pencil' %}
+                Comments
             </button>
             <button class="btn btn-success next-tab-main" type="button">
                 Next Step
-                <span class="glyphicon glyphicon-chevron-right"></span>
+                {% bootstrap_icon 'chevron-right' %}
             </button>
         </div>
     </h1>
@@ -173,7 +173,7 @@
                     </div>
                 </div>
             </div>
-        </div>  
+        </div>
 
 
         {# Cancel Modal #}
@@ -205,22 +205,28 @@
                         <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
                     </div>
                     <div class="modal-body">
-                        WARNING: If you start a new growth now you will NOT be able to return to this page!!
-                        {% if reservation_object %}
-                            {% bootstrap_form reservation_form %}
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>   
-                                </div>
-                                <div class="panel-body">
-                                    <strong>Tool:</strong> {{ reservation_object.tool.upper }} <br>
-                                    <strong>Operator:</strong> {{ reservation_object.user.operator.name }} <br>
-                                    <strong>Run Time:</strong> {{ reservation_object.growth_length_in_hours }} hours
-                                    {% if reservation_object.comment %}
-                                        <br><strong>Comment:</strong> {{ reservation_object.comment }}
-                                    {% endif %}
-                                </div>                    
+                        <strong>WARNING:</strong> If you start a new growth now you will NOT be able to return to this page!!
+                        {% if reservation and reservation.user == user %}
+                            <h6>&nbsp;</h6>
+                            <div>
+                                <strong>This will close the following reservation:</strong><br>
+                                {% bootstrap_form reservation_form %}
                             </div>
+                            <p>
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <strong>Tool:</strong> {{ reservation.tool.upper }} <br>
+                                        <strong>Operator:</strong> {{ reservation.user.full_name }} <br>
+                                        <strong>Run Time:</strong> {{ reservation.growth_length_in_hours }} hours
+                                        {% if reservation.comment %}
+                                            <br><strong>Comment:</strong> {{ reservation.comment }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </p>
                         {% endif %}
                     </div>
                     <div class="modal-footer">
@@ -239,5 +245,6 @@
 
 {% block scripts %}
     <script type="text/javascript" src="{% static 'growths/js/django-formset.js' %}"></script>
+    <script type="text/javascript" src="{% static 'growths/js/growth_wizard.js' %}"></script>
     <script type="text/javascript" src="{% static 'growths/js/create_growth.js' %}"></script>
 {% endblock scripts %}

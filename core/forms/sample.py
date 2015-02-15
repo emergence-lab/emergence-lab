@@ -1,20 +1,38 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import six
+
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 from core.models import Substrate, Sample
 
 
 class SubstrateForm(forms.ModelForm):
+    """
+    Form to create a substrate. At least one field must have data to validate.
+    """
 
     class Meta:
         model = Substrate
         fields = ('comment', 'source', 'serial',)
 
+    def clean(self):
+        cleaned_data = super(SubstrateForm, self).clean()
+        data = [cleaned_data.get('comment'),
+                cleaned_data.get('source'),
+                cleaned_data.get('serial')]
+
+        if not any(data):
+            raise ValidationError(_('Cannot leave all fields blank.'))
+
 
 class SampleForm(forms.ModelForm):
+    """
+    Form to create a new sample using an already existing substrate.
+    """
 
     class Meta:
         model = Sample
@@ -47,12 +65,14 @@ class SampleSelectOrCreateForm(forms.Form):
         cleaned_data = super(SampleSelectOrCreateForm, self).clean()
 
         # check if existing sample specified
-        uuid = cleaned_data['sample_uuid']
+        uuid = cleaned_data.get('sample_uuid')
         if uuid:
             try:
                 cleaned_data['sample'] = Sample.objects.get_by_uuid(uuid)
             except ObjectDoesNotExist:
-                raise ValidationError('Sample {} not found'.format(uuid))
+                self.add_error('sample_uuid',
+                               'Sample {} not found'.format(uuid))
+                return
         else:
             cleaned_data['sample'] = None
 
@@ -72,9 +92,11 @@ class SampleSelectOrCreateForm(forms.Form):
             }
             substrate_form = SubstrateForm(data=substrate_data)
             if not substrate_form.is_valid():
-                    self.add_error(None, substrate_form.errors)
-
-        return cleaned_data
+                for field, error in six.iteritems(substrate_form.errors):
+                    if field == '__all__':
+                        self.add_error(None, error)
+                    else:
+                        self.add_error('substrate_{}'.format(field), error)
 
     def save(self, commit=True):
         if self.cleaned_data['sample'] is None:
@@ -90,7 +112,8 @@ class SampleSelectOrCreateForm(forms.Form):
         return self.instance
 
 
-SampleFormSet = forms.formsets.formset_factory(SampleSelectOrCreateForm)
+SampleFormSet = forms.formsets.formset_factory(
+    SampleSelectOrCreateForm, min_num=1, extra=0, validate_min=True)
 
 
 class SplitSampleForm(forms.ModelForm):

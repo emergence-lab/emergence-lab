@@ -1,20 +1,26 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
+import time
+
 from django.shortcuts import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from schedule_queue.models import Reservation
-from django.views.generic import ListView, RedirectView
-from django.views.generic.edit import CreateView, UpdateView
-import time
+from django.views import generic
 
+from braces.views import LoginRequiredMixin
+
+from core.views import ActionReloadView
 from schedule_queue import config as tools
 
 
-class ReservationLanding(ListView):
+class ReservationLanding(LoginRequiredMixin, generic.ListView):
     model = Reservation
     queryset = tools.get_tool_list()
     template_name = 'schedule_queue/reservation_landing.html'
 
 
-class ReservationListByTool(ListView):
+class ReservationListByTool(LoginRequiredMixin, generic.ListView):
     model = Reservation
     template_name = 'schedule_queue/reservation_list.html'
 
@@ -32,7 +38,7 @@ class ReservationListByTool(ListView):
         return super(ReservationListByTool, self).get_context_data(**kwargs)
 
 
-class ReservationCreate(CreateView):
+class ReservationCreate(LoginRequiredMixin, generic.CreateView):
     model = Reservation
     fields = ['tool', 'platter', 'growth_length_in_hours', 'comment', 'bake_length_in_minutes']
     template_name = 'schedule_queue/reservation_form.html'
@@ -45,7 +51,10 @@ class ReservationCreate(CreateView):
         self.object.priority_field = int(10 * time.time())
         self.object.user = self.request.user
 
-        if len(Reservation.objects.exclude(is_active=False).filter(tool=self.object.tool)) < tools.get_tool_info(self.object.tool)['max_reservations']:
+        num_reservations = (Reservation.active_objects.filter(tool=self.object.tool)
+                                                      .count())
+        max_reservations = tools.get_tool_info(self.object.tool)['max_reservations']
+        if num_reservations < max_reservations:
             self.object.save()
             return HttpResponseRedirect(reverse('reservation_list_by_tool',
                                                 args=(self.object.tool,)))
@@ -53,7 +62,7 @@ class ReservationCreate(CreateView):
             raise Exception("Reservation List Full")
 
 
-class ReservationEdit(UpdateView):
+class ReservationEdit(LoginRequiredMixin, generic.UpdateView):
     model = Reservation
     fields = ['tool', 'platter', 'growth_length_in_hours',
               'comment', 'bake_length_in_minutes']
@@ -63,59 +72,64 @@ class ReservationEdit(UpdateView):
         return reverse('reservation_list_by_tool', args=(self.object.tool,))
 
 
-class IncreasePriority(RedirectView):
-    permanent = False
+class IncreasePriority(LoginRequiredMixin, ActionReloadView):
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
-        tmp = Reservation.objects.filter(is_active=True,
-                                         priority_field__lt=reservation_obj.priority_field
-                                         ).order_by('-priority_field')
+        tmp = (Reservation.active_objects.filter(priority_field__lt=reservation_obj.priority_field)
+                                         .order_by('-priority_field'))
         if tmp.first():
             tmp = tmp.first()
             reservation_obj.priority_field, tmp.priority_field = tmp.priority_field, reservation_obj.priority_field
             reservation_obj.save()
             tmp.save()
-        return reverse('reservation_list_by_tool', args=(reservation_obj.tool,))
-
-
-class DecreasePriority(RedirectView):
-    permanent = False
+        self.tool = reservation_obj.tool
 
     def get_redirect_url(self, *args, **kwargs):
+        return reverse('reservation_list_by_tool', args=(self.tool,))
+
+
+class DecreasePriority(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
-        tmp = Reservation.objects.filter(is_active=True,
-                                         priority_field__gt=reservation_obj.priority_field
-                                         ).order_by('priority_field')
+        tmp = (Reservation.active_objects.filter(priority_field__gt=reservation_obj.priority_field)
+                                         .order_by('priority_field'))
         if tmp.first():
             tmp = tmp.first()
             reservation_obj.priority_field, tmp.priority_field = tmp.priority_field, reservation_obj.priority_field
             reservation_obj.save()
             tmp.save()
-        return reverse('reservation_list_by_tool', args=(reservation_obj.tool,))
-
-
-class CancelReservation(RedirectView):
-    permanent = False
+        self.tool = reservation_obj.tool
 
     def get_redirect_url(self, *args, **kwargs):
+        return reverse('reservation_list_by_tool', args=(self.tool,))
+
+
+class CancelReservation(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
         if reservation_obj.is_active and reservation_obj.user == self.request.user:
             reservation_obj.is_active = False
             reservation_obj.save()
-        return reverse('reservation_list_by_tool', args=(reservation_obj.tool,))
-
-
-class CloseReservation(RedirectView):
-    permanent = False
+        self.tool = reservation_obj.tool
 
     def get_redirect_url(self, *args, **kwargs):
+        return reverse('reservation_list_by_tool', args=(self.tool,))
+
+
+class CloseReservation(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
         if reservation_obj.is_active and reservation_obj.user == self.request.user:
             reservation_obj.is_active = False
             reservation_obj.save()
+
+    def get_redirect_url(self, *args, **kwargs):
         return reverse('dashboard')

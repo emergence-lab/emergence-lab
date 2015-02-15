@@ -1,4 +1,4 @@
-Django==1.7.3
+Django==1.7.4
 django-auth-ldap==1.2.2
 django-filter==0.9.1
 git+https://github.com/alex/django-filter.git@25213fbdbb40e5036e854c26dd8d34bbc2ca4592
@@ -28,3 +28,4 @@ django-polymorphic==0.6
 django-uuidfield==0.5.0
 redis==2.10.3
 MySQL-python==1.2.5
+django-sendfile==0.3.6

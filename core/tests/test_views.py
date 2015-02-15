@@ -10,11 +10,7 @@ from model_mommy import mommy
 from core.models import Investigation, Project, ProjectTracking
 
 
-class TestHomepage(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        get_user_model().objects.create_user('default', password='')
+class TestHomepageAbout(TestCase):
 
     def test_homepage_url_resolution(self):
         match = resolve('/')
@@ -22,11 +18,13 @@ class TestHomepage(TestCase):
 
     def test_homepage_access_anonymous(self):
         self.client.logout()
+
         response = self.client.get(reverse('home'))
         self.assertTemplateUsed(response, 'core/index.html')
         self.assertEqual(response.status_code, 200)
 
     def test_homepage_access_login(self):
+        get_user_model().objects.create_user('default', password='')
         result = self.client.login(username='default', password='')
         self.assertTrue(result)
 
@@ -34,22 +32,34 @@ class TestHomepage(TestCase):
         self.assertTemplateUsed(response, 'core/index.html')
         self.assertEqual(response.status_code, 200)
 
+    def test_about_url_resolution(self):
+        url = '/about/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'about')
+
+    def test_about_access_anonymous(self):
+        self.client.logout()
+
+        response = self.client.get(reverse('about'))
+        self.assertTemplateUsed(response, 'core/about.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_about_access_login(self):
+        get_user_model().objects.create_user('default', password='')
+        result = self.client.login(username='default', password='')
+        self.assertTrue(result)
+
+        response = self.client.get(reverse('about'))
+        self.assertTemplateUsed(response, 'core/about.html')
+        self.assertEqual(response.status_code, 200)
 
 class TestUserCRUD(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        User = get_user_model()
-        user1 = User.objects.create_user('username1', password='')
-        user2 = User.objects.create_user('username2', password='')
-        user2.is_active = False
-        user2.save()
-
-    @classmethod
-    def tearDownClass(cls):
-        get_user_model().objects.all().delete()
-
     def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username2', password='')
+        user.is_active = False
+        user.save()
         self.client.login(username='username1', password='')
 
     def test_operator_list_url_resolution(self):
@@ -219,6 +229,7 @@ class TestProjectCRUD(TestCase):
 class TestInvestigationCRUD(TestCase):
 
     def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
         project2 = mommy.make(Project, name='project 2', slug='project-2',
@@ -228,8 +239,6 @@ class TestInvestigationCRUD(TestCase):
                    slug='investigation-1', is_active=True, project=project1)
         mommy.make(Investigation, name='investigation 2',
                    slug='investigation-2', is_active=False, project=project2)
-
-        user = get_user_model().objects.create_user('username1', password='')
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):

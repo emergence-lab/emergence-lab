@@ -44,9 +44,16 @@ class SampleManager(models.Manager):
 
         return sample
 
-    def get_by_uuid(self, uuid):
-        uuid = Sample.strip_uuid(uuid)
+    def get_by_uuid(self, uuid, clean=True):
+        if clean:
+            uuid = Sample.strip_uuid(uuid)
         return Sample.objects.get(pk=uuid)
+
+    def get_by_process(self, uuid, clean=True):
+        if clean:
+            uuid = Process.strip_uuid(uuid)
+        nodes = ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
+        return [node.get_sample() for node in nodes]
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
@@ -198,16 +205,25 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         return self.leaf_nodes.get(piece=piece)
 
-    def get_node(self, uuid):
+    def get_node(self, uuid, clean=True):
         """
         Get the specific node from the tree with the specified uuid.
         """
-        uuid = ProcessNode.strip_uuid(uuid)
+        if clean:
+            uuid = ProcessNode.strip_uuid(uuid)
         return self._get_tree_queryset().get(uuid_full__startswith=uuid)
 
-    def get_nodes_for_process(self, uuid):
+    def has_nodes_for_process(self, uuid, clean=True):
+        """
+        Returns if the sample has any nodes corresponding to the specified
+        process.
+        """
+        return self.get_nodes_for_process(uuid, clean).exists()
+
+    def get_nodes_for_process(self, uuid, clean=True):
         """
         Get all nodes from the tree that have the specified process.
         """
-        uuid = Process.strip_uuid(uuid)
+        if clean:
+            uuid = Process.strip_uuid(uuid)
         return self._get_tree_queryset().filter(process__uuid_full__startswith=uuid)

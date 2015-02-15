@@ -2,7 +2,8 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
-import unittest
+
+from django.test import TestCase
 
 from model_mommy import mommy
 from rest_framework.serializers import ValidationError
@@ -13,7 +14,7 @@ from .models import ChildProcess, ParentProcess
 from core.serializers import ProcessSerializer, SampleSerializer
 
 
-class TestProcessSerializer(unittest.TestCase):
+class TestProcessSerializer(TestCase):
 
     def test_polymorphic_field_mapping(self):
         """
@@ -145,7 +146,7 @@ class TestProcessSerializer(unittest.TestCase):
         self.assertIsNotNone(process.uuid)
 
 
-class TestSampleSerializer(unittest.TestCase):
+class TestSampleSerializer(TestCase):
 
     def test_serialization_sample(self):
         """

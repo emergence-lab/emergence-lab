@@ -52,3 +52,6 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     parent = mptt.TreeForeignKey('self', null=True, related_name='children')
     process = models.ForeignKey(Process, null=True)
     piece = models.CharField(max_length=5)
+
+    def get_sample(self):
+        return self.get_root().sample
