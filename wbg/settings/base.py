@@ -94,6 +94,7 @@ INSTALLED_APPS = (
     'hall',
     'simulations',
     'schedule_queue',
+    'sem',
     # misc
     'actstream',
 )
