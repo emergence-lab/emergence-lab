@@ -4,10 +4,12 @@ from __future__ import absolute_import, unicode_literals
 from django.core.urlresolvers import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from braces.views import LoginRequiredMixin
+
 from .models import SEMScan
 
 
-class SEMList(ListView):
+class SEMList(LoginRequiredMixin, ListView):
     """
     List the most recent sem data
     """
@@ -16,7 +18,7 @@ class SEMList(ListView):
     paginate_by = 25
 
 
-class SEMDetail(DetailView):
+class SEMDetail(LoginRequiredMixin, DetailView):
     """
     Detail view of the sem model.
     """
@@ -31,7 +33,7 @@ class SEMDetail(DetailView):
         return context
 
 
-class SEMCreate(CreateView):
+class SEMCreate(LoginRequiredMixin, CreateView):
     """
     View for creation of new sem data.
     """
@@ -39,7 +41,7 @@ class SEMCreate(CreateView):
     template_name = 'sem/sem_create.html'
 
 
-class SEMUpdate(UpdateView):
+class SEMUpdate(LoginRequiredMixin, UpdateView):
     """
     View for updating sem data.
     """
@@ -47,7 +49,7 @@ class SEMUpdate(UpdateView):
     template_name = 'sem/sem_update.html'
 
 
-class SEMDelete(DeleteView):
+class SEMDelete(LoginRequiredMixin, DeleteView):
     """
     View for deleting sem data
     """
