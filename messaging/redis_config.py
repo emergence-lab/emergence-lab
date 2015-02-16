@@ -1,10 +1,13 @@
-### Classes for Redis objects associated with this app
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
+import pickle
+import uuid
+
 from django.conf import settings
 from django.utils import timezone
 
 from redis import StrictRedis
-import uuid
-import pickle
 
 
 class Helper(object):
@@ -17,11 +20,10 @@ class Helper(object):
                              settings.REDIS_DB)
 
     def get_notifications(self, user_id):
-        ### LATER: ADD GROUPS AND LABS
+        # LATER: ADD GROUPS AND LABS
         notifications = []
         notification_set = self.r.lrange(
-            'users:{0}:notifications'.format(user_id),
-                      0, -1)
+            'users:{}:notifications'.format(user_id), 0, -1)
         for i in notification_set:
             if self.r.get(i):
                 notifications.append(pickle.loads(self.r.get(i)))
@@ -30,8 +32,9 @@ class Helper(object):
                           0, i)
         return notifications
 
-    def new_notification(self, target, notification, app=None, url=None, severity=None, expiration=30):
-        ### LATER: ADD GROUPS AND LABS
+    def new_notification(self, target, notification, app=None, url=None,
+                         severity=None, expiration=30):
+        # LATER: ADD GROUPS AND LABS
         notification_id = str(uuid.uuid4())
         item = Notification()
         item.created = timezone.datetime.now()
@@ -40,9 +43,10 @@ class Helper(object):
         item.url = url
         if severity not in ['success', 'warning', 'info', 'danger']:
             item.severity = None
-        else: item.severity = severity
+        else:
+            item.severity = severity
         self.r.set(notification_id, pickle.dumps(item))
-        self.r.expire(notification_id, expiration*24*3600)
+        self.r.expire(notification_id, expiration * 24 * 3600)
         self.r.lpush('users:{0}:notifications'.format(target), notification_id)
         return item
 
@@ -56,5 +60,3 @@ class Notification(object):
         self.payload = None
         self.severity = None
         self.expiration = 30
-
-

@@ -26,10 +26,13 @@ class RelationalFilterView(FilterView):
                 qs = getattr(obj, model + "_set").all()
                 prefix = model + '__'
                 # filter for '<model>__' in GET
-                get_params = list(k for k, v in request.GET.iteritems() if prefix in k)
+                get_params = [k
+                              for k, v in request.GET.iteritems()
+                              if prefix in k]
                 for field in fields:  # <model>__<field>
                     # sort by final character (#)
-                    final_params = sorted(list(v for v in get_params if field in v), key=lambda str: str[-1])
+                    final_params = sorted([v for v in get_params if field in v],
+                                          key=lambda str: str[-1])
                     if final_params:
                         # TODO: break this out into relational_action parameter?
                         # TODO: add relationalfilter to auto-handle naming etc?
@@ -39,37 +42,48 @@ class RelationalFilterView(FilterView):
                             qs = qs.filter(**{field + '__' + lookup: value})
                 setattr(obj, model + "_filter", qs)
 
-        context = self.get_context_data(filter=self.filterset, object_list=self.object_list)
+        context = self.get_context_data(filter=self.filterset,
+                                        object_list=self.object_list)
         return self.render_to_response(context)
 
 
 class D180GrowthFilter(filters.FilterSet):
     operator = filters.ModelMultipleChoiceFilter(queryset=User.objects.all())
     project = filters.ModelMultipleChoiceFilter(queryset=Project.objects.all())
-    investigation = filters.ModelMultipleChoiceFilter(queryset=Investigation.objects.all())
-    created = filters.DateFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                 widget=DateTimeWidget(attrs={'class': 'datetime'},
-                                                       options={'minView': '2',
-                                                                'startView': '3',
-                                                                'todayBtn': 'true',
-                                                                'clearBtn': 'true',
-                                                                'format': 'yyyy-mm-dd'}))
-    afm__rms = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                    distinct=True)
-    afm__zrange = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                       distinct=True)
-    afm__size = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                     distinct=True)
-    hall__sheet_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                                     distinct=True)
-    hall__sheet_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                                  distinct=True)
-    hall__mobility = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                          distinct=True)
-    hall__bulk_concentration = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                                    distinct=True)
-    hall__bulk_resistance = filters.NumberFilter(lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
-                                                 distinct=True)
+    investigation = filters.ModelMultipleChoiceFilter(
+        queryset=Investigation.objects.all())
+    created = filters.DateFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        widget=DateTimeWidget(attrs={'class': 'datetime'},
+                              options={'minView': '2',
+                                       'startView': '3',
+                                       'todayBtn': 'true',
+                                       'clearBtn': 'true',
+                                       'format': 'yyyy-mm-dd'}))
+    afm__rms = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    afm__zrange = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    afm__size = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    hall__sheet_concentration = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    hall__sheet_resistance = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    hall__mobility = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    hall__bulk_concentration = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
+    hall__bulk_resistance = filters.NumberFilter(
+        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        distinct=True)
 
     # TODO: break this out into RelationalFilterSet class
     def __init__(self, *args, **kwargs):
@@ -81,11 +95,13 @@ class D180GrowthFilter(filters.FilterSet):
 
     class Meta:
         model = D180Growth
-        fields = ['uuid_full', 'created', 'user', 'project', 'investigations', 'platter',
-                  'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan', 'has_aln',
-                  'is_template', 'is_buffer', 'has_pulsed', 'has_graded', 'has_superlattice', 'has_mqw', ]
+        fields = ['uuid_full', 'created', 'user', 'project', 'investigations',
+                  'platter', 'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan',
+                  'has_aln', 'is_template', 'is_buffer', 'has_pulsed',
+                  'has_graded', 'has_superlattice', 'has_mqw', ]
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
-            'hall': ['sheet_concentration', 'sheet_resistance', 'mobility', 'bulk_concentration', 'bulk_resistance']
+            'hall': ['sheet_concentration', 'sheet_resistance', 'mobility',
+                     'bulk_concentration', 'bulk_resistance']
         }
         order_by = ['-uuid_full']

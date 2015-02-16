@@ -25,7 +25,7 @@ def get_tool_info(slug):
 
 # Tool definitions
 
-class d180(object):
+class D180(object):
 
     @staticmethod
     def get_name():
@@ -36,7 +36,7 @@ class d180(object):
         return 'd180'
 
 
-class d75(object):
+class D75(object):
 
     @staticmethod
     def get_name():
@@ -47,9 +47,9 @@ class d75(object):
         return 'd75'
 
 # custom attributes for tools
-tool = {'d180': {'slug': d180.get_slug(),
+tool = {'d180': {'slug': D180.get_slug(),
                  'max_reservations': 5,
                  'process_start_url': 'create_growth_d180_start'},
-    'd75': {'slug': d75.get_slug(),
+    'd75': {'slug': D75.get_slug(),
             'max_reservations': 3}
         }
