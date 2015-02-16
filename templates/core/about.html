@@ -7,10 +7,14 @@
 <h4 class="text-center">Emergence Lab</h4>
 
 <div class="text-center">
-    <p>
-        on commit {{commit}} <br>
-        {{commits_ahead}} commits ahead of {{tag}} on branch {{branch}} <br>
-    </p>
+    {% if error %}
+        {{error}}
+    {% else %}
+        <p>
+            on commit {{commit}} <br>
+            {{commits_ahead}} commits ahead of {{tag}} on branch {{branch}} <br>
+        </p>
+    {% endif %}
 </div>
 
 {% endblock content %}
