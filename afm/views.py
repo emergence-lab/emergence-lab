@@ -4,10 +4,12 @@ from __future__ import absolute_import, unicode_literals
 from django.core.urlresolvers import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from braces.views import LoginRequiredMixin
+
 from .models import AFMScan
 
 
-class AFMList(ListView):
+class AFMList(LoginRequiredMixin, ListView):
     """
     List the most recent afm data
     """
@@ -16,7 +18,7 @@ class AFMList(ListView):
     paginate_by = 25
 
 
-class AFMDetail(DetailView):
+class AFMDetail(LoginRequiredMixin, DetailView):
     """
     Detail view of the afm model.
     """
@@ -31,7 +33,7 @@ class AFMDetail(DetailView):
         return context
 
 
-class AFMCreate(CreateView):
+class AFMCreate(LoginRequiredMixin, CreateView):
     """
     View for creation of new afm data.
     """
@@ -39,7 +41,7 @@ class AFMCreate(CreateView):
     template_name = 'afm/afm_create.html'
 
 
-class AFMUpdate(UpdateView):
+class AFMUpdate(LoginRequiredMixin, UpdateView):
     """
     View for updating afm data.
     """
@@ -47,7 +49,7 @@ class AFMUpdate(UpdateView):
     template_name = 'afm/afm_update.html'
 
 
-class AFMDelete(DeleteView):
+class AFMDelete(LoginRequiredMixin, DeleteView):
     """
     View for deleting afm data
     """
