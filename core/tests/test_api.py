@@ -102,24 +102,30 @@ class TestProcessAPI(TestCase):
         """
         Test retrieval of a process node using the full uuid.
         """
-        node = mommy.make(ProcessNode)
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        sample.run_process(mommy.make(Process))
+        node = sample.leaf_nodes[0]
         response = self.client.get(
             '/api/v0/process/node/{}/'.format(node.uuid_full.hex))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
         self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
+        self.assertEqual(results.get('sample'), sample.uuid)
 
     def test_retrieve_node_view_get_short_uuid(self):
         """
         Test retrieval of a process node using the short uuid.
         """
-        node = mommy.make(ProcessNode)
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        sample.run_process(mommy.make(Process))
+        node = sample.leaf_nodes[0]
         response = self.client.get(
             '/api/v0/process/node/{}/'.format(node.uuid))
         results = json.loads(response.content)
         self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
+        self.assertEqual(results.get('sample'), sample.uuid)
 
 
 class TestSampleAPI(TestCase):
@@ -165,23 +171,27 @@ class TestSampleAPI(TestCase):
         for piece, process in zip(['a', 'b', 'c'], processes['step-2']):
             sample.run_process(process, piece)
 
-        response = self.client.get('/api/v0/sample/{}/'.format(sample.uuid))
+        response = self.client.get('/api/v0/sample/{}/node/tree/'.format(sample.uuid))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
-        children = results.get('process_tree').get('children')
+
+        children = results.get('nodes').get('children')
         self.assertEqual(len(children), 1)
         child = children[0]
-        self.assertEqual(child.get('uuid'), processes['step-1'][0].uuid)
+        self.assertEqual(child.get('process').get('uuid'),
+                         processes['step-1'][0].uuid)
         self.assertEqual(len(child.get('children')), 1)
         child = child.get('children')[0]
-        self.assertEqual(child.get('uuid'), processes['step-1'][1].uuid)
+        self.assertEqual(child.get('process').get('uuid'),
+                         processes['step-1'][1].uuid)
         self.assertEqual(len(child.get('children')), 3)
         for c, process, piece in zip(child.get('children'),
                                      processes['step-2'],
                                      ['a', 'b', 'c']):
             self.assertEqual(c.get('piece'), piece)
             self.assertEqual(len(c.get('children')), 1)
-            self.assertEqual(c.get('children')[0].get('uuid'), process.uuid)
+            self.assertEqual(c.get('children')[0].get('process').get('uuid'),
+                             process.uuid)
 
     def test_retrieve_view_leaf(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
@@ -202,13 +212,13 @@ class TestSampleAPI(TestCase):
         for piece, process in zip(['a', 'b', 'c'], processes['step-2']):
             sample.run_process(process, piece)
 
-        response = self.client.get('/api/v0/sample/{}/leaf/'.format(sample.uuid))
+        response = self.client.get('/api/v0/sample/{}/node/leaf/'.format(sample.uuid))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
-        leaf_nodes = results.get('leaf_nodes')
+        leaf_nodes = results.get('nodes')
         leaf_uuids = [p.uuid for p in processes['step-2']]
         for node in leaf_nodes:
-            self.assertIn(node.get('uuid'), leaf_uuids)
+            self.assertIn(node.get('process').get('uuid'), leaf_uuids)
 
 
 class TestUserAPI(TestCase):
