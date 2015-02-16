@@ -1,32 +1,27 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-{% block title %}Delete AFM{% endblock %}
+{% block title %}Delete SEM{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h3>Are you sure you want to delete {{afm}}?</h3>
+    <h3>Are you sure you want to delete {{sem}}?</h3>
 
     <form action="" method="post">
         {% csrf_token %}
         {% buttons %}
-        <a href="{% url 'afm_detail' pk=afm.id %}" class="btn btn-default">No</a>
+        <a href="{% url 'sem_detail' pk=sem.id %}" class="btn btn-default">No</a>
         <button type="submit" class="btn btn-danger">Yes</button>
         {% endbuttons %}
     </form>
 
-    <p>Location: {{afm.location}}</p>
-    <p>Size: {{afm.size}}</p>
-    <p>RMS: {{afm.rms}}</p>
-    <p>Z-Range: {{afm.zrange}}</p>
+    <p>Magnification: {{sem.magnification}}</p>
+    <p>Image Source: {{sem.image_source}}</p>
 
-    {% if afm.height %}
-    <img src="{{afm.height.url}}" alt="height">
-    {% endif %}
-    {% if afm.amplitude %}
-    <img src="{{afm.amplitude.url}}" alt="height">
+    {% if sem.image %}
+    <img src="{{sem.image.url}}" alt="image">
     {% endif %}
 
-    <a href="{% url 'afm_detail' pk=afm.id %}">back</a>
+    <a href="{% url 'sem_detail' pk=sem.id %}">back</a>
 </div>
 {% endblock %}

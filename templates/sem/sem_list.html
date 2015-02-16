@@ -1,19 +1,19 @@
 {% extends "core/base.html" %}
 
-{% block title %}AFM{% endblock %}
+{% block title %}SEM{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h3>Recent AFM Scans <a class="btn btn-primary" href="{% url 'afm_create' %}">New</a></h3>
+    <h3>Recent SEM Scans <a class="btn btn-primary" href="{% url 'sem_create' %}">New</a></h3>
 
     <ul>
     {% for object in object_list %}
         <li>
-            <a href="{% url 'afm_detail' pk=object.id %}">{{object}}</a>
+            <a href="{% url 'sem_detail' pk=object.id %}">{{object}}</a>
         </li>
     {% endfor %}
     </ul>
 
-    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
+    <a class="btn btn-default" href="{% url 'dashboard' %}">Back</a>
 </div>
 {% endblock %}

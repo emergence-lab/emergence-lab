@@ -1,11 +1,11 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-{% block title %}Add AFM{% endblock %}
+{% block title %}Add SEM{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Add AFM</h1>
+    <h1>Add SEM</h1>
 
     <form action="" method="post" class="form">
         {% csrf_token %}
@@ -15,6 +15,6 @@
         {% endbuttons %}
     </form>
 
-    <a href="{% url 'afm_list' %}">back</a>
+    <a href="{% url 'sem_list' %}">back</a>
 </div>
 {% endblock %}
