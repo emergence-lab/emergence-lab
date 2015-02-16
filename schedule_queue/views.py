@@ -77,11 +77,13 @@ class IncreasePriority(LoginRequiredMixin, ActionReloadView):
     def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
-        tmp = (Reservation.active_objects.filter(priority_field__lt=reservation_obj.priority_field)
-                                         .order_by('-priority_field'))
+        tmp = (Reservation.active_objects.filter(
+            priority_field__lt=reservation_obj.priority_field)
+            .order_by('-priority_field'))
         if tmp.first():
             tmp = tmp.first()
-            reservation_obj.priority_field, tmp.priority_field = tmp.priority_field, reservation_obj.priority_field
+            reservation_obj.priority_field, tmp.priority_field = \
+                tmp.priority_field, reservation_obj.priority_field
             reservation_obj.save()
             tmp.save()
         self.tool = reservation_obj.tool
@@ -95,11 +97,13 @@ class DecreasePriority(LoginRequiredMixin, ActionReloadView):
     def perform_action(self, request, *args, **kwargs):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
-        tmp = (Reservation.active_objects.filter(priority_field__gt=reservation_obj.priority_field)
-                                         .order_by('priority_field'))
+        tmp = (Reservation.active_objects.filter(
+            priority_field__gt=reservation_obj.priority_field)
+            .order_by('priority_field'))
         if tmp.first():
             tmp = tmp.first()
-            reservation_obj.priority_field, tmp.priority_field = tmp.priority_field, reservation_obj.priority_field
+            reservation_obj.priority_field, tmp.priority_field = \
+                tmp.priority_field, reservation_obj.priority_field
             reservation_obj.save()
             tmp.save()
         self.tool = reservation_obj.tool
