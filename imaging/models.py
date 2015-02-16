@@ -13,7 +13,7 @@ def get_file_path(instance, filename):
     """
     return '/'.join(['growths' + instance.sample.uuid, instance.uuid, filename])
 
-class SEM(Process):
+class SEMScan(Process):
     """
     Stores SEM characterization images.
     """
@@ -33,7 +33,7 @@ class SEM(Process):
     magnification = models.FloatField(blank=True, null=True)
     image_source = models.CharField(max_length=45, choices=TOOL_CHOICES, default='esem_600')
 
-class OpticalImage(Process):
+class OpticalImageScan(Process):
     """
     Stores optical characterization images.
     """
@@ -45,4 +45,3 @@ class OpticalImage(Process):
     image = models.ImageField(upload_to=get_file_path, storage=labshare,
                               max_length=150, blank=True, null=True)
     magnification = models.FloatField(blank=True, null=True)
-    
