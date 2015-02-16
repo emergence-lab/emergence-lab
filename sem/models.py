@@ -9,7 +9,7 @@ from core.models import Process
 
 def get_file_path(instance, filename):
     """
-    Stores afm scans in /:sample_uuid/:process_uuid/
+    Stores sem scans in /:sample_uuid/:process_uuid/
     """
     return '/'.join(['growths' + instance.sample.uuid, instance.uuid, filename])
 
