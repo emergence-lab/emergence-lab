@@ -13,6 +13,7 @@ def get_file_path(instance, filename):
     """
     return '/'.join(['growths' + instance.sample.uuid, instance.uuid, filename])
 
+
 class SEMScan(Process):
     """
     Stores SEM characterization images.
