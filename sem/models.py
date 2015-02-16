@@ -32,16 +32,3 @@ class SEMScan(Process):
                                max_length=150, blank=True, null=True)
     magnification = models.FloatField(blank=True, null=True)
     image_source = models.CharField(max_length=45, choices=TOOL_CHOICES, default='esem_600')
-
-class OpticalImageScan(Process):
-    """
-    Stores optical characterization images.
-    """
-    name = 'Optical Image'
-    slug = 'optical'
-    is_destructive = False
-
-    image_number = models.IntegerField(defailt=0)
-    image = models.ImageField(upload_to=get_file_path, storage=labshare,
-                              max_length=150, blank=True, null=True)
-    magnification = models.FloatField(blank=True, null=True)
