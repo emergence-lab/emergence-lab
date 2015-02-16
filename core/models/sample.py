@@ -193,6 +193,13 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         return sorted([n.piece for n in self.leaf_nodes])
 
     @property
+    def nodes(self):
+        """
+        Returns a list of the nodes currently associated with the sample.
+        """
+        return self._get_tree_queryset()
+
+    @property
     def node_count(self):
         """
         Returns the number of nodes in the tree including the root.
