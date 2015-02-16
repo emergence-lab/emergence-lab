@@ -99,6 +99,9 @@ urlpatterns = [
 
     # schedule_queue urls
     url(r'^scheduling/', include('schedule_queue.urls')),
+
+    # sem urls
+    url(r'^sem/', include('sem.urls')),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
