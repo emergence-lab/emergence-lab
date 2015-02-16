@@ -109,9 +109,11 @@ class SampleLeafNodeAPIView(views.APIView):
 
     def get(self, request, *args, **kwargs):
         sample = Sample.objects.get_by_uuid(kwargs.get('uuid'))
+        piece = kwargs.get('piece')
         data = SampleSerializer(sample).data
         data['nodes'] = [ProcessNodeSerializer(node).data
-                         for node in sample.leaf_nodes]
+                         for node in sample.leaf_nodes
+                         if piece is None or node.piece == piece]
         return Response(data)
 
 
@@ -124,7 +126,7 @@ class SamplePieceNodeAPIView(views.APIView):
 
     def _recurse_tree(self, node, piece):
         data = ProcessNodeSerializer(node).data
-        data['children'] = [self._recurse_tree(child)
+        data['children'] = [self._recurse_tree(child, piece)
                             for child in node.get_children()
                             if child.piece == piece]
         return data

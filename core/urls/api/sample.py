@@ -15,11 +15,9 @@ urlpatterns = [
         core.api.SampleTreeNodeAPIView.as_view()),
     url(r'^s(?P<uuid>[0-9]+)/node/leaf/$',
         core.api.SampleLeafNodeAPIView.as_view()),
-    # url(r'^s(?P<uuid>[0-9]+)/node/process/p(?P<process_uuid>[0-9a-f\-]{7,})/$',
-    # core.api.SampleProcessNodeAPIView.as_view()),
     url(r'^s(?P<uuid>[0-9]+)/node/piece/(?P<piece>[a-z]+)/$',
         core.api.SamplePieceNodeAPIView.as_view()),
-    # url(r'^s(?P<uuid>[0-9]+)/node/piece/(?P<piece>[a-z]+)/leaf/$',
-    #     core.api.SampleLeafNodeAPIView.as_view()),
+    url(r'^s(?P<uuid>[0-9]+)/node/piece/(?P<piece>[a-z]+)/leaf/$',
+        core.api.SampleLeafNodeAPIView.as_view()),
     url(r'^substrate/$', core.api.SubstrateListAPIView.as_view()),
 ]
