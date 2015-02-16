@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Update AFM{% endblock %}
+
+{% block content %}
+<div class="container">
+    <ol class="breadcrumb">
+        <li><a href="{% url 'growth_detail' slug=afm.growth.growth_number %}">{{afm.growth}}</a></li>
+        <li><a href="{% url 'sample_detail' pk=afm.sample.id %}">{{afm.sample}}</a></li>
+        <li><a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a></li>
+        <li class="active">Update</li>
+    </ol>
+
+    <h1>Update {{afm}}</h1>
+
+    <form action="" method="post" class="form">
+        {% csrf_token %}
+        {% bootstrap_form form layout='inlinne' %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Update</button>
+        {% endbuttons %}
+    </form>
+
+    <a href="{% url 'afm_detail' pk=afm.id %}">back</a>
+</div>
+{% endblock %}

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from imaging.models import SEM, OpticalImage
+from imaging.models import SEMScan
 
 admin.site.register(SEM)
-admin.site.register(OpticalImage)
