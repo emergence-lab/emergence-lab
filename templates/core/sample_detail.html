@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+
+{% load mptt_tags %}
+
+{% block title %}{{sample.uuid}}{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'sample_list' %}">Samples</a></li>
+            <li class='active'>{{sample.uuid}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            {{sample}}
+            <div class="pull-right">
+                <a href="#" class="btn btn-warning">Edit</a>
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <h3 class="page-header">Sample Details</h3>
+        <p>UUID: {{sample.uuid}}</p>
+        <p>Created: {{sample.created}}</p>
+        <p>Modified: {{sample.modified}}</p>
+        <p>Comment: {{sample.comment|safe}}</p>
+        <p>Processes:
+            <ul>
+                {% recursetree sample.nodes %}
+                        {% if not node.is_root_node %}
+                            <li>
+                                {{node.process.name}}
+                                (<a href="{% url 'process_detail' uuid=node.process.uuid %}">{{node.process.uuid}}</a>)
+                                on {{node.process.created}}
+                        {% endif %}
+                        {% if not node.is_leaf_node %}
+                            {% if node.is_root_node %}
+                                {{children}}
+                            {% else %}
+                                <ul>
+                                    {{children}}
+                                </ul>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                            </li>
+                        {% endif %}
+                {% endrecursetree %}
+            </ul>
+        </p>
+    </div>
+
+</main>
+
+{% endblock content %}

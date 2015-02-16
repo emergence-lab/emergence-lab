@@ -75,6 +75,8 @@ urlpatterns = [
         name='investigation_deactivate'),
     url(r'^investigations/$',
         core.views.InvestigationListView.as_view(), name='investigation_list'),
+    url(r'^samples/', include('core.urls.sample')),
+    url(r'^process/', include('core.urls.process')),
 
     # afm urls
     url(r'^afm/', include('afm.urls')),

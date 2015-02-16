@@ -1,0 +1,45 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{process.uuid}}{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="#">Processes</a></li>
+            <li class='active'>{{process.uuid}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            {{process}}
+            <div class="pull-right">
+                <a href="#" class="btn btn-warning">Edit</a>
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <h3 class="page-header">{{process.name}} Details</h3>
+        <p>UUID: {{process.uuid}}</p>
+        <p>Created: {{process.created}}</p>
+        <p>Modified: {{process.modified}}</p>
+        <p>Comment: {{process.comment|safe}}</p>
+        <p>
+            Samples:
+            <ul>
+                {% for sample in samples %}
+                    <li>
+                        <a href="{% url 'sample_detail' uuid=sample.uuid %}">{{sample.uuid}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </p>
+    </div>
+
+</main>
+
+{% endblock content %}
