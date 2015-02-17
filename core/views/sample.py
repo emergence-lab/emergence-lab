@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.http import Http404
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
 from core.models import Sample
+from core.forms import SampleMultiForm
 
 
 class SampleListView(LoginRequiredMixin, generic.ListView):
@@ -19,7 +21,6 @@ class SampleListView(LoginRequiredMixin, generic.ListView):
 class SampleDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = 'core/sample_detail.html'
     model = Sample
-    context_object_name = 'sample'
     lookup_url_kwarg = 'uuid'
 
     def get_object(self, queryset=None):
@@ -35,3 +36,16 @@ class SampleDetailView(LoginRequiredMixin, generic.DetailView):
             raise Http404(_('No {}s found matching the query'.format(
                 queryset.model._meta.verbose_name)))
         return obj
+
+
+class SampleCreateView(LoginRequiredMixin, generic.CreateView):
+    template_name = 'core/sample_create.html'
+    model = Sample
+    form_class = SampleMultiForm
+
+    def form_valid(self, form):
+        substrate = form['substrate'].save()
+        comment = form['sample'].cleaned_data.get('comment', '')
+        sample = Sample.objects.create(substrate, comment)
+        return HttpResponseRedirect(
+            reverse('sample_detail', kwargs={'uuid': sample.uuid}))
