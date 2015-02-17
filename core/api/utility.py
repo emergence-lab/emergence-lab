@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import os
+
 from django.conf import settings
 
 from rest_framework.views import APIView
-from rest_framweork.response import Response
+from rest_framework.response import Response
 from rest_framework import permissions
 from sendfile import sendfile
 
