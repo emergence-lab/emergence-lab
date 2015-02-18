@@ -10,7 +10,7 @@ from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, PosixGroupType
 
 # Filesystem Directories
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage' # For s3 store
 
 
 # Secrets
@@ -177,6 +177,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
 
 REST_FRAMEWORK = {
     'PAGINATE_BY': 25,
+    'UPLOADED_FILES_USE_URL': False,
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
