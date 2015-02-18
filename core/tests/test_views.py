@@ -3,11 +3,13 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve, reverse
+from django.http import Http404
 from django.test import TestCase
 
 from model_mommy import mommy
 
-from core.models import Investigation, Project, ProjectTracking
+from core.models import (Investigation, Project, ProjectTracking, Sample,
+                         Substrate)
 
 
 class TestHomepageAbout(TestCase):
@@ -52,6 +54,7 @@ class TestHomepageAbout(TestCase):
         response = self.client.get(reverse('about'))
         self.assertTemplateUsed(response, 'core/about.html')
         self.assertEqual(response.status_code, 200)
+
 
 class TestUserCRUD(TestCase):
 
@@ -336,3 +339,60 @@ class TestInvestigationCRUD(TestCase):
         self.assertEqual(obj.description, data['description'])
         detail_url = reverse('investigation_detail_all', args=(proj.slug, obj.slug,))
         self.assertRedirects(response, detail_url)
+
+
+class TestSampleCRUD(TestCase):
+
+    def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
+        self.client.login(username='username1', password='')
+
+    def test_sample_list_resolution_template(self):
+        url = '/samples/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'sample_list')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/sample_list.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_sample_list_content(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = reverse('sample_list')
+        response = self.client.get(url)
+        self.assertContains(response, sample.uuid)
+
+    def test_sample_detail_resolution_template(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = '/samples/{}/'.format(sample.uuid)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'sample_detail')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/sample_detail.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_sample_detail_content(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = reverse('sample_detail', args=(sample.uuid,))
+        response = self.client.get(url)
+        self.assertContains(response, sample.uuid)
+
+    def test_sample_detail_invalid(self):
+        url = reverse('sample_detail', args=('s1000',))
+        with self.assertRaises(Http404):
+            response = self.client.get(url)
+            print(response)
+
+    def test_sample_create_resolution_template(self):
+        url = '/samples/create/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'sample_create')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/sample_create.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_sample_create_empty_data(self):
+        url = reverse('sample_create')
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', '',
+                             'Cannot leave all fields blank.')
