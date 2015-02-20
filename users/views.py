@@ -7,6 +7,8 @@ from redis import StrictRedis
 import pickle
 
 import gitlab
+from rest_framework.authtoken.models import Token
+
 from users.forms import GitTokenForm
 from users.redis_config import GitCredential
 
@@ -27,6 +29,8 @@ class UserProfile(TemplateView):
                 kwargs['thisuser'].gitlab_id = pickle.loads(
                     r.get('users:{0}:git.credential'.format(
                         kwargs['thisuser'].id))).gitlab_id
+                kwargs['thisuser'].em_token = Token.objects.get(
+                    user=User.objects.get(username=kwargs['username']))
             except TypeError:
                 pass
         return super(UserProfile, self).get_context_data(**kwargs)
