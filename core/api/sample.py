@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from core.models import Sample, Substrate, ProcessNode
 from core.models.sample import SampleManager
 from core.serializers import (SampleSerializer, SubstrateSerializer,
-                              ProcessSerializer, ProcessNodeSerializer)
+                              ProcessNodeSerializer)
 
 
 class SubstrateListAPIView(generics.ListAPIView):
@@ -159,6 +159,7 @@ class SamplePieceNodeAPIView(views.APIView):
         data['nodes'] = self._recurse_tree(sample.process_tree,
                                            kwargs.get('piece'))
         return Response(data)
+
 
 class SampleByProcessAPIView(views.APIView):
     """
