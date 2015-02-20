@@ -11,5 +11,7 @@ from .sample import (SampleListAPIView,
                      SampleLeafNodeAPIView,
                      SamplePieceNodeAPIView,
                      SampleNodeRetrieveAPIView,
-                     SubstrateListAPIView,)
+                     SubstrateListAPIView,
+                     SampleByProcessAPIView,
+                     SampleTreeNodeRelativeAPIView,)
 from .utility import FileAccessAPI

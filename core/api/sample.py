@@ -5,8 +5,9 @@ from rest_framework import generics, permissions, views
 from rest_framework.response import Response
 
 from core.models import Sample, Substrate, ProcessNode
+from core.models.sample import SampleManager
 from core.serializers import (SampleSerializer, SubstrateSerializer,
-                              ProcessNodeSerializer)
+                              ProcessSerializer, ProcessNodeSerializer)
 
 
 class SubstrateListAPIView(generics.ListAPIView):
@@ -101,6 +102,27 @@ class SampleTreeNodeAPIView(views.APIView):
         return Response(data)
 
 
+class SampleTreeNodeRelativeAPIView(views.APIView):
+    """
+    Read-only endpoint to show details for a sample from the uuid.
+    Retrieves the entire process tree.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def _recurse_tree(self, node):
+        data = ProcessNodeSerializer(node).data
+        data['children'] = [self._recurse_tree(child)
+                            for child in node.get_children()]
+        return data
+
+    def get(self, request, *args, **kwargs):
+        uuid = ProcessNode.strip_uuid(kwargs.get('uuid'))
+        node = ProcessNode.objects.get(uuid_full__startswith=uuid)
+        data = ProcessNodeSerializer(node).data
+        data['nodes'] = self._recurse_tree(node)
+        return Response(data)
+
+
 class SampleLeafNodeAPIView(views.APIView):
     """
     Read-only endpoint to show the leaf nodes for a sample from the uuid.
@@ -136,4 +158,15 @@ class SamplePieceNodeAPIView(views.APIView):
         data = SampleSerializer(sample).data
         data['nodes'] = self._recurse_tree(sample.process_tree,
                                            kwargs.get('piece'))
+        return Response(data)
+
+class SampleByProcessAPIView(views.APIView):
+    """
+    Read-only endpoint to show the leaf nodes for a sample from the uuid.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        data = [i.uuid for i in SampleManager().get_by_process(
+            kwargs.get('uuid'))]
         return Response(data)
