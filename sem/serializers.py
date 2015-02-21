@@ -26,10 +26,9 @@ class SEMSerializer(serializers.ModelSerializer):
     Serializes the sem model.
 
     """
-    height = FilePathField(max_length=150)
-    amplitude = FilePathField(max_length=150)
+    image = FilePathField(max_length=150)
 
     class Meta:
         model = SEMScan
-        fields = ('uuid', 'image_number', 'magnification', 'source',
+        fields = ('uuid', 'image_number', 'magnification', 'image_source',
                   'image')
