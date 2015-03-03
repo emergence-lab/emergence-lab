@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block content %}
+<title>Upload pictures</title>
+<link href="{% static 'sem/css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
+
+
+<!--<form class="dropzone" action="{% url 'sem_upload' %}" method="post" enctype="multipart/form-data">-->
+<form class="dropzone" action="{% url 'sem_upload' %}" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+    <div class="fallback">
+        <input name="file" type="file" multiple />
+        <button type="submit"></button>
+    </div>
+</form>
+<script src="{% static 'sem/js/dropzone.js' %}"></script>
+{% endblock %}
