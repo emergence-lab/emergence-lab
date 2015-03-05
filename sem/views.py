@@ -55,12 +55,13 @@ class SEMUpload(LoginRequiredMixin, CreateView):
     form_class = DropzoneForm
 
     def form_valid(self, form):
-        self.object = SEMScan()
-        self.object.image = self.request.FILES.getlist('file')[0]
-        self.object.image_number = 0
-        self.object.image_source = 'esem_600'
-        sleep(0.001*randint(1,99))
-        self.object.select_for_update().save()
+        self.object = form.save()
+        #self.object = SEMScan()
+        #self.object.image = self.request.FILES.getlist('file')[0]
+        #self.object.image_number = 0
+        #self.object.image_source = 'esem_600'
+        #sleep(0.001*randint(1,99))
+        #self.object.select_for_update().save()
         data = {'status': 'success'}
         response = JSONResponse(data, mimetype=response_mimetype(self.request))
         return response

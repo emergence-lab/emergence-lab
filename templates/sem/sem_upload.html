@@ -12,6 +12,8 @@
 {% csrf_token %}
     <div class="fallback">
         <input name="file" type="file" multiple />
+        <input name='image_source' hidden="hidden" type="text" value="esem_600" />
+        <input name='image_number' hidden="hidden" type="number" value="0" />
         <button type="submit"></button>
     </div>
 </form>
