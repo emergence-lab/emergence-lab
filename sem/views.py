@@ -13,6 +13,7 @@ from braces.views import LoginRequiredMixin
 from .models import SEMScan
 from .forms import DropzoneForm
 from .response import JSONResponse, response_mimetype
+from .image_helper import is_tiff, get_image_source
 
 
 class SEMList(LoginRequiredMixin, ListView):
@@ -47,7 +48,6 @@ class SEMCreate(LoginRequiredMixin, CreateView):
     template_name = 'sem/sem_create.html'
 
 
-#@transaction.atomic
 class SEMUpload(LoginRequiredMixin, CreateView):
     """
     View for creation of new sem data.
@@ -56,32 +56,14 @@ class SEMUpload(LoginRequiredMixin, CreateView):
     template_name = 'sem/sem_upload.html'
     form_class = DropzoneForm
 
-    #def post(self, request, *args, **kwargs):
-    #    form_class = self.get_form_class()
-    #    form = self.get_form(form_class)
-    #    if form.is_valid():
-    #        with transaction.atomic():
-    #            return self.form_valid(form)
-    #    else:
-    #        return self.form_invalid(form)
-
-
     def form_valid(self, form):
-        #self.object = form.save(commit=False)
-        #self.object = SEMScan()
-        #SEMScan.objects.bulk_create([SEMScan(image_number=0,
-        #                                     image_source='esem_600',
-        #                                     image=i) for i in self.request.FILES.getlist('file')])
+        
+        with transaction.atomic():
 
-        #self.object.image_source = 'esem_600'
-        #self.object.image_number = 0
-        self.object = form.save(commit=False)
-        self.object.image_source = 'esem_600'
-        self.object.image_number = 0
-        self.object.save()
-        #SEMScan.save()
-        #sleep(0.001*randint(1,99))
-        #self.object.save()
+            obj = SEMScan.objects.create(image_source='esem_600',
+                                   image_number=0,
+                                   image=self.request.FILES['file'])
+            obj.save()
         data = {'status': 'success'}
         response = JSONResponse(data, mimetype=response_mimetype(self.request))
         return response
