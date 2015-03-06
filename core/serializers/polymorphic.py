@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from polymorphic.polymorphic_model import PolymorphicModel
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_field_kwargs
+from rest_framework.fields import SkipField
 import six
 
 from .fields import PolymorphicTypeField
@@ -68,17 +69,37 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         if not self.polymorphic_class_mapping:
             self._build_polymorphic_field_mapping()
 
+        fields = [field for field in self.fields.values()
+                  if not field.write_only]
+
         model_class = ContentType.objects.get_for_id(obj.polymorphic_ctype_id).model_class()
         if model_class is not PolymorphicModel:
 
             while model_class.__base__ is not PolymorphicModel:
 
                 for field in self.polymorphic_class_mapping[model_class.__name__].fields:
-                    self.fields[field.name] = copy(self.polymorphic_fields[field.name])
+                    if self.polymorphic_fields[field.name].write_only:
+                        continue
+
+                    f = copy(self.polymorphic_fields[field.name])
+                    f.bind(field_name=field.name, parent=self)
+                    fields.append(f)
 
                 model_class = model_class.__base__
 
-        return super(PolymorphicModelSerializer, self).to_representation(obj)
+        ret = OrderedDict()
+        for field in fields:
+            try:
+                attribute = field.get_attribute(obj)
+            except SkipField:
+                continue
+
+            if attribute is None:
+                ret[field.field_name] = None
+            else:
+                ret[field.field_name] = field.to_representation(attribute)
+
+        return ret
 
     def to_internal_value(self, data):
         try:
