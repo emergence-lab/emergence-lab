@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from polymorphic.polymorphic_model import PolymorphicModel
 from rest_framework import serializers
-from rest_framework.utils.field_mapping import get_field_kwargs
+from rest_framework.utils.field_mapping import get_field_kwargs, ClassLookupDict
 from rest_framework.fields import SkipField
 import six
 
@@ -48,10 +48,14 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
             self._build_polymorphic_field_mapping()
 
         polymorphic_fields = OrderedDict()
+        try:
+            field_mapping = self._field_mapping
+        except AttributeError:
+            field_mapping = ClassLookupDict(self.serializer_field_mapping)
 
         for name, subclass in six.iteritems(self.polymorphic_class_mapping):
             for field in subclass.fields:
-                rest_field = self._field_mapping[field]
+                rest_field = field_mapping[field]
                 kwargs = get_field_kwargs(field.name, field)
                 if 'choices' in kwargs:
                     rest_field = serializers.ChoiceField
