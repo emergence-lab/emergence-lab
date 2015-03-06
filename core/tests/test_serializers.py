@@ -145,6 +145,24 @@ class TestProcessSerializer(TestCase):
         self.assertEqual(process.child_field, data['child_field'])
         self.assertIsNotNone(process.uuid)
 
+    def test_serializer_many_homogeneous(self):
+        processes = [
+            mommy.make(ChildProcess),
+            mommy.make(ChildProcess),
+            mommy.make(ChildProcess),
+        ]
+        serializer = ProcessSerializer(Process.objects.all(), many=True)
+        serializer.data
+
+    def test_serializer_many_heterogeneous(self):
+        processes = [
+            mommy.make(ChildProcess),
+            mommy.make(ParentProcess),
+            mommy.make(Process),
+        ]
+        serializer = ProcessSerializer(Process.objects.all(), many=True)
+        serializer.data
+
 
 class TestSampleSerializer(TestCase):
 
