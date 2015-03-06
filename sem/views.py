@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from random import randint
 from time import sleep
 
+from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -46,6 +47,7 @@ class SEMCreate(LoginRequiredMixin, CreateView):
     template_name = 'sem/sem_create.html'
 
 
+#@transaction.atomic
 class SEMUpload(LoginRequiredMixin, CreateView):
     """
     View for creation of new sem data.
@@ -54,14 +56,32 @@ class SEMUpload(LoginRequiredMixin, CreateView):
     template_name = 'sem/sem_upload.html'
     form_class = DropzoneForm
 
+    #def post(self, request, *args, **kwargs):
+    #    form_class = self.get_form_class()
+    #    form = self.get_form(form_class)
+    #    if form.is_valid():
+    #        with transaction.atomic():
+    #            return self.form_valid(form)
+    #    else:
+    #        return self.form_invalid(form)
+
+
     def form_valid(self, form):
-        self.object = form.save()
+        #self.object = form.save(commit=False)
         #self.object = SEMScan()
-        #self.object.image = self.request.FILES.getlist('file')[0]
-        #self.object.image_number = 0
+        #SEMScan.objects.bulk_create([SEMScan(image_number=0,
+        #                                     image_source='esem_600',
+        #                                     image=i) for i in self.request.FILES.getlist('file')])
+
         #self.object.image_source = 'esem_600'
+        #self.object.image_number = 0
+        self.object = form.save(commit=False)
+        self.object.image_source = 'esem_600'
+        self.object.image_number = 0
+        self.object.save()
+        #SEMScan.save()
         #sleep(0.001*randint(1,99))
-        #self.object.select_for_update().save()
+        #self.object.save()
         data = {'status': 'success'}
         response = JSONResponse(data, mimetype=response_mimetype(self.request))
         return response
