@@ -11,7 +11,7 @@ def get_afm_path(instance, filename):
     """
     Stores afm scans in /:sample_uuid/:afm_uuid/
     """
-    return '/'.join(['growths' + instance.sample.uuid, instance.uuid, filename])
+    return '/'.join(['process', instance.uuid, filename])
 
 
 class AFMScan(Process):
