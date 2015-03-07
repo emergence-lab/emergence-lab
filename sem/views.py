@@ -16,7 +16,8 @@ from core.models import Sample
 from .models import SEMScan
 from .forms import DropzoneForm
 from .response import JSONResponse, response_mimetype
-from .image_helper import _is_tiff, get_image_source, get_sample, _process_name
+from .image_helper import (_is_tiff, get_image_source, get_sample,
+                           _process_name, convert_tiff,)
 
 
 class SEMList(LoginRequiredMixin, ListView):
@@ -62,18 +63,16 @@ class SEMUpload(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         image = self.request.FILES['file']
         source = get_image_source(image)
-        print(image)
         try:
             sample = get_sample(image)
         except:
             sample = None
-        print('sample={}'.format(sample))
+        image = convert_tiff(image)
         with transaction.atomic():
             obj = SEMScan.objects.create(image_source=source,
-                                   image_number=0,
-                                   image=self.request.FILES['file'])
+                                         image_number=0,
+                                         image=image)
             if sample:
-                print(sample)
                 s = Sample.objects.get(id=sample)
                 s.run_process(obj)
         data = {'status': 'success'}

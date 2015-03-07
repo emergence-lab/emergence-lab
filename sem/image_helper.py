@@ -1,4 +1,8 @@
 import os
+from io import BytesIO
+import tempfile
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from PIL import Image
 import exifread
@@ -15,6 +19,7 @@ def get_image_source(image):
         tags = exifread.process_file(image)
         for i in allowed_sources.keys():
             if i in tags.keys():
+                image_obj.seek(0)
                 return allowed_sources[i]
         else:
             raise Exception('Unrecognizable')
@@ -22,8 +27,8 @@ def get_image_source(image):
         raise Exception('Unable to process')
 
 def _is_tiff(image):
-    tmp = os.path.splitext(image)
-    if tmp[1] == 'tif' or tmp[1] == 'tiff':
+    tmp = str(image).split('.')[1]
+    if str(tmp) == 'tif' or str(tmp) == 'tiff':
         return True
     else:
         return False
@@ -41,5 +46,16 @@ def get_image_number(image):
 def convert_tiff(image):
     if _is_tiff(image):
         img = Image.open(image)
-        return img.save(_process_name(image).join('.png'))
+        tmp = open(tempfile.NamedTemporaryFile().name, 'wb+')
+        tmp.seek(0)
+        final = img.save(tmp, format='png')
+        output = InMemoryUploadedFile(file=tmp,
+                                      field_name=None,
+                                      name=str(_process_name(image) + '.png'),
+                                      content_type='image/png',
+                                      size=tmp.tell(),
+                                      charset=None)
+        return output
+    else:
+        return image
 
