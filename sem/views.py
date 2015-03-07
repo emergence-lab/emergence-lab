@@ -6,14 +6,17 @@ from time import sleep
 
 from django.db import transaction
 from django.core.urlresolvers import reverse
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
-
+from django.views.generic import (CreateView, DeleteView,
+                                  DetailView, ListView,
+                                  UpdateView,)
+from django.core.files.base import File
 from braces.views import LoginRequiredMixin
 
+from core.models import Sample
 from .models import SEMScan
 from .forms import DropzoneForm
 from .response import JSONResponse, response_mimetype
-from .image_helper import is_tiff, get_image_source
+from .image_helper import _is_tiff, get_image_source, get_sample, _process_name
 
 
 class SEMList(LoginRequiredMixin, ListView):
@@ -57,13 +60,22 @@ class SEMUpload(LoginRequiredMixin, CreateView):
     form_class = DropzoneForm
 
     def form_valid(self, form):
-        
+        image = self.request.FILES['file']
+        source = get_image_source(image)
+        print(image)
+        try:
+            sample = get_sample(image)
+        except:
+            sample = None
+        print('sample={}'.format(sample))
         with transaction.atomic():
-
-            obj = SEMScan.objects.create(image_source='esem_600',
+            obj = SEMScan.objects.create(image_source=source,
                                    image_number=0,
                                    image=self.request.FILES['file'])
-            obj.save()
+            if sample:
+                print(sample)
+                s = Sample.objects.get(id=sample)
+                s.run_process(obj)
         data = {'status': 'success'}
         response = JSONResponse(data, mimetype=response_mimetype(self.request))
         return response
