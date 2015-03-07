@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from random import randint
-from time import sleep
-
 from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.views.generic import (CreateView, DeleteView,
                                   DetailView, ListView,
                                   UpdateView,)
-from django.core.files.base import File
 from braces.views import LoginRequiredMixin
 
 from core.models import Sample
 from .models import SEMScan
 from .forms import DropzoneForm
 from .response import JSONResponse, response_mimetype
-from .image_helper import (_is_tiff, get_image_source, get_sample,
-                           _process_name, convert_tiff,)
+from .image_helper import (get_image_source, get_sample,
+                           convert_tiff,)
 
 
 class SEMList(LoginRequiredMixin, ListView):
