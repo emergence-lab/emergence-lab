@@ -14,8 +14,8 @@ def get_file_path(instance, filename):
     """
     Stores sem scans in /:sample_uuid/:process_uuid/
     """
-    #return '/'.join(['growths' + instance.sample.uuid, instance.uuid, filename])
-    return filename
+    return '/'.join(['process', instance.uuid, filename])
+    #return filename
 
 
 class SEMScan(Process):
@@ -33,8 +33,8 @@ class SEMScan(Process):
     ]
 
     image_number = models.IntegerField(default=0)
-    #image = models.ImageField(upload_to=get_file_path, storage=labshare, max_length=150, blank=True, null=True)
-    image = models.ImageField(max_length=150, blank=True, null=True)
+    image = models.ImageField(upload_to=get_file_path, storage=labshare, max_length=150, blank=True, null=True)
+    #image = models.ImageField(max_length=150, blank=True, null=True)
 
     magnification = models.FloatField(blank=True, null=True)
     image_source = models.CharField(max_length=45, choices=TOOL_CHOICES, default='esem_600')
