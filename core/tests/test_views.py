@@ -3,11 +3,14 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve, reverse
+from django.http import Http404
 from django.test import TestCase
 
 from model_mommy import mommy
 
-from core.models import Investigation, Project, ProjectTracking
+from .helpers import test_resolution_template
+from core.models import (Investigation, Process, Project, ProjectTracking,
+                         Sample, Substrate)
 
 
 class TestHomepageAbout(TestCase):
@@ -52,6 +55,7 @@ class TestHomepageAbout(TestCase):
         response = self.client.get(reverse('about'))
         self.assertTemplateUsed(response, 'core/about.html')
         self.assertEqual(response.status_code, 200)
+
 
 class TestUserCRUD(TestCase):
 
@@ -335,4 +339,200 @@ class TestInvestigationCRUD(TestCase):
         obj = Investigation.objects.get(id=obj.id)
         self.assertEqual(obj.description, data['description'])
         detail_url = reverse('investigation_detail_all', args=(proj.slug, obj.slug,))
+        self.assertRedirects(response, detail_url)
+
+
+class TestSampleCRUD(TestCase):
+
+    def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
+        self.client.login(username='username1', password='')
+
+    def test_sample_list_resolution_template(self):
+        test_resolution_template(self,
+            url='/samples/',
+            url_name='sample_list',
+            template_file='core/sample_list.html',
+            response_code=200)
+
+    def test_sample_list_content(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = reverse('sample_list')
+        response = self.client.get(url)
+        self.assertContains(response, sample.uuid)
+
+    def test_sample_detail_resolution_template(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        test_resolution_template(self,
+            url='/samples/{}/'.format(sample.uuid),
+            url_name='sample_detail',
+            template_file='core/sample_detail.html',
+            response_code=200)
+
+    def test_sample_detail_content(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = reverse('sample_detail', args=(sample.uuid,))
+        response = self.client.get(url)
+        self.assertContains(response, sample.uuid)
+
+    def test_sample_detail_invalid(self):
+        url = reverse('sample_detail', args=('s1000',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_sample_create_resolution_template(self):
+        test_resolution_template(self,
+            url='/samples/create/',
+            url_name='sample_create',
+            template_file='core/sample_create.html',
+            response_code=200)
+
+    def test_sample_create_empty_data(self):
+        url = reverse('sample_create')
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', '',
+                             'Cannot leave all fields blank.')
+
+    def test_sample_create_valid_data(self):
+        url = reverse('sample_create')
+        data = {
+            'sample-comment': 'test sample',
+            'substrate-comment': 'test sub',
+            'substrate-serial': 'serial',
+            'substrate-source': 'source',
+        }
+        response = self.client.post(url, data)
+        sample = Sample.objects.last()
+        detail_url = reverse('sample_detail', args=(sample.uuid,))
+        self.assertRedirects(response, detail_url)
+        self.assertEqual(sample.comment, data['sample-comment'])
+        self.assertEqual(sample.substrate.comment, data['substrate-comment'])
+
+    def test_sample_edit_resolution_template(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        test_resolution_template(self,
+            url='/samples/{}/edit/'.format(sample.uuid),
+            url_name='sample_edit',
+            template_file='core/sample_edit.html',
+            response_code=200)
+
+    def test_sample_edit_invalid(self):
+        url = reverse('sample_edit', args=('s1000',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_sample_edit_valid_data(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = reverse('sample_edit', args=(sample.uuid,))
+        data = {'comment': 'testing'}
+        response = self.client.post(url, data)
+        sample = Sample.objects.get_by_uuid(sample.uuid)
+        self.assertEqual(sample.comment, data['comment'])
+        detail_url = reverse('sample_detail', args=(sample.uuid,))
+        self.assertRedirects(response, detail_url)
+
+
+class TestProcessCRUD(TestCase):
+
+    def setUp(self):
+        get_user_model().objects.create_user('username1', password='')
+        self.client.login(username='username1', password='')
+
+    def test_process_list_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/',
+            url_name='process_list',
+            template_file='core/process_list.html',
+            response_code=200)
+
+    def test_process_list_content(self):
+        process = mommy.make(Process)
+        url = reverse('process_list')
+        response = self.client.get(url)
+        self.assertContains(response, process.uuid)
+
+    def test_process_detail_resolution_template(self):
+        process = mommy.make(Process)
+        test_resolution_template(self,
+            url='/process/{}/'.format(process.uuid),
+            url_name='process_detail',
+            template_file='core/process_detail.html',
+            response_code=200)
+
+    def test_process_detail_invalid(self):
+        url = reverse('process_detail', args=('p0000000',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_process_detail_content(self):
+        process = mommy.make(Process)
+        sample = Sample.objects.create(mommy.make(Substrate))
+        sample.run_process(process)
+        url = reverse('process_detail', args=(process.uuid,))
+        response = self.client.get(url)
+        self.assertContains(response, process.uuid)
+        self.assertContains(response, sample.uuid)
+
+    def test_process_edit_resolution_template(self):
+        process = mommy.make(Process)
+        test_resolution_template(self,
+            url='/process/{}/edit/'.format(process.uuid),
+            url_name='process_edit',
+            template_file='core/process_edit.html',
+            response_code=200)
+
+    def test_process_edit_invalid(self):
+        url = reverse('process_edit', args=('p0000000',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_process_edit_empty_data(self):
+        process = mommy.make(Process)
+        url = '/process/{}/edit/'.format(process.uuid)
+        data = {}
+        response = self.client.post(url, data)
+        before = process.comment
+        process = Process.objects.get(id=process.id)
+        self.assertEqual(process.comment, before)
+        detail_url =  '/process/{}/'.format(process.uuid)
+        self.assertRedirects(response, detail_url)
+
+    def test_process_edit_valid_data(self):
+        process = mommy.make(Process)
+        url = '/process/{}/edit/'.format(process.uuid)
+        data = {
+            'comment': 'testing',
+        }
+        response = self.client.post(url, data)
+        process = Process.objects.get(id=process.id)
+        self.assertEqual(process.comment, data['comment'])
+        detail_url =  '/process/{}/'.format(process.uuid)
+        self.assertRedirects(response, detail_url)
+
+    def test_process_create_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/create/',
+            url_name='process_create',
+            template_file='core/process_create.html',
+            response_code=200)
+
+    def test_process_create_empty_data(self):
+        url = '/process/create/'
+        data = {}
+        response = self.client.post(url, data)
+        process = Process.objects.last()
+        self.assertEqual(process.comment, '')
+        detail_url =  '/process/{}/'.format(process.uuid)
+        self.assertRedirects(response, detail_url)
+
+    def test_process_create_valid_data(self):
+        url = '/process/create/'
+        data = {
+            'comment': 'testing',
+        }
+        response = self.client.post(url, data)
+        process = Process.objects.last()
+        self.assertEqual(process.comment, data['comment'])
+        detail_url =  '/process/{}/'.format(process.uuid)
         self.assertRedirects(response, detail_url)

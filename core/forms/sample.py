@@ -7,6 +7,8 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from betterforms import multiform
+
 from core.models import Substrate, Sample
 
 
@@ -14,6 +16,10 @@ class SubstrateForm(forms.ModelForm):
     """
     Form to create a substrate. At least one field must have data to validate.
     """
+    comment = forms.CharField(
+        label="Substrate Comments",
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'hallo'}))
 
     class Meta:
         model = Substrate
@@ -33,20 +39,21 @@ class SampleForm(forms.ModelForm):
     """
     Form to create a new sample using an already existing substrate.
     """
+    comment = forms.CharField(
+        label="Sample Comments",
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'hallo'}))
 
     class Meta:
         model = Sample
-        fields = ('substrate', 'comment',)
+        fields = ('comment',)
 
-    def save(self, commit=True):
-        substrate = self.cleaned_data.get('substrate', None)
-        comment = self.cleaned_data.get('comment', '')
-        instance = Sample.objects.create(substrate, comment)
 
-        if commit:
-            instance.save()
-
-        return instance
+class SampleMultiForm(multiform.MultiModelForm):
+    form_classes = {
+        'substrate': SubstrateForm,
+        'sample': SampleForm,
+    }
 
 
 class SampleSelectOrCreateForm(forms.Form):

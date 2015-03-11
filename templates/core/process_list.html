@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block title %}Samples{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Processes</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Processes
+            <a class="btn btn-primary pull-right" href="{% url 'process_create' %}">
+                <span class="glyphicon glyphicon-plus"></span>
+                Create Process
+            </a>
+        </h1>
+    </header>
+
+    <section>
+        <ul class="list-group">
+            {% for process in object_list %}
+                <li class="list-group-item">
+                    <h4>
+                        <a href="{% url 'process_detail' uuid=process.uuid %}">
+                            {{process.uuid}}
+                        </a>
+                    </h4>
+                    {{process.name}}
+                    <small>created on {{process.created.date}}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+</main>
+
+{% endblock content %}

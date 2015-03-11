@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}Edit {{process.uuid}}{% endblock title %}
+
+{% block header %}
+    {% load staticfiles %}
+    <script src="{% static 'growths/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'growths/js/rangy-core.js' %}"></script>
+    <script src="{% static 'growths/js/hallo.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'growths/css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/font-awesome.css' %}">
+{% endblock header %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list' %}">Processes</a></li>
+            <li><a href="{% url 'process_detail' uuid=process.uuid %}">{{process.uuid}}</a></li>
+            <li class='active'>Edit</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Edit {{process.uuid}}
+            <div class="pull-right">
+                <a href="{% url 'process_detail' uuid=process.uuid %}" class="btn btn-danger">Cancel</a>
+            </div>
+        </h1>
+    </header>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="btn btn-warning" type="submit">Update</button>
+    </form>
+
+</main>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'growths/js/growth_wizard.js' %}"></script>
+    <script type="text/javascript">
+        growth_wizard.enable_rich_text('.hallo', 'form');
+    </script>
+{% endblock scripts %}

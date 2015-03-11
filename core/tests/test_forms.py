@@ -35,14 +35,11 @@ class TestSubstrateForm(unittest.TestCase):
 class TestSampleForm(TestCase):
 
     def test_save(self):
-        substrate = mommy.make(Substrate)
         form = SampleForm(data={
-            'substrate': substrate.id,
             'comment': 'test',
         })
         self.assertDictEqual(dict(form.errors), {})
-        sample = form.save()
-        self.assertEqual(sample.substrate_id, substrate.id)
+        sample = form.save(commit=False)
         self.assertEqual(sample.comment, 'test')
 
 
