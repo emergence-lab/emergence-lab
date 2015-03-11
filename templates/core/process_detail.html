@@ -17,7 +17,9 @@
         <h1 class="page-header">
             {{process}}
             <div class="pull-right">
-                <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
+                    Edit
+                </a>
             </div>
         </h1>
     </header>
@@ -28,16 +30,31 @@
         <p>Created: {{process.created}}</p>
         <p>Modified: {{process.modified}}</p>
         <p>Comment: {{process.comment|safe}}</p>
-        <p>
-            Samples:
-            <ul>
-                {% for sample in samples %}
-                    <li>
-                        <a href="{% url 'sample_detail' uuid=sample.uuid %}">{{sample.uuid}}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </p>
+        {% if not samples %}
+            <div class="alert alert-warning">
+                <h3>This process doesn't have any associated samples</h3>
+                <p>Get started by running this process on an existing or new sample(s).</p>
+                <div class="top-spacer-sm">
+                    <a href="#" class="btn btn-primary right-spacer-xs">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Run Process
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <p>
+                Samples:
+                <ul>
+                    {% for sample in samples %}
+                        <li>
+                            <a href="{% url 'sample_detail' uuid=sample.uuid %}">
+                                {{sample.uuid}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </p>
+        {% endif %}
     </div>
 
 </main>
