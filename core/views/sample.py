@@ -49,3 +49,24 @@ class SampleCreateView(LoginRequiredMixin, generic.CreateView):
         sample = Sample.objects.create(substrate, comment)
         return HttpResponseRedirect(
             reverse('sample_detail', kwargs={'uuid': sample.uuid}))
+
+
+class SampleUpdateView(LoginRequiredMixin, generic.UpdateView):
+    template_name = 'core/sample_edit.html'
+    model = Sample
+    lookup_url_kwarg = 'uuid'
+    fields = ('comment',)
+
+    def get_object(self, queryset=None):
+        queryset = queryset or self.get_queryset()
+
+        assert self.lookup_url_kwarg in self.kwargs, (
+            'Expected view {} to be called with a URL keyword argument '
+            'named "{}". Fix your URL conf.'.format(self.__class__.__name__,
+                                                    self.lookup_url_kwarg))
+        try:
+            obj = Sample.objects.get_by_uuid(self.kwargs[self.lookup_url_kwarg])
+        except queryset.model.DoesNotExist:
+            raise Http404(_('No {}s found matching the query'.format(
+                queryset.model._meta.verbose_name)))
+        return obj

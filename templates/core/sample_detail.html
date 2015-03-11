@@ -19,7 +19,7 @@
         <h1 class="page-header">
             {{sample}}
             <div class="pull-right">
-                <a href="#" class="btn btn-warning">Edit</a>
+                <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">Edit</a>
             </div>
         </h1>
     </header>

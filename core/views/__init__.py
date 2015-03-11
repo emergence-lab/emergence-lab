@@ -36,7 +36,12 @@ from .sample import (
     SampleDetailView,
     SampleListView,
     SampleCreateView,
+    SampleUpdateView,
 )
 from .process import (
     ProcessDetailView,
+    ProcessCreateView,
+    ProcessListView,
+    ProcessUpdateView,
+    RunProcessView,
 )

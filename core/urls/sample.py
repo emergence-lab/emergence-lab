@@ -11,4 +11,8 @@ urlpatterns = [
         name='sample_create'),
     url(r'^(?P<uuid>s[0-9]+)/$', core.views.SampleDetailView.as_view(),
         name='sample_detail'),
+    url(r'^(?P<uuid>s[0-9]+)/edit/$', core.views.SampleUpdateView.as_view(),
+        name='sample_edit'),
+    url(r'^(?P<uuid>s[0-9]+)/run/$', core.views.RunProcessView.as_view(),
+        name='run_process'),
 ]

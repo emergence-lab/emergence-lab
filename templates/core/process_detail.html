@@ -8,7 +8,7 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="#">Processes</a></li>
+            <li><a href="{% url 'process_list' %}">Processes</a></li>
             <li class='active'>{{process.uuid}}</li>
         </ol>
     </nav>
@@ -17,7 +17,7 @@
         <h1 class="page-header">
             {{process}}
             <div class="pull-right">
-                <a href="#" class="btn btn-warning">Edit</a>
+                <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">Edit</a>
             </div>
         </h1>
     </header>
