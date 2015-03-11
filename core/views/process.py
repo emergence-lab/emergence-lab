@@ -38,6 +38,9 @@ class ProcessCreateView(LoginRequiredMixin, generic.CreateView):
     model = Process
     fields = ('comment',)
 
+    def get_success_url(self):
+        return reverse('process_detail', args=(self.object.uuid,))
+
 
 class ProcessListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/process_list.html'
