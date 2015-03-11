@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+
+{% block title %}Samples{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Samples</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Samples
+            <a class="btn btn-primary pull-right" href="{% url 'sample_create' %}">
+                <span class="glyphicon glyphicon-plus"></span>
+                Create Sample
+            </a>
+        </h1>
+    </header>
+
+    <section>
+        <ul class="list-group">
+            {% for sample in object_list %}
+                <li class="list-group-item">
+                    <div class="clearfix">
+                        <div class="pull-right">
+                                <a href="#" class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Run Process
+                            </a>    
+                        </div>
+                        <h4>
+                            <a href="{% url 'sample_detail' uuid=sample.uuid %}">
+                                {{sample.uuid}}
+                            </a>
+                        </h4>
+                        <small>created on {{sample.created.date}}</small>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+</main>
+
+{% endblock content %}
