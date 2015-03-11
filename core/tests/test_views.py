@@ -8,6 +8,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
+from .helpers import test_resolution_template
 from core.models import (Investigation, Project, ProjectTracking, Sample,
                          Substrate)
 
@@ -348,12 +349,11 @@ class TestSampleCRUD(TestCase):
         self.client.login(username='username1', password='')
 
     def test_sample_list_resolution_template(self):
-        url = '/samples/'
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'sample_list')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/sample_list.html')
-        self.assertEqual(response.status_code, 200)
+        test_resolution_template(self,
+            url='/samples/',
+            url_name='sample_list',
+            template_file='core/sample_list.html',
+            response_code=200)
 
     def test_sample_list_content(self):
         sample = Sample.objects.create(mommy.make(Substrate))
@@ -363,12 +363,11 @@ class TestSampleCRUD(TestCase):
 
     def test_sample_detail_resolution_template(self):
         sample = Sample.objects.create(mommy.make(Substrate))
-        url = '/samples/{}/'.format(sample.uuid)
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'sample_detail')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/sample_detail.html')
-        self.assertEqual(response.status_code, 200)
+        test_resolution_template(self,
+            url='/samples/{}/'.format(sample.uuid),
+            url_name='sample_detail',
+            template_file='core/sample_detail.html',
+            response_code=200)
 
     def test_sample_detail_content(self):
         sample = Sample.objects.create(mommy.make(Substrate))
@@ -382,12 +381,11 @@ class TestSampleCRUD(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_sample_create_resolution_template(self):
-        url = '/samples/create/'
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'sample_create')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/sample_create.html')
-        self.assertEqual(response.status_code, 200)
+        test_resolution_template(self,
+            url='/samples/create/',
+            url_name='sample_create',
+            template_file='core/sample_create.html',
+            response_code=200)
 
     def test_sample_create_empty_data(self):
         url = reverse('sample_create')
@@ -413,12 +411,11 @@ class TestSampleCRUD(TestCase):
 
     def test_sample_edit_resolution_template(self):
         sample = Sample.objects.create(mommy.make(Substrate))
-        url = '/samples/{}/edit/'.format(sample.uuid)
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'sample_edit')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/sample_edit.html')
-        self.assertEqual(response.status_code, 200)
+        test_resolution_template(self,
+            url='/samples/{}/edit/'.format(sample.uuid),
+            url_name='sample_edit',
+            template_file='core/sample_edit.html',
+            response_code=200)
 
     def test_sample_edit_invalid(self):
         url = reverse('sample_edit', args=('s1000',))
