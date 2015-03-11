@@ -9,7 +9,7 @@ import json
 from IPython.nbconvert.exporters.html import HTMLExporter
 from IPython.config import Config
 from runipy.notebook_runner import NotebookRunner
-from IPython.nbformat.current import read, write, reads_json
+from IPython.nbformat import read, write, reads
 from .forms import NBCellEdit
 
 
@@ -76,9 +76,10 @@ class NotebookInteractive(FormView):
                                str(self.request.user),
                                str(self.kwargs['notebook_name'] + '.ipynb'))
         self.nb_name = self.kwargs['notebook_name']
-        self.e = HTMLExporter(config=Config({'HTMLExporter':{'default_template':'basic'}}))
-        self.nb = read(open(self.nb_path, 'rb'), 'json')
-        self.cells = [ws.cells for ws in self.nb.worksheets]
+        #self.e = HTMLExporter(config=Config({'HTMLExporter':{'default_template':'basic'}}))
+        self.e = HTMLExporter()
+        self.nb = read(open(self.nb_path, 'rb'), 4)
+        self.cells = self.nb.cells
 
     def get(self, request, *args, **kwargs):
         self._set_ipython_variables()
@@ -92,22 +93,22 @@ class NotebookInteractive(FormView):
 
     def get_initial(self):
         initial = super(NotebookInteractive, self).get_initial()
-        for cell_num, i in enumerate(self.cells[0]):
-            if i['cell_type'] == 'code': initial['cell_{}'.format(cell_num)] = i['input']
+        for cell_num, i in enumerate(self.cells):
+            if i['cell_type'] == 'code': initial['cell_{}'.format(cell_num)] = i['source']
             elif i['cell_type'] == 'markdown': initial['cell_{}'.format(cell_num)] = i['source']
         return initial
 
     def get_context_data(self, **kwargs):
         if 'notebook_content' not in kwargs:
             nb_content = []
-            for cell in self.cells[0]:
+            for cell in self.cells:
                 #with open(tempfile.NamedTemporaryFile().name, 'wb+') as output:
                 temp_nb = {
                     'metadata': {},
-                    'nbformat': 3,
-                    'worksheets': [{'cells': [cell]}]
+                    'nbformat': 4,
+                    'cells': [cell]
                 }
-                for i in self.e.from_notebook_node(reads_json(json.dumps(temp_nb))):
+                for i in self.e.from_notebook_node(reads(json.dumps(temp_nb), 4)):
                     if not 'defaultdict' in str(i):
                         nb_content.append(i)
             kwargs['notebook_content'] = nb_content
@@ -119,7 +120,7 @@ class NotebookInteractive(FormView):
                     tmp.append(comments[i])
             kwargs['comments'] = tmp
         if 'cell_count' not in kwargs:
-            kwargs['cell_count'] = int(len(self.cells[0]))
+            kwargs['cell_count'] = int(len(self.cells))
         if 'notebook_name' not in kwargs:
             kwargs['notebook_name'] = self.nb_name
         return super(NotebookInteractive, self).get_context_data(**kwargs)

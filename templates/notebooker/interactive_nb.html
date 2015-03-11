@@ -21,7 +21,7 @@
         <![endif]-->
         <style>
             .input_area {
-                width: 70%;
+                width: 100%;
                 margin-left:0;
                 text-align: left;
               }
@@ -36,6 +36,26 @@
                 margin-left:0;
                 text-align: left;
               }
+              .inner_cell {
+                width: 100%;
+                padding-right: 0;
+              }
+              .cell {
+                padding-right: 0;
+                padding-left: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+              }
+              #notebook-container {
+                width: 100%;
+                padding-right: 0;
+                box-shadow: none !important;
+                -webkit-box-shadow: none !important;
+
+              }
+              .inner_cell {
+                padding-right: 0;
+              }
               .comment_area {
                 float: right;
                 width: 30%;
@@ -43,10 +63,13 @@
                 text-align: left;
                 vertical-align: top;
               }
-/*              .form-control {
+              .border-box-sizing {
+                padding-left: 0px;
                 padding-right: 0px;
+                padding-top: 0px;
+                padding-bottom: 0px;
               }
-
+/*
               .form-control + .glyphicon {
                 position: absolute;
                 right: 0;
@@ -110,7 +133,7 @@
     <h2 class="col-md-offset-1">Notebooks / <a href="{% url 'notebook_list' %}">{{ user }}</a> / {{ notebook_name }} </h2>
 </div>
 <br></br>
-<div id="nb_content" class="container-fluid">
+<div id="nb_content" class="containter-fluid">
     <div id="comment_area" class="comment_area">
         <h3><span class="glyphicon glyphicon-comment"></span>&emsp;Comments:</h3>
         <div>

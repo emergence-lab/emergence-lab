@@ -21,18 +21,18 @@
         <![endif]-->
         <style>
             .input_area {
-                width: 70%;
+                width: 100%;
                 margin-left:0;
                 text-align: left;
               }
               .output_area {
-                width: 70%;
+                width: 100%;
                 margin-left:0;
                 text-align: left;
               }
               .nb_content {
                 float: left;
-                width: 70%;
+                width: 100%;
                 margin-left:0;
                 text-align: left;
               }
@@ -85,14 +85,14 @@
 </div>
 <br></br>
 <div id="nb_content" class="container-fluid">
-    <div class="comment_area">
+<!--    <div class="comment_area">
         <h3><span class="glyphicon glyphicon-comment"></span>&emsp;Comments:</h3>
         <div>
             {% for i in comments %}
                 {{ i.comment }}
             {% endfor %}
         </div>
-    </div>
+    </div>-->
     <div class="nb_content">
 
         {{ notebook_content|safe }}
