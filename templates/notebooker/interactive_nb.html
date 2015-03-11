@@ -128,7 +128,7 @@
             <ul class="nav navbar-nav">
                 {% if not user.is_anonymous %}
                 <li>
-                    <a class="navbar-link" href="{% url 'dashboard' %}"><span class="glyphicon glyphicon-th-list"></span> Dashboard</a>
+                    <a class="navbar-link" href="{% url 'dashboard' %}"><span class="glyphicon glyphicon-home"></span> Dashboard</a>
                 </li>
                 {% endif %}
             </ul>
@@ -154,13 +154,13 @@
     <div class="nb_content">
         <form id="cell_form" action="" method="post">{% csrf_token %}
             {% for i in notebook_content %}
-                <a class="btn glyphicon glyphicon-edit edit_{{forloop.counter}}" title="Edit" id="edit_button_{{forloop.counter}}"></a>
+                <a class="col-md-offset-1 btn glyphicon glyphicon-edit edit_{{forloop.counter}}" title="Edit" id="edit_button_{{forloop.counter}}"></a>
                 <button class="btn glyphicon glyphicon-repeat button_css" type="submit" title="Update Cell" name="upd_cell_{{forloop.counter}}" value=""></button>
                 <div id="cell_block_{{forloop.counter}}">
                     {{ i|safe }}
                 </div>
 
-                <div class="{{forloop.counter}}" id="cell_edit_{{ forloop.counter }}">
+                <div class="{{forloop.counter}} col-md-offset-1" id="cell_edit_{{ forloop.counter }}">
                     {% for field in form %}
                         {% if forloop.counter = forloop.parentloop.counter %}
                             {% bootstrap_field field %}

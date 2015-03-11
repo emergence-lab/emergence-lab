@@ -13,9 +13,10 @@ class NBCellEdit(forms.Form):
         for i in range(self.cell_count):
             self.fields['cell_{}'.format(i)] = forms.CharField(widget=AceWidget(mode='text',
                                                         #theme='twilight',
-                                                        width="400px",
+                                                        width="95%",
                                                         height="100px",
                                                         #label="LABEL",
+                                                        wordwrap=True,
                                                         showprintmargin=True),
                                                      required=False)
             #self.fields['cell'][i].label = 'LABEL'
