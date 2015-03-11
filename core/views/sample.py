@@ -70,3 +70,6 @@ class SampleUpdateView(LoginRequiredMixin, generic.UpdateView):
             raise Http404(_('No {}s found matching the query'.format(
                 queryset.model._meta.verbose_name)))
         return obj
+
+    def get_success_url(self):
+        return reverse('sample_detail', args=(self.object.uuid,))

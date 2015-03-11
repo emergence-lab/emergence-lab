@@ -378,9 +378,8 @@ class TestSampleCRUD(TestCase):
 
     def test_sample_detail_invalid(self):
         url = reverse('sample_detail', args=('s1000',))
-        with self.assertRaises(Http404):
-            response = self.client.get(url)
-            print(response)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     def test_sample_create_resolution_template(self):
         url = '/samples/create/'
@@ -396,3 +395,42 @@ class TestSampleCRUD(TestCase):
         response = self.client.post(url, data)
         self.assertFormError(response, 'form', '',
                              'Cannot leave all fields blank.')
+
+    def test_sample_create_valid_data(self):
+        url = reverse('sample_create')
+        data = {
+            'sample-comment': 'test sample',
+            'substrate-comment': 'test sub',
+            'substrate-serial': 'serial',
+            'substrate-source': 'source',
+        }
+        response = self.client.post(url, data)
+        sample = Sample.objects.last()
+        detail_url = reverse('sample_detail', args=(sample.uuid,))
+        self.assertRedirects(response, detail_url)
+        self.assertEqual(sample.comment, data['sample-comment'])
+        self.assertEqual(sample.substrate.comment, data['substrate-comment'])
+
+    def test_sample_edit_resolution_template(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = '/samples/{}/edit/'.format(sample.uuid)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'sample_edit')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/sample_edit.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_sample_edit_invalid(self):
+        url = reverse('sample_edit', args=('s1000',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_sample_edit_valid_data(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        url = reverse('sample_edit', args=(sample.uuid,))
+        data = {'comment': 'testing'}
+        response = self.client.post(url, data)
+        sample = Sample.objects.get_by_uuid(sample.uuid)
+        self.assertEqual(sample.comment, data['comment'])
+        detail_url = reverse('sample_detail', args=(sample.uuid,))
+        self.assertRedirects(response, detail_url)

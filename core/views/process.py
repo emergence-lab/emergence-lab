@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
@@ -59,6 +60,9 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
                                                     self.lookup_url_kwarg))
         uuid = Process.strip_uuid(self.kwargs[self.lookup_url_kwarg])
         return get_object_or_404(Process, uuid_full__startswith=uuid)
+
+    def get_success_url(self):
+        return reverse('process_detail', args=(self.object.uuid,))
 
 
 class RunProcessView(LoginRequiredMixin, generic.TemplateView):
