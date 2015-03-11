@@ -7,7 +7,7 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample
+from core.models import Process
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
