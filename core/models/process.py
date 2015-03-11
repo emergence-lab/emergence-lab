@@ -2,12 +2,20 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.db import models
+from django.core.files.storage import default_storage as labshare
 
 from mptt import models as mptt
 import polymorphic
 
 from .mixins import TimestampMixin, UUIDMixin
 from . import fields
+
+
+def get_file_path(instance, filename):
+    """
+    Stores files in /process/:process_uuid/filename/
+    """
+    return '/'.join(['process', instance.uuid, filename])
 
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
@@ -55,3 +63,15 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
 
     def get_sample(self):
         return self.get_root().sample
+
+
+class DataFile(models.Model):
+    """
+    Generic model for files associated with processes
+    """
+    processes = models.ManyToManyField(Process,
+                                       related_name='datafiles',
+                                       related_query_name='datafiles')
+    content_type = models.CharField(max_length=10, null=True, blank=True)
+    data = models.FileField(upload_to=get_file_path, storage=labshare,
+                            max_length=200, blank=True, null=True)
