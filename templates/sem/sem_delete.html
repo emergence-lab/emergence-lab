@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Delete SEM{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3>Are you sure you want to delete {{sem}}?</h3>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% buttons %}
+        <a href="{% url 'sem_detail' pk=sem.id %}" class="btn btn-default">No</a>
+        <button type="submit" class="btn btn-danger">Yes</button>
+        {% endbuttons %}
+    </form>
+
+    <p>Magnification: {{sem.magnification}}</p>
+    <p>Image Source: {{sem.image_source}}</p>
+
+    {% if sem.image %}
+    <img src="{{sem.image.url}}" alt="image">
+    {% endif %}
+
+    <a href="{% url 'sem_detail' pk=sem.id %}">back</a>
+</div>
+{% endblock %}
