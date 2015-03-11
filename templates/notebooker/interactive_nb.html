@@ -68,6 +68,15 @@
                 padding-right: 0px;
                 padding-top: 0px;
                 padding-bottom: 0px;
+                min-height: 10px !important;
+              }
+              .button_css {
+                outline: none;
+                padding: 5px;
+                border: 0px;
+                box-sizing: none;
+                background-color: transparent;
+                color: rgb(51, 122, 183);
               }
 /*
               .form-control + .glyphicon {
@@ -146,7 +155,7 @@
         <form id="cell_form" action="" method="post">{% csrf_token %}
             {% for i in notebook_content %}
                 <a class="btn glyphicon glyphicon-edit edit_{{forloop.counter}}" title="Edit" id="edit_button_{{forloop.counter}}"></a>
-                <button class="btn glyphicon glyphicon-repeat" type="submit" title="Update Cell" name="upd_cell_{{forloop.counter}}" value=""></button>
+                <button class="btn glyphicon glyphicon-repeat button_css" type="submit" title="Update Cell" name="upd_cell_{{forloop.counter}}" value=""></button>
                 <div id="cell_block_{{forloop.counter}}">
                     {{ i|safe }}
                 </div>
