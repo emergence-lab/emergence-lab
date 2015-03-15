@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import string
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -293,3 +294,32 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         if clean:
             uuid = Process.strip_uuid(uuid)
         return self._get_tree_queryset().filter(process__uuid_full__startswith=uuid)
+
+    def has_nodes_for_process_type(self, process_type):
+        """
+        Returns if the sample has any nodes corresponding to the specified
+        process type.
+
+        :param process_type: The process class to search for.
+        :returns: Whether the sample has any nodes with the specified process
+                  type.
+        :raises ValueError: If the provided process type class is not a valid
+                            process.
+        """
+        return self.get_nodes_for_process_type(process_type).exists()
+
+    def get_nodes_for_process_type(self, process_type):
+        """
+        Get all nodes from the tree that have the specified process type.
+
+        :param process_type: The process class to search for.
+        :returns: The nodes for the sample with the specified process type.
+        :raises ValueError: If the provided process type class is not a valid
+                            process.
+        """
+        if process_type != Process and Process not in process_type.__bases__:
+            raise ValueError('{} is not a valid process, it does not inherit '
+                             'from Process'.format(process_type.__name__))
+        content_type = ContentType.objects.get_for_model(process_type).id
+        return self._get_tree_queryset().filter(
+            process__polymorphic_ctype=content_type)
