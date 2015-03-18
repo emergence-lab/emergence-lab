@@ -5,15 +5,22 @@ from django.conf import settings
 from django.views.generic import ListView, RedirectView, TemplateView, FormView
 import tempfile
 import json
+import platform
+from time import sleep
 
 from IPython.nbconvert.exporters.html import HTMLExporter
 from IPython.config import Config
-from runipy.notebook_runner import NotebookRunner
+from IPython.nbconvert.preprocessors import ExecutePreprocessor
+#from IPython.kernel import KernelManager
+#from IPython import get_ipython
+from .runipy_extender import NotebookRunner
+#from runipy.notebook_runner import NotebookRunner
 from IPython.nbformat import read, write, reads
 from .forms import NBCellEdit
 
 
 # Create your views here.
+
 
 class NotebookList(TemplateView):
     template_name = 'notebooker/template_list.html'
@@ -136,13 +143,30 @@ class NotebookInteractive(FormView):
                 cell_num = int(i)
             elif 'upd_all' in self.request.POST:
                 pass
-        if self.cells[0][cell_num]['cell_type'] == 'code':
-            self.cells[0][cell_num]['input'] = form.cleaned_data['cell_{}'.format(cell_num)]
-        elif self.cells[0][cell_num]['cell_type'] == 'code':
-            self.cells[0][cell_num]['source'] = form.cleaned_data['cell_{}'.format(cell_num)]
+        if self.cells[cell_num]['cell_type'] == 'code':
+            self.cells[cell_num]['source'] = form.cleaned_data['cell_{}'.format(cell_num)]
+        elif self.cells[cell_num]['cell_type'] == 'markdown':
+            self.cells[cell_num]['source'] = form.cleaned_data['cell_{}'.format(cell_num)]
         r = NotebookRunner(self.nb)
-        r.run_notebook()
-        write(r.nb, open(self.nb_path, 'w'), 'json')
+        #r.run_notebook()
+        #r = ExecutePreprocessor()
+        #km = KernelManager()
+        #km.start_kernel
+        #kc = km.client
+        #if platform.system() == 'Darwin':
+        #    sleep(1)
+        ##kc.start_channels()
+        #print(kc)
+        #print(get_ipython)
+        #r = get_ipython()
+        #if r is None:
+        #    r = kc
+        for cell in self.cells:
+            if cell['cell_type'] == 'code':
+                r.run_cell(cell)
+        #exp1 = r.preprocess_cell()
+        #r.run_cell(r.cell for cell in self.nb.cells if cell['cell_type'] == 'code')
+        write(self.nb, open(self.nb_path, 'w'), 4)
         return HttpResponseRedirect(reverse('notebook_int', kwargs = {'notebook_name': self.kwargs['notebook_name']}))
 
 #class NotebookIntDemo(TemplateView):
