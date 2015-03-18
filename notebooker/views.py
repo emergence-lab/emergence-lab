@@ -22,6 +22,10 @@ from .forms import NBCellEdit
 # Create your views here.
 
 
+class EmbeddedNotebook(TemplateView):
+    template_name = 'notebooker/embedded.html'
+
+
 class NotebookList(TemplateView):
     template_name = 'notebooker/template_list.html'
 
@@ -33,14 +37,15 @@ class NotebookList(TemplateView):
                 for template in os.listdir(os.path.join(settings.MEDIA_ROOT, 'notebooks', user)):
                     if template.endswith('.ipynb'):
                         tmp.append({'name': template.split('.ipynb')[0],
-                                    'path': os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template),
+                                    #'path': os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user, template),
+                                    'jupyter_url': '{0}/user/{1}/notebooks/{2}'.format(settings.JUPYTERHUB_URL, user, template)
                                     #'files': os.listdir(os.path.join(settings.MEDIA_ROOT, 'simulations', 'templates', user)),
                                     #'comment': comment
                                     })
                 kwargs['template_list'] = tmp
         return super(NotebookList, self).get_context_data(**kwargs)
 
-class NotebookDemo(TemplateView):
+class NotebookViewer(TemplateView):
     template_name = 'notebooker/demo_nb.html'
 
 
@@ -71,7 +76,7 @@ class NotebookDemo(TemplateView):
                 for i in comments:
                     tmp.append(comments[i])
             kwargs['comments'] = tmp
-        return super(NotebookDemo, self).get_context_data(**kwargs)
+        return super(NotebookViewer, self).get_context_data(**kwargs)
 
 class NotebookInteractive(FormView):
     template_name = 'notebooker/interactive_nb.html'
@@ -101,8 +106,12 @@ class NotebookInteractive(FormView):
     def get_initial(self):
         initial = super(NotebookInteractive, self).get_initial()
         for cell_num, i in enumerate(self.cells):
-            if i['cell_type'] == 'code': initial['cell_{}'.format(cell_num)] = i['source']
-            elif i['cell_type'] == 'markdown': initial['cell_{}'.format(cell_num)] = i['source']
+            if i['cell_type'] == 'code':
+                initial['cell_{}'.format(cell_num)] = i['source']
+                initial['type_{}'.format(cell_num)] = i['cell_type']
+            elif i['cell_type'] == 'markdown':
+                initial['cell_{}'.format(cell_num)] = i['source']
+                initial['type_{}'.format(cell_num)] = i['cell_type']
         return initial
 
     def get_context_data(self, **kwargs):
@@ -148,24 +157,9 @@ class NotebookInteractive(FormView):
         elif self.cells[cell_num]['cell_type'] == 'markdown':
             self.cells[cell_num]['source'] = form.cleaned_data['cell_{}'.format(cell_num)]
         r = NotebookRunner(self.nb)
-        #r.run_notebook()
-        #r = ExecutePreprocessor()
-        #km = KernelManager()
-        #km.start_kernel
-        #kc = km.client
-        #if platform.system() == 'Darwin':
-        #    sleep(1)
-        ##kc.start_channels()
-        #print(kc)
-        #print(get_ipython)
-        #r = get_ipython()
-        #if r is None:
-        #    r = kc
         for cell in self.cells:
             if cell['cell_type'] == 'code':
                 r.run_cell(cell)
-        #exp1 = r.preprocess_cell()
-        #r.run_cell(r.cell for cell in self.nb.cells if cell['cell_type'] == 'code')
         write(self.nb, open(self.nb_path, 'w'), 4)
         return HttpResponseRedirect(reverse('notebook_int', kwargs = {'notebook_name': self.kwargs['notebook_name']}))
 

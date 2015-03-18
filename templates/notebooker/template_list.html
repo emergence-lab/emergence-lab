@@ -33,7 +33,7 @@
         <td>{{ template.name }}</td>
         <td></td>
         <td>
-            <a class="glyphicon glyphicon-edit" href="{% url 'notebook_int' template.name %}"></a>
+            <a class="glyphicon glyphicon-edit" href="{{template.jupyter_url}}"></a>
             <a class="glyphicon glyphicon-remove" href="#"></a>
         </td>
       </tr>

@@ -87,18 +87,18 @@
         </style>
         <script type="text/javascript">
             // When your page loads
-            $(document).ready(function(){
-               // When the toggle areas in your navbar are clicked, toggle them
-               $("div[id^='cell_edit_']").hide();
-               $("a[id^='edit_button_']").click(function(e){
-                   var cellnum = e.target.id.substr(12);
-                   var cellname = 'cell_edit_' + cellnum;
-                   var formattededitcell = "div[id='" + cellname + "']";
-                   var formatteddispcell = "div[id='cell_block_" + cellnum + "']";
-                   e.preventDefault();
-                   $(formattededitcell).toggle();
-                   $(formatteddispcell).toggle();
-               });
+            //$(document).ready(function(){
+            //   // When the toggle areas in your navbar are clicked, toggle them
+            //   $("div[id^='cell_edit_']").hide();
+            //   $("a[id^='edit_button_']").click(function(e){
+            //       var cellnum = e.target.id.substr(12);
+            //       var cellname = 'cell_edit_' + cellnum;
+            //       var formattededitcell = "div[id='" + cellname + "']";
+            //       var formatteddispcell = "div[id='cell_block_" + cellnum + "']";
+            //       e.preventDefault();
+            //       $(formattededitcell).toggle();
+            //       $(formatteddispcell).toggle();
+            //   });
             })
         </script>
     </head>
@@ -156,18 +156,30 @@
             {% for i in notebook_content %}
                 <a class="col-md-offset-1 btn glyphicon glyphicon-edit edit_{{forloop.counter}}" title="Edit" id="edit_button_{{forloop.counter}}"></a>
                 <button class="btn glyphicon glyphicon-repeat button_css" type="submit" title="Update Cell" name="upd_cell_{{forloop.counter}}" value=""></button>
+                <select name="_cell_type_{{forloop.counter}}" id="_cell_type_{{forloop.counter}}">
+                    <option value="code">Python</option>
+                    <option value="markdown">Markdown</option>
+                </select>
                 <div id="cell_block_{{forloop.counter}}">
                     {{ i|safe }}
                 </div>
 
-                <div class="{{forloop.counter}} col-md-offset-1" id="cell_edit_{{ forloop.counter }}">
+                <div class="{{forloop.counter}} col-md-offset-1">
                     {% for field in form %}
                         {% if forloop.counter = forloop.parentloop.counter %}
-                            {% bootstrap_field field %}
+                            <div id="cell_edit_{{ forloop.parentloop.counter }}">
+                                {% if 'Cell' in field.label %}
+                                    {% bootstrap_field field %}
+                                {% endif %}
+                            </div>
+                            <div id="type_{{ forloop.parentloop.counter }}">
+                                {% if 'Type' in field.label %}
+                                    {% bootstrap_field field %}
+                                {% endif %}
+                            </div>
                         {% endif %}
                     {% endfor %}
                 </div>
-
 
             {% endfor %}
         </form>

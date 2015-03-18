@@ -8,6 +8,10 @@ class NBCellEdit(forms.Form):
         #super(NBCellEdit, self).__init__(*args, **kwargs)
         super(NBCellEdit, self).__init__(*args, **kwargs)
 
+        #choices = (
+        #    ('markdown', 'Markdown'),
+        #    ('code', 'Python'),
+        #)
         #self.fields['cell'] = []
         #self.fields['cell'] = {}
         for i in range(self.cell_count):
@@ -19,6 +23,7 @@ class NBCellEdit(forms.Form):
                                                         wordwrap=True,
                                                         showprintmargin=True),
                                                      required=False)
+            self.fields['type_{}'.format(i)] = forms.CharField(max_length=10)
             #self.fields['cell'][i].label = 'LABEL'
         #super(NBCellEdit, self).__init__(*args, **kwargs)
     #cell_upd = forms.IntegerField(required=False)

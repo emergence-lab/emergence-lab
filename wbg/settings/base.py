@@ -310,3 +310,7 @@ EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS')
 # Feedback
 
 ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK')
+
+# Jupyter
+
+JUPYTERHUB_URL = get_secret('JUPYTERHUB_URL')
