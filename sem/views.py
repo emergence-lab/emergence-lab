@@ -45,6 +45,7 @@ class SEMAddFiles(LoginRequiredMixin, CreateView):
     Add files to an existing sem process
     """
     model = DataFile
+    template_name = 'sem/sem_upload.html'
     form_class = DropzoneForm
 
     def form_valid(self, form):
