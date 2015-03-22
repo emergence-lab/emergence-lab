@@ -8,7 +8,7 @@ from django.views.generic import (CreateView, DeleteView,
                                   UpdateView, RedirectView,)
 from braces.views import LoginRequiredMixin
 
-from core.models import Sample, DataFile
+from core.models import Sample, DataFile, SampleManager
 from core.views import ActionReloadView
 from .models import SEMScan
 from .forms import DropzoneForm
@@ -32,7 +32,8 @@ class SEMAutoCreate(LoginRequiredMixin, ActionReloadView):
     """
     def perform_action(self, request, *args, **kwargs):
         process = SEMScan.objects.create()
-        sample = sample.objects.get(id=self.kwargs['sample'])
+        sample = SampleManager().get_by_uuid(self.kwargs['uuid'])
+        #sample = Sample.objects.get(id=self.kwargs['uuid'])
         sample.run_process(process)
         self.process_id = process.id
 
@@ -48,14 +49,19 @@ class SEMAddFiles(LoginRequiredMixin, CreateView):
     template_name = 'sem/sem_upload.html'
     form_class = DropzoneForm
 
+    def get_context_data(self, **kwargs):
+        context = super(SEMAddFiles, self).get_context_data(**kwargs)
+        context['process_id'] = self.kwargs['pk']
+        return context
+
     def form_valid(self, form):
         image = self.request.FILES['file']
         source = get_image_source(image)
         image = convert_tiff(image)
-        process = SEMScan.objects.get(id=self.kwargs['process'])
+        process = SEMScan.objects.get(id=self.kwargs['pk'])
         with transaction.atomic():
-            obj = DataFile.objects.create(image=image,
-                                          content_type='image')
+            obj = DataFile.objects.create(data=image,
+                                          content_type=image.content_type)
             obj.processes.add(process)
         data = {'status': 'success'}
         response = JSONResponse(data, mimetype=response_mimetype(self.request))

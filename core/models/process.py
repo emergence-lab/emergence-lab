@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import os
+import uuid
+
 from django.db import models
 from django.core.files.storage import default_storage as labshare
 
@@ -15,7 +18,7 @@ def get_file_path(instance, filename):
     """
     Stores files in /process/:process_uuid/filename/
     """
-    return '/'.join(['process', instance.uuid, filename])
+    return '/'.join(['process', uuid.uuid4().get_hex() + os.path.splitext(filename)[1]])
 
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):

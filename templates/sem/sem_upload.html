@@ -7,8 +7,8 @@
 <link href="{% static 'sem/css/dropzone.css' %}" type="text/css" rel="stylesheet"/>
 
 
-<!--<form class="dropzone" action="{% url 'sem_upload' %}" method="post" enctype="multipart/form-data">-->
-<form class="dropzone" action="{% url 'sem_upload' %}" method="post" enctype="multipart/form-data">
+<!--<form class="dropzone" action="{% url 'sem_files' pk=process_id %}" method="post" enctype="multipart/form-data">-->
+<form class="dropzone" action="{% url 'sem_files' pk=process_id %}" method="post" enctype="multipart/form-data">
 {% csrf_token %}
     <div class="fallback">
         <input name="file" type="file" multiple />
