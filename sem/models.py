@@ -7,13 +7,6 @@ from django.core.files.storage import default_storage as labshare
 from core.models import Process
 
 
-def get_file_path(instance, filename):
-    """
-    Stores sem scans in /:sample_uuid/:process_uuid/
-    """
-    return '/'.join(['process', instance.uuid, filename])
-
-
 class SEMScan(Process):
     """
     Stores SEM characterization images.
@@ -28,13 +21,8 @@ class SEMScan(Process):
         ('fib_1200', 'FEI Dual-Beam FIB'),
     ]
 
-    image_number = models.IntegerField(default=0)
-    image = models.ImageField(upload_to=get_file_path,
-                              storage=labshare,
-                              max_length=150,
-                              blank=True,
-                              null=True)
-    magnification = models.FloatField(blank=True, null=True)
     image_source = models.CharField(max_length=45,
                                     choices=TOOL_CHOICES,
-                                    default='esem_600')
+                                    default='esem_600',
+                                    blank=True,
+                                    null=True)
