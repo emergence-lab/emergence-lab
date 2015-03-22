@@ -15,4 +15,6 @@ urlpatterns = [
         sem.views.SEMUpdate.as_view(), name='sem_update'),
     url(r'^(?P<pk>\d+)/delete/$',
         sem.views.SEMDelete.as_view(), name='sem_delete'),
+    url(r'^(?P<pk>\d+)/add_files/$',
+        sem.views.SEMAddFiles.as_view(), name='sem_files'),
 ]
