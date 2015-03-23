@@ -75,9 +75,12 @@ class SEMDetail(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(SEMDetail, self).get_context_data(**kwargs)
+        process = SEMScan.objects.get(id=self.kwargs['pk'])
+        context['process_id'] = process.id
         context['sample_siblings'] = []
         context['pocket_siblings'] = []
         context['growth_siblings'] = []
+        context['images'] = [i.data for i in process.datafiles.get_queryset()]
         return context
 
 

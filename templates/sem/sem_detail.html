@@ -4,27 +4,15 @@
 
 {% block content %}
 <div class="container">
-    <ol class="breadcrumb">
-        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'growth_detail' slug=sem.growth.growth_number %}">{{sem.growth}}</a></li>
-        <li><a href="{% url 'sample_family_detail' growth=sem.growth.growth_number pocket=sem.sample.pocket %}">{{sem.growth}}_{{sem.sample.pocket}}</a></li>
-        <li><a href="{% url 'sample_detail' pk=sem.sample.id %}">{{sem.sample}}</a></li>
-        <li class="active">{{sem}}</li>
-    </ol>
 
     <h3>
         {{sem}}
-        <a class="btn btn-warning" href="{% url 'sem_update' pk=sem.id %}">Update</a>
-        <a class="btn btn-danger" href="{% url 'sem_delete' pk=sem.id %}">Delete</a>
+        <a class="btn btn-default" href="{% url 'sem_list' %}">SEM List</a>
+        <a class="btn btn-warning" href="{% url 'sem_update' pk=process_id %}">Update</a>
+        <a class="btn btn-danger" href="{% url 'sem_delete' pk=process_id %}">Delete</a>
     </h3>
 
-    <p>Magnification: {{sem.magnification}}</p>
     <p>Image Source: {{sem.image_source}}</p>
-
-    {% if sem.image %}
-    <img src="{{sem.image.url}}" alt="image">
-    {% endif %}
-
 
     <div>
         {% if sample_siblings %}
@@ -59,7 +47,14 @@
     </div>
 
     <div>
-        <a class="btn btn-default" href="{% url 'sem_list' %}">SEM List</a>
+        {% if images %}
+            <h4>Images</h4>
+            {% for i in images %}
+                <img height="500" src="{{ i.url }}">
+            {% endfor %}
+        {% endif %}
     </div>
+
+
 </div>
 {% endblock %}
