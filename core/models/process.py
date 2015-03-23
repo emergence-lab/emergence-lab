@@ -16,7 +16,7 @@ from . import fields
 
 def get_file_path(instance, filename):
     """
-    Stores files in /process/:process_uuid/filename/
+    Stores files in /process_data and generates a UUID-based file name
     """
     return '/'.join(['process_data',
                      uuid.uuid4().get_hex() + os.path.splitext(filename)[1]])
