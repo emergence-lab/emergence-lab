@@ -76,6 +76,17 @@ class SampleSelectOrCreateForm(forms.Form):
         if uuid:
             try:
                 cleaned_data['sample'] = Sample.objects.get_by_uuid(uuid)
+                if uuid[-1].isalpha():  # specified piece
+                    if uuid[-1] not in cleaned_data['sample'].pieces:
+                        self.add_error('sample_uuid',
+                            'Sample {} does not have piece {}'.format(
+                                uuid[:-1], uuid[-1]))
+                    cleaned_data['piece'] = uuid[-1]
+                else:
+                    if len(cleaned_data['sample'].pieces) > 1:
+                        self.add_error('sample_uuid',
+                            'Sample {} is ambiguous, piece '
+                            'needs to be specified'.format(uuid))
                 cleaned_data['piece'] = uuid[-1] if uuid[-1].isalpha() else 'a'
             except ObjectDoesNotExist:
                 self.add_error('sample_uuid',
