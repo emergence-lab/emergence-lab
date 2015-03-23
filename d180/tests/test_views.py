@@ -238,6 +238,110 @@ class TestD180Wizard(TestCase):
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
 
+    def test_start_valid_hold_reservation(self):
+        """
+        Test a post where the form is valid, selecting to hold the reservation.
+        """
+        mommy.make(Investigation)
+        mommy.make(Platter)
+        user = get_user_model().objects.first()
+        reservation = mommy.make('schedule_queue.Reservation',
+                                 user=user, is_active=True)
+        url = reverse('create_growth_d180_start')
+        data = {
+            'sample-INITIAL_FORMS': '1',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1',
+            'checklist-field_0': 'on',
+            'checklist-field_1': 'on',
+            'checklist-field_2': 'on',
+            'checklist-field_3': 'on',
+            'checklist-field_4': 'on',
+            'checklist-field_5': 'on',
+            'checklist-field_6': 'on',
+            'checklist-field_7': 'on',
+            'checklist-field_8': 'on',
+            'checklist-field_9': 'on',
+            'checklist-field_10': 'on',
+            'checklist-field_11': 'on',
+            'checklist-field_12': 'on',
+            'checklist-field_13': 'on',
+            'growth-has_gan': 'on',
+            'growth-has_u': 'on',
+            'growth-orientation': '0001',
+            'growth-investigations': '1',
+            'growth-platter': '1',
+            'growth-user': '1',
+            'growth-growth_number': 'g2000',
+            'source-cp2mg': '0.00',
+            'source-nh3': '0.00',
+            'source-sih4': '0.00',
+            'source-tega1': '0.00',
+            'source-tmal1': '0.00',
+            'source-tmga1': '0.00',
+            'source-tmga2': '0.00',
+            'source-tmin1': '0.00',
+            'source-tmin2': '0.00',
+            'sample-0-substrate_comment': 'test',
+            'reservation-hold': 'on',
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('create_growth_d180_readings'))
+        reservation = type(reservation).objects.get(id=reservation.id)
+        self.assertTrue(reservation.is_active)
+
+    def test_start_valid_hold_reservation(self):
+        """
+        Test a post where the form is valid, without holding the reservation.
+        """
+        mommy.make(Investigation)
+        mommy.make(Platter)
+        user = get_user_model().objects.first()
+        reservation = mommy.make('schedule_queue.Reservation',
+                                 user=user, is_active=True)
+        url = reverse('create_growth_d180_start')
+        data = {
+            'sample-INITIAL_FORMS': '1',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1',
+            'checklist-field_0': 'on',
+            'checklist-field_1': 'on',
+            'checklist-field_2': 'on',
+            'checklist-field_3': 'on',
+            'checklist-field_4': 'on',
+            'checklist-field_5': 'on',
+            'checklist-field_6': 'on',
+            'checklist-field_7': 'on',
+            'checklist-field_8': 'on',
+            'checklist-field_9': 'on',
+            'checklist-field_10': 'on',
+            'checklist-field_11': 'on',
+            'checklist-field_12': 'on',
+            'checklist-field_13': 'on',
+            'growth-has_gan': 'on',
+            'growth-has_u': 'on',
+            'growth-orientation': '0001',
+            'growth-investigations': '1',
+            'growth-platter': '1',
+            'growth-user': '1',
+            'growth-growth_number': 'g2000',
+            'source-cp2mg': '0.00',
+            'source-nh3': '0.00',
+            'source-sih4': '0.00',
+            'source-tega1': '0.00',
+            'source-tmal1': '0.00',
+            'source-tmga1': '0.00',
+            'source-tmga2': '0.00',
+            'source-tmin1': '0.00',
+            'source-tmin2': '0.00',
+            'sample-0-substrate_comment': 'test',
+            'reservation-hold': 'off',
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('create_growth_d180_readings'))
+        reservation = type(reservation).objects.get(id=reservation.id)
+        self.assertFalse(reservation.is_active)
+
     def test_readings_empty_data(self):
         """
         Test a post where no data is sent.
