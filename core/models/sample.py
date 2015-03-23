@@ -250,13 +250,20 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         return self.process_tree.get_descendant_count() + 1
 
-    def get_piece(self, piece):
+    def get_piece(self, piece, full=False):
         """
         Branch uid in the format {sample uid}{piece}
 
         :param piece: The piece to retrieve.
-        :returns: The leaf node for the specified branch.
+        :param full: Whether to retrieve the entire tree to the root for the
+                     piece. Defaults to False.
+        :returns: Either the leaf node or the entire tree for the specified
+                  branch depending on the full parameter.
         """
+        if full:
+            return (self.leaf_nodes
+                        .get(piece=piece)
+                        .get_ancestors(include_self=True))
         return self.leaf_nodes.get(piece=piece)
 
     def get_node(self, uuid, clean=True):
