@@ -47,6 +47,8 @@ class SampleManager(models.Manager):
 
     def get_by_uuid(self, uuid, clean=True):
         if clean:
+            if uuid[-1].isalpha():  # has piece information attached
+                uuid = uuid[:-1]
             uuid = Sample.strip_uuid(uuid)
         return Sample.objects.get(pk=uuid)
 

@@ -76,12 +76,14 @@ class SampleSelectOrCreateForm(forms.Form):
         if uuid:
             try:
                 cleaned_data['sample'] = Sample.objects.get_by_uuid(uuid)
+                cleaned_data['piece'] = uuid[-1] if uuid[-1].isalpha() else 'a'
             except ObjectDoesNotExist:
                 self.add_error('sample_uuid',
                                'Sample {} not found'.format(uuid))
                 return
         else:
             cleaned_data['sample'] = None
+            cleaned_data['piece'] = 'a'
 
         # cannot create new sample and specify existing sample
         if cleaned_data.get('sample') is not None:

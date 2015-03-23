@@ -132,7 +132,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             source_form.save()
             for s in sample_formset:
                 sample = s.save()
-                sample.run_process(self.object)
+                piece = s.cleaned_data['piece']
+                sample.run_process(self.object, piece)
             reservation = Reservation.get_latest(user=self.request.user,
                                                  tool_name='d180')
             if reservation and not reservation_form.cleaned_data['hold_open']:
