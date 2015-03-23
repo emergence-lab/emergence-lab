@@ -219,6 +219,13 @@ class TestProjectCRUD(TestCase):
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
 
+    def test_project_create_reserved_name(self):
+        url = reverse('project_create')
+        data = {'name': 'create'}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'name',
+            'Project name "create" is reserved, please choose another')
+
     def test_project_update_valid_data(self):
         obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_update', args=(obj.slug,))
