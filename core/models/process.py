@@ -18,7 +18,8 @@ def get_file_path(instance, filename):
     """
     Stores files in /process/:process_uuid/filename/
     """
-    return '/'.join(['process', uuid.uuid4().get_hex() + os.path.splitext(filename)[1]])
+    return '/'.join(['process_data',
+                     uuid.uuid4().get_hex() + os.path.splitext(filename)[1]])
 
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
