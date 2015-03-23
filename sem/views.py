@@ -5,16 +5,15 @@ from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.views.generic import (CreateView, DeleteView,
                                   DetailView, ListView,
-                                  UpdateView, RedirectView,)
+                                  UpdateView, )
 from braces.views import LoginRequiredMixin
 
-from core.models import Sample, DataFile, SampleManager
+from core.models import DataFile, SampleManager
 from core.views import ActionReloadView
 from .models import SEMScan
 from .forms import DropzoneForm
 from .response import JSONResponse, response_mimetype
-from .image_helper import (get_image_source, get_sample,
-                           convert_tiff,)
+from .image_helper import (convert_tiff,)
 
 
 class SEMList(LoginRequiredMixin, ListView):
@@ -33,7 +32,6 @@ class SEMAutoCreate(LoginRequiredMixin, ActionReloadView):
     def perform_action(self, request, *args, **kwargs):
         process = SEMScan.objects.create()
         sample = SampleManager().get_by_uuid(self.kwargs['uuid'])
-        #sample = Sample.objects.get(id=self.kwargs['uuid'])
         sample.run_process(process)
         self.process_id = process.id
 
@@ -56,7 +54,7 @@ class SEMAddFiles(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         image = self.request.FILES['file']
-        source = get_image_source(image)
+        # source = get_image_source(image)
         image = convert_tiff(image)
         process = SEMScan.objects.get(id=self.kwargs['pk'])
         with transaction.atomic():
@@ -89,34 +87,6 @@ class SEMCreate(LoginRequiredMixin, CreateView):
     """
     model = SEMScan
     template_name = 'sem/sem_create.html'
-
-
-#class SEMUpload(LoginRequiredMixin, CreateView):
-#    """
-#    View for creation of new sem data.
-#    """
-#    model = SEMScan
-#    template_name = 'sem/sem_upload.html'
-#    form_class = DropzoneForm
-#
-#    def form_valid(self, form):
-#        image = self.request.FILES['file']
-#        source = get_image_source(image)
-#        try:
-#            sample = get_sample(image)
-#        except:
-#            sample = None
-#        image = convert_tiff(image)
-#        with transaction.atomic():
-#            obj = SEMScan.objects.create(image_source=source,
-#                                         image_number=0,
-#                                         image=image)
-#            if sample:
-#                s = Sample.objects.get(id=sample)
-#                s.run_process(obj)
-#        data = {'status': 'success'}
-#        response = JSONResponse(data, mimetype=response_mimetype(self.request))
-#        return response
 
 
 class SEMUpdate(LoginRequiredMixin, UpdateView):

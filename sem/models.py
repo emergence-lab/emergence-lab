@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.db import models
-from django.core.files.storage import default_storage as labshare
 
 from core.models import Process
 
