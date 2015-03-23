@@ -69,7 +69,7 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
         return self.get_root().sample
 
 
-class DataFile(models.Model):
+class DataFile(TimestampMixin, models.Model):
     """
     Generic model for files associated with processes
     """
