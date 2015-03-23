@@ -116,6 +116,8 @@ class SampleSelectOrCreateForm(forms.Form):
             comment = self.cleaned_data['sample_comment']
             sample = Sample.objects.create(substrate=substrate, comment=comment)
             self.instance = sample
+        else:
+            self.instance = self.cleaned_data['sample']
         return self.instance
 
 
