@@ -4,7 +4,8 @@ from __future__ import absolute_import
 from .user import UserListAPIView
 from .process import (ProcessListAPIView,
                       ProcessRetrieveAPIView,
-                      ProcessNodeRetrieveAPIView,)
+                      ProcessNodeRetrieveAPIView,
+                      ProcessFilesRetrieveAPIView,)
 from .sample import (SampleListAPIView,
                      SampleRetrieveAPIView,
                      SampleTreeNodeAPIView,

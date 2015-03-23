@@ -9,7 +9,8 @@ from django.test import TestCase
 from model_mommy import mommy
 from rest_framework.test import APIClient
 
-from core.models import Process, ProcessNode, Sample, SplitProcess, Substrate
+from core.models import (DataFile, Process, ProcessNode, Sample, SplitProcess,
+                         Substrate,)
 from .models import ChildProcess, ParentProcess
 
 
@@ -126,6 +127,19 @@ class TestProcessAPI(TestCase):
         self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
         self.assertEqual(results.get('sample'), sample.uuid)
+
+    def test_retrieve_file_view(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        process = mommy.make(Process)
+        datafile = mommy.make(DataFile)
+        process.datafiles.add(datafile)
+        sample.run_process(process)
+        response = self.client.get(
+            '/api/v0/process/{}/files/'.format(process.uuid))
+        results = json.loads(response.content)
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0].get('id'))
+        self.assertEqual(results[0].get('id'), datafile.id)
 
 
 class TestSampleAPI(TestCase):

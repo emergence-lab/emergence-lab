@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from rest_framework import serializers
 
 from .polymorphic import PolymorphicModelSerializer
-from core.models import Process, ProcessNode
+from core.models import DataFile, Process, ProcessNode
 
 
 class ProcessSerializer(PolymorphicModelSerializer):
@@ -27,3 +27,10 @@ class ProcessNodeSerializer(serializers.ModelSerializer):
         fields = ('uuid_full', 'uuid', 'created', 'modified', 'comment',
                   'sample', 'piece', 'level', 'parent', 'children', 'process')
         depth = 1
+
+
+class DataFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DataFile
+        fields = ('id', 'created', 'modified', 'content_type', 'data')
