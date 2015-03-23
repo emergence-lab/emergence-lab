@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample, Process
+from core.models import Sample, Process, SplitProcess
 
 
 class TestSampleManager(TestCase):
@@ -192,7 +192,7 @@ class TestSample(TestCase):
         Test that the piece can be returned if there is only one piece.
         """
         root = self.sample.process_tree
-        node = self.sample.get_piece(root.piece)
+        node = self.sample.get_piece(root.piece, full=False)
         self.assertEqual(root.uuid, node.uuid)
 
     def test_get_piece_multiple(self):
@@ -206,8 +206,31 @@ class TestSample(TestCase):
             node = self.sample._insert_node(None, piece, root)
             node_uuids.append(node.uuid)
         for uuid, piece in zip(node_uuids, pieces):
-            node = self.sample.get_piece(piece)
+            node = self.sample.get_piece(piece, full=False)
             self.assertEqual(node.uuid, uuid)
+
+    def test_get_piece_single_full(self):
+        """
+        Test that the piece can be returned if there is only one piece.
+        """
+        root = self.sample.process_tree
+        node = self.sample.run_process(mommy.make(Process))
+        nodes = self.sample.get_piece(root.piece, full=True)
+        self.assertListEqual([root, node], list(nodes))
+
+    def test_get_piece_multiple_full(self):
+        """
+        Test that the piece can be returned if there are multiple pieces.
+        """
+        root = self.sample.process_tree
+        pieces = 'abcdefg'
+        nodes = []
+        for piece in pieces:
+            node = self.sample._insert_node(None, piece, root)
+            nodes.append(node)
+        for node, piece in zip(nodes, pieces):
+            piece_nodes = self.sample.get_piece(piece, full=True)
+            self.assertListEqual([root, node], list(piece_nodes))
 
     def test_node_count(self):
         root = self.sample.process_tree
@@ -320,3 +343,32 @@ class TestSample(TestCase):
         self.sample.run_process(process_1)
         result = self.sample.has_nodes_for_process(process_1.uuid)
         self.assertTrue(result)
+
+    def test_get_nodes_for_process_type_invalid(self):
+        self.assertListEqual(
+            [], list(self.sample.get_nodes_for_process_type(Process)))
+        with self.assertRaises(ValueError):
+            self.sample.get_nodes_for_process_type(Sample)
+
+    def test_get_nodes_for_process_type_valid(self):
+        process_1 = mommy.make(Process)
+        self.sample.run_process(process_1)
+        p1_node = list(self.sample.leaf_nodes)
+        process_2 = self.sample.split(2)[0].process
+        p2_nodes = list(self.sample.leaf_nodes)
+        self.assertListEqual(
+            p1_node, list(self.sample.get_nodes_for_process_type(Process)))
+        self.assertListEqual(
+            p2_nodes, list(self.sample.get_nodes_for_process_type(SplitProcess)))
+
+    def test_has_nodes_for_process_type_invalid(self):
+        self.assertFalse(self.sample.has_nodes_for_process_type(Process))
+        with self.assertRaises(ValueError):
+            self.sample.get_nodes_for_process_type(Sample)
+
+    def test_has_nodes_for_process_type_valid(self):
+        self.sample.run_process(mommy.make(Process))
+        self.assertFalse(self.sample.has_nodes_for_process_type(SplitProcess))
+        self.sample.split(2)
+        self.assertTrue(self.sample.has_nodes_for_process_type(Process))
+        self.assertTrue(self.sample.has_nodes_for_process_type(SplitProcess))

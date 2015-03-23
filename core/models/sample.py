@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import string
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -95,6 +96,16 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         Splits the sample piece into the specific number of pieces, with an
         optional comment on the split process itself.
+
+        :param number: The number of pieces to split the sample into.
+        :param piece: The piece to split. Defaults to 'a'.
+        :param comment: An optional comment associated with the split.
+        :param force_refresh: Specifies whether to update the sample in-place
+                              with the new tree. Set to True if the sample
+                              variable is going to be used further. Defaults to
+                              True.
+        :returns: The ProcessNodes associated with the split. One for each
+                  piece.
         """
         if comment is None:
             comment = 'Split sample into {0} pieces'.format(number)
@@ -124,6 +135,16 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     def run_process(self, process, piece='a', comment='', force_refresh=True):
         """
         Append a process to the specified branch.
+
+        :param process: The process to run on the sample.
+        :param piece: The piece to use for the process. Defaults to 'a'.
+        :param comment: An optional comment associated with the process for this
+                        sample. Separate from the process comment.
+        :param force_refresh: Specifies whether to update the sample in-place
+                              with the new tree. Set to True if the sample
+                              variable is going to be used further. Defaults to
+                              True.
+        :returns: The ProcessNode associated with the process.
         """
         branch = self.get_piece(piece)
         node = self._insert_node(process, piece, branch, comment)
@@ -136,6 +157,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         Insert a process into the tree before the specified node. Invalidates
         references for affected nodes.
+
+        :param process: The process to run on the sample.
+        :param uuid: The uuid of the node to insert the process before. Must be
+                     a child node of the sample, cannot be the root node.
+        :param comment: An optional comment associated with the process for this
+                        sample. Separate from the process comment.
+        :param force_refresh: Specifies whether to update the sample in-place
+                              with the new tree. Set to True if the sample
+                              variable is going to be used further. Defaults to
+                              True.
+        :returns: The ProcessNode associated with the process.
+        :raises Exception: If the provided node is the root node.
         """
         target = self.get_node(uuid)
         if target == self.root_node:
@@ -158,6 +191,17 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         Insert a process into the tree after the specified node. Invalidates
         references for affected nodes.
+
+        :param process: The process to run on the sample.
+        :param uuid: The uuid of the node to insert the process after. Must be
+                     a child node of the sample.
+        :param comment: An optional comment associated with the process for this
+                        sample. Separate from the process comment.
+        :param force_refresh: Specifies whether to update the sample in-place
+                              with the new tree. Set to True if the sample
+                              variable is going to be used further. Defaults to
+                              True.
+        :returns: The ProcessNode associated with the process.
         """
         parent = self.get_node(uuid)
         children = list(parent.get_children())
@@ -206,15 +250,30 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         return self.process_tree.get_descendant_count() + 1
 
-    def get_piece(self, piece):
+    def get_piece(self, piece, full=False):
         """
         Branch uid in the format {sample uid}{piece}
+
+        :param piece: The piece to retrieve.
+        :param full: Whether to retrieve the entire tree to the root for the
+                     piece. Defaults to False.
+        :returns: Either the leaf node or the entire tree for the specified
+                  branch depending on the full parameter.
         """
+        if full:
+            return (self.leaf_nodes
+                        .get(piece=piece)
+                        .get_ancestors(include_self=True))
         return self.leaf_nodes.get(piece=piece)
 
     def get_node(self, uuid, clean=True):
         """
         Get the specific node from the tree with the specified uuid.
+
+        :param uuid: The uuid of the node to retrieve. Must be a child node of
+                     the sample.
+        :param clean: Whether to clean the provided uuid. Defaults to True.
+        :returns: The node with the specified uuid.
         """
         if clean:
             uuid = ProcessNode.strip_uuid(uuid)
@@ -224,13 +283,50 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         Returns if the sample has any nodes corresponding to the specified
         process.
+
+        :param uuid: The uuid of the process to search for.
+        :param clean: Whether to clean the provided uuid. Defaults to True.
+        :returns: Whether the sample has any nodes with the specified process.
         """
         return self.get_nodes_for_process(uuid, clean).exists()
 
     def get_nodes_for_process(self, uuid, clean=True):
         """
         Get all nodes from the tree that have the specified process.
+
+        :param uuid: The uuid of the process to search for.
+        :param clean: Whether to clean the provided uuid. Defaults to True.
+        :returns: The nodes for the sample with the specified process.
         """
         if clean:
             uuid = Process.strip_uuid(uuid)
         return self._get_tree_queryset().filter(process__uuid_full__startswith=uuid)
+
+    def has_nodes_for_process_type(self, process_type):
+        """
+        Returns if the sample has any nodes corresponding to the specified
+        process type.
+
+        :param process_type: The process class to search for.
+        :returns: Whether the sample has any nodes with the specified process
+                  type.
+        :raises ValueError: If the provided process type class is not a valid
+                            process.
+        """
+        return self.get_nodes_for_process_type(process_type).exists()
+
+    def get_nodes_for_process_type(self, process_type):
+        """
+        Get all nodes from the tree that have the specified process type.
+
+        :param process_type: The process class to search for.
+        :returns: The nodes for the sample with the specified process type.
+        :raises ValueError: If the provided process type class is not a valid
+                            process.
+        """
+        if process_type != Process and Process not in process_type.__bases__:
+            raise ValueError('{} is not a valid process, it does not inherit '
+                             'from Process'.format(process_type.__name__))
+        content_type = ContentType.objects.get_for_model(process_type).id
+        return self._get_tree_queryset().filter(
+            process__polymorphic_ctype=content_type)
