@@ -64,7 +64,7 @@ class WizardFullForm(forms.ModelForm):
 
     class Meta:
         model = D180Growth
-        fields = ('user', 'growth_number', 'investigations', 'platter',
+        fields = ('user', 'investigations', 'platter',
                   'comment',
                   'has_gan', 'has_aln', 'has_inn', 'has_algan',
                   'has_ingan', 'other_material', 'orientation',

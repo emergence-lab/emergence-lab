@@ -135,7 +135,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 sample.run_process(self.object)
             reservation = Reservation.get_latest(user=self.request.user,
                                                  tool_name='d180')
-            if reservation is not None and reservation_form.hold_open:
+            if reservation and not reservation_form.cleaned_data['hold_open']:
                 reservation.deactivate()
 
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
