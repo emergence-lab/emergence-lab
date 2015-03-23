@@ -240,7 +240,7 @@ class TestD180Wizard(TestCase):
 
     def test_start_valid_existing_sample(self):
         """
-        Test a post where the form is valid, creating a new sample.
+        Test a post where the form is valid, using an existing sample.
         """
         mommy.make(Investigation)
         mommy.make(Platter)
@@ -284,6 +284,59 @@ class TestD180Wizard(TestCase):
         }
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
+
+    def test_start_valid_existing_sample_piece(self):
+        """
+        Test a post where the form is valid, using an existing sample specifying
+        the piece.
+        """
+        mommy.make(Investigation)
+        mommy.make(Platter)
+        sample = Sample.objects.create(substrate=mommy.make('Substrate'))
+        sample.split(2)
+        piece = 'b'
+        url = reverse('create_growth_d180_start')
+        data = {
+            'sample-INITIAL_FORMS': '1',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1',
+            'checklist-field_0': 'on',
+            'checklist-field_1': 'on',
+            'checklist-field_2': 'on',
+            'checklist-field_3': 'on',
+            'checklist-field_4': 'on',
+            'checklist-field_5': 'on',
+            'checklist-field_6': 'on',
+            'checklist-field_7': 'on',
+            'checklist-field_8': 'on',
+            'checklist-field_9': 'on',
+            'checklist-field_10': 'on',
+            'checklist-field_11': 'on',
+            'checklist-field_12': 'on',
+            'checklist-field_13': 'on',
+            'growth-has_gan': 'on',
+            'growth-has_u': 'on',
+            'growth-orientation': '0001',
+            'growth-investigations': '1',
+            'growth-platter': '1',
+            'growth-user': '1',
+            'growth-growth_number': 'g2000',
+            'source-cp2mg': '0.00',
+            'source-nh3': '0.00',
+            'source-sih4': '0.00',
+            'source-tega1': '0.00',
+            'source-tmal1': '0.00',
+            'source-tmga1': '0.00',
+            'source-tmga2': '0.00',
+            'source-tmin1': '0.00',
+            'source-tmin2': '0.00',
+            'sample-0-sample_uuid': '{}{}'.format(sample.uuid, piece),
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('create_growth_d180_readings'))
+        nodes = sample.get_nodes_for_process_type(D180Growth)
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].piece, piece)
 
     def test_start_valid_hold_reservation(self):
         """
