@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from .project import TrackProjectForm
+from .project import CreateProjectForm, TrackProjectForm
 from .sample import (
     SampleForm,
     SubstrateForm,

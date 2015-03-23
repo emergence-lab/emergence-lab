@@ -9,7 +9,7 @@ from braces.views import LoginRequiredMixin
 
 from .utility import ActiveListView, ActionReloadView
 from core.models import Investigation, Project, ProjectTracking, User
-from core.forms import TrackProjectForm
+from core.forms import TrackProjectForm, CreateProjectForm
 from core.streams import project_stream, investigation_stream
 
 
@@ -59,11 +59,7 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     """
     template_name = 'core/project_create.html'
     model = Project
-    fields = ('name', 'description',)
-
-    def form_valid(self, form):
-        self.object = form.save()
-        return HttpResponseRedirect(self.get_success_url())
+    form_class = CreateProjectForm
 
     def get_success_url(self):
         return reverse('project_detail_all', kwargs={'slug': self.object.slug})

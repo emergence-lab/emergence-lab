@@ -24,3 +24,21 @@ class TrackProjectForm(forms.ModelForm):
     class Meta:
         model = ProjectTracking
         fields = ('project', 'is_owner',)
+
+
+class CreateProjectForm(forms.ModelForm):
+
+    class Meta:
+        model = Project
+        fields = ('name', 'description',)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        reserved_names = [
+            'create',
+            'track',
+        ]
+        if name in reserved_names:
+            self.add_error('name',
+                'Project name "{}" is reserved, please choose another'.format(name))
+        return name
