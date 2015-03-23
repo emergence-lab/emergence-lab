@@ -8,6 +8,7 @@
     <h3>
         {{sem}}
         <a class="btn btn-default" href="{% url 'sem_list' %}">SEM List</a>
+        <a class="btn btn-success" href="{% url 'sem_files' pk=process_id %}">Add Images</a>
         <a class="btn btn-warning" href="{% url 'sem_update' pk=process_id %}">Update</a>
         <a class="btn btn-danger" href="{% url 'sem_delete' pk=process_id %}">Delete</a>
     </h3>
