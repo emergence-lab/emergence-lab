@@ -337,6 +337,14 @@ class TestInvestigationCRUD(TestCase):
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
 
+    def test_project_create_reserved_name(self):
+        proj = Project.objects.filter(is_active=True).first()
+        url = reverse('investigation_create', args=(proj.slug,))
+        data = {'name': 'activate'}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'name',
+            'Investigation name "activate" is reserved, please choose another')
+
     def test_investigation_update_valid_data(self):
         obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
