@@ -5,8 +5,11 @@ from django.db import models
 from django.contrib.auth import models as auth
 from django.core.mail import send_mail
 from django.core import validators
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+from rest_framework.authtoken.models import Token
 
 from .mixins import ActiveStateMixin
 
@@ -143,3 +146,9 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
             return True
 
         return _user_has_module_perms(self, app_label)
+
+
+@receiver(models.signals.post_save, sender=User)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
