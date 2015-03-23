@@ -16,8 +16,8 @@ class Reservation(ActiveStateMixin, models.Model):
 
     @staticmethod
     def get_latest(user, tool_name):
-        item = Reservation.objects.filter(is_active=True,
-                                          tool=tool_name).order_by('priority_field').first()
+        item = (Reservation.active_objects.filter(tool=tool_name)
+                                          .order_by('priority_field').first())
         if item and item.user == user:
             return item
         else:
