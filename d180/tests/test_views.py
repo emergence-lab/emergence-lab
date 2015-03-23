@@ -246,7 +246,7 @@ class TestD180Wizard(TestCase):
         mommy.make(Platter)
         user = get_user_model().objects.first()
         reservation = mommy.make('schedule_queue.Reservation',
-                                 user=user, is_active=True)
+                                 user=user, is_active=True, tool='d180')
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '1',
@@ -283,14 +283,14 @@ class TestD180Wizard(TestCase):
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
             'sample-0-substrate_comment': 'test',
-            'reservation-hold': 'on',
+            'reservation-hold_open': 'on',
         }
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
         reservation = type(reservation).objects.get(id=reservation.id)
         self.assertTrue(reservation.is_active)
 
-    def test_start_valid_hold_reservation(self):
+    def test_start_valid_close_reservation(self):
         """
         Test a post where the form is valid, without holding the reservation.
         """
@@ -298,7 +298,7 @@ class TestD180Wizard(TestCase):
         mommy.make(Platter)
         user = get_user_model().objects.first()
         reservation = mommy.make('schedule_queue.Reservation',
-                                 user=user, is_active=True)
+                                 user=user, is_active=True, tool='d180')
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '1',
@@ -335,7 +335,6 @@ class TestD180Wizard(TestCase):
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
             'sample-0-substrate_comment': 'test',
-            'reservation-hold': 'off',
         }
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
