@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django import forms
 
-from core.models import Project, ProjectTracking
+from core.models import Investigation, Project, ProjectTracking
 
 
 class TrackProjectForm(forms.ModelForm):
@@ -41,4 +41,23 @@ class CreateProjectForm(forms.ModelForm):
         if name in reserved_names:
             self.add_error('name',
                 'Project name "{}" is reserved, please choose another'.format(name))
+        return name
+
+
+class CreateInvestigationForm(forms.ModelForm):
+
+    class Meta:
+        model = Investigation
+        fields = ('name', 'description',)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        reserved_names = [
+            'activate',
+            'deactivate',
+            'add-investigation'
+        ]
+        if name in reserved_names:
+            self.add_error('name',
+                'Investigation name "{}" is reserved, please choose another'.format(name))
         return name

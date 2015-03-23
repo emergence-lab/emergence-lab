@@ -9,7 +9,8 @@ from braces.views import LoginRequiredMixin
 
 from .utility import ActiveListView, ActionReloadView
 from core.models import Investigation, Project, ProjectTracking, User
-from core.forms import TrackProjectForm, CreateProjectForm
+from core.forms import (CreateInvestigationForm, CreateProjectForm,
+                        TrackProjectForm,)
 from core.streams import project_stream, investigation_stream
 
 
@@ -161,7 +162,7 @@ class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
     """
     template_name = 'core/investigation_create.html'
     model = Investigation
-    fields = ('name', 'description')
+    form_class = CreateInvestigationForm
 
     def dispatch(self, request, *args, **kwargs):
         self.initial = {'project': Project.objects.get(slug=kwargs.pop('slug'))}
