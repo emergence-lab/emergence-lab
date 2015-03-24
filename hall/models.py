@@ -3,12 +3,21 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 
-from core.models import Process
+from core.models import Process, DataFile
 
 
 class Hall(Process):
     """
     Stores hall characterization information.
+    """
+    name = 'Hall'
+    slug = 'hall'
+    is_destructive = False
+
+
+class HallData(DataFile):
+    """
+    Stores data for an instance of a Hall process.
     """
     temperature = models.DecimalField(max_digits=7, decimal_places=2, blank=True, default=300.0)
     symmetry_factor = models.DecimalField(max_digits=7, decimal_places=2, blank=True, default=1.0)
