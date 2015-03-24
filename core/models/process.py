@@ -69,13 +69,22 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
         return self.get_root().sample
 
 
-class DataFile(TimestampMixin, models.Model):
+class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
     """
     Generic model for files associated with processes
     """
+    DATA_STATE = [
+        ('raw', 'Raw'),
+        ('cleaned', 'Cleaned'),
+        ('extracted', 'Extracted'),
+        ('analyzed', 'Analyzed'),
+        ('other', 'Other')
+    ]
+
     processes = models.ManyToManyField(Process,
                                        related_name='datafiles',
                                        related_query_name='datafiles')
     content_type = models.CharField(max_length=10, null=True, blank=True)
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
+    state = models.CharField(max_length=20, choices=DATA_STATE, default='raw')

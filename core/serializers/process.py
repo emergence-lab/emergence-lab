@@ -29,8 +29,8 @@ class ProcessNodeSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class DataFileSerializer(serializers.ModelSerializer):
+class DataFileSerializer(PolymorphicModelSerializer):
 
     class Meta:
         model = DataFile
-        fields = ('id', 'created', 'modified', 'content_type', 'data')
+        fields = ('id', 'created', 'modified', 'content_type', 'data', 'state')
