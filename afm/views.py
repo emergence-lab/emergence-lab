@@ -6,7 +6,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from braces.views import LoginRequiredMixin
 
-from .models import AFMScan
+from .models import AFMFile, AFMScan
 
 
 class AFMList(LoginRequiredMixin, ListView):
@@ -30,6 +30,7 @@ class AFMDetail(LoginRequiredMixin, DetailView):
         context['sample_siblings'] = []
         context['pocket_siblings'] = []
         context['growth_siblings'] = []
+        context['dataset'] = self.object.datafiles.get_queryset().instance_of(AFMFile)
         return context
 
 
