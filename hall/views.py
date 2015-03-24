@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.views import generic
 
-from .models import Hall
+from .models import Hall, HallData
 
 
 class HallListView(generic.ListView):
@@ -19,5 +19,5 @@ class HallDetailView(generic.DetailView):
         context = super(HallDetailView, self).get_context_data(**kwargs)
         process = Hall.objects.get(id=self.kwargs['pk'])
         context['process_id'] = process.id
-        context['dataset'] = [i.halldata for i in process.datafiles.get_queryset()]
+        context['dataset'] = process.datafiles.get_queryset().instance_of(HallData)
         return context
