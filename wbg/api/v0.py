@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^sem/', include('sem.urls.api')),
     url(r'^messaging/', include('messaging.urls.api')),
     url(r'^d180/', include('d180.urls.api')),
+    url(r'^hall/', include('hall.urls.api')),
 ]
