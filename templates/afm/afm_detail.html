@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}{{afm}}{% endblock %}
 
@@ -8,22 +9,47 @@
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
     </ol>
 
-    <h3>
-        {{afm}}
-        <a class="btn btn-warning" href="{% url 'afm_update' uuid=afm.uuid %}">Update</a>
-        <a class="btn btn-danger" href="{% url 'afm_delete' uuid=afm.uuid %}">Delete</a>
-    </h3>
-
-    {% for file in dataset %}
-        <p><strong>State:</strong> {{file.get_state_display}}</p>
-        <p><strong>Location:</strong> {{file.get_location_display}}</p>
-        <p><strong>Size:</strong> {{file.size}} &mu;m</p>
-        <p><strong>RMS:</strong> {{file.rms}} nm</p>
-        <p><strong>Z-Range:</strong> {{file.zrange}} nm</p>
-    {% endfor %}
+    <header>
+        <h1 class="page-header">
+            {{afm.name}} - {{afm}}
+            <div class="pull-right">
+                <a class="btn btn-warning" href="{% url 'afm_update' uuid=afm.uuid %}">
+                    {% bootstrap_icon 'edit' %}
+                    Edit
+                </a>
+                <a class="btn btn-danger" href="{% url 'afm_delete' uuid=afm.uuid %}">
+                    {% bootstrap_icon 'remove' %}
+                   Delete 
+                </a>
+            </div>
+        </h1>
+    </header>
 
     <div>
-        <a class="btn btn-default" href="{% url 'afm_list' %}">AFM List</a>
+        <p>Created on {{afm.created}}</p>
+        <p>Modified on {{afm.modified}}</p>
+        <p>{{afm.comment}}</p>
+        <p>{{afm.process_node.comment}}</p>
+    </div>
+
+    <div>
+        <h3 class="page-header">
+            Data Files
+            <div class="pull-right">
+                <a class="btn btn-primary" href="{% url 'afm_upload' uuid=afm.uuid %}">
+                    {% bootstrap_icon 'upload' %}
+                    Upload File
+                </a>
+            </div>
+        </h3>
+        {% include "afm/afm_detail_partial.html" with object_list=dataset process=afm %}
+    </div>
+
+    <div>
+        <a class="btn btn-default" href="{% url 'afm_list' %}">
+            {% bootstrap_icon 'arrow-left' %}
+            AFM List
+        </a>
     </div>
 </div>
 {% endblock %}

@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import os
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from braces.views import LoginRequiredMixin
+import nanoscope
+from PIL import Image
+import six
 
 from afm.models import AFMFile, AFMScan
-from core.models import Process
+from core.models import DataFile, Process
+from core.forms import DropzoneForm
+from core.views import ActionReloadView
 
 
 class AFMList(LoginRequiredMixin, ListView):
@@ -102,3 +112,72 @@ class AFMDelete(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('afm_list')
+
+
+class AFMFileUpload(LoginRequiredMixin, CreateView):
+    """
+    Add files to an existing afm process
+    """
+    model = AFMFile
+    template_name = 'afm/afm_upload.html'
+    form_class = DropzoneForm
+
+    def get_context_data(self, **kwargs):
+        context = super(AFMFileUpload, self).get_context_data(**kwargs)
+        context['process'] = self.kwargs['uuid']
+        return context
+
+    def form_valid(self, form):
+        process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
+
+        image = self.request.FILES['file']
+        scan_number = int(os.path.splitext(image.name)[-1][1:])
+        raw = six.BytesIO(image.read())
+        raw.mode = 'b'
+        scan = nanoscope.read(raw, encoding='cp1252')
+        for img in scan:
+            img.process()
+
+            with transaction.atomic():
+                obj = AFMFile.objects.create(data=image,
+                                             content_type='application/octet-stream',
+                                             rms=img.rms,
+                                             zrange=img.zrange,
+                                             size=img.scan_area,
+                                             image_type=img.type,
+                                             scan_number=scan_number)
+                obj.processes.add(process)
+                pixels = img.colorize()
+                tempfile_io = six.StringIO()
+                Image.fromarray(pixels).save(tempfile_io, format='PNG')
+                tempfile = InMemoryUploadedFile(
+                    tempfile_io, None, image.name + '.png', 'image/png',
+                    tempfile_io.len, None)
+
+                img_file = AFMFile.objects.create(data=tempfile,
+                                                  content_type='image/png',
+                                                  state='extracted',                            rms=img.rms,
+                                                  zrange=img.zrange,
+                                                  size=img.scan_area,
+                                                  image_type=img.type,
+                                                  scan_number=scan_number)
+                img_file.processes.add(process)
+
+        return JsonResponse({'status': 'success'})
+
+
+class AFMRemoveFileActionReloadView(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
+        datafile = DataFile.objects.get(pk=self.kwargs['id'])
+        datafile.processes.remove(process)
+        if not datafile.processes.all().exists():
+            datafile.delete()
+
+    def get(self, request, *args, **kwargs):
+        self.perform_action(request, *args, **kwargs)
+        return super(ActionReloadView, self).get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('afm_detail', args=(self.kwargs['uuid'],))

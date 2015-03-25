@@ -84,7 +84,7 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
     processes = models.ManyToManyField(Process,
                                        related_name='datafiles',
                                        related_query_name='datafiles')
-    content_type = models.CharField(max_length=10, null=True, blank=True)
+    content_type = models.CharField(max_length=45, null=True, blank=True)
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
     state = models.CharField(max_length=20, choices=DATA_STATE, default='raw')
