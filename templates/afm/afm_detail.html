@@ -10,8 +10,8 @@
 
     <h3>
         {{afm}}
-        <a class="btn btn-warning" href="{% url 'afm_update' pk=afm.id %}">Update</a>
-        <a class="btn btn-danger" href="{% url 'afm_delete' pk=afm.id %}">Delete</a>
+        <a class="btn btn-warning" href="{% url 'afm_update' uuid=afm.uuid %}">Update</a>
+        <a class="btn btn-danger" href="{% url 'afm_delete' uuid=afm.uuid %}">Delete</a>
     </h3>
 
     {% for file in dataset %}

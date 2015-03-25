@@ -6,9 +6,7 @@
 {% block content %}
 <div class="container">
     <ol class="breadcrumb">
-        <li><a href="{% url 'growth_detail' slug=afm.growth.growth_number %}">{{afm.growth}}</a></li>
-        <li><a href="{% url 'sample_detail' pk=afm.sample.id %}">{{afm.sample}}</a></li>
-        <li><a href="{% url 'afm_detail' pk=afm.id %}">{{afm}}</a></li>
+        <li><a href="{% url 'afm_detail' uuid=afm.uuid %}">{{afm}}</a></li>
         <li class="active">Update</li>
     </ol>
 
@@ -16,12 +14,16 @@
 
     <form action="" method="post" class="form">
         {% csrf_token %}
-        {% bootstrap_form form layout='inlinne' %}
+        {% bootstrap_form form layout='inline' %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-warning pull-right">Update</button>
         {% endbuttons %}
     </form>
 
-    <a href="{% url 'afm_detail' pk=afm.id %}">back</a>
+    <a class="btn btn-default" href="{% url 'afm_detail' uuid=afm.uuid %}">
+        {% bootstrap_icon 'arrow-left' %}
+        Back
+    </a>
 </div>
+
 {% endblock %}
