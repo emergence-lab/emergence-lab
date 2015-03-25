@@ -98,12 +98,18 @@ class QuickSearchRedirectView(LoginRequiredMixin, generic.RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         query = self.request.GET.get('search_query', '')
         if query.startswith('s'):
-            sample = Sample.objects.get_by_uuid(query)
-            return reverse('sample_detail', args=(sample.uuid,))
+            try:
+                sample = Sample.objects.get_by_uuid(query)
+                return reverse('sample_detail', args=(sample.uuid,))
+            except Sample.DoesNotExist:
+                return reverse('sample_list')
         elif query.startswith('p'):
-            uuid = Process.strip_uuid(query)
-            process = Process.objects.get(uuid_full__startswith=uuid)
-            return reverse('process_detail', args=(process.uuid,))
+            try:
+                uuid = Process.strip_uuid(query)
+                process = Process.objects.get(uuid_full__startswith=uuid)
+                return reverse('process_detail', args=(process.uuid,))
+            except Process.DoesNotExist:
+                return reverse('process_list')
         elif query.startswith('@'):
             return reverse('users_profile',
                            kwargs={'username': query.strip('@')})
