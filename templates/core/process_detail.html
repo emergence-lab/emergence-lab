@@ -55,6 +55,32 @@
                 </ul>
             </p>
         {% endif %}
+
+        {% if not process.datafiles.all.exists %}
+            <div class="alert alert-info">
+                <h3>This process doesn't have any associated data files</h3>
+                <p>Get started by uploading a file.</p>
+                <div class="top-spacer-sm">
+                    <a href="#" class="btn btn-primary right-spacer-xs">
+                        <span class="glyphicon glyphicon-upload"></span>
+                        Upload File
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <p>
+                Data Files:
+                <ul>
+                    {% for file in process.datafiles.all %}
+                        <li>
+                            Content Type: {{file.content_type}} <br>
+                            Data State: {{file.state}} <br>
+                            Location: {{file.data}}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </p>
+        {% endif %}
     </div>
 
 </main>
