@@ -10,7 +10,7 @@
     <form action="" method="post">
         {% csrf_token %}
         {% buttons %}
-        <a href="{% url 'afm_detail' pk=afm.id %}" class="btn btn-default">No</a>
+        <a href="{% url 'afm_detail' uuid=afm.uuid %}" class="btn btn-default">No</a>
         <button type="submit" class="btn btn-danger">Yes</button>
         {% endbuttons %}
     </form>
@@ -27,6 +27,6 @@
     <img src="{{afm.amplitude.url}}" alt="height">
     {% endif %}
 
-    <a href="{% url 'afm_detail' pk=afm.id %}">back</a>
+    <a href="{% url 'afm_detail' uuid=afm.uuid %}">back</a>
 </div>
 {% endblock %}

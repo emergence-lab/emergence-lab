@@ -11,10 +11,14 @@
         {% csrf_token %}
         {% bootstrap_form form layout='inline' %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-success pull-right">Create</button>
         {% endbuttons %}
     </form>
 
-    <a href="{% url 'afm_list' %}">back</a>
+    <a class="btn btn-default" href="{% url 'afm_list' %}">
+        {% bootstrap_icon 'arrow-left' %}
+        Back
+    </a>
 </div>
+
 {% endblock %}

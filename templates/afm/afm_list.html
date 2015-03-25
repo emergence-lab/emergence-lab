@@ -4,16 +4,25 @@
 
 {% block content %}
 <div class="container">
-    <h3>Recent AFM Scans <a class="btn btn-primary" href="{% url 'afm_create' %}">New</a></h3>
+    <header>
+        <h1 class="page-header">
+            AFM Scans
+            <a class="btn btn-primary pull-right" href="{% url 'afm_create' %}">
+                <span class="glyphicon glyphicon-plus"></span>
+                Create
+            </a>
+        </h1>
+    </header>
 
     <ul>
-    {% for object in object_list %}
-        <li>
-            <a href="{% url 'afm_detail' pk=object.id %}">{{object}}</a>
-        </li>
-    {% endfor %}
+        {% for object in object_list %}
+            <li>
+                <a href="{% url 'afm_detail' uuid=object.uuid %}">{{object}}</a>
+            </li>
+        {% endfor %}
     </ul>
 
     <a class="btn btn-default" href="{% url 'home' %}">Back</a>
 </div>
+
 {% endblock %}
