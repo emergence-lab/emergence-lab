@@ -41,9 +41,6 @@ class AFMDetail(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(AFMDetail, self).get_context_data(**kwargs)
-        context['sample_siblings'] = []
-        context['pocket_siblings'] = []
-        context['growth_siblings'] = []
         context['dataset'] = self.object.datafiles.get_queryset().instance_of(AFMFile)
         return context
 
@@ -54,6 +51,7 @@ class AFMCreate(LoginRequiredMixin, CreateView):
     """
     model = AFMScan
     template_name = 'afm/afm_create.html'
+    fields = ('comment',)
 
     def get_success_url(self):
         return reverse('afm_detail', args=(self.object.uuid,))
