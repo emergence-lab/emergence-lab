@@ -127,6 +127,19 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
         context['process'] = self.kwargs['uuid']
         return context
 
+    def process_image(self, scan, filename, scan_number):
+        image = Image.fromarray(scan.colorize())
+
+        processed_image = Image.new(image.mode, (654, 580), 'white')
+        processed_image.paste(image,
+                              (20, 20, image.size[0] + 20, image.size[1] + 20))
+
+        tempio = six.StringIO()
+        processed_image.save(tempio, format='PNG')
+        return InMemoryUploadedFile(
+            tempio, field_name=None, name=filename + '.png',
+            content_type='image/png', size=tempio.len, charset=None)
+
     def form_valid(self, form):
         process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
 
@@ -147,20 +160,16 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
                                              image_type=img.type,
                                              scan_number=scan_number)
                 obj.processes.add(process)
-                pixels = img.colorize()
-                tempfile_io = six.StringIO()
-                Image.fromarray(pixels).save(tempfile_io, format='PNG')
-                tempfile = InMemoryUploadedFile(
-                    tempfile_io, None, image.name + '.png', 'image/png',
-                    tempfile_io.len, None)
 
-                img_file = AFMFile.objects.create(data=tempfile,
-                                                  content_type='image/png',
-                                                  state='extracted',                            rms=img.rms,
-                                                  zrange=img.zrange,
-                                                  size=img.scan_area,
-                                                  image_type=img.type,
-                                                  scan_number=scan_number)
+                img_file = AFMFile.objects.create(
+                    data=self.process_image(img, image.name, scan_number),
+                    content_type='image/png',
+                    state='extracted',
+                    rms=img.rms,
+                    zrange=img.zrange,
+                    size=img.scan_area,
+                    image_type=img.type,
+                    scan_number=scan_number)
                 img_file.processes.add(process)
 
         return JsonResponse({'status': 'success'})
