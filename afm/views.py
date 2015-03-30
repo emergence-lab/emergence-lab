@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import math
 import os
 
+from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -12,7 +14,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from braces.views import LoginRequiredMixin
 import nanoscope
-from PIL import Image
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
 import six
 
 from afm.models import AFMFile, AFMScan
@@ -133,6 +136,34 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
         processed_image = Image.new(image.mode, (654, 580), 'white')
         processed_image.paste(image,
                               (20, 20, image.size[0] + 20, image.size[1] + 20))
+
+        scale_image = Image.open(
+            os.path.join(settings.STATIC_ROOT, 'afm', 'img', 'scale_12.png'))
+        processed_image.paste(scale_image,
+                             (28 + image.size[0], 30, 28 + image.size[0] + scale_image.size[0], 30 + scale_image.size[1]))
+
+
+        calibri = ImageFont.truetype(
+            os.path.join(settings.STATIC_ROOT, 'afm', 'fonts', 'calibrib.ttf'),
+            20)
+
+        draw = ImageDraw.Draw(processed_image)
+
+        zrange_str = 'Z-Range: {0:.2f} nm'.format(scan.zrange)
+        rms_str = 'RMS: {0:.2f} nm'.format(scan.rms)
+        size_str = 'Area: {0} \u03bcm X {0} \u03bcm'.format(math.sqrt(scan.scan_area))
+
+        draw.text((20, 25 + image.size[1]), filename, 'black', calibri)
+        draw.text((20 + image.size[0] - calibri.getsize(size_str)[0], 25 + image.size[1]),
+                  size_str, 'black', calibri)
+        if scan.type == 'Height':
+            draw.text((20, 50 + image.size[1]), zrange_str, 'black', calibri)
+            draw.text((20 + image.size[0] - calibri.getsize(rms_str)[0], 50 + image.size[1]),
+                      rms_str, 'black', calibri)
+        else:
+            type_str = '{} AFM'.format(scan.type)
+            draw.text((20 + image.size[0] - calibri.getsize(type_str)[0], 50 + image.size[1]),
+                      type_str, 'black', calibri)
 
         tempio = six.StringIO()
         processed_image.save(tempio, format='PNG')
