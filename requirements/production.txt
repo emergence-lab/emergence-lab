@@ -1,4 +1,3 @@
 -r base.txt
 
---allow-external mysql-connector-python
-mysql-connector-python
+mysqlclient==1.3.6
