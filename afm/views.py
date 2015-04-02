@@ -14,7 +14,6 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from braces.views import LoginRequiredMixin
 import nanoscope
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import six
 
@@ -140,8 +139,10 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
         scale_image = Image.open(
             os.path.join(settings.STATIC_ROOT, 'afm', 'img', 'scale_12.png'))
         processed_image.paste(scale_image,
-                             (28 + image.size[0], 30, 28 + image.size[0] + scale_image.size[0], 30 + scale_image.size[1]))
-
+                             (28 + image.size[0],
+                              30,
+                              28 + image.size[0] + scale_image.size[0],
+                              30 + scale_image.size[1]))
 
         calibri = ImageFont.truetype(
             os.path.join(settings.STATIC_ROOT, 'afm', 'fonts', 'calibrib.ttf'),
@@ -154,16 +155,20 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
         size_str = 'Area: {0} \u03bcm X {0} \u03bcm'.format(math.sqrt(scan.scan_area))
 
         draw.text((20, 25 + image.size[1]), filename, 'black', calibri)
-        draw.text((20 + image.size[0] - calibri.getsize(size_str)[0], 25 + image.size[1]),
-                  size_str, 'black', calibri)
+        draw.text(
+            (20 + image.size[0] - calibri.getsize(size_str)[0], 25 + image.size[1]),
+            size_str, 'black', calibri)
         if scan.type == 'Height':
-            draw.text((20, 50 + image.size[1]), zrange_str, 'black', calibri)
-            draw.text((20 + image.size[0] - calibri.getsize(rms_str)[0], 50 + image.size[1]),
-                      rms_str, 'black', calibri)
+            draw.text(
+                (20, 50 + image.size[1]), zrange_str, 'black', calibri)
+            draw.text(
+                (20 + image.size[0] - calibri.getsize(rms_str)[0], 50 + image.size[1]),
+                rms_str, 'black', calibri)
         else:
             type_str = '{} AFM'.format(scan.type)
-            draw.text((20 + image.size[0] - calibri.getsize(type_str)[0], 50 + image.size[1]),
-                      type_str, 'black', calibri)
+            draw.text(
+                (20 + image.size[0] - calibri.getsize(type_str)[0], 50 + image.size[1]),
+                type_str, 'black', calibri)
 
         tempio = six.StringIO()
         processed_image.save(tempio, format='PNG')
@@ -172,7 +177,8 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
             content_type='image/png', size=tempio.len, charset=None)
 
     def form_valid(self, form):
-        process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
+        process = Process.objects.get(
+            uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
 
         image = self.request.FILES['file']
         scan_number = int(os.path.splitext(image.name)[-1][1:])
