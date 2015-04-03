@@ -154,12 +154,11 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
             unit = 'V'
             print(scan.sensitivity, scan.magnify, scan.scale)
         draw.text(
-            (28 + image.size[0] + scale_image.size[0] + 7, 25 ),
+            (28 + image.size[0] + scale_image.size[0] + 7, 25),
             '{0:.1f} {1}'.format(scan.height_scale, unit), 'black', calibri)
         draw.text(
             (28 + image.size[0] + scale_image.size[0] + 7, 20 + scale_image.size[1]),
             '0.0 {}'.format(unit), 'black', calibri)
-
 
         zrange_str = 'Z-Range: {0:.2f} nm'.format(scan.zrange)
         rms_str = 'RMS: {0:.2f} nm'.format(scan.rms)
