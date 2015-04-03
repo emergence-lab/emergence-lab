@@ -136,6 +136,11 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
         processed_image.paste(image,
                               (20, 20, image.size[0] + 20, image.size[1] + 20))
 
+        calibri = ImageFont.truetype(
+            os.path.join(settings.STATIC_ROOT, 'afm', 'fonts', 'calibrib.ttf'),
+            20)
+        draw = ImageDraw.Draw(processed_image)
+
         scale_image = Image.open(
             os.path.join(settings.STATIC_ROOT, 'afm', 'img', 'scale_12.png'))
         processed_image.paste(scale_image,
@@ -143,12 +148,18 @@ class AFMFileUpload(LoginRequiredMixin, CreateView):
                               30,
                               28 + image.size[0] + scale_image.size[0],
                               30 + scale_image.size[1]))
+        if scan.type == 'Height':
+            unit = 'nm'
+        else:
+            unit = 'V'
+            print(scan.sensitivity, scan.magnify, scan.scale)
+        draw.text(
+            (28 + image.size[0] + scale_image.size[0] + 7, 25 ),
+            '{0:.1f} {1}'.format(scan.height_scale, unit), 'black', calibri)
+        draw.text(
+            (28 + image.size[0] + scale_image.size[0] + 7, 20 + scale_image.size[1]),
+            '0.0 {}'.format(unit), 'black', calibri)
 
-        calibri = ImageFont.truetype(
-            os.path.join(settings.STATIC_ROOT, 'afm', 'fonts', 'calibrib.ttf'),
-            20)
-
-        draw = ImageDraw.Draw(processed_image)
 
         zrange_str = 'Z-Range: {0:.2f} nm'.format(scan.zrange)
         rms_str = 'RMS: {0:.2f} nm'.format(scan.rms)
