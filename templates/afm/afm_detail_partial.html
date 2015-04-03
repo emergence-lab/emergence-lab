@@ -1,0 +1,40 @@
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Created</th>
+            <th>Modified</th>
+            <th>Scan Number</th>
+            <th>RMS [nm]</th>
+            <th>Z-Range [nm]</th>
+            <th>Location</th>
+            <th>Size [&mu;m]</th>
+            <th>Image Type</th>
+            <th>File Type</th>
+            <th>Data State</th>
+            <th>File Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    {% for file in object_list %}
+        <tr>
+            <th>{{file.id}}</th>
+            <td>{{file.created}}</td>
+            <td>{{file.modified}}</td>
+            <td>{{file.scan_number}}</td>
+            <td>{{file.rms}}</td>
+            <td>{{file.zrange}}</td>
+            <td>{{file.get_location_display}}</td>
+            <td>{{file.scan_size}}</td>
+            <td>{{file.get_image_type_display}}</td>
+            <td>{{file.content_type}}</td>
+            <td>{{file.get_state_display}}</td>
+            <td>{{file.data}}</td>
+            <td>
+                <a href="{% url 'afm_file_remove' uuid=process.uuid id=file.id %}" class="btn" data-toggle="tooltip" data-placement="right" title="Remove">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>

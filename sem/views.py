@@ -11,7 +11,7 @@ from braces.views import LoginRequiredMixin
 from core.models import DataFile, SampleManager
 from core.views import ActionReloadView
 from .models import SEMScan
-from .forms import DropzoneForm
+from core.forms import DropzoneForm
 from .response import JSONResponse, response_mimetype
 from .image_helper import (convert_tiff,)
 
