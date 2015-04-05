@@ -23,14 +23,14 @@ class UserProfile(TemplateView):
             kwargs['thisuser'] = User.objects.get(username=kwargs['username'])
             r = StrictRedis(settings.REDIS_HOST, settings.REDIS_PORT, settings.REDIS_DB)
             try:
+                kwargs['thisuser'].em_token = Token.objects.get(
+                    user=User.objects.get(username=kwargs['username']))
                 kwargs['thisuser'].gitlab_token = pickle.loads(
                     r.get('users:{0}:git.credential'.format(
                         kwargs['thisuser'].id))).token
                 kwargs['thisuser'].gitlab_id = pickle.loads(
                     r.get('users:{0}:git.credential'.format(
                         kwargs['thisuser'].id))).gitlab_id
-                kwargs['thisuser'].em_token = Token.objects.get(
-                    user=User.objects.get(username=kwargs['username']))
             except TypeError:
                 pass
         return super(UserProfile, self).get_context_data(**kwargs)
