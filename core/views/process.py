@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from itertools import groupby
 
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
