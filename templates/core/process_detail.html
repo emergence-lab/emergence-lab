@@ -16,6 +16,9 @@
     <header>
         <h1 class="page-header">
             {{process}}
+            {% if process.legacy_identifier %}
+                ({{process.legacy_identifier}})
+            {% endif %}
             <div class="pull-right">
                 <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
                     Edit
@@ -26,7 +29,8 @@
 
     <div>
         <h3 class="page-header">{{process.name}} Details</h3>
-        <p>UUID: {{process.uuid}}</p>
+        <p>UUID: {{process.uuid}} ({{process.uuid_full}})</p>
+        <p>Legacy ID: {{process.legacy_identifier}}</p>
         <p>Created: {{process.created}}</p>
         <p>Modified: {{process.modified}}</p>
         <p>Comment: {{process.comment|safe}}</p>
