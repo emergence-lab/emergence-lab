@@ -81,11 +81,24 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('analyzed', 'Analyzed'),
         ('other', 'Other')
     ]
+    CONTENT_TYPE = [
+        ('', 'Unknown'),
+        ('application/octet-stream', 'Binary File'),
+        ('application/pdf', 'PDF File'),
+        ('application/vnd.ms-excel', 'Excel File'),
+        ('application/vnd.openxmlformats-officedocument.spreadsheelml.sheet', 'Excel File'),
+        ('image/png', 'PNG Image'),
+        ('image/bmp', 'BMP Image'),
+        ('image/jpeg', 'JPEG Image'),
+        ('image/tiff', 'TIFF Image'),
+        ('image/gif', 'GIF Image'),
+        ('text/plain', 'Plaintext File'),
+    ]
 
     processes = models.ManyToManyField(Process,
                                        related_name='datafiles',
                                        related_query_name='datafiles')
-    content_type = models.CharField(max_length=45, null=True, blank=True)
+    content_type = models.CharField(max_length=45, blank=True, choices=CONTENT_TYPE, default='')
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
     state = models.CharField(max_length=20, choices=DATA_STATE, default='raw')
