@@ -29,7 +29,7 @@
             <td>{{file.get_image_type_display}}</td>
             <td>{{file.content_type}}</td>
             <td>{{file.get_state_display}}</td>
-            <td>{{file.data}}</td>
+            <td><a href="{{MEDIA_URL}}{{file.data}}">{{file.data}}</a></td>
             <td>
                 <a href="{% url 'afm_file_remove' uuid=process.uuid id=file.id %}" class="btn" data-toggle="tooltip" data-placement="right" title="Remove">
                     <span class="glyphicon glyphicon-remove"></span>
