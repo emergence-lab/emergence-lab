@@ -87,9 +87,10 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        piece = form.cleaned_data['piece']
+        pieces = form.cleaned_data['pieces']
         sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
-        sample.run_process(self.object, piece=piece)
+        for piece in pieces:
+            sample.run_process(self.object, piece=piece)
         return HttpResponseRedirect(self.get_success_url())
 
 

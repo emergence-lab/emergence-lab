@@ -22,5 +22,5 @@ class AutoCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
         super(AutoCreateForm, self).__init__(*args, **kwargs)
-        self.fields['piece'] = forms.ChoiceField(choices=zip(pieces, pieces),
-                                                 label='Piece to use')
+        self.fields['pieces'] = forms.MultipleChoiceField(
+            choices=zip(pieces, pieces), label='Piece(s) to use')
