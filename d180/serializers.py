@@ -19,7 +19,7 @@ class D180GrowthSerializer(serializers.ModelSerializer):
                   'has_ingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_pulsed',
                   'has_superlattice', 'has_mqw', 'has_graded',
-                  'has_n', 'has_p', 'has_u', 'growth_number',)
+                  'has_n', 'has_p', 'has_u', 'legacy_identifier',)
 
 
 class D180ReadingsSerializer(serializers.ModelSerializer):
