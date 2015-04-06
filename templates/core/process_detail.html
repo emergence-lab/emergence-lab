@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}{{process.uuid}}{% endblock title %}
 
@@ -21,6 +22,7 @@
             {% endif %}
             <div class="pull-right">
                 <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
+                    {% bootstrap_icon 'edit' %}
                     Edit
                 </a>
             </div>
@@ -40,7 +42,7 @@
                 <p>Get started by running this process on an existing or new sample(s).</p>
                 <div class="top-spacer-sm">
                     <a href="#" class="btn btn-primary right-spacer-xs">
-                        <span class="glyphicon glyphicon-plus"></span>
+                        {% bootstrap_icon 'plus' %}
                         Run Process
                     </a>
                 </div>
@@ -65,15 +67,15 @@
                 <h3>This process doesn't have any associated data files</h3>
                 <p>Get started by uploading a file.</p>
                 <div class="top-spacer-sm">
-                    <a href="#" class="btn btn-primary right-spacer-xs">
-                        <span class="glyphicon glyphicon-upload"></span>
+                    <a href="{% url 'file_upload' uuid=process.uuid %}" class="btn btn-primary right-spacer-xs">
+                        {% bootstrap_icon 'upload' %}
                         Upload File
                     </a>
                 </div>
             </div>
         {% else %}
             {% for filetype, filelist in datafiles.items %}
-                {% include filetype.partial_template with object_list=filelist %}
+                {% include filetype.partial_template with object_list=filelist process=process %}
             {% endfor %}
         {% endif %}
     </div>

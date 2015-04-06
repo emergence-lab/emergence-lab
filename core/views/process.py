@@ -4,13 +4,14 @@ from __future__ import absolute_import, unicode_literals
 from itertools import groupby
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample
+from core.models import Process, Sample, DataFile
+from core.forms import DropzoneForm
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
@@ -90,3 +91,30 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
         sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
         sample.run_process(self.object, piece=piece)
         return HttpResponseRedirect(self.get_success_url())
+
+
+class UploadFileView(LoginRequiredMixin, generic.CreateView):
+    """
+    Add files to an existing sem process
+    """
+    model = DataFile
+    template_name = 'core/file_upload.html'
+    form_class = DropzoneForm
+
+    def get_context_data(self, **kwargs):
+        context = super(UploadFileView, self).get_context_data(**kwargs)
+        context['process'] = self.kwargs['uuid']
+        return context
+
+    def form_valid(self, form):
+        process = Process.objects.get(
+            uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
+
+        image = self.request.FILES['file']
+
+        with transaction.atomic():
+            obj = DataFile.objects.create(data=image,
+                                          content_type=image.content_type)
+            obj.processes.add(process)
+
+        return JsonResponse({'status': 'success'})

@@ -17,7 +17,7 @@
     <ul>
         {% for object in object_list %}
             <li>
-                <a href="{% url 'afm_detail' uuid=object.uuid %}">{{object}}</a>
+                <a href="{% url 'process_detail' uuid=object.uuid %}">{{object}}</a>
             </li>
         {% endfor %}
     </ul>

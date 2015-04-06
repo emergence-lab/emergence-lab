@@ -32,18 +32,7 @@
         <p>{{afm.process_node.comment}}</p>
     </div>
 
-    <div>
-        <h3 class="page-header">
-            Data Files
-            <div class="pull-right">
-                <a class="btn btn-primary" href="{% url 'afm_upload' uuid=afm.uuid %}">
-                    {% bootstrap_icon 'upload' %}
-                    Upload File
-                </a>
-            </div>
-        </h3>
-        {% include "afm/afm_detail_partial.html" with object_list=dataset process=afm %}
-    </div>
+    {% include "afm/afm_detail_partial.html" with object_list=dataset process=afm %}
 
     <div>
         <a class="btn btn-default" href="{% url 'afm_list' %}">

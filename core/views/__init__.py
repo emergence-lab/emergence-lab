@@ -45,4 +45,5 @@ from .process import (
     ProcessUpdateView,
     RunProcessView,
     CreateUploadProcessView,
+    UploadFileView,
 )

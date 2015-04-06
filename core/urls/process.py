@@ -13,4 +13,6 @@ urlpatterns = [
         name='process_detail'),
     url(r'^(?P<uuid>p[0-9a-f\-]{7,})/edit/$',
         core.views.ProcessUpdateView.as_view(), name='process_edit'),
+    url(r'^(?P<uuid>p[0-9a-f\-]{7,})/upload/$',
+        core.views.UploadFileView.as_view(), name='file_upload'),
 ]
