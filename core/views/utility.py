@@ -113,7 +113,12 @@ class QuickSearchRedirectView(LoginRequiredMixin, generic.RedirectView):
         elif query.startswith('@'):
             return reverse('users_profile',
                            kwargs={'username': query.strip('@')})
-        return reverse('dashboard')
+        else:
+            try:
+                process = Process.objects.get(legacy_identifier=query)
+                return reverse('process_detail', args=(process.uuid,))
+            except Process.DoesNotExist:
+                return reverse('dashboard')
 
 
 class HomepageView(generic.TemplateView):
