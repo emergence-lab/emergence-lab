@@ -42,6 +42,7 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     is_destructive = True
 
     comment = fields.RichTextField(blank=True)
+    legacy_identifier = models.SlugField(max_length=100)
 
 
 class SplitProcess(Process):

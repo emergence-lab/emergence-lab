@@ -39,7 +39,6 @@ class D180Growth(Process):
     # general info
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
-    growth_number = models.SlugField(max_length=10)
     investigations = models.ManyToManyField(Investigation,
         related_name='growths', related_query_name='growth',)
     platter = models.ForeignKey(Platter,
