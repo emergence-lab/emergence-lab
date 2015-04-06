@@ -14,4 +14,7 @@ from .sample import (
     SampleFormSet
 )
 from .utility import ChecklistForm
-from .process import DropzoneForm
+from .process import (
+    AutoCreateForm,
+    DropzoneForm,
+)

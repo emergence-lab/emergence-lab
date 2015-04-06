@@ -1,6 +1,6 @@
 <div>
     <h3 class="page-header">
-        AFM Datafiles
+        Datafiles
     </h3>
 
     <table class="table table-striped table-bordered table-hover">
@@ -9,12 +9,6 @@
                 <th>ID</th>
                 <th>Created</th>
                 <th>Modified</th>
-                <th>Scan Number</th>
-                <th>RMS [nm]</th>
-                <th>Z-Range [nm]</th>
-                <th>Location</th>
-                <th>Size [&mu;m]</th>
-                <th>Image Type</th>
                 <th>File Type</th>
                 <th>Data State</th>
                 <th>File</th>
@@ -25,12 +19,6 @@
                 <th>{{file.id}}</th>
                 <td>{{file.created}}</td>
                 <td>{{file.modified}}</td>
-                <td>{{file.scan_number}}</td>
-                <td>{{file.rms}}</td>
-                <td>{{file.zrange}}</td>
-                <td>{{file.get_location_display}}</td>
-                <td>{{file.scan_size}}</td>
-                <td>{{file.get_image_type_display}}</td>
                 <td>{{file.get_content_type_display}}</td>
                 <td>{{file.get_state_display}}</td>
                 <td><a href="{{MEDIA_URL}}{{file.data}}">
@@ -39,5 +27,5 @@
             </tr>
         {% endfor %}
     </table>
-
 </div>
+

@@ -9,7 +9,7 @@
 
     <form action="" method="post" class="form">
         {% csrf_token %}
-        {% bootstrap_form form layout='inline' %}
+        {% bootstrap_form form %}
         {% buttons %}
             <button type="submit" class="btn btn-success pull-right">Create</button>
         {% endbuttons %}

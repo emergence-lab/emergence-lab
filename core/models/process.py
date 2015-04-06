@@ -74,6 +74,8 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
     """
     Generic model for files associated with processes
     """
+    partial_template = 'core/generic_file_partial.html'
+
     DATA_STATE = [
         ('raw', 'Raw'),
         ('cleaned', 'Cleaned'),

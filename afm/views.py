@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -18,9 +18,10 @@ from PIL import Image, ImageDraw, ImageFont
 import six
 
 from afm.models import AFMFile, AFMScan
-from core.models import DataFile, Process, Sample
+from afm.forms import AutoCreateAFMForm
+from core.models import DataFile, Process
 from core.forms import DropzoneForm
-from core.views import ActionReloadView
+from core.views import ActionReloadView, CreateUploadProcessView
 
 
 class AFMList(LoginRequiredMixin, ListView):
@@ -239,20 +240,13 @@ class AFMRemoveFileActionReloadView(LoginRequiredMixin, ActionReloadView):
         return reverse('afm_detail', args=(self.kwargs['uuid'],))
 
 
-class AutocreateAFMView(LoginRequiredMixin, CreateView):
+class AutocreateAFMView(CreateUploadProcessView):
     """
     View for creation of new afm data.
     """
     model = AFMScan
     template_name = 'afm/afm_create.html'
-    fields = ('comment',)
-
-    def form_valid(self, form):
-        self.object = form.save()
-        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
-        piece = self.kwargs.get('piece') or 'a'
-        sample.run_process(self.object, piece=piece)
-        return HttpResponseRedirect(self.get_success_url())
+    form_class = AutoCreateAFMForm
 
     def get_success_url(self):
         return reverse('afm_upload', args=(self.object.uuid,))

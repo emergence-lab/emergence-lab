@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+from itertools import groupby
+
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.models import Process
+from core.models import Process, Sample
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
@@ -30,6 +33,9 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
         context['samples'] = set(node.get_sample() for node in
                                  self.object.processnode_set.get_queryset())
+        context['datafiles'] = {k: list(g)
+                                for k, g in groupby(self.object.datafiles.all(),
+                                             lambda x: type(x))}
         return context
 
 
@@ -70,3 +76,17 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class RunProcessView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'core/process_run.html'
+
+
+class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
+
+    def get_form(self, form_class):
+        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        return form_class(pieces=sample.pieces, **self.get_form_kwargs())
+
+    def form_valid(self, form):
+        self.object = form.save()
+        piece = form.cleaned_data['piece']
+        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        sample.run_process(self.object, piece=piece)
+        return HttpResponseRedirect(self.get_success_url())

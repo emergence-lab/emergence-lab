@@ -59,7 +59,7 @@
                             {% if not node.is_root_node %}
                                 <li>
                                     {{node.process.name}}
-                                    (<a href="{% url 'process_detail' uuid=node.process.uuid %}">{{node.process.uuid}}</a>, {{node.process.legacy_identifier}})
+                                    (<a href="{% url 'process_detail' uuid=node.process.uuid %}">{{node.process.uuid}}</a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %})
                                     on {{node.process.created}}
                             {% endif %}
                             {% if not node.is_leaf_node %}
