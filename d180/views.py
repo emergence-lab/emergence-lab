@@ -345,7 +345,7 @@ class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView)
         numberofreadings = len(D180Readings.objects.filter(growth=self.get_object()))
         print (numberofreadings)
         for x in range(0, numberofreadings):
-            rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
+            rform = D180ReadingsForm(request.POST, prefix=('reading' + str(x+1)))
             if rform.is_valid():
                 newgrowth = growth=self.get_object()
                 newlayer = rform.cleaned_data['layer']
@@ -392,7 +392,7 @@ class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView)
                 newsilane_dilution = rform.cleaned_data['silane_dilution']
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
-                thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
+                thisreading = D180Readings.objects.filter(growth=newgrowth, layer=newlayer)
                 thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
                                    pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
                                    tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
