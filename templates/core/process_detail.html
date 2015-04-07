@@ -30,7 +30,12 @@
     </header>
 
     <div>
-        <h3 class="page-header">{{process.name}} Details</h3>
+        <h3 class="page-header">
+            {{process.name}} Details
+            {% if readings %}
+                <a class="pull-right btn btn-info" href="{% url 'd180_readings_detail' process %}">Readings</a>
+            {% endif %}
+        </h3>
         <p>UUID: {{process.uuid}} ({{process.uuid_full}})</p>
         <p>Legacy ID: {{process.legacy_identifier}}</p>
         <p>Created: {{process.created}}</p>

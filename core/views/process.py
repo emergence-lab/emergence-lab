@@ -38,6 +38,8 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
         context['datafiles'] = {k: list(g)
                                 for k, g in groupby(self.object.datafiles.all(),
                                              lambda x: type(x))}
+        if type(self.object).name == 'D180 Growth':
+            context['readings'] = True
         return context
 
 
