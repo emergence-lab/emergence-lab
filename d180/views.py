@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views import generic
+from django.shortcuts import get_object_or_404
 
 from braces.views import LoginRequiredMixin
 
@@ -15,7 +16,7 @@ from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                     D180ReadingsFormSet, ReservationCloseForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
-from core.models import Sample
+from core.models import Sample, Process
 from schedule_queue.models import Reservation
 
 
@@ -259,11 +260,16 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
 class ReadingsDetailView(generic.DetailView):
     model = D180Growth
     template_name = 'growths/readings_detail.html'
-    slug_field = 'growth_number'
+    #slug_field = 'legacy_identifier'
+    #lookup_url_kwarg = 'uuid'
     context_object_name = 'growth'
 
+    def get_object(self):
+        uuid = Process.strip_uuid(self.kwargs['uuid'])
+        return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
+
     def get_context_data(self, **kwargs):
-        context = super(readings_detail, self).get_context_data(**kwargs)
+        context = super(ReadingsDetailView, self).get_context_data(**kwargs)
         context['growth'] = self.object
 
         # turn list organized by column into a list organized by row

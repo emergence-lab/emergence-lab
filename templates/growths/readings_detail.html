@@ -9,14 +9,14 @@
     <header>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
+            <li><a href="{% url 'process_detail' growth.uuid %}">{{growth}}</a></li>
             <li class="active">Readings</li>
         </ol>
 
         <h1 class="page-header">
             Readings for {{growth}}
             <div class="pull-right">
-                <a href="{% url 'update_readings' growth %}" class="btn btn-warning">Edit</a>
+                <a href="#" class="btn btn-warning">Edit</a>
             </div>
         </h1>
     </header>
