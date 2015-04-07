@@ -13,7 +13,8 @@ from .models import D180Growth, D180Source, D180Readings, Platter
 from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                     WizardGrowthInfoForm, WizardFullForm,
                     WizardPrerunChecklistForm, WizardPostrunChecklistForm,
-                    D180ReadingsFormSet, ReservationCloseForm)
+                    D180ReadingsFormSet, ReservationCloseForm,
+                    D180ReadingsForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
 from core.models import Sample, Process
@@ -295,114 +296,117 @@ class ReadingsDetailView(generic.DetailView):
         return context
 
 
-#class UpdateReadingsView(SingleObjectMixin, TemplateView):
-#    context_object_name = 'growth'
-#    queryset = growth.objects.all()
-#    slug_field = 'growth_number'
-#    template_name = 'growths/update_readings.html'
-#
-#    def get_context_data(self, **kwargs):
-#        self.object = None
-#        context = super(update_readings, self).get_context_data(**kwargs)
-#        context["growth"] = self.get_object()
-#        allreadings = readings.objects.filter(growth=self.get_object())
-#        context["readings"] = allreadings
-#        formlist = []
-#        numberofreadings = 0
-#        for reading in allreadings:
-#            numberofreadings = numberofreadings + 1
-#            rform = readings_form(instance=readings(), prefix=('reading' + str(numberofreadings)),
-#                                  initial={'growth': reading.growth,
-#                'layer': reading.layer, 'layer_desc': reading.layer_desc,
-#                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
-#                'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm, 'gc_pressure': reading.gc_pressure,
-#                'gc_position': reading.gc_position, 'voltage_in': reading.voltage_in,
-#                'voltage_out': reading.voltage_out, 'current_in': reading.current_in,
-#                'current_out': reading.current_out, 'top_vp_flow': reading.top_vp_flow,
-#                'hydride_inner': reading.hydride_inner, 'hydride_outer': reading.hydride_outer,
-#                'alkyl_flow_inner': reading.alkyl_flow_inner, 'alkyl_push_inner': reading.alkyl_push_inner,
-#                'alkyl_flow_middle': reading.alkyl_flow_middle, 'alkyl_push_middle': reading.alkyl_push_middle,
-#                'alkyl_flow_outer': reading.alkyl_flow_outer, 'alkyl_push_outer': reading.alkyl_push_outer,
-#                'n2_flow': reading.n2_flow, 'h2_flow': reading.h2_flow, 'nh3_flow': reading.nh3_flow,
-#                'hydride_pressure': reading.hydride_pressure, 'tmga1_flow': reading.tmga1_flow,
-#                'tmga1_pressure': reading.tmga1_pressure, 'tmga2_flow': reading.tmga2_flow,
-#                'tmga2_pressure': reading.tmga2_pressure, 'tega2_flow': reading.tega2_flow,
-#                'tega2_pressure': reading.tega2_pressure, 'tmin1_flow': reading.tmin1_flow,
-#                'tmin1_pressure': reading.tmin1_pressure, 'tmal1_flow': reading.tmal1_flow,
-#                'tmal1_pressure': reading.tmal1_pressure, 'cp2mg_flow': reading.cp2mg_flow,
-#                'cp2mg_pressure': reading.cp2mg_pressure, 'cp2mg_dilution': reading.cp2mg_dilution,
-#                'silane_flow': reading.silane_flow, 'silane_dilution': reading.silane_dilution,
-#                'silane_mix': reading.silane_mix, 'silane_pressure': reading.silane_pressure})
-#            formlist.append(rform)
-#        context["readingslist"] = formlist
-#        return context
-#    def post(self, request, **kwargs):
-#        numberofreadings = len(readings.objects.filter(growth=self.get_object()))
-#        print (numberofreadings)
-#        for x in range(0, numberofreadings):
-#            rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
-#            if rform.is_valid():
-#                newgrowth = growth=self.get_object()
-#                newlayer = rform.cleaned_data['layer']
-#                newlayer_desc = rform.cleaned_data['layer_desc']
-#                newpyro_out = rform.cleaned_data['pyro_out']
-#                newpyro_in = rform.cleaned_data['pyro_in']
-#                newecp_temp = rform.cleaned_data['ecp_temp']
-#                newtc_out = rform.cleaned_data['tc_out']
-#                newtc_in = rform.cleaned_data['tc_in']
-#                newmotor_rpm = rform.cleaned_data['motor_rpm']
-#                newgc_pressure = rform.cleaned_data['gc_pressure']
-#                newgc_position = rform.cleaned_data['gc_position']
-#                newvoltage_in = rform.cleaned_data['voltage_in']
-#                newvoltage_out = rform.cleaned_data['voltage_out']
-#                newcurrent_in = rform.cleaned_data['current_in']
-#                newcurrent_out = rform.cleaned_data['current_out']
-#                newtop_vp_flow = rform.cleaned_data['top_vp_flow']
-#                newhydride_inner = rform.cleaned_data['hydride_inner']
-#                newhydride_outer = rform.cleaned_data['hydride_outer']
-#                newalkyl_flow_inner = rform.cleaned_data['alkyl_flow_inner']
-#                newalkyl_push_inner = rform.cleaned_data['alkyl_push_inner']
-#                newalkyl_flow_middle = rform.cleaned_data['alkyl_flow_middle']
-#                newalkyl_push_middle = rform.cleaned_data['alkyl_push_middle']
-#                newalkyl_flow_outer = rform.cleaned_data['alkyl_flow_outer']
-#                newalkyl_push_outer = rform.cleaned_data['alkyl_push_outer']
-#                newn2_flow = rform.cleaned_data['n2_flow']
-#                newh2_flow = rform.cleaned_data['h2_flow']
-#                newnh3_flow = rform.cleaned_data['nh3_flow']
-#                newhydride_pressure = rform.cleaned_data['hydride_pressure']
-#                newtmga1_flow = rform.cleaned_data['tmga1_flow']
-#                newtmga1_pressure = rform.cleaned_data['tmga1_pressure']
-#                newtmga2_flow = rform.cleaned_data['tmga2_flow']
-#                newtmga2_pressure = rform.cleaned_data['tmga2_pressure']
-#                newtega2_flow = rform.cleaned_data['tega2_flow']
-#                newtega2_pressure = rform.cleaned_data['tega2_pressure']
-#                newtmin1_flow = rform.cleaned_data['tmin1_flow']
-#                newtmin1_pressure = rform.cleaned_data['tmin1_pressure']
-#                newtmal1_flow = rform.cleaned_data['tmal1_flow']
-#                newtmal1_pressure = rform.cleaned_data['tmal1_pressure']
-#                newcp2mg_flow = rform.cleaned_data['cp2mg_flow']
-#                newcp2mg_pressure = rform.cleaned_data['cp2mg_pressure']
-#                newcp2mg_dilution = rform.cleaned_data['cp2mg_dilution']
-#                newsilane_flow = rform.cleaned_data['silane_flow']
-#                newsilane_dilution = rform.cleaned_data['silane_dilution']
-#                newsilane_mix = rform.cleaned_data['silane_mix']
-#                newsilane_pressure = rform.cleaned_data['silane_pressure']
-#                thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
-#                thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
-#                                   pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
-#                                   tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
-#                                   gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
-#                                   current_in=newcurrent_in, current_out=newcurrent_out, top_vp_flow=newtop_vp_flow,
-#                                   hydride_inner=newhydride_inner, hydride_outer=newhydride_outer,
-#                                   alkyl_flow_inner=newalkyl_flow_inner, alkyl_push_inner=newalkyl_push_inner,
-#                                   alkyl_flow_middle=newalkyl_flow_middle, alkyl_push_middle=newalkyl_push_middle,
-#                                   alkyl_flow_outer=newalkyl_flow_outer, alkyl_push_outer=newalkyl_push_outer,
-#                                   n2_flow=newn2_flow, h2_flow=newh2_flow, nh3_flow=newnh3_flow, hydride_pressure=newhydride_pressure,
-#                                   tmga1_flow=newtmga1_flow, tmga1_pressure=newtmga1_pressure, tmga2_flow=newtmga2_flow,
-#                                   tmga2_pressure=newtmga2_pressure, tega2_flow=newtega2_flow, tega2_pressure=newtega2_pressure,
-#                                   tmin1_flow=newtmin1_flow, tmin1_pressure=newtmin1_pressure, tmal1_flow=newtmal1_flow,
-#                                   tmal1_pressure=newtmal1_pressure, cp2mg_flow=newcp2mg_flow, cp2mg_pressure=newcp2mg_pressure,
-#                                   cp2mg_dilution=newcp2mg_dilution, silane_flow=newsilane_flow, silane_dilution=newsilane_dilution,
-#                                   silane_mix=newsilane_mix, silane_pressure=newsilane_pressure)
-#        return HttpResponseRedirect(reverse('update_readings', args=[self.get_object()]))
-#
+class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView):
+    context_object_name = 'growth'
+    queryset = D180Growth.objects.all()
+    #slug_field = 'growth_number'
+    template_name = 'growths/update_readings.html'
+
+    def get_object(self):
+        uuid = Process.strip_uuid(self.kwargs['uuid'])
+        return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
+
+    def get_context_data(self, **kwargs):
+        self.object = None
+        context = super(UpdateReadingsView, self).get_context_data(**kwargs)
+        context["growth"] = self.get_object()
+        allreadings = D180Readings.objects.filter(growth=self.get_object())
+        context["readings"] = allreadings
+        formlist = []
+        numberofreadings = 0
+        for reading in allreadings:
+            numberofreadings = numberofreadings + 1
+            rform = D180ReadingsForm(instance=D180Readings(), prefix=('reading' + str(numberofreadings)),
+                                  initial={'growth': reading.growth,
+                'layer': reading.layer, 'layer_desc': reading.layer_desc,
+                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
+                'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm, 'gc_pressure': reading.gc_pressure,
+                'gc_position': reading.gc_position, 'voltage_in': reading.voltage_in,
+                'voltage_out': reading.voltage_out, 'current_in': reading.current_in,
+                'current_out': reading.current_out, 'top_vp_flow': reading.top_vp_flow,
+                'hydride_inner': reading.hydride_inner, 'hydride_outer': reading.hydride_outer,
+                'alkyl_flow_inner': reading.alkyl_flow_inner, 'alkyl_push_inner': reading.alkyl_push_inner,
+                'alkyl_flow_middle': reading.alkyl_flow_middle, 'alkyl_push_middle': reading.alkyl_push_middle,
+                'alkyl_flow_outer': reading.alkyl_flow_outer, 'alkyl_push_outer': reading.alkyl_push_outer,
+                'n2_flow': reading.n2_flow, 'h2_flow': reading.h2_flow, 'nh3_flow': reading.nh3_flow,
+                'hydride_pressure': reading.hydride_pressure, 'tmga1_flow': reading.tmga1_flow,
+                'tmga1_pressure': reading.tmga1_pressure, 'tmga2_flow': reading.tmga2_flow,
+                'tmga2_pressure': reading.tmga2_pressure, 'tega2_flow': reading.tega2_flow,
+                'tega2_pressure': reading.tega2_pressure, 'tmin1_flow': reading.tmin1_flow,
+                'tmin1_pressure': reading.tmin1_pressure, 'tmal1_flow': reading.tmal1_flow,
+                'tmal1_pressure': reading.tmal1_pressure, 'cp2mg_flow': reading.cp2mg_flow,
+                'cp2mg_pressure': reading.cp2mg_pressure, 'cp2mg_dilution': reading.cp2mg_dilution,
+                'silane_flow': reading.silane_flow, 'silane_dilution': reading.silane_dilution,
+                'silane_mix': reading.silane_mix, 'silane_pressure': reading.silane_pressure})
+            formlist.append(rform)
+        context["readingslist"] = formlist
+        return context
+    def post(self, request, **kwargs):
+        numberofreadings = len(D180Readings.objects.filter(growth=self.get_object()))
+        print (numberofreadings)
+        for x in range(0, numberofreadings):
+            rform = readings_form(request.POST, prefix=('reading' + str(x+1)))
+            if rform.is_valid():
+                newgrowth = growth=self.get_object()
+                newlayer = rform.cleaned_data['layer']
+                newlayer_desc = rform.cleaned_data['layer_desc']
+                newpyro_out = rform.cleaned_data['pyro_out']
+                newpyro_in = rform.cleaned_data['pyro_in']
+                newecp_temp = rform.cleaned_data['ecp_temp']
+                newtc_out = rform.cleaned_data['tc_out']
+                newtc_in = rform.cleaned_data['tc_in']
+                newmotor_rpm = rform.cleaned_data['motor_rpm']
+                newgc_pressure = rform.cleaned_data['gc_pressure']
+                newgc_position = rform.cleaned_data['gc_position']
+                newvoltage_in = rform.cleaned_data['voltage_in']
+                newvoltage_out = rform.cleaned_data['voltage_out']
+                newcurrent_in = rform.cleaned_data['current_in']
+                newcurrent_out = rform.cleaned_data['current_out']
+                newtop_vp_flow = rform.cleaned_data['top_vp_flow']
+                newhydride_inner = rform.cleaned_data['hydride_inner']
+                newhydride_outer = rform.cleaned_data['hydride_outer']
+                newalkyl_flow_inner = rform.cleaned_data['alkyl_flow_inner']
+                newalkyl_push_inner = rform.cleaned_data['alkyl_push_inner']
+                newalkyl_flow_middle = rform.cleaned_data['alkyl_flow_middle']
+                newalkyl_push_middle = rform.cleaned_data['alkyl_push_middle']
+                newalkyl_flow_outer = rform.cleaned_data['alkyl_flow_outer']
+                newalkyl_push_outer = rform.cleaned_data['alkyl_push_outer']
+                newn2_flow = rform.cleaned_data['n2_flow']
+                newh2_flow = rform.cleaned_data['h2_flow']
+                newnh3_flow = rform.cleaned_data['nh3_flow']
+                newhydride_pressure = rform.cleaned_data['hydride_pressure']
+                newtmga1_flow = rform.cleaned_data['tmga1_flow']
+                newtmga1_pressure = rform.cleaned_data['tmga1_pressure']
+                newtmga2_flow = rform.cleaned_data['tmga2_flow']
+                newtmga2_pressure = rform.cleaned_data['tmga2_pressure']
+                newtega2_flow = rform.cleaned_data['tega2_flow']
+                newtega2_pressure = rform.cleaned_data['tega2_pressure']
+                newtmin1_flow = rform.cleaned_data['tmin1_flow']
+                newtmin1_pressure = rform.cleaned_data['tmin1_pressure']
+                newtmal1_flow = rform.cleaned_data['tmal1_flow']
+                newtmal1_pressure = rform.cleaned_data['tmal1_pressure']
+                newcp2mg_flow = rform.cleaned_data['cp2mg_flow']
+                newcp2mg_pressure = rform.cleaned_data['cp2mg_pressure']
+                newcp2mg_dilution = rform.cleaned_data['cp2mg_dilution']
+                newsilane_flow = rform.cleaned_data['silane_flow']
+                newsilane_dilution = rform.cleaned_data['silane_dilution']
+                newsilane_mix = rform.cleaned_data['silane_mix']
+                newsilane_pressure = rform.cleaned_data['silane_pressure']
+                thisreading = readings.objects.filter(growth=newgrowth, layer=newlayer)
+                thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
+                                   pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
+                                   tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
+                                   gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
+                                   current_in=newcurrent_in, current_out=newcurrent_out, top_vp_flow=newtop_vp_flow,
+                                   hydride_inner=newhydride_inner, hydride_outer=newhydride_outer,
+                                   alkyl_flow_inner=newalkyl_flow_inner, alkyl_push_inner=newalkyl_push_inner,
+                                   alkyl_flow_middle=newalkyl_flow_middle, alkyl_push_middle=newalkyl_push_middle,
+                                   alkyl_flow_outer=newalkyl_flow_outer, alkyl_push_outer=newalkyl_push_outer,
+                                   n2_flow=newn2_flow, h2_flow=newh2_flow, nh3_flow=newnh3_flow, hydride_pressure=newhydride_pressure,
+                                   tmga1_flow=newtmga1_flow, tmga1_pressure=newtmga1_pressure, tmga2_flow=newtmga2_flow,
+                                   tmga2_pressure=newtmga2_pressure, tega2_flow=newtega2_flow, tega2_pressure=newtega2_pressure,
+                                   tmin1_flow=newtmin1_flow, tmin1_pressure=newtmin1_pressure, tmal1_flow=newtmal1_flow,
+                                   tmal1_pressure=newtmal1_pressure, cp2mg_flow=newcp2mg_flow, cp2mg_pressure=newcp2mg_pressure,
+                                   cp2mg_dilution=newcp2mg_dilution, silane_flow=newsilane_flow, silane_dilution=newsilane_dilution,
+                                   silane_mix=newsilane_mix, silane_pressure=newsilane_pressure)
+        return HttpResponseRedirect(reverse('d180_readings_edit', args=[self.get_object()]))
