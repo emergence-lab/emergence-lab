@@ -258,11 +258,10 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
                 source_form=source_form,
                 comment_form=comment_form))
 
+
 class ReadingsDetailView(generic.DetailView):
     model = D180Growth
     template_name = 'growths/readings_detail.html'
-    #slug_field = 'legacy_identifier'
-    #lookup_url_kwarg = 'uuid'
     context_object_name = 'growth'
 
     def get_object(self):
@@ -299,7 +298,6 @@ class ReadingsDetailView(generic.DetailView):
 class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView):
     context_object_name = 'growth'
     queryset = D180Growth.objects.all()
-    #slug_field = 'growth_number'
     template_name = 'growths/update_readings.html'
 
     def get_object(self):
@@ -316,38 +314,46 @@ class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView)
         numberofreadings = 0
         for reading in allreadings:
             numberofreadings = numberofreadings + 1
-            rform = D180ReadingsForm(instance=D180Readings(), prefix=('reading' + str(numberofreadings)),
+            rform = D180ReadingsForm(instance=D180Readings(),
+                                     prefix=('reading' + str(numberofreadings)),
                                   initial={'growth': reading.growth,
                 'layer': reading.layer, 'layer_desc': reading.layer_desc,
-                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in, 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
-                'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm, 'gc_pressure': reading.gc_pressure,
-                'gc_position': reading.gc_position, 'voltage_in': reading.voltage_in,
+                'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in,
+                'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
+                'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm,
+                'gc_pressure': reading.gc_pressure, 'gc_position': reading.gc_position,
+                'voltage_in': reading.voltage_in,
                 'voltage_out': reading.voltage_out, 'current_in': reading.current_in,
                 'current_out': reading.current_out, 'top_vp_flow': reading.top_vp_flow,
                 'hydride_inner': reading.hydride_inner, 'hydride_outer': reading.hydride_outer,
-                'alkyl_flow_inner': reading.alkyl_flow_inner, 'alkyl_push_inner': reading.alkyl_push_inner,
-                'alkyl_flow_middle': reading.alkyl_flow_middle, 'alkyl_push_middle': reading.alkyl_push_middle,
-                'alkyl_flow_outer': reading.alkyl_flow_outer, 'alkyl_push_outer': reading.alkyl_push_outer,
-                'n2_flow': reading.n2_flow, 'h2_flow': reading.h2_flow, 'nh3_flow': reading.nh3_flow,
-                'hydride_pressure': reading.hydride_pressure, 'tmga1_flow': reading.tmga1_flow,
-                'tmga1_pressure': reading.tmga1_pressure, 'tmga2_flow': reading.tmga2_flow,
-                'tmga2_pressure': reading.tmga2_pressure, 'tega2_flow': reading.tega2_flow,
-                'tega2_pressure': reading.tega2_pressure, 'tmin1_flow': reading.tmin1_flow,
-                'tmin1_pressure': reading.tmin1_pressure, 'tmal1_flow': reading.tmal1_flow,
-                'tmal1_pressure': reading.tmal1_pressure, 'cp2mg_flow': reading.cp2mg_flow,
-                'cp2mg_pressure': reading.cp2mg_pressure, 'cp2mg_dilution': reading.cp2mg_dilution,
-                'silane_flow': reading.silane_flow, 'silane_dilution': reading.silane_dilution,
-                'silane_mix': reading.silane_mix, 'silane_pressure': reading.silane_pressure})
+                'alkyl_flow_inner': reading.alkyl_flow_inner,
+                'alkyl_push_inner': reading.alkyl_push_inner,
+                'alkyl_flow_middle': reading.alkyl_flow_middle,
+                'alkyl_push_middle': reading.alkyl_push_middle,
+                'alkyl_flow_outer': reading.alkyl_flow_outer,
+                'alkyl_push_outer': reading.alkyl_push_outer,
+                'n2_flow': reading.n2_flow, 'h2_flow': reading.h2_flow,
+                'nh3_flow': reading.nh3_flow, 'hydride_pressure': reading.hydride_pressure,
+                'tmga1_flow': reading.tmga1_flow, 'tmga1_pressure': reading.tmga1_pressure,
+                'tmga2_flow': reading.tmga2_flow, 'tmga2_pressure': reading.tmga2_pressure,
+                'tega2_flow': reading.tega2_flow, 'tega2_pressure': reading.tega2_pressure,
+                'tmin1_flow': reading.tmin1_flow, 'tmin1_pressure': reading.tmin1_pressure,
+                'tmal1_flow': reading.tmal1_flow, 'tmal1_pressure': reading.tmal1_pressure,
+                'cp2mg_flow': reading.cp2mg_flow, 'cp2mg_pressure': reading.cp2mg_pressure,
+                'cp2mg_dilution': reading.cp2mg_dilution, 'silane_flow': reading.silane_flow,
+                'silane_dilution': reading.silane_dilution, 'silane_mix': reading.silane_mix,
+                'silane_pressure': reading.silane_pressure})
             formlist.append(rform)
         context["readingslist"] = formlist
         return context
+
     def post(self, request, **kwargs):
         numberofreadings = len(D180Readings.objects.filter(growth=self.get_object()))
         print (numberofreadings)
         for x in range(0, numberofreadings):
-            rform = D180ReadingsForm(request.POST, prefix=('reading' + str(x+1)))
+            rform = D180ReadingsForm(request.POST, prefix=('reading' + str(x + 1)))
             if rform.is_valid():
-                newgrowth = growth=self.get_object()
+                newgrowth = self.get_object()
                 newlayer = rform.cleaned_data['layer']
                 newlayer_desc = rform.cleaned_data['layer_desc']
                 newpyro_out = rform.cleaned_data['pyro_out']
@@ -393,20 +399,30 @@ class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView)
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
                 thisreading = D180Readings.objects.filter(growth=newgrowth, layer=newlayer)
-                thisreading.update(growth=newgrowth, layer = newlayer, layer_desc=newlayer_desc,
-                                   pyro_out=newpyro_out, pyro_in=newpyro_in, ecp_temp=newecp_temp, tc_out=newtc_out,
-                                   tc_in=newtc_in, motor_rpm=newmotor_rpm, gc_pressure=newgc_pressure,
-                                   gc_position=newgc_position, voltage_in=newvoltage_in, voltage_out=newvoltage_out,
-                                   current_in=newcurrent_in, current_out=newcurrent_out, top_vp_flow=newtop_vp_flow,
-                                   hydride_inner=newhydride_inner, hydride_outer=newhydride_outer,
-                                   alkyl_flow_inner=newalkyl_flow_inner, alkyl_push_inner=newalkyl_push_inner,
-                                   alkyl_flow_middle=newalkyl_flow_middle, alkyl_push_middle=newalkyl_push_middle,
-                                   alkyl_flow_outer=newalkyl_flow_outer, alkyl_push_outer=newalkyl_push_outer,
-                                   n2_flow=newn2_flow, h2_flow=newh2_flow, nh3_flow=newnh3_flow, hydride_pressure=newhydride_pressure,
-                                   tmga1_flow=newtmga1_flow, tmga1_pressure=newtmga1_pressure, tmga2_flow=newtmga2_flow,
-                                   tmga2_pressure=newtmga2_pressure, tega2_flow=newtega2_flow, tega2_pressure=newtega2_pressure,
-                                   tmin1_flow=newtmin1_flow, tmin1_pressure=newtmin1_pressure, tmal1_flow=newtmal1_flow,
-                                   tmal1_pressure=newtmal1_pressure, cp2mg_flow=newcp2mg_flow, cp2mg_pressure=newcp2mg_pressure,
-                                   cp2mg_dilution=newcp2mg_dilution, silane_flow=newsilane_flow, silane_dilution=newsilane_dilution,
-                                   silane_mix=newsilane_mix, silane_pressure=newsilane_pressure)
+                thisreading.update(growth=newgrowth, layer=newlayer,
+                                   layer_desc=newlayer_desc, pyro_out=newpyro_out,
+                                   pyro_in=newpyro_in, ecp_temp=newecp_temp,
+                                   tc_out=newtc_out, tc_in=newtc_in, motor_rpm=newmotor_rpm,
+                                   gc_pressure=newgc_pressure, gc_position=newgc_position,
+                                   voltage_in=newvoltage_in, voltage_out=newvoltage_out,
+                                   current_in=newcurrent_in, current_out=newcurrent_out,
+                                   top_vp_flow=newtop_vp_flow, hydride_inner=newhydride_inner,
+                                   hydride_outer=newhydride_outer,
+                                   alkyl_flow_inner=newalkyl_flow_inner,
+                                   alkyl_push_inner=newalkyl_push_inner,
+                                   alkyl_flow_middle=newalkyl_flow_middle,
+                                   alkyl_push_middle=newalkyl_push_middle,
+                                   alkyl_flow_outer=newalkyl_flow_outer,
+                                   alkyl_push_outer=newalkyl_push_outer,
+                                   n2_flow=newn2_flow, h2_flow=newh2_flow,
+                                   nh3_flow=newnh3_flow, hydride_pressure=newhydride_pressure,
+                                   tmga1_flow=newtmga1_flow, tmga1_pressure=newtmga1_pressure,
+                                   tmga2_flow=newtmga2_flow, tmga2_pressure=newtmga2_pressure,
+                                   tega2_flow=newtega2_flow, tega2_pressure=newtega2_pressure,
+                                   tmin1_flow=newtmin1_flow, tmin1_pressure=newtmin1_pressure,
+                                   tmal1_flow=newtmal1_flow, tmal1_pressure=newtmal1_pressure,
+                                   cp2mg_flow=newcp2mg_flow, cp2mg_pressure=newcp2mg_pressure,
+                                   cp2mg_dilution=newcp2mg_dilution, silane_flow=newsilane_flow,
+                                   silane_dilution=newsilane_dilution, silane_mix=newsilane_mix,
+                                   silane_pressure=newsilane_pressure)
         return HttpResponseRedirect(reverse('d180_readings_edit', args=[self.get_object()]))
