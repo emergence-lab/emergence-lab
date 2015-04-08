@@ -56,6 +56,7 @@ class ProcessCreateView(LoginRequiredMixin, generic.CreateView):
 class ProcessListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/process_list.html'
     model = Process
+    paginate_by = 25
 
     def get_queryset(self):
         queryset = super(ProcessListView, self).get_queryset()
