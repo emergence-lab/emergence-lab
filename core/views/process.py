@@ -8,11 +8,9 @@ from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
-from django.contrib.contenttypes.models import ContentType
-
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile, SplitProcess
+from core.models import Process, Sample, DataFile
 from core.forms import DropzoneForm
 
 
@@ -68,7 +66,7 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Process
     context_object_name = 'process'
     lookup_url_kwarg = 'uuid'
-    fields = ('-comment',)
+    fields = ('comment',)
 
     def get_object(self, queryset=None):
         queryset = queryset or self.get_queryset()
