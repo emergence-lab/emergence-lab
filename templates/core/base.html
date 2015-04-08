@@ -60,28 +60,20 @@
                             <span class="glyphicon glyphicon-th"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="disabled"><a href="#">
+                            <li class="dropdown-header"><a href="#">
                                 Apps
-                            </a></li>
-                            <li class="disabled"><a href="#">
-                                <span class="glyphicon glyphicon-book"></span>
-                                Notebook
                             </a></li>
                             <li><a href="#">
                                 <span class="glyphicon glyphicon-search"></span>
                                 Search
                             </a></li>
-                            <li><a href="{% url 'afm_list' %}">
-                                <span class="glyphicon glyphicon-picture"></span>
-                                AFM
+                            <li><a href="{% url 'process_list' %}">
+                                <span class="glyphicon glyphicon-compressed"></span>
+                                Processes
                             </a></li>
-                            <li><a href="{% url 'hall_list' %}">
-                                <span class="glyphicon glyphicon-magnet"></span>
-                                Hall
-                            </a></li>
-                            <li><a href="{% url 'sem_list' %}">
-                                <span class="glyphicon glyphicon-picture"></span>
-                                SEM
+                            <li><a href="{% url 'sample_list' %}">
+                                <span class="glyphicon glyphicon-leaf"></span>
+                                Samples
                             </a></li>
                             <li><a href="{% url 'simulation_admin' %}">
                                 <span class="glyphicon glyphicon-cloud"></span>
@@ -98,7 +90,7 @@
                             {% endif %}
                             </a></li>
                             <li class="divider"></li>
-                            <li class="disabled"><a href="#">
+                            <li class="dropdown-header"><a href="#">
                                 Additional Services
                             </a></li>
                             <li><a href="***REMOVED***">
