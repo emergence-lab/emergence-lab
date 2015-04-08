@@ -8,10 +8,11 @@ from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
+from django.contrib.contenttypes.models import ContentType
 
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile
+from core.models import Process, Sample, DataFile, SplitProcess
 from core.forms import DropzoneForm
 
 
@@ -56,13 +57,17 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/process_list.html'
     model = Process
 
+    def get_queryset(self):
+        queryset = super(ProcessListView, self).get_queryset()
+        return queryset.order_by('-created')
+
 
 class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'core/process_edit.html'
     model = Process
     context_object_name = 'process'
     lookup_url_kwarg = 'uuid'
-    fields = ('comment',)
+    fields = ('-comment',)
 
     def get_object(self, queryset=None):
         queryset = queryset or self.get_queryset()
