@@ -22,7 +22,17 @@
         </h1>
     </header>
 
-    <section>
+    <section class="col-md-2">
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" {% if not slug %}class="active"{%endif%}><a href="{% url 'process_list' %}">All</a></li>
+        {% for process_type in process_list %}
+            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_list_filter' slug=process_type.slug %}">{{process_type.name}}</a></li>
+        {% endfor %}
+        </ul>
+        <br>
+    </section>
+
+    <section class="col-md-10">
         <ul class="list-group">
             {% for process in object_list %}
                 <li class="list-group-item">
