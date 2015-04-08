@@ -16,6 +16,7 @@ class SampleListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/sample_list.html'
     model = Sample
     queryset = Sample.objects.order_by('-created')
+    paginate_by = 25
 
 
 class SampleDetailView(LoginRequiredMixin, generic.DetailView):
