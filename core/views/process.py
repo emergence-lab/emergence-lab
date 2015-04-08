@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile
+from core.models import Process, Sample, DataFile, SplitProcess
 from core.forms import DropzoneForm
 
 
@@ -62,6 +62,14 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         queryset = super(ProcessListView, self).get_queryset()
         return queryset.order_by('-created')
+
+
+class ProcessListViewFilter(ProcessListView):
+
+    def get_queryset(self):
+        slug = self.kwargs['slug']
+        queryset = super(ProcessListViewFilter, self).get_queryset()
+        return [i for i in queryset if i.slug==slug]
 
 
 class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):

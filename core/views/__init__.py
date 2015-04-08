@@ -42,6 +42,7 @@ from .process import (
     ProcessDetailView,
     ProcessCreateView,
     ProcessListView,
+    ProcessListViewFilter,
     ProcessUpdateView,
     RunProcessView,
     CreateUploadProcessView,
