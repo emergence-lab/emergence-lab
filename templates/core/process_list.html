@@ -30,7 +30,9 @@
                         <a href="{% url 'process_detail' uuid=process.uuid %}">
                             {{process.uuid}}
                         </a>
-                        ({{process.legacy_identifier}})
+                        {% if process.legacy_identifier %}
+                            ({{process.legacy_identifier}})
+                        {% endif %}
                     </h4>
                     {{process.name}}
                     <small>created on {{process.created.date}}</small>
