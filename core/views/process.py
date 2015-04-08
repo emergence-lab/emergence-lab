@@ -74,13 +74,19 @@ class ProcessListViewFilter(ProcessListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListViewFilter, self).get_context_data(**kwargs)
-        context['slug'] = self.kwargs['slug']
+        context['slug'] = self.kwargs.get('slug', 'all')
+        # context['user'] = self.kwargs.get('user', 'all')
         return context
 
     def get_queryset(self):
-        slug = self.kwargs['slug']
+        slug = self.kwargs.get('slug', 'all')
+        # user = self.kwargs.get('user', 'all')
         queryset = super(ProcessListViewFilter, self).get_queryset()
-        return [i for i in queryset if i.slug==slug]
+        if slug != 'all':
+            queryset = [i for i in queryset if i.slug==slug]
+        # if user != 'all':
+        #    queryset = [i for i in queryset if i.user==self.request.user]
+        return queryset
 
 
 class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
