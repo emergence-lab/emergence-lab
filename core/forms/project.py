@@ -37,6 +37,7 @@ class CreateProjectForm(forms.ModelForm):
         reserved_names = [
             'create',
             'track',
+            'all'
         ]
         if name in reserved_names:
             self.add_error('name',
