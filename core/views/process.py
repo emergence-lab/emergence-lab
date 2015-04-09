@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from itertools import groupby
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -63,18 +64,19 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
         context['process_list'] = get_subclasses(Process)
+        context['user_list'] = get_user_model().objects.all().filter(is_active=True)
         context['slug'] = self.kwargs.get('slug', 'all')
-        # context['user'] = self.kwargs.get('user', 'all')
+        context['username'] = self.kwargs.get('username', 'all')
         return context
 
     def get_queryset(self):
         slug = self.kwargs.get('slug', 'all')
-        # user = self.kwargs.get('user', 'all')
+        username = self.kwargs.get('username', 'all')
         queryset = super(ProcessListView, self).get_queryset().order_by('-created')
+        if username != 'all':
+            queryset = queryset.filter(user__username=username)
         if slug != 'all':
             queryset = [i for i in queryset if i.slug == slug]
-        # if user != 'all':
-        #    queryset = [i for i in queryset if i.user==self.request.user]
         return queryset
 
 

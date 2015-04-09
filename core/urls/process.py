@@ -6,10 +6,10 @@ from django.conf.urls import url
 import core.views
 
 urlpatterns = [
-    url(r'^list/(?P<slug>[\w-]+)/$',
+    #url(r'^list/(?P<slug>[\w-]+)/$',
+    #    core.views.ProcessListView.as_view(), name='process_list'),
+    url(r'^list/(?P<slug>[\w-]+)/(?P<username>[\w-]+)/$',
         core.views.ProcessListView.as_view(), name='process_list'),
-    # url(r'^list/(?P<slug>[\w-]+)/(?P<user>[\w-]+)/$',
-    #    core.views.ProcessListViewFilter.as_view(), name='process_list_filter'),
     url(r'^create/$', core.views.ProcessCreateView.as_view(),
         name='process_create'),
     url(r'^(?P<uuid>p[0-9a-f\-]{7,})/$', core.views.ProcessDetailView.as_view(),

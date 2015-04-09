@@ -21,9 +21,10 @@
             </a>
         </h1>
         <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="#">All</a></li>
-            <li role="presentation"><a href="#">My Processes</a></li>
-            <li role="presentation"><a href="#">My Lab's Processes</a></li>
+            <li role="presentation" {% if username == 'all' %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username='all' %}">All Users</a></li>
+            {% for user_obj in user_list %}
+                <li role="presentation"{% if username == user_obj.username %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.full_name}}</a></li>
+            {% endfor %}
         </ul>
         <p></p>
     </header>
@@ -36,9 +37,9 @@
         Filter by type:
         <p></p>
         <ul class="nav nav-pills nav-stacked">
-            <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_list' slug='all' %}">All</a></li>
+            <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_list' slug='all' username='all' %}">All</a></li>
         {% for process_type in process_list %}
-            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_list' slug=process_type.slug %}">{{process_type.name}}</a></li>
+            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_list' slug=process_type.slug username=username %}">{{process_type.name}}</a></li>
         {% endfor %}
         </ul>
         <p></p>
