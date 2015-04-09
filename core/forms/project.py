@@ -37,7 +37,7 @@ class CreateProjectForm(forms.ModelForm):
         reserved_names = [
             'create',
             'track',
-            'all'
+            'all',
         ]
         if name in reserved_names:
             self.add_error('name',
@@ -56,7 +56,8 @@ class CreateInvestigationForm(forms.ModelForm):
         reserved_names = [
             'activate',
             'deactivate',
-            'add-investigation'
+            'add-investigation',
+            'all',
         ]
         if name in reserved_names:
             self.add_error('name',
