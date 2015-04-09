@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from model_mommy import mommy
@@ -15,6 +16,9 @@ from core.serializers import ProcessSerializer, SampleSerializer
 
 
 class TestProcessSerializer(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('default', password='')
 
     def test_polymorphic_field_mapping(self):
         """
@@ -102,6 +106,7 @@ class TestProcessSerializer(TestCase):
         data = {
             'polymorphic_type': 'Process',
             'comment': 'Test comment',
+            'user': self.user,
         }
         process = serializer.create(data)
         self.assertIsNotNone(process)
@@ -118,6 +123,7 @@ class TestProcessSerializer(TestCase):
             'polymorphic_type': 'ParentProcess',
             'comment': 'Test comment',
             'parent_field': 111,
+            'user': self.user,
         }
         process = serializer.create(data)
         self.assertIsNotNone(process)
@@ -136,6 +142,7 @@ class TestProcessSerializer(TestCase):
             'comment': 'Test comment',
             'parent_field': 111,
             'child_field': 222,
+            'user': self.user,
         }
         process = serializer.create(data)
         self.assertIsNotNone(process)

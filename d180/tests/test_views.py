@@ -83,7 +83,7 @@ class TestPlatterCRUD(TestCase):
 class TestD180Wizard(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('default', password='')
+        self.user = get_user_model().objects.create_user('default', password='')
         self.client.login(username='default', password='')
 
     def test_start_resolution_template(self):
@@ -175,7 +175,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
+            'growth-user': self.user.id,
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -222,8 +222,8 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
-            'growth-growth_number': 'g2000',
+            'growth-user': self.user.id,
+            'growth-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -269,8 +269,8 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
-            'growth-growth_number': 'g2000',
+            'growth-user': self.user.id,
+            'growth-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -293,7 +293,7 @@ class TestD180Wizard(TestCase):
         mommy.make(Investigation)
         mommy.make(Platter)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
-        sample.split(2)
+        sample.split(self.user, 2)
         piece = 'b'
         url = reverse('create_growth_d180_start')
         data = {
@@ -319,8 +319,8 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
-            'growth-growth_number': 'g2000',
+            'growth-user': self.user.id,
+            'growth-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -345,7 +345,7 @@ class TestD180Wizard(TestCase):
         mommy.make(Investigation)
         mommy.make(Platter)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
-        sample.split(2)
+        sample.split(self.user, 2)
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '1',
@@ -370,8 +370,8 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
-            'growth-growth_number': 'g2000',
+            'growth-user': self.user.id,
+            'growth-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -420,8 +420,8 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'growth-investigations': '1',
             'growth-platter': '1',
-            'growth-user': '1',
-            'growth-growth_number': 'g2000',
+            'growth-user': self.user.id,
+            'growth-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -473,7 +473,7 @@ class TestD180Wizard(TestCase):
             'growth-investigations': '1',
             'growth-platter': '1',
             'growth-user': '1',
-            'growth-growth_number': 'g2000',
+            'growth-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',

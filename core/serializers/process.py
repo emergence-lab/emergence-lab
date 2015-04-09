@@ -11,7 +11,7 @@ class ProcessSerializer(PolymorphicModelSerializer):
 
     class Meta:
         model = Process
-        fields = ('uuid_full', 'uuid', 'created', 'modified', 'comment',
+        fields = ('uuid_full', 'uuid', 'created', 'modified', 'user', 'comment',
                   'is_destructive')
 
 

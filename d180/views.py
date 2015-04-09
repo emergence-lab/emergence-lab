@@ -99,7 +99,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             'info_form': WizardBasicInfoForm(
                 initial={
                     'user': self.request.user,
-                    'growth_number': growth_number
+                    'legacy_identifier': growth_number
                 },
                 prefix='growth'),
             'growth_form': WizardGrowthInfoForm(prefix='growth'),

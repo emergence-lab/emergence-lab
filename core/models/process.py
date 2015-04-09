@@ -4,8 +4,9 @@ from __future__ import absolute_import, unicode_literals
 import os
 import uuid
 
-from django.db import models
 from django.core.files.storage import default_storage as labshare
+from django.conf import settings
+from django.db import models
 
 from mptt import models as mptt
 import polymorphic
@@ -43,6 +44,8 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
 
     comment = fields.RichTextField(blank=True)
     legacy_identifier = models.SlugField(max_length=100)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             limit_choices_to={'is_active': True})
 
 
 class SplitProcess(Process):

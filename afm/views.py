@@ -64,7 +64,10 @@ class AFMCreate(LoginRequiredMixin, CreateView):
     """
     model = AFMScan
     template_name = 'afm/afm_create.html'
-    fields = ('comment',)
+    fields = ('comment', 'user',)
+
+    def get_initial(self):
+        return {'user': self.request.user}
 
     def get_success_url(self):
         return reverse('afm_detail', args=(self.object.uuid,))

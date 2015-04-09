@@ -451,7 +451,8 @@ class TestSampleCRUD(TestCase):
 class TestProcessCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
         self.client.login(username='username1', password='')
 
     def test_process_list_resolution_template(self):
@@ -536,15 +537,13 @@ class TestProcessCRUD(TestCase):
         url = '/process/create/'
         data = {}
         response = self.client.post(url, data)
-        process = Process.objects.last()
-        self.assertEqual(process.comment, '')
-        detail_url =  '/process/{}/'.format(process.uuid)
-        self.assertRedirects(response, detail_url)
+        self.assertFormError(response, 'form', 'user', 'This field is required.')
 
     def test_process_create_valid_data(self):
         url = '/process/create/'
         data = {
             'comment': 'testing',
+            'user': self.user.id
         }
         response = self.client.post(url, data)
         process = Process.objects.last()

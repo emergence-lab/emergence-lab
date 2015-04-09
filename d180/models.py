@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -37,8 +36,6 @@ class D180Growth(Process):
     is_destructive = True
 
     # general info
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             limit_choices_to={'is_active': True})
     investigations = models.ManyToManyField(Investigation,
         related_name='growths', related_query_name='growth',)
     platter = models.ForeignKey(Platter,

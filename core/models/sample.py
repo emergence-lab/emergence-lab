@@ -94,11 +94,12 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         """
         self.process_tree = ProcessNode.objects.get(id=self.process_tree_id)
 
-    def split(self, number=2, piece='a', comment=None, force_refresh=True):
+    def split(self, user, number=2, piece='a', comment=None, force_refresh=True):
         """
         Splits the sample piece into the specific number of pieces, with an
         optional comment on the split process itself.
 
+        :param user: The user that split the sample.
         :param number: The number of pieces to split the sample into.
         :param piece: The piece to split. Defaults to 'a'.
         :param comment: An optional comment associated with the split.
@@ -112,7 +113,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         if comment is None:
             comment = 'Split sample into {0} pieces'.format(number)
 
-        process = SplitProcess.objects.create(comment=comment)
+        process = SplitProcess.objects.create(comment=comment, user=user)
         nodes = []
 
         branch = self.get_piece(piece)
