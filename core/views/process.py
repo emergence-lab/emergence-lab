@@ -63,17 +63,6 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
         context['process_list'] = get_subclasses(Process)
-        return context
-
-    def get_queryset(self):
-        queryset = super(ProcessListView, self).get_queryset()
-        return queryset.order_by('-created')
-
-
-class ProcessListViewFilter(ProcessListView):
-
-    def get_context_data(self, **kwargs):
-        context = super(ProcessListViewFilter, self).get_context_data(**kwargs)
         context['slug'] = self.kwargs.get('slug', 'all')
         # context['user'] = self.kwargs.get('user', 'all')
         return context
@@ -81,7 +70,7 @@ class ProcessListViewFilter(ProcessListView):
     def get_queryset(self):
         slug = self.kwargs.get('slug', 'all')
         # user = self.kwargs.get('user', 'all')
-        queryset = super(ProcessListViewFilter, self).get_queryset()
+        queryset = super(ProcessListView, self).get_queryset().order_by('-created')
         if slug != 'all':
             queryset = [i for i in queryset if i.slug==slug]
         # if user != 'all':
