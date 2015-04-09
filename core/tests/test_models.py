@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import timezone
@@ -65,6 +66,7 @@ class TestSample(TestCase):
     def setUp(self):
         substrate = mommy.make('core.Substrate')
         self.sample = Sample.objects.create(substrate=substrate)
+        self.user = get_user_model().objects.create_user('default', password='')
 
     def test_insert_node_append(self):
         """
@@ -266,7 +268,7 @@ class TestSample(TestCase):
         split_number = len(pieces)
         before = self.sample.node_count
         root = self.sample.root_node
-        nodes = self.sample.split(split_number)
+        nodes = self.sample.split(self.user, split_number)
         after = self.sample.node_count
         self.assertEqual(before + split_number, after)
         self.assertEqual(split_number, len(nodes))
@@ -285,9 +287,9 @@ class TestSample(TestCase):
         split_number = 4
         before = self.sample.node_count
         root_first = self.sample.root_node
-        nodes_first = self.sample.split(split_number, 'a')
+        nodes_first = self.sample.split(self.user, split_number, 'a')
         root_second = self.sample.get_piece('b')
-        nodes_second = self.sample.split(split_number, 'b')
+        nodes_second = self.sample.split(self.user, split_number, 'b')
         after = self.sample.node_count
         self.assertEqual(split_number * 2 + before, after)
         for node in nodes_first:
@@ -354,7 +356,7 @@ class TestSample(TestCase):
         process_1 = mommy.make(Process)
         self.sample.run_process(process_1)
         p1_node = list(self.sample.leaf_nodes)
-        process_2 = self.sample.split(2)[0].process
+        process_2 = self.sample.split(self.user, 2)[0].process
         p2_nodes = list(self.sample.leaf_nodes)
         self.assertListEqual(
             p1_node, list(self.sample.get_nodes_for_process_type(Process)))
@@ -369,6 +371,6 @@ class TestSample(TestCase):
     def test_has_nodes_for_process_type_valid(self):
         self.sample.run_process(mommy.make(Process))
         self.assertFalse(self.sample.has_nodes_for_process_type(SplitProcess))
-        self.sample.split(2)
+        self.sample.split(self.user, 2)
         self.assertTrue(self.sample.has_nodes_for_process_type(Process))
         self.assertTrue(self.sample.has_nodes_for_process_type(SplitProcess))

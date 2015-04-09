@@ -17,7 +17,8 @@ from .models import ChildProcess, ParentProcess
 class TestProcessAPI(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
         self.client = APIClient()
         self.client.login(username='username1', password='')
 
@@ -145,7 +146,8 @@ class TestProcessAPI(TestCase):
 class TestSampleAPI(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
         self.client = APIClient()
         self.client.login(username='username1', password='')
 
@@ -181,7 +183,7 @@ class TestSampleAPI(TestCase):
         }
         for process in processes['step-1']:
             sample.run_process(process)
-        sample.split(3)
+        sample.split(self.user, 3)
         for piece, process in zip(['a', 'b', 'c'], processes['step-2']):
             sample.run_process(process, piece)
 
@@ -222,7 +224,7 @@ class TestSampleAPI(TestCase):
         }
         for process in processes['step-1']:
             sample.run_process(process)
-        sample.split(3)
+        sample.split(self.user, 3)
         for piece, process in zip(['a', 'b', 'c'], processes['step-2']):
             sample.run_process(process, piece)
 

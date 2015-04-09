@@ -64,7 +64,7 @@ class TestAFMCRUD(TestCase):
 
     def test_afm_create_valid_data(self):
         url = reverse('afm_create')
-        data = {'comment': 'testing'}
+        data = {'comment': 'testing', 'user': self.user.id}
         response = self.client.post(url, data)
         afm = AFMScan.objects.last()
         self.assertEqual(afm.comment, data['comment'])
