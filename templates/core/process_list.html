@@ -20,9 +20,21 @@
                 Create Process
             </a>
         </h1>
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="#">All</a></li>
+            <li role="presentation"><a href="#">My Processes</a></li>
+            <li role="presentation"><a href="#">My Lab's Processes</a></li>
+        </ul>
+        <p></p>
     </header>
 
+    <section>
+
+    </section>
+
     <section class="col-md-2">
+        Filter by type:
+        <p></p>
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_list' slug='all' %}">All</a></li>
         {% for process_type in process_list %}
@@ -30,6 +42,7 @@
         {% endfor %}
         </ul>
         <p></p>
+
     </section>
 
     <section class="col-md-10">
@@ -55,7 +68,7 @@
     </section>
 
     {% if is_paginated %}
-    <nav>
+    <nav class="pull-right">
       <ul class="pagination">
         {% if page_obj.has_previous %}
         <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
