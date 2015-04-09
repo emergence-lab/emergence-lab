@@ -28,17 +28,31 @@
                 <li class="list-group-item">
                     <div class="clearfix">
                         <div class="pull-right">
+                                <a href="#" class="btn btn-warning btn-sm">
+                                    <span class="glyphicon glyphicon-edit">
+                                    Split
+                                    </span>
+                                </a>
                                 <a href="#" class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-plus"></span>
                                 Run Process
-                            </a>
+                                </a>
                         </div>
                         <h4>
                             <a href="{% url 'sample_detail' uuid=sample.uuid %}">
                                 {{sample.uuid}}
+                                {% if sample.pieces|length > 1 %}
+                                 &emsp; <span class="badge" data-toggle="tooltip" title="Pieces">{{sample.pieces|length}}</span>
+                                {% endif %}
                             </a>
                         </h4>
                         <small>created on {{sample.created.date}}</small>
+                        <p></p>
+                        {% for i in sample.nodes %}
+                            {% if not i.is_root_node %}
+                            <span class="label label-default" href="{% url 'process_detail' uuid=i.process.uuid %}" data-toggle="tooltip" data-html="true" title="{{i.process.comment|safe|truncatewords:50}}">{{i.process.name}}</span>
+                            {%endif%}
+                        {% endfor %}
                     </div>
                 </li>
             {% endfor %}
