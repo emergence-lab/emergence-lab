@@ -7,9 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
+from django_filters.views import FilterView
 
 from core.models import Sample
 from core.forms import SampleMultiForm
+from core.filters import SampleFilterSet
 
 
 class SampleListView(LoginRequiredMixin, generic.ListView):
@@ -74,3 +76,9 @@ class SampleUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('sample_detail', args=(self.object.uuid,))
+
+
+class SampleSearchView(LoginRequiredMixin, FilterView):
+    template_name = 'core/sample_search.html'
+    model = Sample
+    filterset_class = SampleFilterSet

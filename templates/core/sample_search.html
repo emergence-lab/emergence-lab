@@ -1,0 +1,39 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Sample Search{% endblock title %}
+
+{% block header %}
+    {% load staticfiles %}
+    {{filter.form.media}}
+{% endblock header %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'sample_list' %}">Samples</a></li>
+            <li class="active">Search</li>
+        </ol>
+    </nav>
+
+    <div>
+        <form action="" method="get" class="form">
+            {% bootstrap_form filter.form %}
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+
+    <div>
+        <ul class="list-group">
+        {% for sample in filter %}
+            <li class="list-group-item">{{sample}} {{sample.created}}</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+</main>
+
+{% endblock content %}

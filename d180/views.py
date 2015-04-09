@@ -89,7 +89,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         try:
             previous_growth = D180Growth.objects.latest('created')
             growth_number = 'g{}'.format(
-                str(int(previous_growth.growth_number[1:]) + 1).zfill(4))
+                str(int(previous_growth.legacy_identifier[1:]) + 1).zfill(4))
         except ObjectDoesNotExist:
             growth_number = 'g1000'
         except ValueError:
