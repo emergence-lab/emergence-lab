@@ -72,7 +72,7 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
         # user = self.kwargs.get('user', 'all')
         queryset = super(ProcessListView, self).get_queryset().order_by('-created')
         if slug != 'all':
-            queryset = [i for i in queryset if i.slug==slug]
+            queryset = [i for i in queryset if i.slug == slug]
         # if user != 'all':
         #    queryset = [i for i in queryset if i.user==self.request.user]
         return queryset
