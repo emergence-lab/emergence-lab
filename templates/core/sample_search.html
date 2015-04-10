@@ -26,12 +26,25 @@
         </form>
     </div>
 
-    <div>
-        <ul class="list-group">
+    <div class="list-group">
         {% for sample in filter %}
-            <li class="list-group-item">{{sample}} {{sample.created}}</li>
+            <a href="{% url 'sample_detail' uuid=sample.uuid %}" class="list-group-item">
+                <div class="clearfix">
+                    <h4 class="list-group-item-heading">
+                        {{sample.uuid}}
+                        {% if sample.pieces|length > 1 %}
+                            <span class="badge">{{sample.pieces|length}} Pieces</span>
+                        {% endif %}
+                    </h4>
+                    <p class="list-group-item-text">
+                        {{sample.comment|safe|truncatewords:50}}
+                        <div class="pull-right">
+                            <small><strong>Created: </strong>{{sample.created.date}}</small>
+                        </div>
+                    </p>
+                </div>
+            </a>
         {% endfor %}
-        </ul>
     </div>
 
 </main>
