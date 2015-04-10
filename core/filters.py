@@ -6,6 +6,7 @@ import operator
 from django import forms
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import get_user_model
 
 from datetimewidget.widgets import DateWidget
 import django_filters
@@ -49,6 +50,20 @@ def _filter_d180_growth_tags(queryset, value):
         q_filters = [Q(**arg) for arg in filter_args]
         d180_processes = d180_processes.filter(reduce(operator.and_, q_filters))
         if not d180_processes.exists():
+            queryset = queryset.exclude(id=sample.id)
+    return queryset
+
+
+def _filter_process_user(queryset, value):
+    if not value:
+        return queryset
+
+    for sample in queryset:
+        if not (sample.nodes.order_by()
+                            .exclude(process_id__isnull=True)
+                            .filter(process__user_id=value)
+                            .distinct()
+                            .exists()):
             queryset = queryset.exclude(id=sample.id)
     return queryset
 
@@ -107,6 +122,10 @@ class SampleFilterSet(django_filters.FilterSet):
         self.filters['processes'] = django_filters.MultipleChoiceFilter(
             choices=[(p.slug, p.name) for p in process_types],
             action=_filter_process_type)
+        users = get_user_model().active_objects.all()
+        self.filters['users'] = django_filters.ChoiceFilter(
+            choices=[(u.id, u.get_full_name()) for u in users],
+            action=_filter_process_user)
 
     class Meta:
         model = Sample
