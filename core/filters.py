@@ -125,7 +125,7 @@ class SampleFilterSet(django_filters.FilterSet):
         users = [(u.id, u.get_full_name())
                  for u in get_user_model().active_objects.all()]
         self.filters['users'] = django_filters.ChoiceFilter(
-            choices=[(0, '-------')] + users,
+            choices=[('', 'Any User')] + users,
             action=_filter_process_user)
 
     class Meta:
