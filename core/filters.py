@@ -122,9 +122,10 @@ class SampleFilterSet(django_filters.FilterSet):
         self.filters['processes'] = django_filters.MultipleChoiceFilter(
             choices=[(p.slug, p.name) for p in process_types],
             action=_filter_process_type)
-        users = get_user_model().active_objects.all()
+        users = [(u.id, u.get_full_name())
+                 for u in get_user_model().active_objects.all()]
         self.filters['users'] = django_filters.ChoiceFilter(
-            choices=[(u.id, u.get_full_name()) for u in users],
+            choices=[(0, '-------')] + users,
             action=_filter_process_user)
 
     class Meta:
