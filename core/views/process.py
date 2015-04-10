@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from itertools import groupby
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -12,6 +13,7 @@ from braces.views import LoginRequiredMixin
 
 from core.models import Process, Sample, DataFile
 from core.forms import DropzoneForm
+from core.polymorphic import get_subclasses
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
@@ -59,9 +61,23 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     model = Process
     paginate_by = 25
 
+    def get_context_data(self, **kwargs):
+        context = super(ProcessListView, self).get_context_data(**kwargs)
+        context['process_list'] = get_subclasses(Process)
+        context['user_list'] = get_user_model().objects.all().filter(is_active=True)
+        context['slug'] = self.kwargs.get('slug', 'all')
+        context['username'] = self.kwargs.get('username', 'all')
+        return context
+
     def get_queryset(self):
-        queryset = super(ProcessListView, self).get_queryset()
-        return queryset.order_by('-created')
+        slug = self.kwargs.get('slug', 'all')
+        username = self.kwargs.get('username', 'all')
+        queryset = super(ProcessListView, self).get_queryset().order_by('-created')
+        if username != 'all':
+            queryset = queryset.filter(user__username=username)
+        if slug != 'all':
+            queryset = [i for i in queryset if i.slug == slug]
+        return queryset
 
 
 class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):

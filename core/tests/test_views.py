@@ -457,14 +457,14 @@ class TestProcessCRUD(TestCase):
 
     def test_process_list_resolution_template(self):
         test_resolution_template(self,
-            url='/process/',
+            url='/process/list/all/all/',
             url_name='process_list',
             template_file='core/process_list.html',
             response_code=200)
 
     def test_process_list_content(self):
         process = mommy.make(Process)
-        url = reverse('process_list')
+        url = reverse('process_list', kwargs={'slug': 'all', 'username': 'all'})
         response = self.client.get(url)
         self.assertContains(response, process.uuid)
 

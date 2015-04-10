@@ -19,7 +19,7 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_list' %}">Processes</a></li>
+            <li><a href="{% url 'process_list' slug='all' username='all' %}">Processes</a></li>
             <li class='active'>Create</li>
         </ol>
     </nav>
@@ -28,7 +28,7 @@
         <h1 class="page-header">
             Create Process
             <div class="pull-right">
-                <a href="{% url 'process_list' %}" class="btn btn-danger">Cancel</a>
+                <a href="{% url 'process_list' slug='all' username='all' %}" class="btn btn-danger">Cancel</a>
             </div>
         </h1>
     </header>

@@ -19,7 +19,7 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_list' %}">Processes</a></li>
+            <li><a href="{% url 'process_list' slug='all' username='all' %}">Processes</a></li>
             <li><a href="{% url 'process_detail' uuid=process.uuid %}">{{process.uuid}}</a></li>
             <li class='active'>Edit</li>
         </ol>

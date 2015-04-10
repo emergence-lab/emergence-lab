@@ -20,29 +20,56 @@
                 Create Process
             </a>
         </h1>
+        <ul class="nav nav-tabs">
+            <li role="presentation" {% if username == 'all' %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username='all' %}">All Users</a></li>
+            {% for user_obj in user_list %}
+                <li role="presentation"{% if username == user_obj.username %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.full_name}}</a></li>
+            {% endfor %}
+        </ul>
+        <p></p>
     </header>
 
     <section>
+
+    </section>
+
+    <section class="col-md-2">
+        Filter by type:
+        <p></p>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_list' slug='all' username='all' %}">All</a></li>
+        {% for process_type in process_list %}
+            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_list' slug=process_type.slug username=username %}">{{process_type.name}}</a></li>
+        {% endfor %}
+        </ul>
+        <p></p>
+
+    </section>
+
+    <section class="col-md-10">
         <ul class="list-group">
             {% for process in object_list %}
                 <li class="list-group-item">
-                    <h4>
+                    <h4 class="list-group-item-heading">
                         <a href="{% url 'process_detail' uuid=process.uuid %}">
                             {{process.uuid}}
                         </a>
                         {% if process.legacy_identifier %}
                             ({{process.legacy_identifier}})
                         {% endif %}
+                        <span class="label label-default pull-right">{{process.name}}</span>
+                        <span class="pull-right"><small>{{process.created.date|date:"SHORT_DATE_FORMAT"}} &emsp; </small></span>
                     </h4>
-                    {{process.name}}
-                    <small>created on {{process.created.date}}</small>
+                    <p class="list-group-item-text"></p>
+                        {{process.comment|truncatewords_html:50|safe}}
+                    </p>
                 </li>
             {% endfor %}
         </ul>
     </section>
 
     {% if is_paginated %}
-    <nav>
+    <nav class="pull-right">
       <ul class="pagination">
         {% if page_obj.has_previous %}
         <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
