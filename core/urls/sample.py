@@ -15,4 +15,6 @@ urlpatterns = [
         name='sample_edit'),
     url(r'^(?P<uuid>s[0-9]+)/run/$', core.views.RunProcessView.as_view(),
         name='run_process'),
+    url(r'^split/(?P<uuid>s[0-9]+)/(?P<piece>[a-z]+)/$',
+        core.views.SampleSplitView.as_view(), name='split_sample'),
 ]
