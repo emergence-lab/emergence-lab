@@ -8,7 +8,7 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.models import Sample, SplitProcess
+from core.models import Sample
 from core.forms import SampleMultiForm
 from core.views import ActionReloadView
 
