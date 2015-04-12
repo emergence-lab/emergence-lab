@@ -8,8 +8,9 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.models import Sample
+from core.models import Sample, SplitProcess
 from core.forms import SampleMultiForm
+from core.views import ActionReloadView
 
 
 class SampleListView(LoginRequiredMixin, generic.ListView):
@@ -74,3 +75,18 @@ class SampleUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('sample_detail', args=(self.object.uuid,))
+
+
+class SampleSplitView(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        piece = self.kwargs.get('piece')
+        self.sample = Sample.objects.get(pk=Sample.strip_uuid(self.kwargs.get('uuid')))
+        self.sample.split(number=int(request.POST.get('split_number_{}'.format(piece))),
+                          piece=piece,
+                          comment=request.POST.get('split_comment_{}'.format(piece)),
+                          user=self.request.user,
+                          )
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('sample_detail', args=(self.sample.uuid,))

@@ -37,6 +37,7 @@ from .sample import (
     SampleListView,
     SampleCreateView,
     SampleUpdateView,
+    SampleSplitView,
 )
 from .process import (
     ProcessDetailView,

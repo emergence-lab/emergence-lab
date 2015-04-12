@@ -72,6 +72,7 @@
                                 </li>
                                 {% endif %}
                             {% else %}
+                                <button type="button" data-placement="left" title="<strong>Split this Sample</strong>" class="btn btn-xs btn-warning" href="#" data-toggle="popover" data-html="true" data-content="{% include 'core/sample_split.html' %}">Split</button>
                                 </li>
                             {% endif %}
                     {% endrecursetree %}

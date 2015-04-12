@@ -56,6 +56,11 @@ class ProcessCreateView(LoginRequiredMixin, generic.CreateView):
         return reverse('process_detail', args=(self.object.uuid,))
 
 
+#class SplitProcessView(LoginRequiredMixin, generic.CreateView):
+#
+#    model = SplitProcess
+#    fields()
+
 class ProcessListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/process_list.html'
     model = Process
