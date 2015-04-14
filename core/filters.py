@@ -130,5 +130,5 @@ class SampleFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Sample
-        order_by = ('created',)
+        order_by = ('created','modified','uuid')
         fields = ('created', 'modified', 'd180_tags')
