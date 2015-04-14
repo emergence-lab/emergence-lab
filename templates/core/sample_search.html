@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Sample Search{% endblock title %}
+
+{% block header %}
+    {% load staticfiles %}
+    {{filter.form.media}}
+{% endblock header %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'sample_list' %}">Samples</a></li>
+            <li class="active">Search</li>
+        </ol>
+    </nav>
+
+    <div>
+        <form action="" method="get" class="form">
+            {% bootstrap_form filter.form %}
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="list-group">
+        {% for sample in filter %}
+            <a href="{% url 'sample_detail' uuid=sample.uuid %}" class="list-group-item">
+                <div class="clearfix">
+                    <h4 class="list-group-item-heading">
+                        {{sample.uuid}}
+                        {% if sample.pieces|length > 1 %}
+                            <span class="badge">{{sample.pieces|length}} Pieces</span>
+                        {% endif %}
+                    </h4>
+                    <p class="list-group-item-text">
+                        {{sample.comment|safe|truncatewords:50}}
+                        <div class="pull-right">
+                            <small><strong>Created: </strong>{{sample.created.date}}</small>
+                        </div>
+                    </p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+</main>
+
+{% endblock content %}

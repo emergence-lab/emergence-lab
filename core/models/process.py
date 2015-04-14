@@ -11,8 +11,9 @@ from django.db import models
 from mptt import models as mptt
 import polymorphic
 
-from .mixins import TimestampMixin, UUIDMixin
-from . import fields
+from core.models.mixins import TimestampMixin, UUIDMixin
+from core.models import fields
+from core.polymorphic import get_subclasses
 
 
 def get_file_path(instance, filename):
@@ -46,6 +47,14 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
+
+    @staticmethod
+    def get_process_class(slug):
+        classes = get_subclasses(Process) + [Process]
+        try:
+            return next(p for p in classes if p.slug == slug)
+        except StopIteration:
+            raise ValueError('Process slug {} not valid'.format(slug))
 
 
 class SplitProcess(Process):

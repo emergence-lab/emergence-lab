@@ -9,6 +9,8 @@ urlpatterns = [
     url(r'^$', core.views.SampleListView.as_view(), name='sample_list'),
     url(r'^create/$', core.views.SampleCreateView.as_view(),
         name='sample_create'),
+    url(r'^search/$', core.views.SampleSearchView.as_view(),
+        name='sample_search'),
     url(r'^(?P<uuid>s[0-9]+)/$', core.views.SampleDetailView.as_view(),
         name='sample_detail'),
     url(r'^(?P<uuid>s[0-9]+)/edit/$', core.views.SampleUpdateView.as_view(),

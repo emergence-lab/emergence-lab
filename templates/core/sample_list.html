@@ -15,10 +15,16 @@
     <header>
         <h1 class="page-header">
             Samples
-            <a class="btn btn-primary pull-right" href="{% url 'sample_create' %}">
-                <span class="glyphicon glyphicon-plus"></span>
-                Create Sample
-            </a>
+            <div class="pull-right">
+                <a class="btn btn-info" href="{% url 'sample_search' %}">
+                    <span class="glyphicon glyphicon-search"></span>
+                    Search Samples
+                </a>
+                <a class="btn btn-primary" href="{% url 'sample_create' %}">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Create Sample
+                </a>
+            </div>
         </h1>
     </header>
 

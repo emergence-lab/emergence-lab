@@ -118,7 +118,7 @@ class QuickSearchRedirectView(LoginRequiredMixin, generic.RedirectView):
                 process = Process.objects.get(legacy_identifier=query)
                 return reverse('process_detail', args=(process.uuid,))
             except Process.DoesNotExist:
-                return reverse('dashboard')
+                return reverse('sample_search')
 
 
 class HomepageView(generic.TemplateView):

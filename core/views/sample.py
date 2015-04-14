@@ -7,9 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
+from django_filters.views import FilterView
 
-from core.models import Sample
+from core.filters import SampleFilterSet
 from core.forms import SampleMultiForm
+from core.models import Sample
 from core.views import ActionReloadView
 
 
@@ -90,3 +92,9 @@ class SampleSplitView(LoginRequiredMixin, ActionReloadView):
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('sample_detail', args=(self.sample.uuid,))
+
+
+class SampleSearchView(LoginRequiredMixin, FilterView):
+    template_name = 'core/sample_search.html'
+    model = Sample
+    filterset_class = SampleFilterSet
