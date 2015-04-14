@@ -21,13 +21,14 @@
             <div class="pull-right">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                      Action <span class="caret"></span>
+                        Action <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                      <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">Add SEM Images</a></li>
-                      <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">Add AFM Scan</a></li>
-                      <!--<li class="divider"></li>-->
-                      <!--<li><a href="#">Separated link</a></li>-->
+                        <li><a href="{% url 'process_autocreate' uuid=sample.uuid %}">Run Process</a></li>
+                        <li class="divider"></li>
+                        <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">Add SEM Images</a></li>
+                        <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">Add AFM Scan</a></li>
+                        <!--<li><a href="#">Separated link</a></li>-->
                     </ul>
                 </div>
                 <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">Edit</a>
@@ -59,7 +60,13 @@
                             {% if not node.is_root_node %}
                                 <li>
                                     {{node.process.name}}
-                                    (<a href="{% url 'process_detail' uuid=node.process.uuid %}">{{node.process.uuid}}</a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %})
+                                    (<a href="{% url 'process_detail' uuid=node.process.uuid %}"
+                                        data-toggle="tooltip"
+                                        data-placement="left"
+                                        title="{{node.process.comment|safe|truncatewords:50}}">
+                                            {{node.process.uuid}}
+                                     </a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %}
+                                    )
                                     on {{node.process.created}}
                             {% endif %}
                             {% if not node.is_leaf_node %}
@@ -72,7 +79,16 @@
                                 </li>
                                 {% endif %}
                             {% else %}
-                                <button type="button" data-placement="left" title="<strong>Split this Sample</strong>" class="btn btn-xs btn-warning" href="#" data-toggle="popover" data-html="true" data-content="{% include 'core/sample_split.html' %}">Split</button>
+                                    <button type="button"
+                                            class="btn btn-xs btn-warning"
+                                            href="#"
+                                            title="<strong>Split this Sample</strong>"
+                                            data-placement="right"
+                                            data-toggle="popover"
+                                            data-html="true"
+                                            data-content="{% include 'core/sample_split.html' %}">
+                                        Split Piece {{node.piece}}
+                                    </button>
                                 </li>
                             {% endif %}
                     {% endrecursetree %}

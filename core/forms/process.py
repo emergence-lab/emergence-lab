@@ -5,7 +5,7 @@ import string
 
 from django import forms
 
-from core.models import DataFile
+from core.models import DataFile, Process
 
 
 class DropzoneForm(forms.ModelForm):
@@ -24,3 +24,10 @@ class AutoCreateForm(forms.ModelForm):
         super(AutoCreateForm, self).__init__(*args, **kwargs)
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
+
+
+class ProcessCreateForm(AutoCreateForm):
+
+    class Meta:
+        model = Process
+        fields = ('comment',)

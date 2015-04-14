@@ -17,4 +17,5 @@ from .utility import ChecklistForm
 from .process import (
     AutoCreateForm,
     DropzoneForm,
+    ProcessCreateForm,
 )

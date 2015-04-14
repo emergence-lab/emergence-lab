@@ -48,10 +48,10 @@
                         <h4>
                             <a href="{% url 'sample_detail' uuid=sample.uuid %}">
                                 {{sample.uuid}}
-                                {% if sample.pieces|length > 1 %}
-                                 &emsp; <span class="badge" data-toggle="tooltip" title="Pieces">{{sample.pieces|length}}</span>
-                                {% endif %}
                             </a>
+                            {% if sample.pieces|length > 1 %}
+                             &emsp; <span class="badge" data-toggle="tooltip" title="Pieces">{{sample.pieces|length}}</span>
+                            {% endif %}
                         </h4>
 
                         <p></p>

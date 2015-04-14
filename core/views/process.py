@@ -12,7 +12,7 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 
 from core.models import Process, Sample, DataFile
-from core.forms import DropzoneForm
+from core.forms import DropzoneForm, ProcessCreateForm
 from core.polymorphic import get_subclasses
 
 
@@ -101,10 +101,6 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
         return reverse('process_detail', args=(self.object.uuid,))
 
 
-class RunProcessView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'core/process_run.html'
-
-
 class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
 
     def get_form(self, form_class):
@@ -118,6 +114,15 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
         for piece in pieces:
             sample.run_process(self.object, piece=piece)
         return HttpResponseRedirect(self.get_success_url())
+
+
+class RunProcessView(CreateUploadProcessView):
+    model = Process
+    template_name = 'core/process_create.html'
+    form_class = ProcessCreateForm
+
+    def get_success_url(self):
+        return reverse('process_detail', args=(self.object.uuid,))
 
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):

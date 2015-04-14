@@ -151,7 +151,7 @@ class AutocreateAFMView(CreateUploadProcessView):
     View for creation of new afm data.
     """
     model = AFMScan
-    template_name = 'afm/afm_create.html'
+    template_name = 'core/process_create.html'
     form_class = AutoCreateAFMForm
 
     def get_success_url(self):
