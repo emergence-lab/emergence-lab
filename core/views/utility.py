@@ -139,16 +139,22 @@ class AboutView(generic.TemplateView):
         try:
             branch = subprocess.check_output(
                 ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                cwd=settings.BASE_DIR)
-            tag, ahead, commit = subprocess.check_output(
-                ['git', 'describe', '--tag'],
-                cwd=settings.BASE_DIR).split('-')
-        except subprocess.CalledProcessException as e:
+                cwd=settings.BASE_DIR).strip()
+            commit = subprocess.check_output(
+                ['git', 'rev-parse', 'HEAD'],
+                cwd=settings.BASE_DIR).strip()
+            tag = subprocess.check_output(
+                ['git', 'describe', '--tags'],
+                cwd=settings.BASE_DIR).strip()
+            ahead = len(subprocess.check_output(
+                ['git', 'rev-list', '0.10.0..{}'.format(branch)]))
+        except subprocess.CalledProcessError as e:
+            raise e
             context['error'] = '{0}: {1}'.format(e.returncode,
                                                  e.output)
             return context
         context['tag'] = tag
         context['commits_ahead'] = ahead
-        context['commit'] = commit[1:]
+        context['commit'] = commit[:7]
         context['branch'] = branch
         return context
