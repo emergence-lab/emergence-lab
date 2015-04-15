@@ -1,0 +1,9 @@
+-r base.txt
+
+coverage
+selenium
+pep8
+flake8
+pep8-naming
+tox
+model_mommy==1.2.2

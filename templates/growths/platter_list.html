@@ -1,0 +1,72 @@
+{% extends "core/base.html" %}
+
+{% block title %}Platters{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Platters</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Current Platters
+            <a class="btn btn-primary pull-right" href="{% url 'platter_create' %}">
+                <span class="glyphicon glyphicon-plus"></span>
+                Add Platter
+            </a>
+        </h1>
+    </header>
+
+    <section>
+        <ul class="list-group">
+            {% for platter in active_list %}
+                <li class="list-group-item">
+                    <div class="clearfix">
+                        {{platter.name}} ({{platter.serial}}) - Started on {{platter.start_date}}
+                        <div class="pull-right">
+                            <a href="{% url 'platter_deactivate' id=platter.id %}" class="btn btn-warning btn-sm">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                                Retire
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if inactive_list %}
+        <header>
+            <h1 class="page-header">
+                Inactive Platters
+            </h1>
+        </header>
+
+        <section>
+            <ul class="list-group">
+                {% for platter in inactive_list %}
+                    <li class="list-group-item">
+                        <div class="clearfix">
+                            {{platter.name}} ({{platter.serial}}) - Retired on {{platter.status_changed.date}}
+                            <div class="pull-right">
+                                <a href="{% url 'platter_activate' id=platter.id %}" class="btn btn-warning btn-sm">
+                                    <span class="glyphicon glyphicon-log-in"></span>
+                                    Unretire
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+</main>
+
+{% endblock content %}

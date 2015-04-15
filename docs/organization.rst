@@ -40,7 +40,6 @@ Core
         * project
         * investigation
         * collaborator
-        * serial_number
         * journal
 
 

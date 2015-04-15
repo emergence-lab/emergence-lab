@@ -14,9 +14,10 @@ Contents:
    deployment
    migrations
    design
-   modules
+   process
+   rest_helpers
    organization
-
+   core
 
 Indices and tables
 ==================
@@ -24,4 +25,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

@@ -8,8 +8,8 @@
 <div class="container">
     <ol class="breadcrumb">
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'growth_detail' growth %}">{{growth}}</a></li>
-        <li><a href="{% url 'readings_detail' growth %}">Readings</a></li>
+        <li><a href="{% url 'process_detail' growth.uuid %}">{{growth}}</a></li>
+        <li><a href="{% url 'd180_readings_detail' growth.uuid %}">Readings</a></li>
         <li class="active">Update</li>
     </ol>
 
@@ -27,9 +27,8 @@
 <button class="btn btn-warning pull-right" id="update_readings" type="submit" name="updatereadingsform">Update Readings</button>
 </form>
 
-<a class="btn btn-default" href="{% url 'home' %}">home</a>
+<a class="btn btn-default" href="{% url 'd180_readings_detail' growth.uuid %}">Back</a>
 
 </div>
 <p> </p>
 {% endblock %}
-

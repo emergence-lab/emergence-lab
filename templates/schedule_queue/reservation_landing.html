@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="col-md-6 col-md-offset-3">
+  <h2 class="text-center">Reservations</h2>
+</div>
+
+
+
+<br></br>
+
+
+<div class="col-md-6 col-md-offset-3 text-center">
+  <table class="table">
+    <tr>
+      <td><strong>Tool Name</strong></td>
+      <td><strong>TEST</strong></td>
+      <td><strong>Actions</strong></td>
+    </tr>
+    {% for item in object_list %}
+      <tr>
+        <td>{{ item.upper }}</td>
+        <td>BLANK</td>
+        <td>
+            <a class="glyphicon glyphicon-plus" href="{% url 'reservation_create' %}"></a>
+
+            <a class="glyphicon glyphicon-th-list" href="{% url 'reservation_list_by_tool' item %}"></a>
+        </td>
+      </tr>
+    {% endfor %}
+    <tr>
+        <td></td><td></td><td><a class="glyphicon glyphicon-plus" href="#" data-toggle="tooltip" title="Create Template"></a></td>
+    </tr>
+  </table>
+</div>
+{% endblock %}

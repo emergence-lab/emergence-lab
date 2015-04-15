@@ -4,13 +4,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
     {% load staticfiles %}
+
     <link href="{% static 'core/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'core/css/wbg.css' %}" rel="stylesheet">
     <script src="{% static 'core/js/jquery-2.1.0.min.js' %}"></script>
     <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
-
     {% block header %}
     {% endblock %}
 
@@ -28,11 +27,6 @@
     <nav class="navbar navbar-default" role="navigation">
         <section class="container-fluid">
             <header class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#wbg-navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
                 <a href="{% url 'home' %}" class="logo navbar-left">
                     <img src="{% static 'core/img/logo.png' %}" alt="WBG">
                 </a>
@@ -40,14 +34,64 @@
 
             <div id="wbg-navbar-collapse" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            Navigation <span class="caret"></span>
+                    {% if not user.is_anonymous %}
+                    <li>
+                        <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="{% url 'users_profile' user.username %}">&nbsp&nbsp{{ user.full_name }}</a>
+                    </li>
+                    <li id="create-button" class="dropdown navbar-button">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="New">
+                            <span class="glyphicon glyphicon-plus"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="{% url 'home' %}">
-                                <span class="glyphicon glyphicon-home"></span>
-                                Home
+                            <li><a href="{% url 'create_growth_d180_start' %}">
+                                Growth
+                            </a></li>
+                            <li><a href="{% url 'reservation_create' %}">
+                                Tool Reservation
+                            </a></li>
+                            <li><a data-toggle="modal" data-target="#exception-modal">
+                                Feedback
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="navbar-button"><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
+                    <li id="apps-dropdown" class="dropdown navbar-button">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Apps">
+                            <span class="glyphicon glyphicon-th"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li class="dropdown-header"><a href="#">
+                                Apps
+                            </a></li>
+                            <li><a href="{% url 'sample_search' %}">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Search
+                            </a></li>
+                            <li><a href="{% url 'process_list' slug='all' username='all' %}">
+                                <span class="glyphicon glyphicon-compressed"></span>
+                                Processes
+                            </a></li>
+                            <li><a href="{% url 'sample_list' %}">
+                                <span class="glyphicon glyphicon-leaf"></span>
+                                Samples
+                            </a></li>
+                            <li><a href="{% url 'simulation_admin' %}">
+                                <span class="glyphicon glyphicon-cloud"></span>
+                                Simulations
+                            </a></li>
+                            <li><a href="{% url 'reservation_landing' %}">
+                                <span class="glyphicon glyphicon-bookmark"></span>
+                                Tool Reservations
+                            </a></li>
+                            {% if user.is_staff %}
+                            <li><a href="{% url 'admin:index' %}">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                Admin
+                            {% endif %}
+                            </a></li>
+                            <li class="divider"></li>
+                            <li class="dropdown-header"><a href="#">
+                                Additional Services
                             </a></li>
                             <li><a href="***REMOVED***">
                                 <span class="glyphicon glyphicon-cloud-download"></span>
@@ -63,59 +107,49 @@
                             </a></li>
                         </ul>
                     </li>
-                    {% if not user.is_anonymous %}
-                    <li>
-                        <a class="navbar-link" href="{% url 'dashboard' %}"><span class="glyphicon glyphicon-th-list"></span> Dashboard</a>
+                    <li class="navbar-button"><a class="navbar-link navbar-right"
+                           id="notifications"
+                           data-toggle="popover"
+                           rel="tooltip"
+                           title="Notifications"
+                           data-html="true"
+                           data-container="body"
+                           data-content="{% include 'core/notifications.html' %}"
+                           data-placement="bottom"><span class="glyphicon glyphicon-bell"></span></a></li>
+                    <li class="navbar-button">
+                        <a class="navbar-link" id="search-button" rel="tooltip" data-placement="bottom" title="Search" href="#">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </a>
                     </li>
-                    {% if user.is_staff %}
-                        <li>
-                            <a href="{% url 'admin:index' %}">
-                                <span class="glyphicon glyphicon-cog"></span>
-                                Admin
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li><button class="btn btn-default navbar-btn" data-toggle="modal" data-target="#exception-modal">Report Issue</button></li>
+                    <li class="navbar-search hidden">
+                        <a class="navbar-link" id="search-close" rel="tooltip" data-placement="bottom" title="Close" href="#">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    </li>
+
+                    <form class="navbar-form navbar-right navbar-search hidden" role="search" action="{% url 'quicksearch' %}">
+                        <div id="search-form " class="input-group">
+                            <div class="form-group pull-right">
+                                <input id="search-entry" type="text" name="search_query" class="form-control" placeholder="Growth Number" autofocus="autofocus">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+
+                        </div>
+                    </form>
                     {% endif %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                {% if user.is_anonymous %}
-                    <li><a class="navbar-right navbar-link" href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                {% else %}
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{user.operator.name}} <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{% url 'dashboard' %}">
-                                <span class="glyphicon glyphicon-th-list"></span>
-                                Dashboard
-                            </a></li>
-                            {% if user.is_staff %}
-                                <li><a href="{% url 'admin:index' %}">
-                                    <span class="glyphicon glyphicon-cog"></span>
-                                    Administration
-                                </a></li>
-                            {% endif %}
-                            <li><a class="navbar-link" href="{% url 'logout' %}">
-                                <span class="glyphicon glyphicon-log-out"></span>
-                                Logout
-                            </a></li>
-                        </ul>
-                    </li>
-                {% endif %}
+                    {% if not user.is_anonymous %}
+                        <li><a class="navbar-link navbar-right" data-toggle="modal" data-target="#logout-modal" rel="tooltip" title="Logout" data-placement="bottom"><span class="glyphicon glyphicon-log-out"></span></a></li>
+                    {% else %}
+                        <li><a class="navbar-right navbar-link" href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                    {% endif %}
+
                 </ul>
-                <form class="navbar-form navbar-right" role="search" action="{% url 'quicksearch' %}">
-                    <div class="input-group">
-                        <div class="form-group">
-                            <input type="text" name="growth" class="form-control" placeholder="Growth Number">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default">
-                                    <span class="glyphicon glyphicon-search"></span>
-                                </button>
-                            </span>
-                        </div>
-                   
-                    </div>
-                </form>
             </div>
         </section>
     </nav>
@@ -168,6 +202,26 @@
     </section>
     {% endif %}
 
+    {% if not user.is_anonymous %}
+    <section id="logout-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <button class="close" type="button" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">Are you sure you want to log out?</h3>
+                </header>
+                <div class="modal-body">
+                    Confirm logout.
+                </div>
+                <footer class="modal-footer">
+                    <button class="btn btn-default" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
+                </footer>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <script type="text/javascript">
         function exception_handler() {
             allvals = []
@@ -199,7 +253,10 @@
 
         $('#ajax-submit').click(exception_handler);
     </script>
-
+    <script src="{% static 'core/js/popover.js' %}"></script>
+    <script src="{% static 'core/js/tooltip.js' %}"></script>
+    <script src="{% static 'core/js/tooltip_rel.js' %}"></script>
+    <script src="{% static 'core/js/nav_search_helper.js' %}"></script>
     {% block scripts %}
     {% endblock %}
 

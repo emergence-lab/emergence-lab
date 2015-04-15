@@ -1,24 +1,25 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from rest_framework import generics, permissions
 
-from .filters import AFMFilter
-from .models import afm
+from .models import AFMScan
 from .serializers import AFMSerializer
 
 
-class AFMListAPI(generics.ListCreateAPIView):
+class AFMListCreateAPIView(generics.ListCreateAPIView):
     """
     List all afm scans or create a new one via api.
     """
-    queryset = afm.objects.all()
+    queryset = AFMScan.objects.all()
     serializer_class = AFMSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-    filter_class = AFMFilter
+    permission_classes = (permissions.IsAuthenticated,)
 
 
-class AFMDetailAPI(generics.RetrieveUpdateAPIView):
+class AFMRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     """
     Show details or update an afm scan.
     """
-    queryset = afm.objects.all()
+    queryset = AFMScan.objects.all()
     serializer_class = AFMSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)

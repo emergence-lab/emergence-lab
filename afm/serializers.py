@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django import forms
+
 from rest_framework import serializers
 
-from .models import afm
-import growths.models
+from core.serializers import DataFileSerializer
+
+from .models import AFMScan
 
 
 class FilePathField(serializers.FileField):
@@ -23,39 +28,8 @@ class AFMSerializer(serializers.ModelSerializer):
     Serializes the afm model.
 
     """
-    growth = serializers.CharField(max_length=50)
-    sample = serializers.CharField(max_length=50)
-    height = FilePathField(max_length=150)
-    amplitude = FilePathField(max_length=150)
-
-    def transform_growth(self, obj, value):
-        return value
-
-    def validate_growth(self, attrs, source):
-        try:
-            growth = growths.models.growth.get_growth(attrs[source])
-        except Exception as e:
-            raise serializers.ValidationError(str(e))
-
-        attrs[source] = growth
-        return attrs
-
-    def transform_sample(self, obj, value):
-        return value
-
-    def validate_sample(self, attrs, source):
-        growth_object = None
-        if type(attrs['growth']) is not str:
-            growth_object = attrs['growth']
-        try:
-            sample = growths.models.sample.get_sample(attrs[source], growth_object)
-        except Exception as e:
-            raise serializers.ValidationError(str(e))
-
-        attrs[source] = sample
-        return attrs
+    datafiles = DataFileSerializer(many=True, read_only=True)
 
     class Meta:
-        model = afm
-        fields = ('id', 'growth', 'sample', 'scan_number', 'rms', 'zrange',
-                  'location', 'size', 'height', 'amplitude')
+        model = AFMScan
+        fields = ('uuid', 'created', 'modified', 'datafiles',)

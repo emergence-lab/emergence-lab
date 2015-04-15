@@ -1,0 +1,39 @@
+<div>
+    <h3 class="page-header">
+        <div class="clearfix">
+            Data Files
+            <div class="pull-right">
+                <a class="btn btn-primary" href="{% url 'file_upload' uuid=process.uuid %}">
+                    <span class="glyphicon glyphicon-upload"></span>
+                    Upload File
+                </a>
+            </div>
+        </div>
+    </h3>
+
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Created</th>
+                <th>Modified</th>
+                <th>File Type</th>
+                <th>Data State</th>
+                <th>File</th>
+            </tr>
+        </thead>
+        {% for file in object_list %}
+            <tr>
+                <th>{{file.id}}</th>
+                <td>{{file.created}}</td>
+                <td>{{file.modified}}</td>
+                <td>{{file.get_content_type_display}}</td>
+                <td>{{file.get_state_display}}</td>
+                <td><a href="{{MEDIA_URL}}{{file.data}}">
+                    <span class="glyphicon glyphicon-file"></span>
+                </a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+

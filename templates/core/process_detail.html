@@ -1,0 +1,93 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}{{process.uuid}}{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list' slug='all' username='all' %}">Processes</a></li>
+            <li class='active'>{{process.uuid}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            {{process}}
+            {% if process.legacy_identifier %}
+                ({{process.legacy_identifier}})
+            {% endif %}
+            <div class="pull-right">
+                <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
+                    {% bootstrap_icon 'edit' %}
+                    Edit
+                </a>
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <h3 class="page-header">
+            {{process.name}} Details
+            {% if readings %}
+                <a class="pull-right btn btn-info" href="{% url 'd180_readings_detail' process %}">Readings</a>
+            {% endif %}
+        </h3>
+        <p>UUID: {{process.uuid}} ({{process.uuid_full}})</p>
+        {% if process.legacy_identifier %}
+            <p>Legacy ID: {{process.legacy_identifier}}</p>
+        {% endif %}
+        <p>User: {{process.user.get_full_name}}</p>
+        <p>Created: {{process.created}}</p>
+        <p>Modified: {{process.modified}}</p>
+        <p>Comment: {{process.comment|safe}}</p>
+        {% if not samples %}
+            <div class="alert alert-warning">
+                <h3>This process doesn't have any associated samples</h3>
+                <p>Get started by running this process on an existing or new sample(s).</p>
+                <div class="top-spacer-sm">
+                    <a href="#" class="btn btn-primary right-spacer-xs">
+                        {% bootstrap_icon 'plus' %}
+                        Run Process
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <p>
+                Samples:
+                <ul>
+                    {% for sample in samples %}
+                        <li>
+                            <a href="{% url 'sample_detail' uuid=sample.uuid %}">
+                                {{sample.uuid}}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </p>
+        {% endif %}
+
+        {% if not datafiles %}
+            <div class="alert alert-info">
+                <h3>This process doesn't have any associated data files</h3>
+                <p>Get started by uploading a file.</p>
+                <div class="top-spacer-sm">
+                    <a href="{% url 'file_upload' uuid=process.uuid %}" class="btn btn-primary right-spacer-xs">
+                        {% bootstrap_icon 'upload' %}
+                        Upload File
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            {% for filetype, filelist in datafiles.items %}
+                {% include filetype.partial_template with object_list=filelist process=process %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</main>
+
+{% endblock content %}

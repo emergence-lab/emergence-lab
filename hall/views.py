@@ -1,15 +1,23 @@
-from django.shortcuts import render_to_response
-from django.http import HttpResponse
-from django.views.generic import View, CreateView, ListView, DetailView
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
-from .models import hall
+from django.views import generic
+
+from .models import Hall, HallData
 
 
-class hall_list(ListView):
-    model = hall
+class HallListView(generic.ListView):
+    model = Hall
     template_name = 'hall/hall_list.html'
 
 
-class hall_detail(DetailView):
-    model = hall
+class HallDetailView(generic.DetailView):
+    model = Hall
     template_name = 'hall/hall_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HallDetailView, self).get_context_data(**kwargs)
+        process = Hall.objects.get(id=self.kwargs['pk'])
+        context['process_id'] = process.id
+        context['dataset'] = process.datafiles.get_queryset().instance_of(HallData)
+        return context

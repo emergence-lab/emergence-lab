@@ -1,0 +1,95 @@
+{% extends "core/base.html" %}
+
+{% block title %}Samples{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Samples</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Samples
+            <div class="pull-right">
+                <a class="btn btn-info" href="{% url 'sample_search' %}">
+                    <span class="glyphicon glyphicon-search"></span>
+                    Search Samples
+                </a>
+                <a class="btn btn-primary" href="{% url 'sample_create' %}">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Create Sample
+                </a>
+            </div>
+        </h1>
+    </header>
+
+    <section>
+        <ul class="list-group">
+            {% for sample in object_list %}
+                <li class="list-group-item">
+                    <div class="clearfix">
+                        <div class="pull-right">
+                                <span class="glyphicon glyphicon-time"></span>
+                                <small><strong>Created: </strong>{{sample.created.date|date:"SHORT_DATE_FORMAT"}}</small> &emsp;
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                        Add Process
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="{% url 'process_autocreate' uuid=sample.uuid %}">Run Process</a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">Add SEM Images</a></li>
+                                        <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">Add AFM Scan</a></li>
+                                    </ul>
+                                </div>
+                        </div>
+                        <h4>
+                            <a href="{% url 'sample_detail' uuid=sample.uuid %}">
+                                {{sample.uuid}}
+                            </a>
+                            {% if sample.pieces|length > 1 %}
+                             &emsp; <span class="badge">{{sample.pieces|length}} Pieces</span>
+                            {% endif %}
+                        </h4>
+
+                        <p></p>
+                        {% for i in sample.nodes %}
+                            {% if not i.is_root_node %}
+                            {% if not i.process.slug == 'split-process' %}
+                            <span class="label label-default" href="{% url 'process_detail' uuid=i.process.uuid %}" data-toggle="tooltip" data-html="true" title="{{i.process.created|date:"SHORT_DATE_FORMAT"}}<p>{{i.process.comment|safe|truncatewords:50}}</p>">{{i.process.name}}</span>
+                            {%endif%}
+                            {%endif%}
+                        {% endfor %}
+                        <p>{{sample.comment|safe|truncatewords:50}}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if is_paginated %}
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
+        {% endif %}
+        {% for page in paginator.page_range %}
+            <li {% if page_obj.number == forloop.counter %}class="active"{% endif %}><a href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}">{% if not page_obj.has_next %}<span aria-hidden="true">{% endif %}Next &raquo;</span><span class="sr-only">Next</span></a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+</main>
+
+{% endblock content %}

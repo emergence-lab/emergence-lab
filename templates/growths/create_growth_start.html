@@ -2,81 +2,249 @@
 {% load bootstrap3 %}
 {% load wysiwyg %}
 
-{% block title %}Start Growth{%endblock%}
+{% block title %}Start Growth{% endblock title %}
+
 {% block header %}
     {% load staticfiles %}
-    {{commentsform.media}}
-{% endblock %}
+    <script src="{% static 'growths/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'growths/js/rangy-core.js' %}"></script>
+    <script src="{% static 'growths/js/hallo.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'growths/css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/font-awesome.css' %}">
+{% endblock header %}
+
 
 {% block content %}
 
 <div class="container">
+
     <div class="row">
         <div class="col-xs-6 col-xs-offset-3">
             <img class="img-wizard" src="{% static 'growths/img/start-progress.png' %}" />
         </div>
     </div>
+
     <h1 class="page-header">
         Start Growth
         <div class="pull-right">
-            <a href="{% url 'dashboard' %}" class="btn btn-danger">Cancel Growth</a>
-            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#commentsmodal">Edit Comments</button>
+            <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
+                {% bootstrap_icon 'remove' %}
+                Cancel
+            </button>
+            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
+                {% bootstrap_icon 'pencil' %}
+                Comments
+            </button>
+            <button class="btn btn-success next-tab-main" type="button">
+                Next Step
+                {% bootstrap_icon 'chevron-right' %}
+            </button>
         </div>
     </h1>
 
-    <form action="" method="POST">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-xs-5">
-        <ul>
-        {% bootstrap_form cgsform %}
+    {# Main Tabs #}
+    <div class="tabbable">
+        <ul class="nav nav-tabs" id="main-tab-list">
+            <li class="active"><a role="tab" data-toggle="tab" href="#info">Basic Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#growth">Growth Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#samples">Sample Info</a></li>
+            <li><a role="tab" data-toggle="tab" href="#checklist">Checklist</a></li>
+            <li><a role="tab" data-toggle="tab" href="#source">Source Info</a></li>
         </ul>
-        </div>
-    </div>       
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
+    </div>
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{sample_formset.management_form}}
+
+
+        <div class="tab-content">
+
+            {# Basic Information Tab #}
+            <div class="tab-pane fade active in" id='info'>
+                <h2>Basic Information</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form info_form %}
+                    </div>
                 </div>
-                <div class="modal-body">
-                    WARNING: If you start a new growth now you will NOT be able to return to this page!!
+            </div>
+
+
+            {# Growth Information Tab #}
+            <div class="tab-pane fade" id="growth">
+                <h2>Growth Information</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form growth_form %}
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+            </div>
+
+            {# Sample Information Tab #}
+            <div class="tab-pane fade" id="samples">
+                <h2>Sample Information</h2>
+                <div class="tabbable" id="sample-tab-list">
+                    <ul class="nav nav-tabs">
+                        <li class="empty-form">
+                            <a href="#{{sample_formset.empty_form.prefix}}" data-toggle="tab">
+                                New Tab
+                            </a>
+                        </li>
+
+
+                        {% for sample_form in sample_formset %}
+                            <li{% if forloop.first %} class="active"{% endif %}>
+                                <a href="#{{sample_form.prefix}}" data-toggle="tab" id="first-sample">
+                                    Sample {{forloop.counter}}
+                                </a>
+                            </li>
+                        {% endfor %}
+
+                        <li><a class="new-tab" data-action="add-form">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a></li>
+                    </ul>
+
+                    {# Sample Tabs #}
+                    <div class="tab-content">
+                        <div class="tab-pane fade in empty-form" id="{{sample_formset.empty_form.prefix}}">
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    {% bootstrap_form sample_formset.empty_form %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% for sample_form in sample_formset %}
+                            <div class="tab-pane fade in{% if forloop.first %} active{% endif %}" id="{{sample_form.prefix}}">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        {% bootstrap_form sample_form %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+
+            {# Checklist Tab #}
+            <div class="tab-pane fade" id="checklist">
+                <h2>Pre-run Checklist</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form checklist_form %}
+                    </div>
+                </div>
+            </div>
+
+
+            {# Source Consumption Tab #}
+            <div class="tab-pane fade" id="source">
+                <h2>Source Consumption</h2>
+                <div class="row">
+                    <div class="col-xs-5">
+                        {% bootstrap_form source_form %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="commentsmodal" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="commentsModalLabel">Edit comments</h4>
-                </div>
-                <div class="modal-body">
-                    {% bootstrap_form commentsform %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+
+
+        {# Comment Modal #}
+        <div class="modal fade" id="comment-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title">Edit Comments</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% bootstrap_form comment_form %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-        
+
+        {# Cancel Modal #}
+        <div class="modal fade" id="cancel-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <header class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h1 class="modal-title">Cancel Growth</h1>
+                    </header>
+                    <div class="modal-body">
+                        <strong>Warning:</strong> This will cancel the current growth. You should do this if you needed to abort the growth prior to any readings being taken.
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-danger">Cancel Growth</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {# Submit Modal #}
+        <div class="modal fade" id="submit-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <strong>WARNING:</strong> If you start a new growth now you will NOT be able to return to this page!!
+                        {% if reservation and reservation.user == user %}
+                            <h6>&nbsp;</h6>
+                            <div>
+                                <strong>This will close the following reservation:</strong><br>
+                                {% bootstrap_form reservation_form %}
+                            </div>
+                            <p>
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <strong>Tool:</strong> {{ reservation.tool.upper }} <br>
+                                        <strong>Operator:</strong> {{ reservation.user.full_name }} <br>
+                                        <strong>Run Time:</strong> {{ reservation.growth_length_in_hours }} hours
+                                        {% if reservation.comment %}
+                                            <br><strong>Comment:</strong> {{ reservation.comment }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </form>
 
-    <button class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal">
-    Start New Growth
-    </button>
-    <a class="btn btn-default" href="{% url 'home' %}">Back</a>
-
 </div>
-<br>
-{% endblock %}
 
+{% endblock content %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'growths/js/django-formset.js' %}"></script>
+    <script type="text/javascript" src="{% static 'growths/js/growth_wizard.js' %}"></script>
+    <script type="text/javascript" src="{% static 'growths/js/create_growth.js' %}"></script>
+{% endblock scripts %}

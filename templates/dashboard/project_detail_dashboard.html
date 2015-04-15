@@ -1,26 +1,52 @@
 {% extends "dashboard/dashboard.html" %}
 
-{% block dashboard_breadcrumb %}
-    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    <li class='active'>{{project}}</li>
-{% endblock dashboard_breadcrumb %}
 
 {% block dashboard_content %}
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#home" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-        <li><a href="#feed" data-toggle="tab"><span class="glyphicon glyphicon-list"></span> Feed</a></li>
-        <li><a href="#growths" data-toggle="tab"><span class="glyphicon glyphicon-file"></span> Growths</a></li>
-        <li><a href="#characterization" data-toggle="tab"><span class="glyphicon glyphicon-signal"></span> Characterization</a></li>
-    </ul>
 
-    <div class="row tab-content">
+    <nav class="top-spacer-sm">
+        <ol class="breadcrumb">
+
+        {% block dashboard_breadcrumb %}
+            <li><a href="{% url 'dashboard' %}#projects">Projects</a></li>
+            <li class='active'>{{project}}</li>
+        {% endblock dashboard_breadcrumb %}
+
+            <li class="dropdown pull-right">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Options">
+                    <span class="glyphicon glyphicon-wrench"></span>
+                </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{% url 'project_list' %}">
+                            Projects
+                        </a></li>
+                        <li><a href="{% url 'platter_list' %}">
+                            Platters
+                        </a></li>
+                        <li><a href="{% url 'operator_list' %}">
+                            Operators
+                        </a></li>
+                    </ul>
+
+        </ol>
+    </nav>
+
+    <div class="col-md-2 top-spacer-sm">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#home" data-toggle="tab"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+            <li><a href="#investigations" data-toggle="tab"><span class="glyphicon glyphicon-th-list"></span> Investigations</a></li>
+            <li><a href="#feed" data-toggle="tab"><span class="glyphicon glyphicon-list"></span> Feed</a></li>
+            <li><a href="#growths" data-toggle="tab"><span class="glyphicon glyphicon-file"></span> Growths</a></li>
+            <li><a href="#characterization" data-toggle="tab"><span class="glyphicon glyphicon-signal"></span> Characterization</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10 tab-content">
         <div class="tab-pane fade in active" id="home">
             <header>
                 <div class="pull-right">
                     <a href="{% url 'project_untrack' slug=project.slug %}" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Stop Tracking Project">
                         <span class="glyphicon glyphicon-remove"></span>
                     </a>
-                    {% if project.active %}
+                    {% if project.is_active %}
                         <a href="{% url 'project_deactivate' slug=project.slug %}" class="btn btn-warning btn-sm">
                             <span class="glyphicon glyphicon-log-out"></span>
                             Make Inactive
@@ -40,7 +66,7 @@
                     {{project}}
                     <small>
                         <span class="glyphicon glyphicon-time left-spacer-sm"></span>
-                        created on {{project.start_date.date}}
+                        created on {{project.created.date}}
                     </small>
                 </h1>
             </header>
@@ -63,6 +89,18 @@
                     {% endif %}
                 </div>
             </article>
+        </div>
+        <div class="tab-pane fade" id="investigations">
+            <header>
+                <h1 class="page-header">Investigations</h1>
+            </header>
+            <ul class="list-group">
+                {% for i in project.investigation_set.all %}
+                    <li class="list-group-item">
+                        <a href="{% url 'investigation_detail_dashboard' project=project.slug slug=i.slug %}">{{i}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
         <div class="tab-pane fade" id="feed">
             <header>

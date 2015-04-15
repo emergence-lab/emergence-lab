@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block title %}Upload Files{% endblock %}
+
+{% block header %}
+    <link href="{% static 'core/css/dropzone.css' %}" rel="stylesheet">
+{% endblock header %}
+
+{% block content %}
+
+<div class="container">
+
+    <header>
+        <h1 class="page-header">
+            Upload files for {{process.name}} {{process}}
+            <div class="pull-right">
+                <a class="btn btn-default" href="{% url 'process_detail' uuid=process %}">
+                    {% bootstrap_icon 'arrow-left' %}
+                    Back
+                </a>
+            </div>
+        </h1>
+    </header>
+
+    <form class="dropzone" action="{{request.get_full_path}}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="fallback">
+            <input name="file" type="file" multiple />
+            <button type="submit"></button>
+        </div>
+    </form>
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'core/js/dropzone.js' %}"></script>
+{% endblock scripts %}

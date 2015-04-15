@@ -24,7 +24,7 @@
         <div class="tab-pane fade in active" id="home">
             <header>
                 <div class="pull-right">
-                    {% if investigation.active %}
+                    {% if investigation.is_active %}
                         <a href="{% url 'investigation_deactivate' project=investigation.project.slug slug=investigation.slug %}" class="btn btn-warning btn-sm">
                             <span class="glyphicon glyphicon-log-out"></span>
                             Make Inactive
@@ -44,7 +44,7 @@
                     {{investigation}}
                     <small>
                         <span class="glyphicon glyphicon-time left-spacer-sm"></span>
-                        created on {{investigation.start_date.date}}
+                        created on {{investigation.created.date}}
                     </small>
                 </h1>
             </header>

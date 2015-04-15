@@ -1,27 +1,20 @@
-from django.contrib.contenttypes.models import ContentType
-
-from actstream.models import actor_stream, target_stream
-
-from .models import operator, project, investigation
-
-
-_operator_contentid = ContentType.objects.get(name='operator').id
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 
 def project_stream(project):
     """
     Filters the activity stream to return any item for the specified project.
     """
-    return target_stream(project)
+    return []
 
 
-def operator_project_stream(operator, project):
+def user_project_stream(user, project):
     """
-    Filters the activity stream to return items the operator has done
+    Filters the activity stream to return items the user has done
     for the specified project.
     """
-    return project_stream(project).filter(actor_content_type_id=_operator_contentid,
-                                          actor_object_id=operator.id)
+    return []
 
 
 def investigation_stream(investigation):
@@ -29,20 +22,12 @@ def investigation_stream(investigation):
     Filters the activity stream to return any item for the specified
     investigation.
     """
-    project = investigation.project
-    stream = project_stream(project)
-    return [item for item in stream
-            if item.data is not None
-            and item.data.get('investigation', 0) == investigation.id]
+    return []
 
 
-def operator_investigation_stream(operator, investigation):
+def user_investigation_stream(user, investigation):
     """
-    Filters the activity stream to return items the operator has done
+    Filters the activity stream to return items the user has done
     for the specified investigation.
     """
-    project = investigation.project
-    stream = operator_project_stream(operator, project)
-    return [item for item in stream
-            if item.data is not None
-            and item.data.get('investigation', 0) == investigation.id]
+    []

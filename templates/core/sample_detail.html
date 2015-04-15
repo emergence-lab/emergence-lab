@@ -1,0 +1,105 @@
+{% extends "core/base.html" %}
+
+{% load mptt_tags %}
+
+{% block title %}{{sample.uuid}}{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'sample_list' %}">Samples</a></li>
+            <li class='active'>{{sample.uuid}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            {{sample}}
+            <div class="pull-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Add Process
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="{% url 'process_autocreate' uuid=sample.uuid %}">Run Process</a></li>
+                        <li class="divider"></li>
+                        <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">Add SEM Images</a></li>
+                        <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">Add AFM Scan</a></li>
+                        <!--<li><a href="#">Separated link</a></li>-->
+                    </ul>
+                </div>
+                <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">Edit</a>
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <h3 class="page-header">Sample Details</h3>
+        <p>UUID: {{sample.uuid}}</p>
+        <p>Created: {{sample.created}}</p>
+        <p>Modified: {{sample.modified}}</p>
+        <p>Comment: {{sample.comment|safe}}</p>
+        {% if sample.nodes.count <= 1 %}
+            <div class="alert alert-warning">
+                <h3>This sample hasn't had any processes run on it.</h3>
+                <p>Get started by running a new or existing process.</p>
+                <div class="top-spacer-sm">
+                    <a href="#" class="btn btn-primary right-spacer-xs">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Run Process
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <p>Processes:
+                <ul>
+                    {% recursetree sample.nodes %}
+                            {% if not node.is_root_node %}
+                                <li>
+                                    {{node.process.name}}
+                                    (<a href="{% url 'process_detail' uuid=node.process.uuid %}"
+                                        data-toggle="tooltip"
+                                        data-placement="left"
+                                        title="{{node.process.comment|safe|truncatewords:50}}">
+                                            {{node.process.uuid}}
+                                     </a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %}
+                                    )
+                                    by {{node.process.user.get_full_name}}
+                                    on {{node.process.created}}
+                            {% endif %}
+                            {% if not node.is_leaf_node %}
+                                {% if node.is_root_node %}
+                                    {{children}}
+                                {% else %}
+                                    <ul>
+                                        {{children}}
+                                    </ul>
+                                </li>
+                                {% endif %}
+                            {% else %}
+                                    <button type="button"
+                                            class="btn btn-xs btn-warning"
+                                            href="#"
+                                            title="<strong>Split this Sample</strong>"
+                                            data-placement="right"
+                                            data-toggle="popover"
+                                            data-html="true"
+                                            data-content="{% include 'core/sample_split.html' %}">
+                                        Split Piece {{node.piece}}
+                                    </button>
+                                </li>
+                            {% endif %}
+                    {% endrecursetree %}
+                </ul>
+            </p>
+        {% endif %}
+    </div>
+
+</main>
+
+{% endblock content %}

@@ -1,30 +1,26 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+
 from django.contrib import admin
 
 import core.models
 
 
 class InvestigationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'project', 'active', 'start_date')
-    list_filter = ('project', 'active')
+    list_display = ('name', 'slug', 'project', 'is_active', 'created')
+    list_filter = ('project', 'is_active')
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'active', 'start_date')
-    list_filter = ('active',)
+    list_display = ('name', 'slug', 'is_active', 'created')
+    list_filter = ('is_active',)
 
 
 class ProjectTrackingInline(admin.TabularInline):
-    model = core.models.project_tracking
+    model = core.models.ProjectTracking
     extra = 1
 
 
-class OperatorAdmin(admin.ModelAdmin):
-    inlines = (ProjectTrackingInline, )
-    fields = ('name', 'active', 'user')
-
-
-admin.site.register(core.models.operator, OperatorAdmin)
-admin.site.register(core.models.platter)
-admin.site.register(core.models.project, ProjectAdmin)
-admin.site.register(core.models.investigation, InvestigationAdmin)
-admin.site.register(core.models.project_tracking)
+admin.site.register(core.models.Project, ProjectAdmin)
+admin.site.register(core.models.Investigation, InvestigationAdmin)
+admin.site.register(core.models.ProjectTracking)

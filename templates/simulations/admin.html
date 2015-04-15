@@ -1,0 +1,64 @@
+{% extends "core/base.html" %}
+
+
+{% block content %}
+
+<h2 class="text-center">Simulation Management Console</h2>
+
+<div class="text-center">
+  <h3>Execution Nodes <a class="glyphicon glyphicon-refresh" href="{% url 'simulation_admin' %}"></a></h3>
+  <p></p>
+  <p></p>
+</div>
+</br>
+
+<div class="text-center">
+  <table class="table">
+    <tr>
+      <td><strong>Instance Name</strong></td>
+      <td><strong>IP Address</strong></td>
+      <td><strong>Type</strong></td>
+      <td><strong>State</strong></td>
+      <td><strong>Uptime</strong></td>
+      <td><strong>Actions</strong></td>
+    </tr>
+    {% for instance in instances %}
+      <tr>
+        <td>{{ instance.instance_name }}</td>
+        <td>{{ instance.instance_address }}</td>
+        <td>{{ instance.instance_type }}</td>
+        <td>
+        {% if instance.instance_state == 'stopped' %}
+        <a><span class="label label-danger">OFFLINE</span></a>
+        {% elif instance.instance_state == 'running' %}
+        <a><span class="label label-success">RUNNING</span></a>
+        {% elif instance.instance_state %}
+        <a><span class="label label-primary">CHANGING</span></a>
+        {% endif %}
+        </td>
+        <td>
+            {% if instance.instance_state == 'running' %}
+            {{ instance.instance_uptime }}</td>
+            {% endif %}
+        <td>
+        {% if instance.instance_type != 't2.micro' %}
+            {% if instance.instance_state == 'stopped' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'start_instance' instance.instance_name %}"></a>
+            {% elif instance.instance_state == 'running' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'stop_instance' instance.instance_name %}"></a>
+            {% endif %}
+        {% elif user.is_staff %}
+            {% if instance.instance_state == 'stopped' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'start_instance' instance.instance_name %}"></a>
+            {% elif instance.instance_state == 'running' %}
+            <a class="glyphicon glyphicon-off" href="{% url 'stop_instance' instance.instance_name %}"></a>
+            {% endif %}
+        {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+
+
+{% endblock %}

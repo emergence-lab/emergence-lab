@@ -1,8 +1,23 @@
+==========
 WGB Django
 ==========
 
+.. image:: ***REMOVED***gitlab-ci/projects/2/status.png?ref=rewrite
+    :target: ***REMOVED***gitlab-ci/projects/2/
+    :alt: build status
+
 Web-based application written in Django with the following goals:
-    1. Improve tracking of experimental data, both growths and the associated characterization data
-    2. Allow data-driven experimentation by allowing programmable access to data
-    3. Enable the use of machine learning to help guide experiments
-    4. Have a clean, consistent user interface based on our specific needs
+
+    #) Improve tracking of experimental samples and data, both process and characteriztion data
+    #) Allow data-driven experimentation by allowing programmable access to data via an embedded iPython notebook
+    #) Have a clean, consistent user interface to encourage best-practices for use
+
+Documentation
+=============
+
+The full documentation is as ***REMOVED***docs/django/
+
+Development Setup
+=================
+
+To get started for development install dependencies with pip install -r requirements/development.txt. Create a ``secrets.json`` file with database and ldap information. To run the tests, run ``tox`` in the command line to run tests and flake8. To only run tests, use ``tox -e py27``.

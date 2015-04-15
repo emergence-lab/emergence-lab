@@ -1,104 +1,202 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import autoslug.fields
+import mptt.fields
+import core.models.fields
+import django.utils.timezone
+from django.conf import settings
+import django.core.validators
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'operator'
-        db.create_table(u'operators', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=45)),
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'core', ['operator'])
+    dependencies = [
+        ('auth', '0001_initial'),
+        ('contenttypes', '0001_initial'),
+    ]
 
-        # Adding model 'platter'
-        db.create_table(u'platters', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=45)),
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('serial', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
-            ('start_date', self.gf('django.db.models.fields.DateField')(auto_now_add=True, blank=True)),
-            ('end_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'core', ['platter'])
-
-        # Adding model 'project'
-        db.create_table(u'projects', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=45)),
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'core', ['project'])
-
-        # Adding model 'investigation'
-        db.create_table(u'investigations', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=45)),
-            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal(u'core', ['investigation'])
-
-        # Adding M2M table for field projects on 'investigation'
-        m2m_table_name = db.shorten_name(u'investigations_projects')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('investigation', models.ForeignKey(orm[u'core.investigation'], null=False)),
-            ('project', models.ForeignKey(orm[u'core.project'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['investigation_id', 'project_id'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'operator'
-        db.delete_table(u'operators')
-
-        # Deleting model 'platter'
-        db.delete_table(u'platters')
-
-        # Deleting model 'project'
-        db.delete_table(u'projects')
-
-        # Deleting model 'investigation'
-        db.delete_table(u'investigations')
-
-        # Removing M2M table for field projects on 'investigation'
-        db.delete_table(db.shorten_name(u'investigations_projects'))
-
-
-    models = {
-        u'core.investigation': {
-            'Meta': {'object_name': 'investigation', 'db_table': "u'investigations'"},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '45'}),
-            'projects': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['core.project']", 'symmetrical': 'False'})
-        },
-        u'core.operator': {
-            'Meta': {'object_name': 'operator', 'db_table': "u'operators'"},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '45'})
-        },
-        u'core.platter': {
-            'Meta': {'object_name': 'platter', 'db_table': "u'platters'"},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'end_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '45'}),
-            'serial': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
-            'start_date': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'blank': 'True'})
-        },
-        u'core.project': {
-            'Meta': {'object_name': 'project', 'db_table': "u'projects'"},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '45'})
-        }
-    }
-
-    complete_apps = ['core']
+    operations = [
+        migrations.CreateModel(
+            name='User',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('password', models.CharField(max_length=128, verbose_name='password')),
+                ('last_login', models.DateTimeField(default=django.utils.timezone.now, verbose_name='last login')),
+                ('is_active', models.BooleanField(default=True, verbose_name='active')),
+                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
+                ('username', models.CharField(help_text='Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.', unique=True, max_length=30, verbose_name='username', validators=[django.core.validators.RegexValidator('^[\\w.@+-]+$', 'Enter a valid username.', 'invalid')])),
+                ('full_name', models.CharField(max_length=255, verbose_name='full name', blank=True)),
+                ('short_name', models.CharField(max_length=50, verbose_name='preferred name', blank=True)),
+                ('email', models.EmailField(max_length=75, verbose_name='email address', blank=True)),
+                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
+                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
+                ('groups', models.ManyToManyField(related_query_name='custom_user', related_name='custom_users', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
+            ],
+            options={
+                'verbose_name': 'user',
+                'verbose_name_plural': 'users',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Investigation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('is_active', models.BooleanField(default=True, verbose_name='active')),
+                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('name', models.CharField(max_length=45, verbose_name='name')),
+                ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
+                ('description', core.models.fields.RichTextField(verbose_name='description', blank=True)),
+            ],
+            options={
+                'verbose_name': 'investigation',
+                'verbose_name_plural': 'investigations',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Process',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('uuid_full', core.models.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
+                ('comment', core.models.fields.RichTextField(blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ProcessNode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('uuid_full', core.models.fields.UUIDField(unique=True, max_length=32, editable=False, blank=True)),
+                ('comment', core.models.fields.RichTextField(blank=True)),
+                ('piece', models.CharField(max_length=5)),
+                ('lft', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('rght', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('tree_id', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('level', models.PositiveIntegerField(editable=False, db_index=True)),
+                ('parent', mptt.fields.TreeForeignKey(related_name='children', to='core.ProcessNode', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Project',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('is_active', models.BooleanField(default=True, verbose_name='active')),
+                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('name', models.CharField(max_length=45, verbose_name='name')),
+                ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
+                ('description', core.models.fields.RichTextField(verbose_name='description', blank=True)),
+            ],
+            options={
+                'verbose_name': 'project',
+                'verbose_name_plural': 'projects',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ProjectTracking',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('is_owner', models.BooleanField(default=False)),
+                ('project', models.ForeignKey(to='core.Project')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Sample',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('comment', core.models.fields.RichTextField(blank=True)),
+                ('process_tree', mptt.fields.TreeOneToOneField(null=True, to='core.ProcessNode')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SplitProcess',
+            fields=[
+                ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=('core.process',),
+        ),
+        migrations.CreateModel(
+            name='Substrate',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
+                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('comment', core.models.fields.RichTextField(blank=True)),
+                ('source', models.CharField(max_length=100, blank=True)),
+                ('serial', models.CharField(max_length=25, blank=True)),
+                ('polymorphic_ctype', models.ForeignKey(related_name='polymorphic_core.substrate_set', editable=False, to='contenttypes.ContentType', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='sample',
+            name='substrate',
+            field=models.OneToOneField(to='core.Substrate'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='processnode',
+            name='process',
+            field=models.ForeignKey(to='core.Process', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='process',
+            name='polymorphic_ctype',
+            field=models.ForeignKey(related_name='polymorphic_core.process_set', editable=False, to='contenttypes.ContentType', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='investigation',
+            name='project',
+            field=models.ForeignKey(verbose_name='project', to='core.Project'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='projects',
+            field=models.ManyToManyField(related_query_name='user', related_name='users', to='core.Project', through='core.ProjectTracking', blank=True, help_text='Projects this user is tracking', verbose_name='tracked projects'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='user_permissions',
+            field=models.ManyToManyField(related_query_name='custom_user', related_name='custom_users', to='auth.Permission', blank=True, help_text='Specific permissions for this user.', verbose_name='user permissions'),
+            preserve_default=True,
+        ),
+    ]
