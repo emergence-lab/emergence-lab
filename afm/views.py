@@ -115,23 +115,6 @@ class AFMFileUpload(UploadFileView):
             img_file.processes.add(process)
 
 
-class AFMRemoveFileActionReloadView(LoginRequiredMixin, ActionReloadView):
-
-    def perform_action(self, request, *args, **kwargs):
-        process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
-        datafile = DataFile.objects.get(pk=self.kwargs['id'])
-        datafile.processes.remove(process)
-        if not datafile.processes.all().exists():
-            datafile.delete()
-
-    def get(self, request, *args, **kwargs):
-        self.perform_action(request, *args, **kwargs)
-        return super(ActionReloadView, self).get(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse('afm_detail', args=(self.kwargs['uuid'],))
-
-
 class AutocreateAFMView(CreateUploadProcessView):
     """
     View for creation of new afm data.
