@@ -5,6 +5,8 @@ from django import forms
 
 from rest_framework import serializers
 
+from core.serializers.process import DataFileSerializer
+
 from .models import SEMScan
 
 
@@ -26,9 +28,9 @@ class SEMSerializer(serializers.ModelSerializer):
     Serializes the sem model.
 
     """
-    image = FilePathField(max_length=150)
+    datafiles = DataFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = SEMScan
-        fields = ('uuid', 'image_number', 'magnification', 'image_source',
-                  'image')
+        fields = ('uuid', 'created', 'modified',
+                  'image_source', 'datafiles')
