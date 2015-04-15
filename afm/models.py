@@ -27,6 +27,7 @@ class AFMFile(DataFile):
         ('f', 'Flat'),
     ]
     IMAGE_TYPE = [
+        ('Raw', 'Raw'),
         ('Height', 'Height'),
         ('Amplitude', 'Amplitude'),
         ('Phase', 'Phase'),

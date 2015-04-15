@@ -7,9 +7,6 @@ import os
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.urlresolvers import reverse
-from django.db import transaction
-from django.http import JsonResponse
-from django.views import generic
 
 from braces.views import LoginRequiredMixin
 import nanoscope
@@ -19,22 +16,14 @@ import six
 from afm.models import AFMFile, AFMScan
 from afm.forms import AutoCreateAFMForm
 from core.models import DataFile, Process
-from core.forms import DropzoneForm
-from core.views import ActionReloadView, CreateUploadProcessView
+from core.views import ActionReloadView, CreateUploadProcessView, UploadFileView
 
 
-class AFMFileUpload(LoginRequiredMixin, generic.CreateView):
+class AFMFileUpload(UploadFileView):
     """
     Add files to an existing afm process
     """
     model = AFMFile
-    template_name = 'afm/afm_upload.html'
-    form_class = DropzoneForm
-
-    def get_context_data(self, **kwargs):
-        context = super(AFMFileUpload, self).get_context_data(**kwargs)
-        context['process'] = self.kwargs['uuid']
-        return context
 
     def process_image(self, scan, filename, scan_number):
         image = Image.fromarray(scan.colorize())
@@ -59,10 +48,9 @@ class AFMFileUpload(LoginRequiredMixin, generic.CreateView):
             unit = 'nm'
         else:
             unit = 'V'
-            print(scan.sensitivity, scan.magnify, scan.scale)
         draw.text(
             (28 + image.size[0] + scale_image.size[0] + 7, 25),
-            '{0:.1f} {1}'.format(scan.height_scale, unit), 'black', calibri)
+            '{0:.0f} {1}'.format(scan.height_scale, unit), 'black', calibri)
         draw.text(
             (28 + image.size[0] + scale_image.size[0] + 7, 20 + scale_image.size[1]),
             '0.0 {}'.format(unit), 'black', calibri)
@@ -93,57 +81,38 @@ class AFMFileUpload(LoginRequiredMixin, generic.CreateView):
             tempio, field_name=None, name=filename + '.png',
             content_type='image/png', size=tempio.len, charset=None)
 
-    def form_valid(self, form):
-        process = Process.objects.get(
-            uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
-
-        image = self.request.FILES['file']
-        scan_number = int(os.path.splitext(image.name)[-1][1:])
-        raw = six.BytesIO(image.read())
+    def process_file(self, process, uploaded_file):
+        scan_number = int(os.path.splitext(uploaded_file.name)[-1][1:])
+        raw = six.BytesIO(uploaded_file.read())
         raw.mode = 'b'
         scan = nanoscope.read(raw, encoding='cp1252')
-        for img in scan:
+        return (scan, {'scan_number': scan_number})
+
+    def save_file(self, process, processed_file, raw_file, content_type=None, **file_kwargs):
+        scan_number = file_kwargs.get('scan_number', 0)
+        obj = self.model.objects.create(data=raw_file,
+                                        content_type='application/octet-stream',
+                                        image_type='Raw',
+                                        state='raw',
+                                        rms=0.0,
+                                        zrange=0.0,
+                                        size=0.0,
+                                        scan_number=scan_number)
+        obj.processes.add(process)
+
+        for img in processed_file:
             img.process()
-
-            with transaction.atomic():
-                obj = AFMFile.objects.create(data=image,
-                                             content_type='application/octet-stream',
-                                             rms=img.rms,
-                                             zrange=img.zrange,
-                                             size=img.scan_area,
-                                             image_type=img.type,
-                                             scan_number=scan_number)
-                obj.processes.add(process)
-
-                img_file = AFMFile.objects.create(
-                    data=self.process_image(img, image.name, scan_number),
-                    content_type='image/png',
-                    state='extracted',
-                    rms=img.rms,
-                    zrange=img.zrange,
-                    size=img.scan_area,
-                    image_type=img.type,
-                    scan_number=scan_number)
-                img_file.processes.add(process)
-
-        return JsonResponse({'status': 'success'})
-
-
-class AFMRemoveFileActionReloadView(LoginRequiredMixin, ActionReloadView):
-
-    def perform_action(self, request, *args, **kwargs):
-        process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
-        datafile = DataFile.objects.get(pk=self.kwargs['id'])
-        datafile.processes.remove(process)
-        if not datafile.processes.all().exists():
-            datafile.delete()
-
-    def get(self, request, *args, **kwargs):
-        self.perform_action(request, *args, **kwargs)
-        return super(ActionReloadView, self).get(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse('afm_detail', args=(self.kwargs['uuid'],))
+            processed_image = self.process_image(img, raw_file.name, scan_number)
+            img_file = self.model.objects.create(
+                data=processed_image,
+                content_type=processed_image.content_type,
+                state='extracted',
+                rms=img.rms,
+                zrange=img.zrange,
+                size=img.scan_area,
+                image_type=img.type,
+                scan_number=scan_number)
+            img_file.processes.add(process)
 
 
 class AutocreateAFMView(CreateUploadProcessView):
@@ -151,7 +120,6 @@ class AutocreateAFMView(CreateUploadProcessView):
     View for creation of new afm data.
     """
     model = AFMScan
-    template_name = 'core/process_create.html'
     form_class = AutoCreateAFMForm
 
     def get_success_url(self):

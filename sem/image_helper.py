@@ -28,10 +28,7 @@ def get_image_source(image):
 
 def _is_tiff(image):
     tmp = str(image).split('.')[1]
-    if str(tmp) == 'tif' or str(tmp) == 'tiff':
-        return True
-    else:
-        return False
+    return str(tmp) in ['tif', 'tiff']
 
 
 def _process_name(image):
