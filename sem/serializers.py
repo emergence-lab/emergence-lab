@@ -33,4 +33,5 @@ class SEMSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SEMScan
-        fields = ('uuid', 'image_source', 'datafiles')
+        fields = ('uuid', 'created', 'modified',
+                  'image_source', 'datafiles')
