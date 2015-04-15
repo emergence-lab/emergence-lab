@@ -102,27 +102,29 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 
 class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
+    template_name = 'core/process_create.html'
 
     def get_form(self, form_class):
         sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
         return form_class(pieces=sample.pieces, **self.get_form_kwargs())
 
     def form_valid(self, form):
-        self.object = form.save()
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
         pieces = form.cleaned_data['pieces']
         sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
         for piece in pieces:
             sample.run_process(self.object, piece=piece)
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_success_url(self):
+        return reverse('process_detail', args=(self.object.uuid,))
+
 
 class RunProcessView(CreateUploadProcessView):
     model = Process
-    template_name = 'core/process_create.html'
     form_class = ProcessCreateForm
-
-    def get_success_url(self):
-        return reverse('process_detail', args=(self.object.uuid,))
 
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):
@@ -130,7 +132,7 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
     Add files to an existing sem process
     """
     model = DataFile
-    template_name = 'core/file_upload.html'
+    template_name = 'core/process_upload.html'
     form_class = DropzoneForm
 
     def get_context_data(self, **kwargs):

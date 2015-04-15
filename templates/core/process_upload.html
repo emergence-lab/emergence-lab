@@ -5,7 +5,7 @@
 {% block title %}Upload Files{% endblock %}
 
 {% block header %}
-    <link href="{% static 'sem/css/dropzone.css' %}" rel="stylesheet">
+    <link href="{% static 'core/css/dropzone.css' %}" rel="stylesheet">
 {% endblock header %}
 
 {% block content %}
@@ -14,7 +14,7 @@
 
     <header>
         <h1 class="page-header">
-            Upload files for {{process}}
+            Upload files for {{process.name}} {{process}}
             <div class="pull-right">
                 <a class="btn btn-default" href="{% url 'process_detail' uuid=process %}">
                     {% bootstrap_icon 'arrow-left' %}
@@ -24,7 +24,7 @@
         </h1>
     </header>
 
-    <form class="dropzone" action="{% url 'file_upload' uuid=process %}" method="post" enctype="multipart/form-data">
+    <form class="dropzone" action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
         <div class="fallback">
             <input name="file" type="file" multiple />
@@ -37,5 +37,5 @@
 {% endblock content %}
 
 {% block scripts %}
-    <script src="{% static 'sem/js/dropzone.js' %}"></script>
+    <script src="{% static 'core/js/dropzone.js' %}"></script>
 {% endblock scripts %}

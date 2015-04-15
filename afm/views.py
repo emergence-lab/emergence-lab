@@ -28,7 +28,7 @@ class AFMFileUpload(LoginRequiredMixin, generic.CreateView):
     Add files to an existing afm process
     """
     model = AFMFile
-    template_name = 'afm/afm_upload.html'
+    template_name = 'core/process_upload.html'
     form_class = DropzoneForm
 
     def get_context_data(self, **kwargs):
@@ -151,7 +151,6 @@ class AutocreateAFMView(CreateUploadProcessView):
     View for creation of new afm data.
     """
     model = AFMScan
-    template_name = 'core/process_create.html'
     form_class = AutoCreateAFMForm
 
     def get_success_url(self):
