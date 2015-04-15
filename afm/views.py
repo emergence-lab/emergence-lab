@@ -7,9 +7,6 @@ import os
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.urlresolvers import reverse
-from django.db import transaction
-from django.http import JsonResponse
-from django.views import generic
 
 from braces.views import LoginRequiredMixin
 import nanoscope
@@ -19,7 +16,6 @@ import six
 from afm.models import AFMFile, AFMScan
 from afm.forms import AutoCreateAFMForm
 from core.models import DataFile, Process
-from core.forms import DropzoneForm
 from core.views import ActionReloadView, CreateUploadProcessView, UploadFileView
 
 
@@ -90,7 +86,7 @@ class AFMFileUpload(UploadFileView):
         raw = six.BytesIO(uploaded_file.read())
         raw.mode = 'b'
         scan = nanoscope.read(raw, encoding='cp1252')
-        return (scan, {'scan_number':scan_number})
+        return (scan, {'scan_number': scan_number})
 
     def save_file(self, process, processed_file, raw_file, content_type=None, **file_kwargs):
         scan_number = file_kwargs.get('scan_number', 0)
