@@ -24,7 +24,7 @@
         </h1>
     </header>
 
-    <form class="dropzone" action="" method="post" enctype="multipart/form-data">
+    <form class="dropzone" action="{{request.get_full_path}}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
         <div class="fallback">
             <input name="file" type="file" multiple />

@@ -11,7 +11,7 @@ from django.views.generic import (CreateView, DeleteView,
 from braces.views import LoginRequiredMixin
 
 from core.forms import DropzoneForm
-from core.models import DataFile, SampleManager
+from core.models import DataFile, SampleManager, Process
 from core.views import ActionReloadView, CreateUploadProcessView
 from sem.forms import AutoCreateSEMForm
 from sem.models import SEMScan
