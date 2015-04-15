@@ -5,6 +5,8 @@ from django import forms
 
 from rest_framework import serializers
 
+from core.serializers import DataFileSerializer
+
 from .models import AFMScan
 
 
@@ -26,10 +28,8 @@ class AFMSerializer(serializers.ModelSerializer):
     Serializes the afm model.
 
     """
-    height = FilePathField(max_length=150)
-    amplitude = FilePathField(max_length=150)
+    datafiles = DataFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = AFMScan
-        fields = ('uuid', 'scan_number', 'rms', 'zrange',
-                  'location', 'size', 'height', 'amplitude')
+        fields = ('uuid', 'created', 'modified', 'datafiles',)
