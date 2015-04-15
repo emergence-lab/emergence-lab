@@ -83,12 +83,20 @@ class SampleSplitView(LoginRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
         piece = self.kwargs.get('piece')
-        self.sample = Sample.objects.get(pk=Sample.strip_uuid(self.kwargs.get('uuid')))
-        self.sample.split(number=int(request.POST.get('split_number_{}'.format(piece))),
+        self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+
+        comment = request.POST.get('split_comment_{}'.format(piece))
+        if comment == '':
+            comment = None
+        num_pieces = int(request.POST.get('split_number_{}'.format(piece)))
+        if num_pieces < 2:
+            raise ValueError(
+                'Invalid number of pieces specified ({}), '
+                'must be more than 2'.format(num_pieces))
+        self.sample.split(number=num_pieces,
                           piece=piece,
-                          comment=request.POST.get('split_comment_{}'.format(piece)),
-                          user=self.request.user,
-                          )
+                          comment=comment,
+                          user=self.request.user)
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('sample_detail', args=(self.sample.uuid,))
