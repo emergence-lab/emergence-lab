@@ -129,7 +129,7 @@ class RunProcessView(CreateUploadProcessView):
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):
     """
-    Add files to an existing sem process
+    Add files to an existing process
     """
     model = DataFile
     template_name = 'core/process_upload.html'
@@ -141,14 +141,30 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
         return context
 
     def form_valid(self, form):
+        print('entering form_valid')
         process = Process.objects.get(
             uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
 
-        image = self.request.FILES['file']
-
+        uploaded_file, file_kwargs = self.process_file(process,
+                                                       self.request.FILES['file'])
+        print('processed file')
         with transaction.atomic():
-            obj = DataFile.objects.create(data=image,
-                                          content_type=image.content_type)
-            obj.processes.add(process)
-
+            self.save_file(process,
+                           uploaded_file, self.request.FILES['file'],
+                           content_type=None, **file_kwargs)
+        print('saved file')
         return JsonResponse({'status': 'success'})
+
+    def process_file(self, process, uploaded_file):
+        return (uploaded_file, {})
+
+    def save_file(self, process, processed_file, raw_file, content_type=None, **file_kwargs):
+        if content_type is None:
+            try:
+                content_type = processed_file.content_type
+            except AttributeError:
+                content_type = 'application/octet-stream'
+        obj = self.model.objects.create(data=processed_file,
+                                        content_type=content_type,
+                                        **file_kwargs)
+        obj.processes.add(process)
