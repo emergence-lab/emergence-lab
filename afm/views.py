@@ -8,15 +8,13 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.urlresolvers import reverse
 
-from braces.views import LoginRequiredMixin
 import nanoscope
 from PIL import Image, ImageDraw, ImageFont
 import six
 
 from afm.models import AFMFile, AFMScan
 from afm.forms import AutoCreateAFMForm
-from core.models import DataFile, Process
-from core.views import ActionReloadView, CreateUploadProcessView, UploadFileView
+from core.views import CreateUploadProcessView, UploadFileView
 
 
 class AFMFileUpload(UploadFileView):
