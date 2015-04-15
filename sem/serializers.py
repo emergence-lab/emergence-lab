@@ -28,7 +28,6 @@ class SEMSerializer(serializers.ModelSerializer):
     Serializes the sem model.
 
     """
-    #image = FilePathField(max_length=150)
     datafiles = DataFileSerializer(many=True, read_only=True)
 
     class Meta:
