@@ -42,8 +42,8 @@
                 {% endif %}
             </div>
         </h3>
-        <p>Created by {{process.user.get_full_name}} on {{process.created}}.</p>
-        <p>Last modified {{process.modified}}.</p>
+        <p>Created by {{process.user.get_full_name}} on {{process.created}}</p>
+        <p>Last modified {{process.modified}}</p>
         {% if process.comment %}
             <p>{{process.comment|safe}}</p>
         {% else %}
