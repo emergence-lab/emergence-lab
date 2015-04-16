@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
 
 {% load mptt_tags %}
+{% load bootstrap3 %}
 
 {% block title %}{{sample.uuid}}{% endblock title %}
 
@@ -21,20 +22,26 @@
             <div class="pull-right">
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="glyphicon glyphicon-plus"></span>
+                        {% bootstrap_icon 'plus' %}
                         Add Process
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="{% url 'process_autocreate' uuid=sample.uuid %}">Run Process</a></li>
+                        <li><a href="{% url 'process_autocreate' uuid=sample.uuid %}">
+                            Run Process
+                        </a></li>
                         <li class="divider"></li>
-                        <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">Add SEM Images</a></li>
-                        <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">Add AFM Scan</a></li>
+                        <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">
+                            Add SEM Images
+                        </a></li>
+                        <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">
+                            Add AFM Scans
+                        </a></li>
                         <!--<li><a href="#">Separated link</a></li>-->
                     </ul>
                 </div>
                 <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">
-                    <span class="glyphicon glyphicon-edit"></span>
+                    {% bootstrap_icon 'edit' %}
                     Edit
                 </a>
             </div>
@@ -43,23 +50,36 @@
 
     <div>
         <h3 class="page-header">Sample Details</h3>
-        <p>UUID: {{sample.uuid}}</p>
-        <p>Created: {{sample.created}}</p>
-        <p>Modified: {{sample.modified}}</p>
-        <p>Comment: {{sample.comment|safe}}</p>
+        <p>Created on {{sample.created}}</p>
+        <p>Last modified on {{sample.modified}}</p>
+        {% if sample.comment %}
+            <p>{{sample.comment|safe}}</p>
+        {% else %}
+            <div class="alert alert-warning">
+                <h3>This sample doesn't have a comment</h3>
+                <p>Get started by adding a comment.</p>
+                <div class="top-spacer-sm">
+                    <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">
+                    {% bootstrap_icon 'edit' %}
+                    Edit
+                    </a>
+                </div>
+            </div>
+        {% endif %}
         {% if sample.nodes.count <= 1 %}
             <div class="alert alert-warning">
                 <h3>This sample hasn't had any processes run on it.</h3>
                 <p>Get started by running a new or existing process.</p>
                 <div class="top-spacer-sm">
                     <a href="#" class="btn btn-primary right-spacer-xs">
-                        <span class="glyphicon glyphicon-plus"></span>
+                        {% bootstrap_icon 'plus' %}
                         Run Process
                     </a>
                 </div>
             </div>
         {% else %}
-            <p>Processes:
+            <div>
+                <h3 class="page-header">Processes</h3>
                 <ul>
                     {% recursetree sample.nodes %}
                             {% if not node.is_root_node %}
@@ -100,7 +120,7 @@
                             {% endif %}
                     {% endrecursetree %}
                 </ul>
-            </p>
+            </div>
         {% endif %}
     </div>
 
