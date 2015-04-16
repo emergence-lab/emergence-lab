@@ -308,7 +308,7 @@ class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView)
         self.object = None
         context = super(UpdateReadingsView, self).get_context_data(**kwargs)
         context["growth"] = self.get_object()
-        allreadings = D180Readings.objects.filter(growth=self.get_object())
+        allreadings = D180Readings.objects.filter(growth=self.get_object()).order_by('layer')
         context["readings"] = allreadings
         formlist = []
         numberofreadings = 0
