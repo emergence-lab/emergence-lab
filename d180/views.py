@@ -251,7 +251,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
             self.object.comment = comment_form.cleaned_data['comment']
             self.object.save()
             source_form.save()
-            return HttpResponseRedirect(reverse('home'))
+            return HttpResponseRedirect(reverse('process_detail', args=(self.object.uuid,)))
         else:
             return self.render_to_response(self.get_context_data(
                 checklist_form=checklist_form,

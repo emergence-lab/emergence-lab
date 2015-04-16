@@ -599,7 +599,7 @@ class TestD180Wizard(TestCase):
             'This field is required.')
 
     def test_postrun_valid(self):
-        mommy.make(D180Growth)
+        process = mommy.make(D180Growth)
         url = reverse('create_growth_d180_postrun')
         data = {
             'checklist-field_0': 'on',
@@ -623,4 +623,4 @@ class TestD180Wizard(TestCase):
             'source-tmin2': '0.00',
         }
         response = self.client.post(url, data)
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('process_detail', args=(process.uuid,)))
