@@ -33,7 +33,10 @@
                         <!--<li><a href="#">Separated link</a></li>-->
                     </ul>
                 </div>
-                <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-edit"></span>
+                    Edit
+                </a>
             </div>
         </h1>
     </header>
