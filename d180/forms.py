@@ -206,7 +206,7 @@ D180ReadingsFormSet = forms.models.modelformset_factory(D180Readings,
 class WizardPostrunChecklistForm(ChecklistForm):
     checklist_fields = [
         'Wait for system to IDLE',
-        'Stop k-space collection'
+        'Stop k-space collection',
         'Turn off motor',
         'Engage gate valve routine, open front viewport and shutter',
         'Transfer platter from reactor to load lock',
