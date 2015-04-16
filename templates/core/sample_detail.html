@@ -67,6 +67,7 @@
                                     {{node.process.name}}
                                     (<a href="{% url 'process_detail' uuid=node.process.uuid %}"
                                         data-toggle="tooltip"
+                                        data-html="true"
                                         data-placement="left"
                                         title="{{node.process.comment|safe|truncatewords:50}}">
                                             {{node.process.uuid}}
