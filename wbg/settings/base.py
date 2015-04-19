@@ -219,3 +219,44 @@ S3_URL = 'https://{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
 REDIS_HOST = get_secret('REDIS_HOST')
 REDIS_PORT = get_secret('REDIS_PORT')
 REDIS_DB = get_secret('REDIS_DB')
+
+# Logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': '%Y-%m-%d %H-%M-%S',
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'core.views.process': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'django': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'WARNING',
+        },
+        'd180.views': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+    },
+}

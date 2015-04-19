@@ -43,6 +43,7 @@ from .sample import (
 from .process import (
     ProcessDetailView,
     ProcessCreateView,
+    ProcessListRedirectView,
     ProcessListView,
     ProcessUpdateView,
     RunProcessView,

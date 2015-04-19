@@ -79,38 +79,24 @@ class AFMFileUpload(UploadFileView):
             tempio, field_name=None, name=filename + '.png',
             content_type='image/png', size=tempio.len, charset=None)
 
-    def process_file(self, process, uploaded_file):
+    def process_file(self, uploaded_file):
         scan_number = int(os.path.splitext(uploaded_file.name)[-1][1:])
         raw = six.BytesIO(uploaded_file.read())
         raw.mode = 'b'
         scan = nanoscope.read(raw, encoding='cp1252')
-        return (scan, {'scan_number': scan_number})
 
-    def save_file(self, process, processed_file, raw_file, content_type=None, **file_kwargs):
-        scan_number = file_kwargs.get('scan_number', 0)
-        obj = self.model.objects.create(data=raw_file,
-                                        content_type='application/octet-stream',
-                                        image_type='Raw',
-                                        state='raw',
-                                        rms=0.0,
-                                        zrange=0.0,
-                                        size=0.0,
-                                        scan_number=scan_number)
-        obj.processes.add(process)
-
-        for img in processed_file:
+        processed_files = [(uploaded_file, dict(image_type='Raw', state='raw',
+                                                rms=0.0, zrange=0.0,
+                                                size=0.0, scan_number=scan_number,
+                                                content_type='application/octet-stream'))]
+        for img in scan:
             img.process()
-            processed_image = self.process_image(img, raw_file.name, scan_number)
-            img_file = self.model.objects.create(
-                data=processed_image,
-                content_type=processed_image.content_type,
-                state='extracted',
-                rms=img.rms,
-                zrange=img.zrange,
-                size=img.scan_area,
-                image_type=img.type,
-                scan_number=scan_number)
-            img_file.processes.add(process)
+            processed_image = self.process_image(img, uploaded_file.name, scan_number)
+            processed_files.append(
+                (processed_image, dict(image_type=img.type, state='extracted',
+                                       rms=img.rms, zrange=img.zrange, size=img.scan_area,
+                                       scan_number=scan_number)))
+        return processed_files
 
 
 class AutocreateAFMView(CreateUploadProcessView):

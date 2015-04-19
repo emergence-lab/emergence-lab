@@ -8,11 +8,6 @@ from .base import *
 DEBUG = True
 TEMPLATE_DEBUG = True
 
-logger = logging.getLogger('django_auth_ldap')
-logger.addHandler(logging.FileHandler('debug.log'))
-logger.setLevel(logging.DEBUG)
-logger.propogate = True
-
 
 # Installed Apps
 

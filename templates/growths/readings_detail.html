@@ -1,22 +1,33 @@
 {% extends "core/base.html" %}
+
 {% load bootstrap3 %}
 
-{% block title %}{{growth}} Readings{%endblock%}
+{% block title %}{{growth}} Readings{% endblock title %}
 
 {% block content %}
 
 <div class="container">
-    <header>
+    <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_detail' growth.uuid %}">{{growth}}</a></li>
-            <li class="active">Readings</li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
+            <li><a href="{% url 'process_detail' uuid=growth.uuid %}">{{growth.uuid}}</a></li>
+            <li class='active'>Readings</li>
         </ol>
+    </nav>
 
+    <header>
         <h1 class="page-header">
             Readings for {{growth}} <small>({{growth.legacy_identifier}})</small>
             <div class="pull-right">
-                <a href="{% url 'd180_readings_edit' growth.uuid %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'process_detail' uuid=growth.uuid %}" class="btn btn-default">
+                    {% bootstrap_icon 'arrow-left' %}
+                    Back
+                </a>
+                <a href="{% url 'd180_readings_edit' growth.uuid %}" class="btn btn-warning">
+                    {% bootstrap_icon 'edit' %}
+                    Edit
+                </a>
             </div>
         </h1>
     </header>
@@ -63,4 +74,4 @@
 
 </div>
 
-{% endblock %}
+{% endblock content %}

@@ -107,12 +107,13 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('image/tiff', 'TIFF Image'),
         ('image/gif', 'GIF Image'),
         ('text/plain', 'Plaintext File'),
+        ('text/csv', 'CSV File'),
     ]
 
     processes = models.ManyToManyField(Process,
                                        related_name='datafiles',
                                        related_query_name='datafiles')
-    content_type = models.CharField(max_length=45, blank=True, choices=CONTENT_TYPE, default='')
+    content_type = models.CharField(max_length=200, blank=True, choices=CONTENT_TYPE, default='')
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
     state = models.CharField(max_length=20, choices=DATA_STATE, default='raw')

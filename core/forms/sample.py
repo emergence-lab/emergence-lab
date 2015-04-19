@@ -32,7 +32,7 @@ class SubstrateForm(forms.ModelForm):
                 cleaned_data.get('serial')]
 
         if not any(data):
-            raise ValidationError(_('Cannot leave all fields blank.'))
+            raise ValidationError(_('Cannot leave all substrate fields blank.'))
 
 
 class SampleForm(forms.ModelForm):
@@ -128,6 +128,9 @@ class SampleSelectOrCreateForm(forms.Form):
             substrate = Substrate.objects.create(**substrate_kwargs)
             comment = self.cleaned_data['sample_comment']
             sample = Sample.objects.create(substrate=substrate, comment=comment)
+            if not substrate.serial:
+                substrate.serial = 'WBG-{}'.format(sample.uuid[1:])
+                substrate.save()
             self.instance = sample
         else:
             self.instance = self.cleaned_data['sample']

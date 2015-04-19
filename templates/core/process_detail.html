@@ -9,17 +9,18 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_list' slug='all' username='all' %}">Processes</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
             <li class='active'>{{process.uuid}}</li>
         </ol>
     </nav>
 
     <header>
         <h1 class="page-header">
-            {{process}}
+            {{process.uuid}}
             {% if process.legacy_identifier %}
                 ({{process.legacy_identifier}})
             {% endif %}
+            <small>{{process.uuid_full}}</small>
             <div class="pull-right">
                 <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
                     {% bootstrap_icon 'edit' %}
@@ -31,19 +32,32 @@
 
     <div>
         <h3 class="page-header">
-            {{process.name}} Details
-            {% if readings %}
-                <a class="pull-right btn btn-info" href="{% url 'd180_readings_detail' process %}">Readings</a>
-            {% endif %}
+            <div class="clearfix">
+                {{process.name}} Details
+                {% if readings %}
+                    <a class="pull-right btn btn-info" href="{% url 'd180_readings_detail' process %}">
+                        {% bootstrap_icon 'list' %}
+                        Readings
+                    </a>
+                {% endif %}
+            </div>
         </h3>
-        <p>UUID: {{process.uuid}} ({{process.uuid_full}})</p>
-        {% if process.legacy_identifier %}
-            <p>Legacy ID: {{process.legacy_identifier}}</p>
+        <p>Created by {{process.user.get_full_name}} on {{process.created}}</p>
+        <p>Last modified {{process.modified}}</p>
+        {% if process.comment %}
+            <p>{{process.comment|safe}}</p>
+        {% else %}
+            <div class="alert alert-warning">
+                <h3>This process doesn't have a comment</h3>
+                <p>Get started by adding a comment.</p>
+                <div class="top-spacer-sm">
+                    <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
+                    {% bootstrap_icon 'edit' %}
+                    Edit
+                    </a>
+                </div>
+            </div>
         {% endif %}
-        <p>User: {{process.user.get_full_name}}</p>
-        <p>Created: {{process.created}}</p>
-        <p>Modified: {{process.modified}}</p>
-        <p>Comment: {{process.comment|safe}}</p>
         {% if not samples %}
             <div class="alert alert-warning">
                 <h3>This process doesn't have any associated samples</h3>
@@ -56,18 +70,18 @@
                 </div>
             </div>
         {% else %}
-            <p>
-                Samples:
-                <ul>
+            <div>
+                <h3 class="page-header">
+                    Samples
+                </h3>
+                <div class="list-group">
                     {% for sample in samples %}
-                        <li>
-                            <a href="{% url 'sample_detail' uuid=sample.uuid %}">
-                                {{sample.uuid}}
-                            </a>
-                        </li>
+                        <a class="list-group-item" href="{% url 'sample_detail' uuid=sample.uuid %}">
+                            {{sample.uuid}}
+                        </a>
                     {% endfor %}
-                </ul>
-            </p>
+                </div>
+            </div>
         {% endif %}
 
         {% if not datafiles %}

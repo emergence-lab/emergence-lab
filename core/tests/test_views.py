@@ -407,7 +407,7 @@ class TestSampleCRUD(TestCase):
         data = {}
         response = self.client.post(url, data)
         self.assertFormError(response, 'form', '',
-                             'Cannot leave all fields blank.')
+                             'Cannot leave all substrate fields blank.')
 
     def test_sample_create_valid_data(self):
         url = reverse('sample_create')
