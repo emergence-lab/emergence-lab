@@ -128,6 +128,9 @@ class SampleSelectOrCreateForm(forms.Form):
             substrate = Substrate.objects.create(**substrate_kwargs)
             comment = self.cleaned_data['sample_comment']
             sample = Sample.objects.create(substrate=substrate, comment=comment)
+            if not substrate.serial:
+                substrate.serial = 'WBG-{}'.format(sample.uuid[1:])
+                substrate.save()
             self.instance = sample
         else:
             self.instance = self.cleaned_data['sample']
