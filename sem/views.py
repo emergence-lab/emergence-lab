@@ -25,5 +25,5 @@ class SEMFileUpload(UploadFileView):
     Add files to an existing sem process
     """
 
-    def process_file(self, process, uploaded_file):
-        return convert_tiff(uploaded_file)
+    def process_file(self, uploaded_file):
+        return [(convert_tiff(uploaded_file), {})]

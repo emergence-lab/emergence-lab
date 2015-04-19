@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from itertools import groupby
+import logging
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
@@ -14,6 +15,9 @@ from braces.views import LoginRequiredMixin
 from core.models import Process, Sample, DataFile
 from core.forms import DropzoneForm, ProcessCreateForm
 from core.polymorphic import get_subclasses
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
@@ -141,30 +145,47 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
         return context
 
     def form_valid(self, form):
-        print('entering form_valid')
         process = Process.objects.get(
             uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
 
-        uploaded_file, file_kwargs = self.process_file(process,
-                                                       self.request.FILES['file'])
-        print('processed file')
+        uploaded_file = self.request.FILES['file']
+        logger.debug('Uploaded file \'{}\' for process {}'.format(uploaded_file.name, process.uuid_full))
+        processed_files = self.process_file(uploaded_file)
+        logger.debug('Processed {} files for process {}'.format(len(processed_files), process.uuid_full))
+
         with transaction.atomic():
-            self.save_file(process,
-                           uploaded_file, self.request.FILES['file'],
-                           content_type=None, **file_kwargs)
-        print('saved file')
+            self.save_files(process, processed_files, uploaded_file)
+
         return JsonResponse({'status': 'success'})
 
-    def process_file(self, process, uploaded_file):
-        return (uploaded_file, {})
+    def get_content_type(self, processed_file):
+        """
+        Returns the correct content type for the uploaded and processed file.
+        By default it checks for the content_type attribute on the file, de
+        """
+        try:
+            return processed_file.content_type
+        except AttributeError:
+            return 'application/octet-stream'
 
-    def save_file(self, process, processed_file, raw_file, content_type=None, **file_kwargs):
-        if content_type is None:
-            try:
-                content_type = processed_file.content_type
-            except AttributeError:
-                content_type = 'application/octet-stream'
-        obj = self.model.objects.create(data=processed_file,
-                                        content_type=content_type,
-                                        **file_kwargs)
-        obj.processes.add(process)
+    def process_file(self, uploaded_file):
+        """
+        Process the uploaded file by extracting data or converting the format.
+
+        :returns: A list of tuples with the first element being the file itself
+                  and the second argument being a dictionary of arguments to pass
+                  when creating the database object for the file.
+        """
+        return [(uploaded_file, {})]
+
+    def save_files(self, process, processed_files, raw_file):
+        """
+        Saves the processed file information to the database and puts the file
+        in the proper location on the filesystem.
+        """
+        for f, kwargs in processed_files:
+            if 'content_type' not in kwargs:
+                kwargs['content_type'] = self.get_content_type(f)
+            logger.debug('Saving file \'{}\' for process {}'.format(f.name, process.uuid_full))
+            obj = self.model.objects.create(data=f, **kwargs)
+            obj.processes.add(process)
