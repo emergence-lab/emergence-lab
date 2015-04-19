@@ -6,6 +6,8 @@ from django.conf.urls import url
 import core.views
 
 urlpatterns = [
+    url(r'^$', core.views.ProcessListRedirectView.as_view(),
+        name='process_list_redirect'),
     url(r'^list/(?P<slug>[\w-]+)/(?P<username>[\w-]+)/$',
         core.views.ProcessListView.as_view(), name='process_list'),
     url(r'^create/$', core.views.ProcessCreateView.as_view(),

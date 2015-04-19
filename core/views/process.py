@@ -60,6 +60,13 @@ class ProcessCreateView(LoginRequiredMixin, generic.CreateView):
         return reverse('process_detail', args=(self.object.uuid,))
 
 
+class ProcessListRedirectView(LoginRequiredMixin, generic.RedirectView):
+    permanent = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('process_list', args=('all', 'all'))
+
+
 class ProcessListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/process_list.html'
     model = Process
