@@ -32,7 +32,7 @@ class SubstrateForm(forms.ModelForm):
                 cleaned_data.get('serial')]
 
         if not any(data):
-            raise ValidationError(_('Cannot leave all fields blank.'))
+            raise ValidationError(_('Cannot leave all substrate fields blank.'))
 
 
 class SampleForm(forms.ModelForm):
