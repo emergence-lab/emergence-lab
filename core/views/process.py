@@ -156,9 +156,11 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
             uuid_full__startswith=Process.strip_uuid(self.kwargs['uuid']))
 
         uploaded_file = self.request.FILES['file']
-        logger.debug('Uploaded file \'{}\' for process {}'.format(uploaded_file.name, process.uuid_full))
+        logger.debug('Uploaded file \'{}\' for process {}'.format(
+            uploaded_file.name, process.uuid_full))
         processed_files = self.process_file(uploaded_file)
-        logger.debug('Processed {} files for process {}'.format(len(processed_files), process.uuid_full))
+        logger.debug('Processed {} files for process {}'.format(
+            len(processed_files), process.uuid_full))
 
         with transaction.atomic():
             self.save_files(process, processed_files, uploaded_file)

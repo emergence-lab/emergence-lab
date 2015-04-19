@@ -22,7 +22,7 @@ class TestSubstrateForm(unittest.TestCase):
         errors = dict(form.errors)
         self.assertIsNotNone(errors.get('__all__'))
         self.assertListEqual(errors.get('__all__'),
-            ['Cannot leave all fields blank.'])
+            ['Cannot leave all substrate fields blank.'])
 
     def test_clean_single_specified(self):
         form = SubstrateForm(data={
@@ -92,7 +92,7 @@ class TestSampleSelectOrCreateForm(TestCase):
         errors = dict(form.errors)
         self.assertIsNotNone(errors.get('__all__'))
         self.assertListEqual(errors.get('__all__'),
-            ['Cannot leave all fields blank.'])
+            ['Cannot leave all substrate fields blank.'])
 
 
 class TestTrackProjectForm(TestCase):

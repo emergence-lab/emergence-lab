@@ -143,7 +143,7 @@ class TestD180Wizard(TestCase):
         self.assertFormError(response, 'source_form', 'cp2mg',
             'This field is required.')
         self.assertFormsetError(response, 'sample_formset', 0, None,
-            'Cannot leave all fields blank.')
+            'Cannot leave all substrate fields blank.')
 
     def test_start_sample_formset_mixed_valid(self):
         """

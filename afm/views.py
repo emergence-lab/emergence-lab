@@ -81,7 +81,7 @@ class AFMFileUpload(UploadFileView):
 
     def process_file(self, uploaded_file):
         scan_number = int(os.path.splitext(uploaded_file.name)[-1][1:])
-        raw = six.BytesIO(uploaded_file.read()) 
+        raw = six.BytesIO(uploaded_file.read())
         raw.mode = 'b'
         scan = nanoscope.read(raw, encoding='cp1252')
 

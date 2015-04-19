@@ -137,7 +137,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 reservation_form.is_valid()]):
             logger.debug('Creating new growth')
             self.object = growth_form.save()
-            logger.debug('Created process {} ({}) for {} samples'.format(self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
+            logger.debug('Created process {} ({}) for {} samples'.format(
+                self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
             source_form.save()
             for s in sample_formset:
                 sample = s.save()
