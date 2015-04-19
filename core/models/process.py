@@ -107,6 +107,7 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('image/tiff', 'TIFF Image'),
         ('image/gif', 'GIF Image'),
         ('text/plain', 'Plaintext File'),
+        ('text/csv', 'CSV File'),
     ]
 
     processes = models.ManyToManyField(Process,
