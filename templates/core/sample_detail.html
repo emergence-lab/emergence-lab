@@ -65,6 +65,16 @@
                 </div>
             </div>
         {% endif %}
+        <div>
+            <h3 class="page-header">
+                Substrate
+                <small>{{sample.substrate.serial}}</small>
+            </h3>
+            <p>Source: {{sample.substrate.source}}</p>
+            <p>Comment: {{sample.substrate.comment|safe}}</p>
+            <p>Created on {{sample.substrate.created}}</p>
+            <p>Last modified on {{sample.substrate.modified}}</p>
+        </div>
         {% if sample.nodes.count <= 1 %}
             <div class="alert alert-warning">
                 <h3>This sample hasn't had any processes run on it.</h3>
