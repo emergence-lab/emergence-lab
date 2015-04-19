@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -19,6 +21,9 @@ from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
 from core.models import Sample, Process
 from schedule_queue.models import Reservation
+
+
+logger = logging.getLogger(__name__)
 
 
 class PlatterListView(LoginRequiredMixin, ActiveListView):
@@ -130,10 +135,13 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
         if all([growth_form.is_valid(), source_form.is_valid(),
                 checklist_form.is_valid(), sample_formset.is_valid(),
                 reservation_form.is_valid()]):
+            logger.debug('Creating new growth')
             self.object = growth_form.save()
+            logger.debug('Created process {} ({}) for {} samples'.format(self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
             source_form.save()
             for s in sample_formset:
                 sample = s.save()
+                logger.debug('Created sample {}'.format(sample.uuid))
                 piece = s.cleaned_data['piece']
                 sample.run_process(self.object, piece)
             reservation = Reservation.get_latest(user=self.request.user,

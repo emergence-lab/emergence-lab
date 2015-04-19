@@ -253,5 +253,10 @@ LOGGING = {
             'propogate': True,
             'level': 'WARNING',
         },
+        'd180.views': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
     },
 }
