@@ -19,7 +19,7 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_list' slug='all' username='all' %}">Processes</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
             <li><a href="{% url 'process_detail' uuid=process.uuid %}">{{process.uuid}}</a></li>
             <li class='active'>Edit</li>
         </ol>
@@ -29,7 +29,10 @@
         <h1 class="page-header">
             Edit {{process.uuid}}
             <div class="pull-right">
-                <a href="{% url 'process_detail' uuid=process.uuid %}" class="btn btn-danger">Cancel</a>
+                <a href="{% url 'process_detail' uuid=process.uuid %}" class="btn btn-default">
+                    {% bootstrap_icon 'arrow-left' %}
+                    Back
+                </a>
             </div>
         </h1>
     </header>

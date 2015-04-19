@@ -11,6 +11,14 @@
 {% block content %}
 
 <div class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
+            <li><a href="{% url 'process_detail' uuid=process %}">{{process}}</a></li>
+            <li class='active'>Upload</li>
+        </ol>
+    </nav>
 
     <header>
         <h1 class="page-header">

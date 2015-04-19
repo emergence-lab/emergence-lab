@@ -1,34 +1,43 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-{% block title %}{{growth}} Readings Update{%endblock%}
+{% block title %}Edit {{growth}} Readings{% endblock title %}
 
 {% block content %}
 
 <div class="container">
     <ol class="breadcrumb">
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'process_detail' growth.uuid %}">{{growth}}</a></li>
+        <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
+        <li><a href="{% url 'process_detail' growth.uuid %}">{{growth.uuid}}</a></li>
         <li><a href="{% url 'd180_readings_detail' growth.uuid %}">Readings</a></li>
-        <li class="active">Update</li>
+        <li class="active">Edit</li>
     </ol>
 
-<h2>Update {{growth}} readings</h2>
-<form action="" method="POST">
-{% csrf_token %}
-    <div class="row">
+    <header>
+        <h1 class="page-header">
+            Update readings for {{growth}} <small>({{growth.legacy_identifier}})</small>
+            <div class="pull-right">
+                <a href="{% url 'd180_readings_detail' growth.uuid %}" class="btn btn-default">
+                    {% bootstrap_icon 'arrow-left' %}
+                    Back
+                </a>
+            </div>
+        </h1>
+    </header>
 
-        {% for reading in readingslist %}
-        <div class="col-xs-2">
-        {% bootstrap_form reading %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="row">
+            {% for reading in readingslist %}
+                <div class="col-xs-2">
+                    {% bootstrap_form reading %}
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-<button class="btn btn-warning pull-right" id="update_readings" type="submit" name="updatereadingsform">Update Readings</button>
-</form>
-
-<a class="btn btn-default" href="{% url 'd180_readings_detail' growth.uuid %}">Back</a>
+        <button class="btn btn-warning pull-right" id="update_readings" type="submit" name="updatereadingsform">Update Readings</button>
+    </form>
 
 </div>
-<p> </p>
-{% endblock %}
+
+{% endblock content %}
