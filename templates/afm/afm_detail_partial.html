@@ -11,26 +11,27 @@
         </div>
     </h3>
 
-    <table class="table table-striped table-bordered table-hover">
+    <table class="table table-striped table-bordered table-hover"
+           data-toggle="table"
+           data-sort-name="created"
+           data-sort-order="asc">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Created</th>
-                <th>Modified</th>
-                <th>Scan Number</th>
-                <th>RMS [nm]</th>
-                <th>Z-Range [nm]</th>
-                <th>Location</th>
-                <th>Size [&mu;m]</th>
-                <th>Image Type</th>
-                <th>File Type</th>
-                <th>Data State</th>
+                <th data-field="created" data-sortable="true">Created</th>
+                <th data-field="modified" data-sortable="true">Modified</th>
+                <th data-field="scan_number" data-sortable="true">Scan Number</th>
+                <th data-field="rms" data-sortable="true">RMS [nm]</th>
+                <th data-field="zrange" data-sortable="true">Z-Range [nm]</th>
+                <th data-field="location" data-sortable="true">Location</th>
+                <th data-field="size" data-sortable="true">Size [&mu;m]</th>
+                <th data-field="image_type" data-sortable="true">Image Type</th>
+                <th data-field="file_type" data-sortable="true">File Type</th>
+                <th data-field="data_state" data-sortable="true">Data State</th>
                 <th>File</th>
             </tr>
         </thead>
         {% for file in object_list %}
             <tr>
-                <th>{{file.id}}</th>
                 <td>{{file.created}}</td>
                 <td>{{file.modified}}</td>
                 <td>{{file.scan_number}}</td>

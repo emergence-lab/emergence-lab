@@ -3,6 +3,11 @@
 
 {% block title %}{{process.uuid}}{% endblock title %}
 
+{% block header %}
+    {% load staticfiles %}
+    <link href="{% static 'core/css/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock header %}
+
 {% block content %}
 
 <main class="container">
@@ -116,3 +121,7 @@
 </main>
 
 {% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'core/js/bootstrap-table.min.js' %}"></script>
+{% endblock scripts %}
