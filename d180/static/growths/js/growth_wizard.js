@@ -5,7 +5,7 @@
         // field.
         elements.each(function() {
             var form_field = $(this);
-            var rich_text = $('<div class="richtext"></div>').html(form_field.html());
+            var rich_text = $('<div class="richtext"></div>').html(form_field.text());
             rich_text.insertBefore(form_field);
             form_field.addClass('hidden');
 
