@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import logging
 import math
 import os
 
@@ -17,6 +18,9 @@ from afm.forms import AutoCreateAFMForm
 from core.views import CreateUploadProcessView, UploadFileView
 
 
+logger = logging.getLogger(__name__)
+
+
 class AFMFileUpload(UploadFileView):
     """
     Add files to an existing afm process
@@ -25,6 +29,10 @@ class AFMFileUpload(UploadFileView):
 
     def process_image(self, scan, filename, scan_number):
         image = Image.fromarray(scan.colorize())
+        if image.size != (512, 512):
+            logger.debug('Image not correct size: {}, should be 512 x 512'.format(image.size))
+            image = image.resize((512, 512), resample=Image.NEAREST)
+            logger.debug('Resized image to 512 x 512')
 
         processed_image = Image.new(image.mode, (654, 580), 'white')
         processed_image.paste(image,
@@ -84,6 +92,7 @@ class AFMFileUpload(UploadFileView):
         raw = six.BytesIO(uploaded_file.read())
         raw.mode = 'b'
         scan = nanoscope.read(raw, encoding='cp1252')
+        logger.debug('Read in file {}'.format(uploaded_file.name))
 
         processed_files = [(uploaded_file, dict(image_type='Raw', state='raw',
                                                 rms=0.0, zrange=0.0,
@@ -91,7 +100,9 @@ class AFMFileUpload(UploadFileView):
                                                 content_type='application/octet-stream'))]
         for img in scan:
             img.process()
+            logger.debug('Converted and flattened {} scan'.format(img.type))
             processed_image = self.process_image(img, uploaded_file.name, scan_number)
+            logger.debug('Created image file for {} scan'.format(img.type))
             processed_files.append(
                 (processed_image, dict(image_type=img.type, state='extracted',
                                        rms=img.rms, zrange=img.zrange, size=img.scan_area,
