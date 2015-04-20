@@ -176,7 +176,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
 # RESTful API
 
 REST_FRAMEWORK = {
-    'PAGINATE_BY': 25,
+    # 'PAGINATE_BY': 25,
     'UPLOADED_FILES_USE_URL': False,
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
     'DEFAULT_AUTHENTICATION_CLASSES': (

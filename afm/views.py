@@ -111,7 +111,8 @@ class AFMFileUpload(UploadFileView):
             logger.debug('Created image file for {} scan'.format(img.type))
             processed_files.append(
                 (processed_image, dict(image_type=img.type, state='extracted',
-                                       rms=img.rms, zrange=img.zrange, size=math.sqrt(img.scan_area),
+                                       rms=img.rms, zrange=img.zrange,
+                                       size=math.sqrt(img.scan_area),
                                        scan_number=scan_number)))
         return processed_files
 
