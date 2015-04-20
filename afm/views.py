@@ -89,6 +89,12 @@ class AFMFileUpload(UploadFileView):
 
     def process_file(self, uploaded_file):
         scan_number = int(os.path.splitext(uploaded_file.name)[-1][1:])
+        if '_' in uploaded_file.name:
+            location = os.path.splitext(uploaded_file.name)[0].split('_')[-1]
+            if location not in 'rRcCfFeE':
+                location = 'c'
+        else:
+            location = 'c'
         raw = six.BytesIO(uploaded_file.read())
         raw.mode = 'b'
         scan = nanoscope.read(raw, encoding='cp1252')
@@ -105,7 +111,7 @@ class AFMFileUpload(UploadFileView):
             logger.debug('Created image file for {} scan'.format(img.type))
             processed_files.append(
                 (processed_image, dict(image_type=img.type, state='extracted',
-                                       rms=img.rms, zrange=img.zrange, size=img.scan_area,
+                                       rms=img.rms, zrange=img.zrange, size=math.sqrt(img.scan_area),
                                        scan_number=scan_number)))
         return processed_files
 
