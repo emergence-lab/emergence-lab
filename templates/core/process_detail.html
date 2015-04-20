@@ -3,6 +3,11 @@
 
 {% block title %}{{process.uuid}}{% endblock title %}
 
+{% block header %}
+    {% load staticfiles %}
+    <link href="{% static 'core/css/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock header %}
+
 {% block content %}
 
 <main class="container">
@@ -74,13 +79,32 @@
                 <h3 class="page-header">
                     Samples
                 </h3>
-                <div class="list-group">
+
+                <table class="table table-striped table-bordered table-hover"
+                       data-toggle="table"
+                       data-search="true"
+                       data-show-columns="true"
+                       data-sort-name="uuid"
+                       data-sort-order="asc">
+                    <thead>
+                        <tr>
+                            <th data-field="uuid" data-sortable="true" data-switchable="false">UUID</th>
+                            <th data-field="created" data-sortable="true">Created</th>
+                            <th data-field="modified" data-sortable="true">Modified</th>
+                            <th data-field="pieces" data-sortable="true">Pieces</th>
+                        </tr>
+                    </thead>
                     {% for sample in samples %}
-                        <a class="list-group-item" href="{% url 'sample_detail' uuid=sample.uuid %}">
-                            {{sample.uuid}}
-                        </a>
+                        <tr>
+                            <td><a href="{% url 'sample_detail' uuid=sample.uuid %}">
+                                {{sample.uuid}}
+                            </a></td>
+                            <td>{{sample.created}}</td>
+                            <td>{{sample.modified}}</td>
+                            <td>{{sample.pieces|length}}</td>
+                        </tr>
                     {% endfor %}
-                </div>
+                </table>
             </div>
         {% endif %}
 
@@ -93,6 +117,17 @@
                         {% bootstrap_icon 'upload' %}
                         Upload File
                     </a>
+                    {% if process.slug == 'afm' %}
+                        <a href="{% url 'afm_upload' uuid=process.uuid %}" class="btn btn-primary">
+                            {% bootstrap_icon 'upload' %}
+                            Upload AFM Scan
+                        </a>
+                    {% elif process.slug == 'sem' %}
+                        <a href="{% url 'sem_upload' uuid=process.uuid %}" class="btn btn-primary">
+                            {% bootstrap_icon 'upload' %}
+                            Upload SEM Image
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         {% else %}
@@ -102,6 +137,12 @@
         {% endif %}
     </div>
 
+    <div class="spacer-lg"></div>
+
 </main>
 
 {% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'core/js/bootstrap-table.min.js' %}"></script>
+{% endblock scripts %}

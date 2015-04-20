@@ -258,5 +258,10 @@ LOGGING = {
             'propogate': True,
             'level': 'DEBUG',
         },
+        'afm.views': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
     },
 }
