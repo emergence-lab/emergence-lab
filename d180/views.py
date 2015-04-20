@@ -204,8 +204,9 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
                                                prefix='reading')
 
         if comment_form.is_valid() and readings_formset.is_valid():
-            self.object.comment = comment_form.cleaned_data['comment']
-            self.object.save()
+            if comment_form.has_changed():
+                self.object.comment = comment_form.cleaned_data['comment']
+                self.object.save()
             for reading_form in readings_formset:
                 if reading_form.has_changed():
                     reading_form.save(growth=self.object)
@@ -229,11 +230,14 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
         except ObjectDoesNotExist:
             previous_source = None
 
+        comment_form = CommentsForm(prefix='comment',
+                                    initial={'comment': self.object.comment})
+
         return {
             'checklist_form': WizardPostrunChecklistForm(prefix='checklist'),
             'source_form': SourcesForm(instance=previous_source,
                                        prefix='source'),
-            'comment_form': CommentsForm(prefix='growth'),
+            'comment_form': comment_form,
         }
 
     def get_context_data(self, **kwargs):
