@@ -98,7 +98,7 @@
                                         data-toggle="tooltip"
                                         data-html="true"
                                         data-placement="left"
-                                        title="{{node.process.comment|safe|truncatewords:50}}">
+                                        title="{{node.process.comment|escape|truncatewords:50}}">
                                             {{node.process.uuid}}
                                      </a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %}
                                     )

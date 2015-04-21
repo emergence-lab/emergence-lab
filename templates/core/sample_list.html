@@ -71,7 +71,7 @@
                         {% for i in sample.nodes %}
                             {% if not i.is_root_node %}
                             {% if not i.process.slug == 'split-process' %}
-                            <span class="label label-default" href="{% url 'process_detail' uuid=i.process.uuid %}" data-toggle="tooltip" data-html="true" title="{{i.process.created|date:"SHORT_DATE_FORMAT"}}<p>{{i.process.comment|safe|truncatewords:50}}</p>">{{i.process.name}}</span>
+                            <span class="label label-default" href="{% url 'process_detail' uuid=i.process.uuid %}" data-toggle="tooltip" data-html="true" title="{{i.process.created|date:"SHORT_DATE_FORMAT"}}<p>{{i.process.comment|escape|truncatewords:50}}</p>">{{i.process.name}}</span>
                             {%endif%}
                             {%endif%}
                         {% endfor %}
