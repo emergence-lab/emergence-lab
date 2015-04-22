@@ -20,6 +20,10 @@
         <h1 class="page-header">
             {{sample}}
             <div class="pull-right">
+                <a href="{% url 'export_sample' uuid=sample.uuid %}" class="btn btn-info">
+                    {% bootstrap_icon 'file' %}
+                    Export
+                </a>
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         {% bootstrap_icon 'plus' %}

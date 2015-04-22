@@ -31,3 +31,4 @@ django-sendfile==0.3.6
 django-betterforms==1.1.1
 ExifRead==2.0.1
 git+https://github.com/jmarini/nanoscope@0.10.1#egg=nanoscope
+WeasyPrint==0.23

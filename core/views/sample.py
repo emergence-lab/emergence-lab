@@ -12,7 +12,7 @@ from django_filters.views import FilterView
 from core.filters import SampleFilterSet
 from core.forms import SampleMultiForm
 from core.models import Sample
-from core.views import ActionReloadView
+from core.views import ActionReloadView, PrintTemplate
 
 
 class SampleListView(LoginRequiredMixin, generic.ListView):
@@ -106,3 +106,13 @@ class SampleSearchView(LoginRequiredMixin, FilterView):
     template_name = 'core/sample_search.html'
     model = Sample
     filterset_class = SampleFilterSet
+
+
+class ExportSampleDetail(PrintTemplate):
+    template_name = 'core/sample_print.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExportSampleDetail, self).get_context_data(**kwargs)
+        sample = Sample.objects.get(id=Sample.strip_uuid(self.kwargs.get('uuid', None)))
+        context['sample'] = sample
+        return context

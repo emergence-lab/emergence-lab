@@ -9,6 +9,7 @@ from .utility import (
     HomepageView,
     ProtectedMediaView,
     QuickSearchRedirectView,
+    PrintTemplate,
 )
 from .user import (
     ActivateUserRedirectView,
@@ -39,6 +40,7 @@ from .sample import (
     SampleUpdateView,
     SampleSplitView,
     SampleSearchView,
+    ExportSampleDetail,
 )
 from .process import (
     ProcessDetailView,
