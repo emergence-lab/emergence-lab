@@ -30,7 +30,7 @@ class PlatterListView(LoginRequiredMixin, ActiveListView):
     """
     View to list all operators and provide actions.
     """
-    template_name = "growths/platter_list.html"
+    template_name = "d180/platter_list.html"
     model = Platter
 
 
@@ -38,7 +38,7 @@ class PlatterCreateView(LoginRequiredMixin, generic.CreateView):
     """
     View for creating a platter.
     """
-    template_name = 'growths/platter_create.html'
+    template_name = 'd180/platter_create.html'
     model = Platter
     fields = ('name', 'serial',)
 
@@ -83,7 +83,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
     """
     Steps through creating a growth.
     """
-    template_name = 'growths/create_growth_start.html'
+    template_name = 'd180/create_growth_start.html'
 
     def build_forms(self):
         try:
@@ -168,7 +168,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
 
 
 class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'growths/create_growth_readings.html'
+    template_name = 'd180/create_growth_readings.html'
 
     def get_object(self):
         return D180Growth.objects.latest('created')
@@ -219,7 +219,7 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
 
 
 class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'growths/create_growth_postrun.html'
+    template_name = 'd180/create_growth_postrun.html'
 
     def get_object(self):
         return D180Growth.objects.latest('created')
@@ -274,7 +274,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
 
 class ReadingsDetailView(generic.DetailView):
     model = D180Growth
-    template_name = 'growths/readings_detail.html'
+    template_name = 'd180/readings_detail.html'
     context_object_name = 'growth'
 
     def get_object(self):
@@ -311,7 +311,7 @@ class ReadingsDetailView(generic.DetailView):
 class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView):
     context_object_name = 'growth'
     queryset = D180Growth.objects.all()
-    template_name = 'growths/update_readings.html'
+    template_name = 'd180/update_readings.html'
 
     def get_object(self):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
