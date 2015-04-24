@@ -15,10 +15,16 @@
     <header>
         <h1 class="page-header">
             Processes
-            <a class="btn btn-primary pull-right" href="{% url 'process_create' %}">
-                <span class="glyphicon glyphicon-plus"></span>
-                Create Process
-            </a>
+            <div class="btn-toolbar pull-right">
+                <a class="btn btn-info" href="{% url 'process_templates' slug='all'%}">
+                    <span class="glyphicon glyphicon-star"></span>
+                    Favorites
+                </a>
+                <a class="btn btn-primary" href="{% url 'process_create' %}">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Create Process
+                </a>
+            </div>
         </h1>
         <ul class="nav nav-tabs">
             <li role="presentation" {% if username == 'all' %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username='all' %}">All Users</a></li>
@@ -57,8 +63,22 @@
                         {% if process.legacy_identifier %}
                             ({{process.legacy_identifier}})
                         {% endif %}
-                        <span class="label label-default pull-right">{{process.name}}</span>
-                        <span class="pull-right"><small>{{process.created.date|date:"SHORT_DATE_FORMAT"}} &emsp; </small></span>
+                        <div class="btn-toolbar pull-right">
+                          <a class="btn btn-xs btn-default"
+                             data-toggle="tooltip"
+                             title="Use as template"
+                             href="{% if process.slug = 'd180-growth' %}{% url 'create_growth_d180_start_template' uuid=process.uuid %}{%else%}{% url 'process_create_from_template' uuid=process.uuid %}{%endif%}">
+                              <span class="glyphicon glyphicon-share-alt" style="color:grey"></span>
+                          </a>
+                            <a class="btn btn-xs btn-default"
+                               data-toggle="tooltip"
+                               title="Favorite"
+                               href="{% url 'add_process_template' uuid=process.uuid %}">
+                                <span class="glyphicon glyphicon-star" style="color:grey"></span>
+                            </a>
+                            <a href="#" class="label label-default">{{process.name}}</a>
+                        </div>
+                        <span class="pull-right"><small>&emsp; {{process.created.date|date:"SHORT_DATE_FORMAT"}} &emsp; </small></span>
                     </h4>
                     <p class="list-group-item-text"></p>
                         {{process.comment|truncatewords_html:50|safe}}
