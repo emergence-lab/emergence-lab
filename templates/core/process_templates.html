@@ -2,6 +2,15 @@
 
 {% block content %}
 <main class="container">
+
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
+            <li class='active'>Favorites</li>
+        </ol>
+    </nav>
+
     <div class="page-header">
         <h1>
             Process Favorites

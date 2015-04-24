@@ -18,6 +18,16 @@
 
 <main class="container">
 
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
+            <li><a href="{% url 'process_templates' slug='all' %}">Favorites</a></li>
+            <li><a href="{% url 'process_template_detail' pk=processtemplate.id %}">Detail</a></li>
+            <li class="active">Edit</li>
+        </ol>
+    </nav>
+
     <header>
         <h1 class="page-header">
             Edit {{processtemplate.name}}
