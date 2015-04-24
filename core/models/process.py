@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-import uuid
 
 from django.core.files.storage import default_storage as labshare
 from django.conf import settings
@@ -20,8 +19,7 @@ def get_file_path(instance, filename):
     """
     Stores files in /process_data and generates a UUID-based file name
     """
-    return '/'.join(['process_data',
-                     uuid.uuid4().get_hex() + os.path.splitext(filename)[1]])
+    return os.path.join('processes', instance.process.uuid_full.hex, filename)
 
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
