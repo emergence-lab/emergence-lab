@@ -12,10 +12,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 from braces.views import LoginRequiredMixin
-from redis import StrictRedis
 
 from core.models import Process, Sample, DataFile, ProcessTemplate
-from core.forms import DropzoneForm, ProcessCreateForm
+from core.forms import DropzoneForm, ProcessCreateForm, EditProcessTemplateForm
 from core.polymorphic import get_subclasses
 from . import ActionReloadView
 
@@ -239,7 +238,17 @@ class AddProcessTemplateView(LoginRequiredMixin, ActionReloadView):
                                        name=process.uuid)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('process_templates')
+        return reverse('process_templates', kwargs={'slug': 'all'})
+
+
+class RemoveProcessTemplateView(LoginRequiredMixin, generic.DeleteView):
+    """
+    View for deleting a process template
+    """
+    model = ProcessTemplate
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('process_templates', kwargs={'slug': 'all'})
 
 
 class ProcessCreateFromTemplateView(ProcessCreateView):
@@ -263,3 +272,15 @@ class ProcessTemplateDetailView(LoginRequiredMixin, generic.DetailView):
     """
     model = ProcessTemplate
     template_name = 'core/process_template_detail.html'
+
+
+class ProcessTemplateEditView(LoginRequiredMixin, generic.UpdateView):
+    """
+    View for editing process template details
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_template_edit.html'
+    form_class = EditProcessTemplateForm
+
+    def get_success_url(self):
+        return reverse('process_template_detail', args=(self.object.id,))
