@@ -3,7 +3,9 @@ from __future__ import absolute_import, unicode_literals
 
 from itertools import groupby
 import logging
+import os
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -12,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile
+from core.models import Process, Sample, DataFile, ProcessNode
 from core.forms import DropzoneForm, ProcessCreateForm
 from core.polymorphic import get_subclasses
 
@@ -196,5 +198,21 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
             if 'content_type' not in kwargs:
                 kwargs['content_type'] = self.get_content_type(f)
             logger.debug('Saving file \'{}\' for process {}'.format(f.name, process.uuid_full))
-            obj = self.model.objects.create(data=f, **kwargs)
-            obj.processes.add(process)
+            obj = self.model.objects.create(data=None, process=process, **kwargs)
+            obj.data = f
+            obj.save()
+            trees = ProcessNode.objects.filter(process=process).values_list('tree_id', flat=True)
+            nodes = ProcessNode.objects.filter(tree_id__in=trees, sample__isnull=False).values_list('sample', flat=True)
+            samples = Sample.objects.filter(id__in=nodes)
+            for sample in samples:
+                base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
+                target = os.path.join(base, process.uuid_full.hex)
+                if not os.path.exists(target):
+                    try:
+                        logger.debug('creating directory {}'.format(base))
+                        os.makedirs(base)
+                    except OSError:
+                        pass
+                    source = os.path.split(os.path.abspath(obj.data.path))[0]
+                    logger.debug('linking {} to {}'.format(source, target))
+                    os.symlink(source, target)
