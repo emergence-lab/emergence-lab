@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="page-header">
+            <h1>
+                {% if processtemplate.name%}{{ processtemplate.name }}{%else%}Unnamed Template{%endif%}
+                <small>&emsp;{{processtemplate.process.uuid}}{% if processtemplate.process.legacy_identifier%}{{processtemplate.process.legacy_identifier}}{%endif%}</small>
+            <span class="pull-right label label-default">{{processtemplate.process.name}}</span>
+            </h1>
+        </div>
+        <div class="col-md-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation"><a href="#">Edit</a></li>
+                <li role="presentation"><a href="href="{% if processtemplate.process.slug = 'd180-growth' %}{% url 'create_growth_d180_start_template' id=processtemplate.process.uuid %}{%else%}{% url 'process_create_from_template' id=processtemplate.process.uuid %}{%endif%}">">Create</a></li>
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <div class="panel panel-info">
+                <div class="panel-heading">Based on <a href="{% url 'process_detail' processtemplate.process.uuid %}">{{processtemplate.process.uuid}} ({{processtemplate.process.created|date:"SHORT_DATE_FORMAT"}})</a></div>
+                <div class="panel-body">
+                    <p>{{processtemplate.comment|escape|safe}}</p>
+                </div>
+                <div class="panel-footer">
+                    <p><strong>Created: </strong>{{processtemplate.created}}<span style="padding-left:5em" ></span><strong>Modified: </strong>{{processtemplate.modified}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

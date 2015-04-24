@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="container">
+    <div class="page-header">
+        <h1>Process Favorites</h1>
+    </div>
+    <div class="col-md-2">
+        Filter by type:
+        <p></p>
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_templates' slug='all' %}">All</a></li>
+        {% for process_type in process_list %}
+            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_templates' slug=process_type.slug %}">{{process_type.name}}</a></li>
+        {% endfor %}
+        </ul>
+        <p></p>
+    </div>
+    <div class="col-md-10">
+        <div class="list-group">
+            {% for object in object_list %}
+                <li href="#" class="list-group-item">
+                    <h4 class="list-group-item-heading">
+                        {{object.name}}
+                        <small>{{object.process.uuid}}</small>
+                        <a class="btn btn-xs btn-default pull-right"
+                           href="{% url 'process_create_from_template' id=object.id %}"
+                           data-toggle="toolip" title="New from template">
+                            <span class="glyphicon glyphicon-share-alt"></span>
+                        </a>
+                    </h4>
+                    <p class="list-group-item-text">{{object.comment|escape|truncatewords_html:50}}</p>
+                </li>
+            {% endfor %}
+        </div>
+    </div>
+
+</main>
+{% endblock %}
