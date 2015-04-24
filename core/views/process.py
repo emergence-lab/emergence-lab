@@ -202,10 +202,13 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
             obj.data = f
             obj.save()
             trees = ProcessNode.objects.filter(process=process).values_list('tree_id', flat=True)
-            nodes = ProcessNode.objects.filter(tree_id__in=trees, sample__isnull=False).values_list('sample', flat=True)
+            nodes = (ProcessNode.objects.filter(tree_id__in=trees,
+                                                sample__isnull=False)
+                                        .values_list('sample', flat=True))
             samples = Sample.objects.filter(id__in=nodes)
             for sample in samples:
-                base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
+                base = os.path.abspath(os.path.join(
+                    settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
                 target = os.path.join(base, process.uuid_full.hex)
                 if not os.path.exists(target):
                     try:
