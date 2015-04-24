@@ -1,0 +1,6 @@
+<form method='post' action='{% url 'split_sample' uuid=sample.uuid piece='a' %}'>
+    {% csrf_token %}
+    <p><input id='split_number_a' name='split_number_a' type='number' class='form-control' placeholder='Final number of pieces (minimum 2)'></p>
+    <p><input id='split_comment_a' name='split_comment_a' type='text' class='form-control' placeholder='Comment...'</p>
+    <p><input id='submit_split_a' type='submit' class='form-control btn btn-success'></p>
+</form>
