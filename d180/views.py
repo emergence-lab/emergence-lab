@@ -19,7 +19,7 @@ from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                     D180ReadingsForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
-from core.models import Sample, Process
+from core.models import Sample, Process, ProcessTemplate
 from schedule_queue.models import Reservation
 
 
@@ -439,3 +439,16 @@ class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView)
                                    silane_dilution=newsilane_dilution, silane_mix=newsilane_mix,
                                    silane_pressure=newsilane_pressure)
         return HttpResponseRedirect(reverse('d180_readings_edit', args=[self.get_object()]))
+
+
+class TemplateWizardStartView(WizardStartView):
+
+    def build_forms(self):
+        if 'id' in self.kwargs:
+            comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
+        elif 'uuid' in self.kwargs:
+            comment = D180Growth.objects.get(uuid_full__startswith=Process.strip_uuid(
+                self.kwargs.get('uuid', None))).comment
+        output = super(TemplateWizardStartView, self).build_forms()
+        output['comment_form'] = CommentsForm(initial={'comment': comment}, prefix='growth')
+        return output
