@@ -231,13 +231,13 @@ class AddProcessTemplateView(LoginRequiredMixin, ActionReloadView):
     def perform_action(self, request, *args, **kwargs):
         process = Process.objects.get(
             uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None)))
-        ProcessTemplate.objects.create(process=process,
-                                       comment=process.comment,
-                                       user=self.request.user,
-                                       name=process.uuid)
+        self.template = ProcessTemplate.objects.create(process=process,
+                                                       comment=process.comment,
+                                                       user=self.request.user,
+                                                       name=process.uuid)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('process_templates', kwargs={'slug': 'all'})
+        return reverse('process_template_detail', kwargs={'pk': self.template.id})
 
 
 class RemoveProcessTemplateView(LoginRequiredMixin, generic.DeleteView):

@@ -123,9 +123,9 @@ class ProcessTemplate(TimestampMixin, models.Model):
     """
     Model for templating existing process details for later reference
     """
-    process = models.OneToOneField(Process,
-                                   related_name='process',
-                                   related_query_name='process')
+    process = models.ForeignKey(Process,
+                                related_name='process',
+                                related_query_name='process')
     name = models.CharField(max_length=50, blank=True)
     comment = fields.RichTextField(blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
