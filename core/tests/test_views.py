@@ -10,7 +10,7 @@ from model_mommy import mommy
 
 from .helpers import test_resolution_template
 from core.models import (Investigation, Process, Project, ProjectTracking,
-                         Sample, Substrate)
+                         Sample, Substrate, ProcessTemplate)
 
 
 class TestHomepageAbout(TestCase):
@@ -550,3 +550,45 @@ class TestProcessCRUD(TestCase):
         self.assertEqual(process.comment, data['comment'])
         detail_url =  '/process/{}/'.format(process.uuid)
         self.assertRedirects(response, detail_url)
+
+
+class TestProcessTemplateCRUD(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
+        self.client.login(username='username1', password='')
+
+    def test_create_process_template(self):
+        process = mommy.make(Process)
+        url = '/process/templates/add/{}/'.format(process.uuid)
+        response = self.client.get(url)
+        template = ProcessTemplate.objects.last()
+        self.assertEqual(template.id, 1)
+        detail_url = '/process/templates/detail/{}/'.format(template.id)
+        self.assertRedirects(response, detail_url)
+
+    def test_edit_process_template(self):
+        process = mommy.make(Process)
+        template = ProcessTemplate.objects.create(process=process,
+                                                  user=self.user)
+        url = '/process/templates/edit/{}/'.format(template.id)
+        data = {
+            'name': 'test',
+            'comment': 'test_comment'
+        }
+        response = self.client.post(url, data)
+        detail_url = 'process/templates/detail/{}/'.format(template.id)
+        self.assertRedirects(response, detail_url)
+        comment = ProcessTemplate.objects.get(id=template.id).comment
+        self.assertEqual(comment, data['comment'])
+
+    def test_delete_process_template(self):
+        process = mommy.make(Process)
+        template = ProcessTemplate.objects.create(process=process,
+                                                  user=self.user)
+        url = '/process/templates/remove/{}/'.format(template.id)
+        response = self.client.post(url, args=(template.id,), follow=True)
+        with self.assertRaises(ProcessTemplate.DoesNotExist):
+            ProcessTemplate.objects.get(id=template.id)
+        self.assertEqual(response.status_code, 200)

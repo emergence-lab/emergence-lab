@@ -1,0 +1,60 @@
+{% extends 'core/base.html' %}
+
+{% load bootstrap3 %}
+
+
+{% block title %}Edit {{processtemplate.name}}{% endblock title %}
+
+{% block header %}
+    {% load staticfiles %}
+    <script src="{% static 'growths/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'growths/js/rangy-core.js' %}"></script>
+    <script src="{% static 'growths/js/hallo.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'growths/css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/font-awesome.css' %}">
+{% endblock header %}
+
+{% block content %}
+
+<main class="container">
+
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
+            <li><a href="{% url 'process_templates' slug='all' %}">Favorites</a></li>
+            <li><a href="{% url 'process_template_detail' pk=processtemplate.id %}">Detail</a></li>
+            <li class="active">Edit</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Edit {{processtemplate.name}}
+            <div class="pull-right">
+                <a href="{% url 'process_template_detail' pk=processtemplate.id %}" class="btn btn-default">
+                    {% bootstrap_icon 'arrow-left' %}
+                    Back
+                </a>
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="btn btn-warning" type="submit">Update</button>
+        </form>
+    </div>
+
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'growths/js/growth_wizard.js' %}"></script>
+    <script type="text/javascript">
+        growth_wizard.enable_rich_text('.hallo', 'form');
+    </script>
+{% endblock scripts %}

@@ -5,7 +5,7 @@ import string
 
 from django import forms
 
-from core.models import DataFile, Process
+from core.models import DataFile, Process, ProcessTemplate
 
 
 class DropzoneForm(forms.ModelForm):
@@ -31,3 +31,17 @@ class ProcessCreateForm(AutoCreateForm):
     class Meta:
         model = Process
         fields = ('comment',)
+
+
+class EditProcessTemplateForm(forms.ModelForm):
+
+    name = forms.CharField(required=False)
+    comment = forms.CharField(
+        label="Process comments",
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'hallo'})
+    )
+
+    class Meta:
+        model = ProcessTemplate
+        fields = ('name', 'comment',)

@@ -117,3 +117,16 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
     state = models.CharField(max_length=20, choices=DATA_STATE, default='raw')
+
+
+class ProcessTemplate(TimestampMixin, models.Model):
+    """
+    Model for templating existing process details for later reference
+    """
+    process = models.ForeignKey(Process,
+                                related_name='process',
+                                related_query_name='process')
+    name = models.CharField(max_length=50, blank=True)
+    comment = fields.RichTextField(blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                         limit_choices_to={'is_active': True})

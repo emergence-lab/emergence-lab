@@ -12,9 +12,10 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile
-from core.forms import DropzoneForm, ProcessCreateForm
+from core.models import Process, Sample, DataFile, ProcessTemplate
+from core.forms import DropzoneForm, ProcessCreateForm, EditProcessTemplateForm
 from core.polymorphic import get_subclasses
+from . import ActionReloadView
 
 
 logger = logging.getLogger(__name__)
@@ -198,3 +199,87 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
             logger.debug('Saving file \'{}\' for process {}'.format(f.name, process.uuid_full))
             obj = self.model.objects.create(data=f, **kwargs)
             obj.processes.add(process)
+
+
+class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
+    """
+    View for favorite process comment templates.
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_templates.html'
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug', 'all')
+        queryset = super(ProcessTemplateListView, self).get_queryset()
+        queryset = queryset.filter(user=self.request.user).order_by('-created')
+        if slug != 'all':
+            queryset = [i for i in queryset if i.process.slug == slug]
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
+        context['process_list'] = get_subclasses(Process)
+        context['slug'] = self.kwargs.get('slug', 'all')
+        return context
+
+
+class AddProcessTemplateView(LoginRequiredMixin, ActionReloadView):
+    """
+    View for adding a process template
+    """
+
+    def perform_action(self, request, *args, **kwargs):
+        process = Process.objects.get(
+            uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None)))
+        self.template = ProcessTemplate.objects.create(process=process,
+                                                       comment=process.comment,
+                                                       user=self.request.user,
+                                                       name=process.uuid)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('process_template_detail', kwargs={'pk': self.template.id})
+
+
+class RemoveProcessTemplateView(LoginRequiredMixin, generic.DeleteView):
+    """
+    View for deleting a process template
+    """
+    model = ProcessTemplate
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('process_templates', kwargs={'slug': 'all'})
+
+
+class ProcessCreateFromTemplateView(ProcessCreateView):
+    """
+    View for creating a process with templated comments
+    """
+
+    def get_initial(self):
+        if 'id' in self.kwargs:
+            comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
+        elif 'uuid' in self.kwargs:
+            comment = Process.objects.get(
+                uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None))).comment
+        return {'user': self.request.user,
+                'comment': comment}
+
+
+class ProcessTemplateDetailView(LoginRequiredMixin, generic.DetailView):
+    """
+    View for process template details
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_template_detail.html'
+
+
+class ProcessTemplateEditView(LoginRequiredMixin, generic.UpdateView):
+    """
+    View for editing process template details
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_template_edit.html'
+    form_class = EditProcessTemplateForm
+
+    def get_success_url(self):
+        return reverse('process_template_detail', args=(self.object.id,))
