@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 from itertools import groupby
 import logging
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -214,7 +213,7 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
         queryset = super(ProcessTemplateListView, self).get_queryset()
         queryset = queryset.filter(user=self.request.user).order_by('-created')
         if slug != 'all':
-            queryset = [i for i in queryset if i.process.slug == slug ]
+            queryset = [i for i in queryset if i.process.slug == slug]
         return queryset
 
     def get_context_data(self, **kwargs):
