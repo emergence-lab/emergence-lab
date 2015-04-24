@@ -3,7 +3,11 @@
 {% block content %}
 <main class="container">
     <div class="page-header">
-        <h1>Process Favorites</h1>
+        <h1>
+            Process Favorites
+            <a href="{% url 'process_list' slug='all' username='all' %}" class="btn btn-default pull-right">Back</a>
+        </h1>
+
     </div>
     <div class="col-md-2">
         Filter by type:
@@ -21,15 +25,34 @@
             {% for object in object_list %}
                 <li href="#" class="list-group-item">
                     <h4 class="list-group-item-heading">
-                        {{object.name}}
-                        <small>{{object.process.uuid}}</small>
-                        <a class="btn btn-xs btn-default pull-right"
-                           href="{% url 'process_create_from_template' id=object.id %}"
-                           data-toggle="toolip" title="New from template">
-                            <span class="glyphicon glyphicon-share-alt"></span>
+                        <a href="{% url 'process_template_detail' pk=object.id %}">
+                            {{object.name}}
+                            <small>{{object.process.uuid}}{% if object.process.legacy_identifier %} ({{object.process.legacy_identifier}}){%endif%}</small>
                         </a>
+                        <div class="btn-toolbar pull-right">
+                            <a class="btn btn-xs btn-default"
+                               href="{% url 'process_template_detail' pk=object.id %}"
+                               data-toggle="toolip" title="Detail">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                            </a>
+                            <a class="btn btn-xs btn-default"
+                               href="{% url 'process_template_edit' pk=object.id %}"
+                               data-toggle="toolip" title="Edit">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a class="btn btn-xs btn-default"
+                               href="{% url 'process_create_from_template' id=object.id %}"
+                               data-toggle="toolip" title="New from template">
+                                <span class="glyphicon glyphicon-share-alt"></span>
+                            </a>
+                            <a class="btn btn-xs btn-default"
+                               href="{% url 'remove_process_template' pk=object.id %}"
+                               data-toggle="toolip" title="Delete template">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                        </div>
                     </h4>
-                    <p class="list-group-item-text">{{object.comment|escape|truncatewords_html:50}}</p>
+                    <p class="list-group-item-text">{{object.comment|escape|safe|truncatewords_html:50}}</p>
                 </li>
             {% endfor %}
         </div>
