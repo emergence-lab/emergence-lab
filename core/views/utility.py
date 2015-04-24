@@ -162,4 +162,8 @@ class PrintTemplate(LoginRequiredMixin, PDFTemplateView):
     """
     Base view for printing
     """
-    pass
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super(PrintTemplate, self).render_to_response(context, **response_kwargs)
+        response['Content-Disposition'] = 'inline; filename="export.pdf"'
+        return response
