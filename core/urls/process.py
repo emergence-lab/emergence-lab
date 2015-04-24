@@ -31,6 +31,8 @@ urlpatterns = [
         name='process_create_from_template'),
     url(r'^templates/detail/(?P<pk>[0-9]+)/$',
         core.views.ProcessTemplateDetailView.as_view(), name='process_template_detail'),
-    url(r'^templates/edit/(?P<id>[0-9]+)/$',
-        core.views.AddProcessTemplateView.as_view(), name='process_template_edit'),
+    url(r'^templates/edit/(?P<pk>[0-9]+)/$',
+        core.views.ProcessTemplateEditView.as_view(), name='process_template_edit'),
+    url(r'^templates/remove/(?P<pk>[0-9]+)/$',
+        core.views.RemoveProcessTemplateView.as_view(), name='remove_process_template'),
 ]
