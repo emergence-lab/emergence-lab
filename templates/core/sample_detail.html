@@ -24,6 +24,18 @@
                     {% bootstrap_icon 'file' %}
                     Export
                 </a>
+                {% if sample.pieces|length = 1 %}
+                <button type="button"
+                        class="btn btn-warning"
+                        href="#"
+                        title="<strong>Split this Sample</strong>"
+                        data-placement="left"
+                        data-toggle="popover"
+                        data-html="true"
+                        data-content="{% include 'core/sample_split_original.html' %}">
+                    Split
+                </button>
+                {% endif %}
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         {% bootstrap_icon 'plus' %}
