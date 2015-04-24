@@ -108,9 +108,10 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('text/csv', 'CSV File'),
     ]
 
-    processes = models.ManyToManyField(Process,
-                                       related_name='datafiles',
-                                       related_query_name='datafiles')
+    process = models.ForeignKey(Process,
+                                related_name='datafiles',
+                                related_query_name='datafiles',
+                                null=True)
     content_type = models.CharField(max_length=200, blank=True, choices=CONTENT_TYPE, default='')
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
