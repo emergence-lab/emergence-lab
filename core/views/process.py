@@ -201,21 +201,30 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
             obj = self.model.objects.create(data=None, process=process, **kwargs)
             obj.data = f
             obj.save()
+
+            # Get list of all samples that have a node with the specified process
             trees = ProcessNode.objects.filter(process=process).values_list('tree_id', flat=True)
             nodes = (ProcessNode.objects.filter(tree_id__in=trees,
                                                 sample__isnull=False)
                                         .values_list('sample', flat=True))
             samples = Sample.objects.filter(id__in=nodes)
+
+            # Create sample-specific directory structure:
+            #   samples/<sample.uuid>/<process.slug>/<process.uuid_full.hex>/
+            # and create a hard link to the file in the process-specific
+            # directory structure:
+            #   processes/<process.uuid_full.hex>/
             for sample in samples:
-                base = os.path.abspath(os.path.join(
+                sample_dir = os.path.abspath(os.path.join(
                     settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
-                target = os.path.join(base, process.uuid_full.hex)
-                if not os.path.exists(target):
-                    try:
-                        logger.debug('creating directory {}'.format(base))
-                        os.makedirs(base)
-                    except OSError:
-                        pass
-                    source = os.path.split(os.path.abspath(obj.data.path))[0]
-                    logger.debug('linking {} to {}'.format(source, target))
-                    os.symlink(source, target)
+                target_dir = os.path.join(sample_dir, process.uuid_full.hex)
+                try:
+                    os.makedirs(target_dir)
+                    logger.debug('created directory {}'.format(target_dir))
+                except OSError:
+                    pass
+                source_dir, filename = os.path.split(os.path.abspath(obj.data.path))
+                target = os.path.join(target_dir, filename)
+                source = os.path.join(source_dir, filename)
+                logger.debug('linking {} to {}'.format(target, source))
+                os.link(source, target)
