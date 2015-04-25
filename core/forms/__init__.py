@@ -18,4 +18,5 @@ from .process import (
     AutoCreateForm,
     DropzoneForm,
     ProcessCreateForm,
+    EditProcessTemplateForm,
 )

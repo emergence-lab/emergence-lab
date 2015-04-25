@@ -104,6 +104,9 @@ urlpatterns = [
 
     # sem urls
     url(r'^sem/', include('sem.urls')),
+
+    # print test
+    url(r'^print/', core.views.utility.PrintTemplate.as_view(), name='print_test'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

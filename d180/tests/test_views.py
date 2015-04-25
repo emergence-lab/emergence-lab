@@ -23,7 +23,7 @@ class TestPlatterCRUD(TestCase):
         match = resolve(url)
         self.assertEqual(match.url_name, 'platter_list')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'growths/platter_list.html')
+        self.assertTemplateUsed(response, 'd180/platter_list.html')
         self.assertEqual(response.status_code, 200)
 
 
@@ -44,7 +44,7 @@ class TestPlatterCRUD(TestCase):
         match = resolve(url)
         self.assertEqual(match.url_name, 'platter_create')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'growths/platter_create.html')
+        self.assertTemplateUsed(response, 'd180/platter_create.html')
         self.assertEqual(response.status_code, 200)
 
     def test_platter_create_valid_data(self):
@@ -91,7 +91,7 @@ class TestD180Wizard(TestCase):
         match = resolve(url)
         self.assertEqual(match.url_name, 'create_growth_d180_start')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'growths/create_growth_start.html')
+        self.assertTemplateUsed(response, 'd180/create_growth_start.html')
         self.assertEqual(response.status_code, 200)
 
     def test_readings_resolution_template(self):
@@ -100,7 +100,7 @@ class TestD180Wizard(TestCase):
         match = resolve(url)
         self.assertEqual(match.url_name, 'create_growth_d180_readings')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'growths/create_growth_readings.html')
+        self.assertTemplateUsed(response, 'd180/create_growth_readings.html')
         self.assertEqual(response.status_code, 200)
 
     def test_postrun_resolution_template(self):
@@ -109,7 +109,7 @@ class TestD180Wizard(TestCase):
         match = resolve(url)
         self.assertEqual(match.url_name, 'create_growth_d180_postrun')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'growths/create_growth_postrun.html')
+        self.assertTemplateUsed(response, 'd180/create_growth_postrun.html')
         self.assertEqual(response.status_code, 200)
 
     def test_start_empty_data(self):

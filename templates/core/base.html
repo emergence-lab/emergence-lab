@@ -43,6 +43,9 @@
                             <span class="glyphicon glyphicon-plus"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
+                            <li><a href="{% url 'sample_create' %}">
+                                Sample
+                            </a></li>
                             <li><a href="{% url 'create_growth_d180_start' %}">
                                 Growth
                             </a></li>
@@ -56,16 +59,20 @@
                     </li>
                     <li class="navbar-button"><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
                     <li id="apps-dropdown" class="dropdown navbar-button">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Apps">
+                        <a href="{% url 'dashboard' %}" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Apps">
                             <span class="glyphicon glyphicon-th"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="dropdown-header"><a href="#">
+                            <li class="dropdown-header">
                                 Apps
-                            </a></li>
+                            </li>
                             <li><a href="{% url 'sample_search' %}">
                                 <span class="glyphicon glyphicon-search"></span>
                                 Search
+                            </a></li>
+                            <li><a href="{% url 'project_list' %}">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                                Projects
                             </a></li>
                             <li><a href="{% url 'process_list_redirect' %}">
                                 <span class="glyphicon glyphicon-compressed"></span>
@@ -90,9 +97,9 @@
                             {% endif %}
                             </a></li>
                             <li class="divider"></li>
-                            <li class="dropdown-header"><a href="#">
+                            <li class="dropdown-header">
                                 Additional Services
-                            </a></li>
+                            </li>
                             <li><a href="***REMOVED***">
                                 <span class="glyphicon glyphicon-cloud-download"></span>
                                 Owncloud

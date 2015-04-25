@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-import uuid
 
 from django.core.files.storage import default_storage as labshare
 from django.conf import settings
@@ -20,8 +19,7 @@ def get_file_path(instance, filename):
     """
     Stores files in /process_data and generates a UUID-based file name
     """
-    return '/'.join(['process_data',
-                     uuid.uuid4().get_hex() + os.path.splitext(filename)[1]])
+    return os.path.join('processes', instance.process.uuid_full.hex, filename)
 
 
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
@@ -110,10 +108,24 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('text/csv', 'CSV File'),
     ]
 
-    processes = models.ManyToManyField(Process,
-                                       related_name='datafiles',
-                                       related_query_name='datafiles')
+    process = models.ForeignKey(Process,
+                                related_name='datafiles',
+                                related_query_name='datafiles',
+                                null=True)
     content_type = models.CharField(max_length=200, blank=True, choices=CONTENT_TYPE, default='')
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
     state = models.CharField(max_length=20, choices=DATA_STATE, default='raw')
+
+
+class ProcessTemplate(TimestampMixin, models.Model):
+    """
+    Model for templating existing process details for later reference
+    """
+    process = models.ForeignKey(Process,
+                                related_name='process',
+                                related_query_name='process')
+    name = models.CharField(max_length=50, blank=True)
+    comment = fields.RichTextField(blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                         limit_choices_to={'is_active': True})

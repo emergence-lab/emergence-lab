@@ -19,4 +19,6 @@ urlpatterns = [
         name='run_process'),
     url(r'^split/(?P<uuid>s[0-9]+)/(?P<piece>[a-z]+)/$',
         core.views.SampleSplitView.as_view(), name='split_sample'),
+    url(r'^print/(?P<uuid>s[0-9]+)/$',
+        core.views.ExportSampleDetail.as_view(), name='export_sample'),
 ]

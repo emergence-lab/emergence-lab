@@ -20,6 +20,22 @@
         <h1 class="page-header">
             {{sample}}
             <div class="pull-right">
+                <a href="{% url 'export_sample' uuid=sample.uuid %}" class="btn btn-info">
+                    {% bootstrap_icon 'file' %}
+                    Export
+                </a>
+                {% if sample.pieces|length = 1 %}
+                <button type="button"
+                        class="btn btn-warning"
+                        href="#"
+                        title="<strong>Split this Sample</strong>"
+                        data-placement="left"
+                        data-toggle="popover"
+                        data-html="true"
+                        data-content="{% include 'core/sample_split_original.html' %}">
+                    Split
+                </button>
+                {% endif %}
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                         {% bootstrap_icon 'plus' %}
@@ -98,7 +114,7 @@
                                         data-toggle="tooltip"
                                         data-html="true"
                                         data-placement="left"
-                                        title="{{node.process.comment|safe|truncatewords:50}}">
+                                        title="{{node.process.comment|escape|truncatewords:50}}">
                                             {{node.process.uuid}}
                                      </a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %}
                                     )

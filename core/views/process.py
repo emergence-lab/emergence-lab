@@ -3,7 +3,9 @@ from __future__ import absolute_import, unicode_literals
 
 from itertools import groupby
 import logging
+import os
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -12,9 +14,10 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile
-from core.forms import DropzoneForm, ProcessCreateForm
+from core.models import Process, Sample, DataFile, ProcessNode, ProcessTemplate
+from core.forms import DropzoneForm, ProcessCreateForm, EditProcessTemplateForm
 from core.polymorphic import get_subclasses
+from . import ActionReloadView
 
 
 logger = logging.getLogger(__name__)
@@ -196,5 +199,117 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
             if 'content_type' not in kwargs:
                 kwargs['content_type'] = self.get_content_type(f)
             logger.debug('Saving file \'{}\' for process {}'.format(f.name, process.uuid_full))
-            obj = self.model.objects.create(data=f, **kwargs)
-            obj.processes.add(process)
+            obj = self.model.objects.create(data=None, process=process, **kwargs)
+            obj.data = f
+            obj.save()
+
+            # Get list of all samples that have a node with the specified process
+            trees = ProcessNode.objects.filter(process=process).values_list('tree_id', flat=True)
+            nodes = (ProcessNode.objects.filter(tree_id__in=trees,
+                                                sample__isnull=False)
+                                        .values_list('sample', flat=True))
+            samples = Sample.objects.filter(id__in=nodes)
+
+            # Create sample-specific directory structure:
+            #   samples/<sample.uuid>/<process.slug>/<process.uuid_full.hex>/
+            # and create a hard link to the file in the process-specific
+            # directory structure:
+            #   processes/<process.uuid_full.hex>/
+            for sample in samples:
+                sample_dir = os.path.abspath(os.path.join(
+                    settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
+                target_dir = os.path.join(sample_dir, process.uuid_full.hex)
+                try:
+                    os.makedirs(target_dir)
+                    logger.debug('created directory {}'.format(target_dir))
+                except OSError:
+                    pass
+                source_dir, filename = os.path.split(os.path.abspath(obj.data.path))
+                target = os.path.join(target_dir, filename)
+                source = os.path.join(source_dir, filename)
+                logger.debug('linking {} to {}'.format(target, source))
+                os.link(source, target)
+
+
+class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
+    """
+    View for favorite process comment templates.
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_templates.html'
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug', 'all')
+        queryset = super(ProcessTemplateListView, self).get_queryset()
+        queryset = queryset.filter(user=self.request.user).order_by('-created')
+        if slug != 'all':
+            queryset = [i for i in queryset if i.process.slug == slug]
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
+        context['process_list'] = get_subclasses(Process)
+        context['slug'] = self.kwargs.get('slug', 'all')
+        return context
+
+
+class AddProcessTemplateView(LoginRequiredMixin, ActionReloadView):
+    """
+    View for adding a process template
+    """
+
+    def perform_action(self, request, *args, **kwargs):
+        process = Process.objects.get(
+            uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None)))
+        self.template = ProcessTemplate.objects.create(process=process,
+                                                       comment=process.comment,
+                                                       user=self.request.user,
+                                                       name=process.uuid)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('process_template_detail', kwargs={'pk': self.template.id})
+
+
+class RemoveProcessTemplateView(LoginRequiredMixin, generic.DeleteView):
+    """
+    View for deleting a process template
+    """
+    model = ProcessTemplate
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse('process_templates', kwargs={'slug': 'all'})
+
+
+class ProcessCreateFromTemplateView(ProcessCreateView):
+    """
+    View for creating a process with templated comments
+    """
+
+    def get_initial(self):
+        if 'id' in self.kwargs:
+            comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
+        elif 'uuid' in self.kwargs:
+            comment = Process.objects.get(
+                uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None))).comment
+        return {'user': self.request.user,
+                'comment': comment}
+
+
+class ProcessTemplateDetailView(LoginRequiredMixin, generic.DetailView):
+    """
+    View for process template details
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_template_detail.html'
+
+
+class ProcessTemplateEditView(LoginRequiredMixin, generic.UpdateView):
+    """
+    View for editing process template details
+    """
+    model = ProcessTemplate
+    template_name = 'core/process_template_edit.html'
+    form_class = EditProcessTemplateForm
+
+    def get_success_url(self):
+        return reverse('process_template_detail', args=(self.object.id,))

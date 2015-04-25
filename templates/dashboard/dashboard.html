@@ -21,7 +21,7 @@
                         <span class="glyphicon glyphicon-plus"></span>
                         New Project
                     </a>
-                    <a href="{% url 'track_project' %}" class="btn btn-primary">
+                    <a href="{% url 'project_list' %}" class="btn btn-primary">
                         <span class="glyphicon glyphicon-star"></span>
                         Track Project
                     </a>
@@ -90,7 +90,9 @@
             <div>
                 <h2>
                     Projects
-                    <a  href="{% url 'track_project' %}" class="pull-right glyphicon glyphicon-plus pull-right right-spacer-sm"></a>
+                    <a  href="{% url 'project_list' %}" class="pull-right right-spacer-sm">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
                 </h2>
             </div>
         </div>
@@ -130,7 +132,7 @@
                             <span class="glyphicon glyphicon-plus"></span>
                             New Project
                         </a>
-                        <a href="{% url 'track_project' %}" class="btn btn-primary">
+                        <a href="{% url 'project_list' %}" class="btn btn-primary">
                             <span class="glyphicon glyphicon-star"></span>
                             Track Project
                         </a>

@@ -9,6 +9,12 @@ import d180.views
 urlpatterns = [
     url(r'^create/start/$',
         d180.views.WizardStartView.as_view(), name='create_growth_d180_start'),
+    url(r'^create/start/(?P<id>[0-9]+)$',
+        d180.views.TemplateWizardStartView.as_view(),
+        name='create_growth_d180_start_template'),
+    url(r'^create/start/(?P<uuid>p[0-9a-f\-]{7,})$',
+        d180.views.TemplateWizardStartView.as_view(),
+        name='create_growth_d180_start_template'),
     url(r'^create/readings/$',
         d180.views.WizardReadingsView.as_view(),
         name='create_growth_d180_readings'),
