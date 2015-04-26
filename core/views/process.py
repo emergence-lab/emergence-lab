@@ -3,21 +3,21 @@ from __future__ import absolute_import, unicode_literals
 
 from itertools import groupby
 import logging
-import os
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
+
+import django_rq
 from braces.views import LoginRequiredMixin
 
-from core.models import Process, Sample, DataFile, ProcessNode, ProcessTemplate
 from core.forms import DropzoneForm, ProcessCreateForm, EditProcessTemplateForm
+from core.models import Process, Sample, DataFile, ProcessTemplate
 from core.polymorphic import get_subclasses
-from . import ActionReloadView
+from core.tasks import process_file, save_files
+from core.views import ActionReloadView
 
 
 logger = logging.getLogger(__name__)
@@ -148,6 +148,11 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
     model = DataFile
     template_name = 'core/process_upload.html'
     form_class = DropzoneForm
+    rq_config = {
+        'process': process_file,
+        'save': save_files,
+    }
+    rq_queue = 'default'
 
     def get_context_data(self, **kwargs):
         context = super(UploadFileView, self).get_context_data(**kwargs)
@@ -161,74 +166,15 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
         uploaded_file = self.request.FILES['file']
         logger.debug('Uploaded file \'{}\' for process {}'.format(
             uploaded_file.name, process.uuid_full))
-        processed_files = self.process_file(uploaded_file)
-        logger.debug('Processed {} files for process {}'.format(
-            len(processed_files), process.uuid_full))
 
-        with transaction.atomic():
-            self.save_files(process, processed_files, uploaded_file)
+        queue = django_rq.get_queue(self.rq_queue)
+        result = queue.enqueue(self.rq_config.get('process', process_file), uploaded_file)
+        queue.enqueue_call(
+            func=self.rq_config.get('save', save_files),
+            args=(self.model, process, result.id, self.rq_queue,),
+            depends_on=result)
 
         return JsonResponse({'status': 'success'})
-
-    def get_content_type(self, processed_file):
-        """
-        Returns the correct content type for the uploaded and processed file.
-        By default it checks for the content_type attribute on the file, de
-        """
-        try:
-            return processed_file.content_type
-        except AttributeError:
-            return 'application/octet-stream'
-
-    def process_file(self, uploaded_file):
-        """
-        Process the uploaded file by extracting data or converting the format.
-
-        :returns: A list of tuples with the first element being the file itself
-                  and the second argument being a dictionary of arguments to pass
-                  when creating the database object for the file.
-        """
-        return [(uploaded_file, {})]
-
-    def save_files(self, process, processed_files, raw_file):
-        """
-        Saves the processed file information to the database and puts the file
-        in the proper location on the filesystem.
-        """
-        for f, kwargs in processed_files:
-            if 'content_type' not in kwargs:
-                kwargs['content_type'] = self.get_content_type(f)
-            logger.debug('Saving file \'{}\' for process {}'.format(f.name, process.uuid_full))
-            obj = self.model.objects.create(data=None, process=process, **kwargs)
-            obj.data = f
-            obj.save()
-
-            # Get list of all samples that have a node with the specified process
-            trees = ProcessNode.objects.filter(process=process).values_list('tree_id', flat=True)
-            nodes = (ProcessNode.objects.filter(tree_id__in=trees,
-                                                sample__isnull=False)
-                                        .values_list('sample', flat=True))
-            samples = Sample.objects.filter(id__in=nodes)
-
-            # Create sample-specific directory structure:
-            #   samples/<sample.uuid>/<process.slug>/<process.uuid_full.hex>/
-            # and create a hard link to the file in the process-specific
-            # directory structure:
-            #   processes/<process.uuid_full.hex>/
-            for sample in samples:
-                sample_dir = os.path.abspath(os.path.join(
-                    settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
-                target_dir = os.path.join(sample_dir, process.uuid_full.hex)
-                try:
-                    os.makedirs(target_dir)
-                    logger.debug('created directory {}'.format(target_dir))
-                except OSError:
-                    pass
-                source_dir, filename = os.path.split(os.path.abspath(obj.data.path))
-                target = os.path.join(target_dir, filename)
-                source = os.path.join(source_dir, filename)
-                logger.debug('linking {} to {}'.format(target, source))
-                os.link(source, target)
 
 
 class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):

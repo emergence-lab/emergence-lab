@@ -12,6 +12,7 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^ckeditor/', include('ckeditor.urls')),
     url(r'^grappelli/', include('grappelli.urls')),
+    url(r'^django-rq/', include('django_rq.urls')),
 
     # misc urls
     url(r'^$', core.views.HomepageView.as_view(), name='home'),

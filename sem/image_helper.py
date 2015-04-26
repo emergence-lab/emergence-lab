@@ -1,9 +1,11 @@
-import tempfile
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from PIL import Image
 import exifread
+from PIL import Image
+import six
 
 
 allowed_sources = {
@@ -45,17 +47,12 @@ def get_image_number(image):
 
 
 def convert_tiff(image):
-    if _is_tiff(image):
-        img = Image.open(image)
-        tmp = open(tempfile.NamedTemporaryFile().name, 'wb+')
-        tmp.seek(0)
-        img.save(tmp, format='png')
-        output = InMemoryUploadedFile(file=tmp,
-                                      field_name=None,
-                                      name=str(_process_name(image) + '.png'),
-                                      content_type='image/png',
-                                      size=tmp.tell(),
-                                      charset=None)
-        return output
-    else:
+    if not _is_tiff(image):
         return image
+
+    img = Image.open(image)
+    tempio = six.StringIO()
+    img.save(tempio, format='PNG')
+    return InMemoryUploadedFile(
+        tempio, field_name=None, name=(_process_name(image) + '.png'),
+        content_type='image/png', size=tempio.len, charset=None)
