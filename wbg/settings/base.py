@@ -85,6 +85,7 @@ INSTALLED_APPS = (
     'mptt',
     'storages',
     'django_ace',
+    'django_rq',
     # local apps
     'core',
     'dashboard',
@@ -214,11 +215,25 @@ AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET')
 AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET')
 S3_URL = 'https://{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
 
+
 # Redis
 
 REDIS_HOST = get_secret('REDIS_HOST')
 REDIS_PORT = get_secret('REDIS_PORT')
 REDIS_DB = get_secret('REDIS_DB')
+
+
+# RQ
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': get_secret('REDIS_HOST'),
+        'PORT': get_secret('REDIS_PORT'),
+        'DB': get_secret('REDIS_DB'),
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
+
 
 # Logging
 
