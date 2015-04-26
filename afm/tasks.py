@@ -42,6 +42,8 @@ def process_nanoscope_file(raw_file):
                              size=0.0, scan_number=scan_number,
                              content_type='application/octet-stream'))]
     for img in scan:
+        img.process()
+        logger.debug('Processed {} scan'.format(img.type))
         processed_image = _create_scan_png(img, raw_file.name, scan_number)
         logger.debug('Created image file for {} scan'.format(img.type))
         scan_size = math.sqrt(img.scan_area)
@@ -50,7 +52,7 @@ def process_nanoscope_file(raw_file):
                             dict(image_type=img.type, state='extracted',
                                  rms=img.rms, zrange=img.zrange,
                                  size=scan_size, scan_number=scan_number)))
-    processed_files[0].size = scan_size
+    processed_files[0].kwargs['size'] = scan_size
     return processed_files
 
 
