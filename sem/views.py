@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from core.views import CreateUploadProcessView, UploadFileView
 from sem.forms import AutoCreateSEMForm
 from sem.models import SEMScan
-from sem.image_helper import convert_tiff
+from sem.tasks import process_sem_file
 
 
 class AutocreateSEMView(CreateUploadProcessView):
@@ -24,6 +24,6 @@ class SEMFileUpload(UploadFileView):
     """
     Add files to an existing sem process
     """
-
-    def process_file(self, uploaded_file):
-        return [(convert_tiff(uploaded_file), {})]
+    rq_config = {
+        'process': process_sem_file,
+    }
