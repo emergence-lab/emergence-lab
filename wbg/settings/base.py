@@ -285,3 +285,11 @@ LOGGING = {
         },
     },
 }
+
+
+# UploadFileHandlers
+
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'core.upload_handler.RQTemporaryFileUploadHandler',
+)
