@@ -41,6 +41,7 @@ def save_files(model, process, job_id, queue='default'):
             data=None, process=process, content_type=content_type, **kwargs)
         obj.data = f
         obj.save()
+        f.close_and_delete()
         _save_sample_files(process, obj)
 
 
