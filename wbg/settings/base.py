@@ -273,7 +273,12 @@ LOGGING = {
             'propogate': True,
             'level': 'DEBUG',
         },
-        'afm.views': {
+        'afm.tasks': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'core.tasks': {
             'handlers': ['file'],
             'propogate': True,
             'level': 'DEBUG',
