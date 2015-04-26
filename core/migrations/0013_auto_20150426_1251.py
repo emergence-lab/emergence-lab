@@ -19,14 +19,25 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
+                ('name', models.CharField(max_length=50, blank=True)),
                 ('comment', core.models.fields.RichTextField(blank=True)),
-                ('process', models.OneToOneField(related_query_name='process', related_name='process', to='core.Process')),
+                ('process', models.ForeignKey(related_query_name='process', related_name='process', to='core.Process')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
             },
             bases=(models.Model,),
+        ),
+        migrations.RemoveField(
+            model_name='datafile',
+            name='processes',
+        ),
+        migrations.AddField(
+            model_name='datafile',
+            name='process',
+            field=models.ForeignKey(related_query_name='datafiles', related_name='datafiles', to='core.Process', null=True),
+            preserve_default=True,
         ),
         migrations.AlterField(
             model_name='datafile',

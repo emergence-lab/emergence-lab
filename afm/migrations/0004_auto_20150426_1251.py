@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0014_processtemplate_name'),
+        ('afm', '0003_auto_20150325_1351'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='processtemplate',
-            name='process',
-            field=models.ForeignKey(related_query_name='process', related_name='process', to='core.Process'),
+            model_name='afmfile',
+            name='image_type',
+            field=models.CharField(default='Height', max_length=45, choices=[('Raw', 'Raw'), ('Height', 'Height'), ('Amplitude', 'Amplitude'), ('Phase', 'Phase')]),
             preserve_default=True,
         ),
     ]
