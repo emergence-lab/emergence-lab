@@ -32,7 +32,13 @@ def save_files(model, process, job_id, queue='default'):
         logger.debug('Saving file \'{}\' for process {}'.format(
             f.name, process.uuid_full))
 
-        obj = model.objects.create(data=None, process=process, **kwargs)
+        try:
+            content_type = f.content_type
+        except AttributeError:
+            content_type = 'application/octet-stream'
+
+        obj = model.objects.create(
+            data=None, process=process, content_type=content_type, **kwargs)
         obj.data = f
         obj.save()
         _save_sample_files(process, obj)
