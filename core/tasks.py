@@ -51,7 +51,7 @@ def _save_sample_files(process, file_object):
     """
     for sample in process.samples(unique=True):
         sample_dir = os.path.abspath(os.path.join(
-                settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
+            settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
         target_dir = os.path.join(sample_dir, process.uuid_full.hex)
         try:
             os.makedirs(target_dir)

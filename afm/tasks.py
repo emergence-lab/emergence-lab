@@ -2,7 +2,10 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+import math
+import os
 
+from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import django_rq

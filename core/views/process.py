@@ -3,12 +3,9 @@ from __future__ import absolute_import, unicode_literals
 
 from itertools import groupby
 import logging
-import os
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
@@ -17,7 +14,7 @@ import django_rq
 from braces.views import LoginRequiredMixin
 
 from core.forms import DropzoneForm, ProcessCreateForm, EditProcessTemplateForm
-from core.models import Process, Sample, DataFile, ProcessNode, ProcessTemplate
+from core.models import Process, Sample, DataFile, ProcessTemplate
 from core.polymorphic import get_subclasses
 from core.tasks import process_file, save_files
 from core.views import ActionReloadView
