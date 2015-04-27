@@ -96,22 +96,18 @@
                                 Admin
                             {% endif %}
                             </a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">
-                                Additional Services
-                            </li>
-                            <li><a href="***REMOVED***">
-                                <span class="glyphicon glyphicon-cloud-download"></span>
-                                Owncloud
-                            </a></li>
-                            <li><a href="***REMOVED***">
-                                <span class="glyphicon glyphicon-book"></span>
-                                Wiki
-                            </a></li>
-                            <li><a href="***REMOVED***">
-                                <span class="glyphicon glyphicon-cog"></span>
-                                Gitlab
-                            </a></li>
+                            {% if external_links %}
+                                <li class="divider"></li>
+                                <li class="dropdown-header">
+                                    Additional Services
+                                </li>
+                                {% for link in external_links %}
+                                    <li><a href="{{link.url}}">
+                                        <span class="glyphicon glyphicon-{{link.icon}}"></span>
+                                        {{link.name}}
+                                    </a></li>
+                                {% endfor %}
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="navbar-button"><a class="navbar-link navbar-right"

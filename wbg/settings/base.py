@@ -58,6 +58,7 @@ LOGOUT_URL = "{}/accounts/logout/".format(SUB_SITE)
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
+    'core.context_processors.external_links',
     'messaging.context_processors.notifications',
 )
 
@@ -293,3 +294,8 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'core.upload_handler.RQTemporaryFileUploadHandler',
 )
+
+
+# External Links
+
+EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS')
