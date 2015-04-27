@@ -52,9 +52,11 @@
                             <li><a href="{% url 'reservation_create' %}">
                                 Tool Reservation
                             </a></li>
-                            <li><a data-toggle="modal" data-target="#exception-modal">
-                                Feedback
-                            </a></li>
+                            {% if feedback %}
+                                <li><a data-toggle="modal" data-target="#exception-modal">
+                                    Feedback
+                                </a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="navbar-button"><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
@@ -96,22 +98,18 @@
                                 Admin
                             {% endif %}
                             </a></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">
-                                Additional Services
-                            </li>
-                            <li><a href="***REMOVED***">
-                                <span class="glyphicon glyphicon-cloud-download"></span>
-                                Owncloud
-                            </a></li>
-                            <li><a href="***REMOVED***">
-                                <span class="glyphicon glyphicon-book"></span>
-                                Wiki
-                            </a></li>
-                            <li><a href="***REMOVED***">
-                                <span class="glyphicon glyphicon-cog"></span>
-                                Gitlab
-                            </a></li>
+                            {% if external_links %}
+                                <li class="divider"></li>
+                                <li class="dropdown-header">
+                                    Additional Services
+                                </li>
+                                {% for link in external_links %}
+                                    <li><a href="{{link.url}}">
+                                        <span class="glyphicon glyphicon-{{link.icon}}"></span>
+                                        {{link.name}}
+                                    </a></li>
+                                {% endfor %}
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="navbar-button"><a class="navbar-link navbar-right"
@@ -164,7 +162,7 @@
     {% block content %}
     {% endblock %}
 
-    {% if not user.is_anonymous %}
+    {% if feedback and not user.is_anonymous %}
     <section id="exception-modal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
