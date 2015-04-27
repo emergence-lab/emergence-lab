@@ -42,7 +42,10 @@ def save_files(model, process, job_id, queue='default'):
             data=None, process=process, **kwargs)
         obj.data = f
         obj.save()
-        f.close_and_delete()
+        try:
+            f.close_and_delete()
+        except AttributeError:
+            pass
         _save_sample_files(process, obj)
 
 
