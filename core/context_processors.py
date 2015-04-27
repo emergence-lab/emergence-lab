@@ -12,7 +12,7 @@ def external_links(request):
     return {'external_links': external_links}
 
 
-def enable_feedback(request):
+def feedback(request):
     """
     Add feedback form for reporting bugs.
     """
