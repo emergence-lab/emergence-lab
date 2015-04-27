@@ -52,9 +52,11 @@
                             <li><a href="{% url 'reservation_create' %}">
                                 Tool Reservation
                             </a></li>
-                            <li><a data-toggle="modal" data-target="#exception-modal">
-                                Feedback
-                            </a></li>
+                            {% if feedback %}
+                                <li><a data-toggle="modal" data-target="#exception-modal">
+                                    Feedback
+                                </a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     <li class="navbar-button"><a id="homelink" class="navbar-link" data-toggle="tooltip" title="Dashboard" data-placement="bottom" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><span class="glyphicon glyphicon-home"></span></a></li>
@@ -160,7 +162,7 @@
     {% block content %}
     {% endblock %}
 
-    {% if not user.is_anonymous %}
+    {% if feedback and not user.is_anonymous %}
     <section id="exception-modal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -10,3 +10,11 @@ def external_links(request):
     """
     external_links = settings.EXTERNAL_LINKS or {}
     return {'external_links': external_links}
+
+
+def enable_feedback(request):
+    """
+    Add feedback form for reporting bugs.
+    """
+    feedback = settings.ENABLE_FEEDBACK or False
+    return {'feedback': feedback}

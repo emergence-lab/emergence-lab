@@ -59,6 +59,7 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'core.context_processors.external_links',
+    'core.context_processors.feedback',
     'messaging.context_processors.notifications',
 )
 
@@ -299,3 +300,8 @@ FILE_UPLOAD_HANDLERS = (
 # External Links
 
 EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS')
+
+
+# Feedback
+
+ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK')
