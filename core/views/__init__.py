@@ -10,6 +10,7 @@ from .utility import (
     ProtectedMediaView,
     QuickSearchRedirectView,
     PrintTemplate,
+    NeverCacheMixin,
 )
 from .user import (
     ActivateUserRedirectView,
