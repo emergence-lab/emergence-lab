@@ -13,7 +13,9 @@ from django.views import generic
 import django_rq
 from braces.views import LoginRequiredMixin
 
-from core.forms import DropzoneForm, ProcessCreateForm, EditProcessTemplateForm
+from core.forms import (DropzoneForm, ProcessCreateForm,
+                        EditProcessTemplateForm, SampleFormSet,
+                        WizardBasicInfoForm)
 from core.models import Process, Sample, DataFile, ProcessTemplate
 from core.polymorphic import get_subclasses
 from core.tasks import process_file, save_files
@@ -259,3 +261,47 @@ class ProcessTemplateEditView(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('process_template_detail', args=(self.object.id,))
+
+class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
+    """
+    Steps through creating a process.
+    """
+    template_name = 'core/process_wizard_create.html'
+
+    def build_forms(self):
+        return {
+            'info_form': WizardBasicInfoForm(
+                initial={
+                    'user': self.request.user,
+                },
+                prefix='process'),
+            'sample_formset': SampleFormSet(prefix='sample'),
+        }
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        return self.render_to_response(self.get_context_data(**self.build_forms()))
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        info_form = WizardBasicInfoForm(request.POST, prefix='process')
+        sample_formset = SampleFormSet(request.POST, prefix='sample')
+        # reservation_form = ReservationCloseForm(request.POST, prefix='reservation')
+
+        if sample_formset.is_valid():
+            logger.debug('Creating new process')
+            self.object = info_form.save()
+            logger.debug('Created process {} ({}) for {} samples'.format(
+                self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
+            # source_form.save()
+            for s in sample_formset:
+                sample = s.save()
+                logger.debug('Created sample {}'.format(sample.uuid))
+                piece = s.cleaned_data['piece']
+                sample.run_process(self.object, piece)
+            return HttpResponseRedirect(reverse('process_detail', kwargs={'uuid': self.object.uuid}))
+        else:
+            basic_info_form = WizardBasicInfoForm(request.POST, prefix='process')
+            return self.render_to_response(self.get_context_data(
+                info_form=basic_info_form,
+                sample_formset=sample_formset))
