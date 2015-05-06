@@ -79,7 +79,7 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['process_list'] = get_subclasses(Process)
+        context['process_list'] = get_subclasses(Process) + [Process]
         context['user_list'] = get_user_model().objects.all().filter(is_active=True)
         context['slug'] = self.kwargs.get('slug', 'all')
         context['username'] = self.kwargs.get('username', 'all')
@@ -196,7 +196,7 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
-        context['process_list'] = get_subclasses(Process)
+        context['process_list'] = get_subclasses(Process) + [Process]
         context['slug'] = self.kwargs.get('slug', 'all')
         return context
 
