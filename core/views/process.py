@@ -262,6 +262,7 @@ class ProcessTemplateEditView(LoginRequiredMixin, generic.UpdateView):
     def get_success_url(self):
         return reverse('process_template_detail', args=(self.object.id,))
 
+
 class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
     """
     Steps through creating a process.
@@ -305,3 +306,17 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
             return self.render_to_response(self.get_context_data(
                 info_form=basic_info_form,
                 sample_formset=sample_formset))
+
+
+class TemplateProcessWizardView(ProcessWizardView):
+
+    def build_forms(self):
+        if 'id' in self.kwargs:
+            comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
+        elif 'uuid' in self.kwargs:
+            comment = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
+                self.kwargs.get('uuid', None))).comment
+        output = super(TemplateProcessWizardView, self).build_forms()
+        output['info_form'] = WizardBasicInfoForm(initial={'user': self.request.user,
+                                                           'comment': comment}, prefix='process')
+        return output

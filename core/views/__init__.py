@@ -59,4 +59,5 @@ from .process import (
     ProcessTemplateEditView,
     RemoveProcessTemplateView,
     ProcessWizardView,
+    TemplateProcessWizardView,
 )
