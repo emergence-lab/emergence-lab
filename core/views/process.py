@@ -272,14 +272,12 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
         self.object = None
         info_form = WizardBasicInfoForm(request.POST, prefix='process')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
-        # reservation_form = ReservationCloseForm(request.POST, prefix='reservation')
 
         if sample_formset.is_valid():
             logger.debug('Creating new process')
             self.object = info_form.save()
             logger.debug('Created process {} ({}) for {} samples'.format(
                 self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
-            # source_form.save()
             for s in sample_formset:
                 sample = s.save()
                 logger.debug('Created sample {}'.format(sample.uuid))
