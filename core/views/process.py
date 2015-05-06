@@ -228,21 +228,6 @@ class RemoveProcessTemplateView(LoginRequiredMixin, generic.DeleteView):
         return reverse('process_templates', kwargs={'slug': 'all'})
 
 
-class ProcessCreateFromTemplateView(ProcessCreateView):
-    """
-    View for creating a process with templated comments
-    """
-
-    def get_initial(self):
-        if 'id' in self.kwargs:
-            comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
-        elif 'uuid' in self.kwargs:
-            comment = Process.objects.get(
-                uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None))).comment
-        return {'user': self.request.user,
-                'comment': comment}
-
-
 class ProcessTemplateDetailView(LoginRequiredMixin, generic.DetailView):
     """
     View for process template details

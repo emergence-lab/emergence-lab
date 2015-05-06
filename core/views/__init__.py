@@ -54,7 +54,6 @@ from .process import (
     UploadFileView,
     ProcessTemplateListView,
     AddProcessTemplateView,
-    ProcessCreateFromTemplateView,
     ProcessTemplateDetailView,
     ProcessTemplateEditView,
     RemoveProcessTemplateView,
