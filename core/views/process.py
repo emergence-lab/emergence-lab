@@ -285,7 +285,8 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
                 logger.debug('Created sample {}'.format(sample.uuid))
                 piece = s.cleaned_data['piece']
                 sample.run_process(self.object, piece)
-            return HttpResponseRedirect(reverse('process_detail', kwargs={'uuid': self.object.uuid}))
+            return HttpResponseRedirect(reverse('process_detail',
+                                                kwargs={'uuid': self.object.uuid}))
         else:
             basic_info_form = WizardBasicInfoForm(request.POST, prefix='process')
             return self.render_to_response(self.get_context_data(
