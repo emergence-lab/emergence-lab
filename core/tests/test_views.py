@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve, reverse
 from django.http import Http404
 from django.test import TestCase
+from django.forms import ValidationError
 
 from model_mommy import mommy
 
@@ -550,6 +551,72 @@ class TestProcessCRUD(TestCase):
         self.assertEqual(process.comment, data['comment'])
         detail_url =  '/process/{}/'.format(process.uuid)
         self.assertRedirects(response, detail_url)
+
+    def test_process_wizard_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/wizard/',
+            url_name='process_wizard',
+            template_file='core/process_wizard_create.html',
+            response_code=200)
+
+    def test_process_wizard_empty_data(self):
+        url = '/process/wizard/'
+        with self.assertRaises(ValidationError) as cm:
+            self.client.post(url, {})
+        exception = cm.exception
+        self.assertEqual(exception.message,
+            'ManagementForm data is missing or has been tampered with')
+
+    def test_process_wizard_valid_data(self):
+        url = '/process/wizard/'
+        sample = Sample.objects.create(mommy.make(Substrate))
+        data = {
+            'process-comment': 'testing',
+            'process-user': self.user.id,
+            'sample-0-sample_uuid': '{}'.format(sample.uuid),
+            'sample-INITIAL_FORMS': '1',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1'
+        }
+        response = self.client.post(url, data)
+        process = Process.objects.last()
+        self.assertEqual(process.comment, data['process-comment'])
+        detail_url =  '/process/{}/'.format(process.uuid)
+        self.assertRedirects(response, detail_url)
+
+    def test_process_wizard_ambiguous_piece(self):
+        url = '/process/wizard/'
+        sample = Sample.objects.create(mommy.make(Substrate))
+        sample.split(self.user, 2)
+        data = {
+            'process-comment': 'testing',
+            'process-user': self.user.id,
+            'sample-0-sample_uuid': '{}'.format(sample.uuid),
+            'sample-INITIAL_FORMS': '1',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1'
+        }
+        response = self.client.post(url, data)
+        self.assertFormsetError(response, 'sample_formset', 0, 'sample_uuid',
+            'Sample {} is ambiguous, piece needs to be specified'.format(sample.uuid))
+
+    def test_process_wizard_sample_piece(self):
+        url = '/process/wizard/'
+        sample = Sample.objects.create(mommy.make(Substrate))
+        sample.split(self.user, 2)
+        piece = 'b'
+        data = {
+            'process-comment': 'testing',
+            'process-user': self.user.id,
+            'sample-0-sample_uuid': '{}{}'.format(sample.uuid, piece),
+            'sample-INITIAL_FORMS': '1',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '1'
+        }
+        response = self.client.post(url, data)
+        nodes = sample.get_nodes_for_process_type(Process)
+        self.assertEqual(len(nodes), 1)
+        self.assertEqual(nodes[0].piece, piece)
 
 
 class TestProcessTemplateCRUD(TestCase):
