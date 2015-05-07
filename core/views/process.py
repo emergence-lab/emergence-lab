@@ -53,18 +53,6 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
         return context
 
 
-class ProcessCreateView(LoginRequiredMixin, generic.CreateView):
-    template_name = 'core/process_create.html'
-    model = Process
-    fields = ('comment', 'user',)
-
-    def get_initial(self):
-        return {'user': self.request.user}
-
-    def get_success_url(self):
-        return reverse('process_detail', args=(self.object.uuid,))
-
-
 class ProcessListRedirectView(LoginRequiredMixin, generic.RedirectView):
     permanent = True
 

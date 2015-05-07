@@ -527,40 +527,15 @@ class TestProcessCRUD(TestCase):
         detail_url =  '/process/{}/'.format(process.uuid)
         self.assertRedirects(response, detail_url)
 
-    def test_process_create_resolution_template(self):
+    def test_process_wizard_resolution_template(self):
         test_resolution_template(self,
             url='/process/create/',
             url_name='process_create',
-            template_file='core/process_create.html',
-            response_code=200)
-
-    def test_process_create_empty_data(self):
-        url = '/process/create/'
-        data = {}
-        response = self.client.post(url, data)
-        self.assertFormError(response, 'form', 'user', 'This field is required.')
-
-    def test_process_create_valid_data(self):
-        url = '/process/create/'
-        data = {
-            'comment': 'testing',
-            'user': self.user.id
-        }
-        response = self.client.post(url, data)
-        process = Process.objects.last()
-        self.assertEqual(process.comment, data['comment'])
-        detail_url =  '/process/{}/'.format(process.uuid)
-        self.assertRedirects(response, detail_url)
-
-    def test_process_wizard_resolution_template(self):
-        test_resolution_template(self,
-            url='/process/wizard/',
-            url_name='process_wizard',
             template_file='core/process_wizard_create.html',
             response_code=200)
 
     def test_process_wizard_empty_data(self):
-        url = '/process/wizard/'
+        url = '/process/create/'
         with self.assertRaises(ValidationError) as cm:
             self.client.post(url, {})
         exception = cm.exception
@@ -568,7 +543,7 @@ class TestProcessCRUD(TestCase):
             'ManagementForm data is missing or has been tampered with')
 
     def test_process_wizard_valid_data(self):
-        url = '/process/wizard/'
+        url = '/process/create/'
         sample = Sample.objects.create(mommy.make(Substrate))
         data = {
             'process-comment': 'testing',
@@ -585,7 +560,7 @@ class TestProcessCRUD(TestCase):
         self.assertRedirects(response, detail_url)
 
     def test_process_wizard_ambiguous_piece(self):
-        url = '/process/wizard/'
+        url = '/process/create/'
         sample = Sample.objects.create(mommy.make(Substrate))
         sample.split(self.user, 2)
         data = {
@@ -601,7 +576,7 @@ class TestProcessCRUD(TestCase):
             'Sample {} is ambiguous, piece needs to be specified'.format(sample.uuid))
 
     def test_process_wizard_sample_piece(self):
-        url = '/process/wizard/'
+        url = '/process/create/'
         sample = Sample.objects.create(mommy.make(Substrate))
         sample.split(self.user, 2)
         piece = 'b'

@@ -56,4 +56,4 @@ class WizardBasicInfoForm(forms.ModelForm):
 
     class Meta:
         model = Process
-        fields = ('user', 'comment')
+        fields = ('user', 'comment',)
