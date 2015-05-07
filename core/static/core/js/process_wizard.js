@@ -16,7 +16,8 @@
                         formatBlocks: ['p', 'h2', 'h3', 'h4', 'h5']
                     },
                     'hallolists': {}
-                }
+                },
+                toolbar: 'halloToolbarFixed',
             });
         });
         
