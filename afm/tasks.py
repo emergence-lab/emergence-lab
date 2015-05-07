@@ -115,6 +115,10 @@ def _create_scan_png(scan, filename, scan_number):
 
     tempio = six.StringIO()
     processed_image.save(tempio, format='PNG')
+    if scan.type == 'Amplitude':
+        filename += 'a'
+    elif scan.type == 'Phase':
+        filename += 'p'
     return InMemoryUploadedFile(
         tempio, field_name=None, name=filename + '.png',
         content_type='image/png', size=tempio.len, charset=None)
