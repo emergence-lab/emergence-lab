@@ -1,8 +1,8 @@
-$(function () {  
+$(function () {
   process_wizard.enable_tabbable('.next-tab-main', '#main-tab-list', '#submit-modal');
 
   process_wizard.enable_rich_text('#samples .tab-pane:not(.empty-form) .hallo', 'form');
-  process_wizard.make_rich_text_editable($('#comment-modal .hallo'));
+  process_wizard.make_rich_text_editable($('#info .hallo'));
 
   var formset = $('#samples div.tab-content .tab-pane').djangoFormset({
     on: {

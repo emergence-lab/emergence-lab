@@ -15,13 +15,11 @@
   <table class="table">
     <tr>
       <td><strong>Tool Name</strong></td>
-      <td><strong>TEST</strong></td>
       <td><strong>Actions</strong></td>
     </tr>
     {% for item in object_list %}
       <tr>
         <td>{{ item.upper }}</td>
-        <td>BLANK</td>
         <td>
             <a class="glyphicon glyphicon-plus" href="{% url 'reservation_create' %}"></a>
 
@@ -30,7 +28,7 @@
       </tr>
     {% endfor %}
     <tr>
-        <td></td><td></td><td><a class="glyphicon glyphicon-plus" href="#" data-toggle="tooltip" title="Create Template"></a></td>
+        <td></td><td><a class="glyphicon glyphicon-plus" href="#" data-toggle="tooltip" title="Create Template"></a></td>
     </tr>
   </table>
 </div>

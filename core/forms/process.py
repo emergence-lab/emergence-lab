@@ -45,3 +45,15 @@ class EditProcessTemplateForm(forms.ModelForm):
     class Meta:
         model = ProcessTemplate
         fields = ('name', 'comment',)
+
+
+class WizardBasicInfoForm(forms.ModelForm):
+
+    comment = forms.CharField(
+        label="Run Comments",
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'hallo'}))
+
+    class Meta:
+        model = Process
+        fields = ('user', 'comment',)

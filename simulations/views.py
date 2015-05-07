@@ -3,42 +3,47 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import TemplateView
 
 import aws_support as aws
+from braces.views import LoginRequiredMixin
+
+from core.views import ActionReloadView, NeverCacheMixin
 
 
-class StartInstance(RedirectView):
-    permanent = False
+class StartInstance(LoginRequiredMixin, ActionReloadView):
 
-    def get_redirect_url(self, *args, **kwargs):
+    def perform_action(self, request, *args, **kwargs):
         signals = aws.EC2Connection(settings.AWS_EC2_REGION,
                                     settings.AWS_ACCESS_KEY_ID,
                                     settings.AWS_SECRET_ACCESS_KEY)
         instance = kwargs.pop('instance_id')
         try:
             signals.start_instance(instance)
-            return reverse('simulation_admin')
         except Exception as e:
             raise Exception(e)
 
-
-class StopInstance(RedirectView):
-    permanent = False
-
     def get_redirect_url(self, *args, **kwargs):
+        return reverse('simulation_admin')
+
+
+class StopInstance(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
         signals = aws.EC2Connection(settings.AWS_EC2_REGION,
                                     settings.AWS_ACCESS_KEY_ID,
                                     settings.AWS_SECRET_ACCESS_KEY)
         instance = kwargs.pop('instance_id')
         try:
             signals.stop_instance(instance)
-            return reverse('simulation_admin')
         except Exception as e:
             raise Exception(e)
 
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('simulation_admin')
 
-class SimulationAdmin(TemplateView):
+
+class SimulationAdmin(LoginRequiredMixin, NeverCacheMixin, TemplateView):
     template_name = 'simulations/admin.html'
 
     signals = aws.EC2Connection(settings.AWS_EC2_REGION,

@@ -24,7 +24,7 @@
         </div>
         <div class="col-md-2">
             <ul class="nav nav-pills nav-stacked">
-                <li role="presentation"><a href="href="{% if processtemplate.process.slug = 'd180-growth' %}{% url 'create_growth_d180_start_template' id=processtemplate.id %}{%else%}{% url 'process_create_from_template' id=processtemplate.id %}{%endif%}">{% bootstrap_icon 'share-alt' %} Create Process</a></li>
+                <li role="presentation"><a href="{% if processtemplate.process.slug = 'd180-growth' %}{% url 'create_growth_d180_start_template' id=processtemplate.id %}{%else%}{% url 'process_create_from_template' id=processtemplate.id %}{%endif%}">{% bootstrap_icon 'share-alt' %} Create Process</a></li>
                 <li role="presentation"><a href="{% url 'process_template_edit' processtemplate.id %}">{% bootstrap_icon 'edit' %} Edit Template</a></li>
                 <li role="presentation"><a href="{% url 'remove_process_template' processtemplate.id %}">{% bootstrap_icon 'remove' %} Delete Template</a></li>
                 <li role="presentation"><a href="{% url 'process_templates' slug='all' %}">{% bootstrap_icon 'arrow-left' %} Template List</a></li>

@@ -10,6 +10,7 @@ from .utility import (
     ProtectedMediaView,
     QuickSearchRedirectView,
     PrintTemplate,
+    NeverCacheMixin,
 )
 from .user import (
     ActivateUserRedirectView,
@@ -44,7 +45,6 @@ from .sample import (
 )
 from .process import (
     ProcessDetailView,
-    ProcessCreateView,
     ProcessListRedirectView,
     ProcessListView,
     ProcessUpdateView,
@@ -53,8 +53,9 @@ from .process import (
     UploadFileView,
     ProcessTemplateListView,
     AddProcessTemplateView,
-    ProcessCreateFromTemplateView,
     ProcessTemplateDetailView,
     ProcessTemplateEditView,
     RemoveProcessTemplateView,
+    ProcessWizardView,
+    TemplateProcessWizardView,
 )

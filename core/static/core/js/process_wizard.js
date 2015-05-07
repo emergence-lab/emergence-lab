@@ -15,8 +15,10 @@
                     'halloheadings': {
                         formatBlocks: ['p', 'h2', 'h3', 'h4', 'h5']
                     },
-                    'hallolists': {}
-                }
+                    'hallolists': {},
+                    'hallolink': {},
+                },
+                toolbar: 'halloToolbarFixed',
             });
         });
         
@@ -71,4 +73,4 @@
         });
     }
 
-})(this.growth_wizard = {});
+})(this.process_wizard = {});

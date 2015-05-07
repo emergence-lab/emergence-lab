@@ -58,7 +58,13 @@ LOGOUT_URL = "{}/accounts/logout/".format(SUB_SITE)
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
+    'core.context_processors.external_links',
+    'core.context_processors.feedback',
     'messaging.context_processors.notifications',
+)
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 
@@ -85,6 +91,7 @@ INSTALLED_APPS = (
     'mptt',
     'storages',
     'django_ace',
+    'django_rq',
     # local apps
     'core',
     'dashboard',
@@ -214,11 +221,25 @@ AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET')
 AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET')
 S3_URL = 'https://{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
 
+
 # Redis
 
 REDIS_HOST = get_secret('REDIS_HOST')
 REDIS_PORT = get_secret('REDIS_PORT')
 REDIS_DB = get_secret('REDIS_DB')
+
+
+# RQ
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': get_secret('REDIS_HOST'),
+        'PORT': get_secret('REDIS_PORT'),
+        'DB': get_secret('REDIS_DB'),
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
+
 
 # Logging
 
@@ -258,10 +279,33 @@ LOGGING = {
             'propogate': True,
             'level': 'DEBUG',
         },
-        'afm.views': {
+        'afm.tasks': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'core.tasks': {
             'handlers': ['file'],
             'propogate': True,
             'level': 'DEBUG',
         },
     },
 }
+
+
+# UploadFileHandlers
+
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'core.upload_handler.RQTemporaryFileUploadHandler',
+)
+
+
+# External Links
+
+EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS')
+
+
+# Feedback
+
+ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK')

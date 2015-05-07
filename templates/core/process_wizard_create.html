@@ -2,14 +2,14 @@
 {% load bootstrap3 %}
 {% load wysiwyg %}
 
-{% block title %}Start Growth{% endblock title %}
+{% block title %}Process Wizard{% endblock title %}
 
 {% block header %}
     {% load staticfiles %}
-    <script src="{% static 'growths/js/jquery-ui.js' %}"></script>
-    <script src="{% static 'growths/js/rangy-core.js' %}"></script>
-    <script src="{% static 'growths/js/hallo.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'growths/css/jquery-ui.css' %}">
+    <script src="{% static 'core/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'core/js/rangy-core.js' %}"></script>
+    <script src="{% static 'core/js/hallo.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'core/css/jquery-ui.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/font-awesome.css' %}">
 {% endblock header %}
 
@@ -18,22 +18,12 @@
 
 <div class="container">
 
-    <div class="row">
-        <div class="col-xs-6 col-xs-offset-3">
-            <img class="img-wizard" src="{% static 'growths/img/start-progress.png' %}" />
-        </div>
-    </div>
-
     <h1 class="page-header">
-        Start Growth
+        Process Wizard
         <div class="pull-right">
             <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
                 {% bootstrap_icon 'remove' %}
                 Cancel
-            </button>
-            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
-                {% bootstrap_icon 'pencil' %}
-                Comments
             </button>
             <button class="btn btn-success next-tab-main" type="button">
                 Next Step
@@ -45,11 +35,8 @@
     {# Main Tabs #}
     <div class="tabbable">
         <ul class="nav nav-tabs" id="main-tab-list">
-            <li class="active"><a role="tab" data-toggle="tab" href="#info">Basic Info</a></li>
-            <li><a role="tab" data-toggle="tab" href="#growth">Growth Info</a></li>
+            <li class="active"><a role="tab" data-toggle="tab" href="#info">Process Info</a></li>
             <li><a role="tab" data-toggle="tab" href="#samples">Sample Info</a></li>
-            <li><a role="tab" data-toggle="tab" href="#checklist">Checklist</a></li>
-            <li><a role="tab" data-toggle="tab" href="#source">Source Info</a></li>
         </ul>
     </div>
 
@@ -70,16 +57,6 @@
                 </div>
             </div>
 
-
-            {# Growth Information Tab #}
-            <div class="tab-pane fade" id="growth">
-                <h2>Growth Information</h2>
-                <div class="row">
-                    <div class="col-xs-5">
-                        {% bootstrap_form growth_form %}
-                    </div>
-                </div>
-            </div>
 
             {# Sample Information Tab #}
             <div class="tab-pane fade" id="samples">
@@ -130,52 +107,6 @@
             </div>
 
 
-            {# Checklist Tab #}
-            <div class="tab-pane fade" id="checklist">
-                <h2>Pre-run Checklist</h2>
-                <div class="row">
-                    <div class="col-xs-5">
-                        {% bootstrap_form checklist_form %}
-                    </div>
-                </div>
-            </div>
-
-
-            {# Source Consumption Tab #}
-            <div class="tab-pane fade" id="source">
-                <h2>Source Consumption</h2>
-                <div class="row">
-                    <div class="col-xs-5">
-                        {% bootstrap_form source_form %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-
-        {# Comment Modal #}
-        <div class="modal fade" id="comment-modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">
-                            <span aria-hidden="true">&times;</span>
-                            <span class="sr-only">Close</span>
-                        </button>
-                        <h4 class="modal-title">Edit Comments</h4>
-                    </div>
-                    <div class="modal-body">
-                        {% bootstrap_form comment_form %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
         {# Cancel Modal #}
         <div class="modal fade" id="cancel-modal">
             <div class="modal-dialog">
@@ -188,7 +119,7 @@
                         <strong>Warning:</strong> This will cancel the current growth. You should do this if you needed to abort the growth prior to any readings being taken.
                     </div>
                     <div class="modal-footer">
-                        <a href="#" class="btn btn-danger">Cancel Growth</a>
+                        <a href="{% url 'dashboard' %}" class="btn btn-danger">Cancel Growth</a>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
                     </div>
                 </div>
@@ -205,33 +136,11 @@
                         <h4 class="modal-title" id="myModalLabel">Are You Sure You Want to Continue?</h4>
                     </div>
                     <div class="modal-body">
-                        <strong>WARNING:</strong> If you start a new growth now you will NOT be able to return to this page!!
-                        {% if reservation and reservation.user == user %}
-                            <h6>&nbsp;</h6>
-                            <div>
-                                <strong>This will close the following reservation:</strong><br>
-                                {% bootstrap_form reservation_form %}
-                            </div>
-                            <p>
-                                <div class="panel panel-primary">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>
-                                    </div>
-                                    <div class="panel-body">
-                                        <strong>Tool:</strong> {{ reservation.tool.upper }} <br>
-                                        <strong>Operator:</strong> {{ reservation.user.full_name }} <br>
-                                        <strong>Run Time:</strong> {{ reservation.growth_length_in_hours }} hours
-                                        {% if reservation.comment %}
-                                            <br><strong>Comment:</strong> {{ reservation.comment }}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </p>
-                        {% endif %}
+                        <strong>WARNING:</strong> If you start a new process you will NOT be able to return to this page!!
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Start New Growth</button>
+                        <button class="btn btn-success pull-right" id="create_growth_start" type="submit" name="creategrowthstart">Create Process</button>
                     </div>
                 </div>
             </div>
@@ -244,7 +153,7 @@
 {% endblock content %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{% static 'growths/js/django-formset.js' %}"></script>
-    <script type="text/javascript" src="{% static 'growths/js/process_wizard.js' %}"></script>
-    <script type="text/javascript" src="{% static 'growths/js/create_growth.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/django-formset.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/process_wizard.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/create_process.js' %}"></script>
 {% endblock scripts %}
