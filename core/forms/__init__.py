@@ -19,4 +19,5 @@ from .process import (
     DropzoneForm,
     ProcessCreateForm,
     EditProcessTemplateForm,
+    WizardBasicInfoForm,
 )
