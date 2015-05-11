@@ -1,0 +1,22 @@
+language: python
+
+services:
+    - redis-server
+    - sqlite3
+
+env:
+    - TOXENV=py27
+    - TOXENV=flake
+
+install:
+    - pip install tox
+    - pip install coveralls
+
+before_script:
+    - cp wbg/secrets.travis.json wbg/secrets.json
+
+script:
+    - tox
+
+after_success:
+    - coveralls
