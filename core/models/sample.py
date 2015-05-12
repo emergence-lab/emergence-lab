@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import operator
 import string
 
 from django.contrib.contenttypes.models import ContentType
@@ -57,6 +58,9 @@ class SampleManager(models.Manager):
     def by_process_type(self, process_type):
         return self.get_queryset().by_process_type(process_type)
 
+    def by_process_types(self, process_types, combine_and=False):
+        return self.get_queryset().by_process_types(process_types, combine_and)
+
 
 class SampleQuerySet(models.query.QuerySet):
 
@@ -87,6 +91,23 @@ class SampleQuerySet(models.query.QuerySet):
                                     .values_list('tree_id', flat=True)
                                     .distinct())
         return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process_types(self, process_types, combine_and=False):
+        for process_type in process_types:
+            if process_type != Process and Process not in process_type.__bases__:
+                raise ValueError('{} is not a valid process, it does not inherit '
+                                 'from Process'.format(process_type.__name__))
+        content_types = ContentType.objects.get_for_models(*process_types)
+
+        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct()
+                 for process_type, content_type in content_types.items())
+        q_filters = (models.Q(process_tree__tree_id__in=tree) for tree in trees)
+        op  = operator.and_ if combine_and else operator.or_
+
+        return self.filter(reduce(op, q_filters))
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):

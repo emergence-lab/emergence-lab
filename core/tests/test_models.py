@@ -92,6 +92,46 @@ class TestSampleManager(TestCase):
         split_samples = Sample.objects.by_process_type(SplitProcess)
         self.assertEqual(split_samples.first(), samples[-1])
 
+    def test_by_process_types_invalid(self):
+        with self.assertRaises(ValueError):
+            Sample.objects.by_process_types([Process, Sample])
+
+    def test_by_process_types_no_samples(self):
+        samples = Sample.objects.by_process_types([Process, SplitProcess])
+        self.assertQuerysetEqual(samples, [])
+
+    def test_by_process_types_valid(self):
+        process = mommy.make(Process)
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        user = get_user_model().objects.create_user('default', password='')
+
+        # run processes
+        # sample 0 has only Process
+        # sample 1 has only SplitProcess
+        # sample 2 has both Process and SplitProcess
+        # sample 3 has no processes
+        samples[0].run_process(process)
+        samples[1].split(user=user, number=2)
+        samples[2].run_process(process)
+        samples[2].split(user=user, number=2)
+
+        qs = Sample.objects.by_process_types([Process], combine_and=True)
+        self.assertQuerysetEqual(
+            qs, map(repr, [samples[0], samples[2]]),ordered=False)
+        qs = Sample.objects.by_process_types([SplitProcess], combine_and=True)
+        self.assertQuerysetEqual(
+            qs, map(repr, samples[1:3]), ordered=False)
+        qs = Sample.objects.by_process_types([Process, SplitProcess], combine_and=True)
+        self.assertQuerysetEqual(
+            qs, map(repr, [samples[2]]), ordered=False)
+        qs = Sample.objects.by_process_types([Process, SplitProcess], combine_and=False)
+        self.assertQuerysetEqual(
+            qs, map(repr, samples[0:3]), ordered=False)
 
 class TestSample(TestCase):
 
