@@ -219,11 +219,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         return node
 
     @property
+    def nodes(self):
+        """
+        Returns a queryset of the nodes currently associated with the sample.
+        """
+        return self._get_tree_queryset()
+
+    @property
     def leaf_nodes(self):
         """
         Returns all of the leaf nodes of the tree as a list.
         """
-        return self._get_tree_queryset().filter(lft=models.F('rght') - 1)
+        return self.nodes.filter(lft=models.F('rght') - 1)
 
     @property
     def root_node(self):
@@ -235,16 +242,19 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     @property
     def pieces(self):
         """
-        Returns a list of the pieces the sample is currently using.
+        Returns a queryset of the pieces the sample is currently using.
         """
-        return sorted([n.piece for n in self.leaf_nodes])
+        return (self.leaf_nodes.order_by('piece')
+                               .values_list('piece', flat=True))
 
     @property
-    def nodes(self):
+    def processes(self):
         """
-        Returns a list of the nodes currently associated with the sample.
+        Returns a queryset of distinct processes run on the sample.
         """
-        return self._get_tree_queryset()
+        nodes = (self.nodes.exclude(process__isnull=True)
+                           .values_list('process_id', flat=True))
+        return Process.objects.filter(id__in=nodes).distinct()
 
     @property
     def node_count(self):

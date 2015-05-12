@@ -187,7 +187,7 @@ class TestSample(TestCase):
         pieces = 'abcdefg'
         for piece in pieces:
             node = self.sample._insert_node(None, piece, root)
-        self.assertListEqual(list(pieces), self.sample.pieces)
+        self.assertListEqual(list(pieces), list(self.sample.pieces))
 
     def test_get_piece_single(self):
         """
