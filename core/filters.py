@@ -109,21 +109,25 @@ class SampleFilterSet(django_filters.FilterSet):
         label='D180 Tags',
         action=_filter_d180_growth_tags
         )
+    process_comment = django_filters.CharFilter(
+        label='Process Comment',
+        action=_filter_process_comment
+        )
 
     def __init__(self, *args, **kwargs):
         super(SampleFilterSet, self).__init__(*args, **kwargs)
 
         process_types = get_subclasses(Process) + [Process]
-        self.filters['processes'] = django_filters.MultipleChoiceFilter(
+        self.filters['process_type'] = django_filters.MultipleChoiceFilter(
             choices=[(p.slug, p.name) for p in process_types],
             action=_filter_process_type)
         users = [(u.id, u.get_full_name())
                  for u in get_user_model().active_objects.all()]
-        self.filters['users'] = django_filters.ChoiceFilter(
+        self.filters['process_user'] = django_filters.ChoiceFilter(
             choices=[('', 'Any User')] + users,
             action=_filter_process_user)
 
     class Meta:
         model = Sample
         order_by = ('created', 'modified', 'uuid')
-        fields = ('created', 'modified', 'd180_tags')
+        fields = ('created', 'modified', 'd180_tags', 'process_comment')
