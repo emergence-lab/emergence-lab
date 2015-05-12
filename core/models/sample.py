@@ -55,8 +55,19 @@ class SampleManager(models.Manager):
     def get_by_process(self, uuid, clean=True):
         if clean:
             uuid = Process.strip_uuid(uuid)
-        nodes = ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
-        return [node.get_sample() for node in nodes]
+        return Process.objects.get(uuid_full__startswith=uuid).samples
+
+    def get_by_process_type(self, process_type):
+        if process_type != Process and Process not in process_type.__bases__:
+            raise ValueError('{} is not a valid process, it does not inherit '
+                             'from Process'.format(process_type.__name__))
+        content_type = ContentType.objects.get_for_model(process_type)
+
+        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return Sample.objects.filter(process_tree__tree_id__in=trees)
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):

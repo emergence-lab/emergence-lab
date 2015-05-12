@@ -39,8 +39,13 @@ class TestSampleManager(TestCase):
 
     def test_get_by_process_nonexistant(self):
         process_uuid = Process.prefix + ''.zfill(Process.short_length)
-        results = Sample.objects.get_by_process(process_uuid)
-        self.assertListEqual(results, [])
+        with self.assertRaises(Process.DoesNotExist):
+            Sample.objects.get_by_process(process_uuid)
+
+    def test_get_by_process_no_samples(self):
+        process = mommy.make(Process)
+        samples = Sample.objects.get_by_process(process.uuid)
+        self.assertQuerysetEqual(samples, [])
 
     def test_get_by_process_multiple(self):
         process = mommy.make(Process)
@@ -59,6 +64,33 @@ class TestSampleManager(TestCase):
         for sample in samples:
             self.assertIn(sample, results)
         self.assertNotIn(extra_sample, results)
+
+    def test_get_by_process_type_invalid(self):
+        with self.assertRaises(ValueError):
+            Sample.objects.get_by_process_type(Sample)
+
+    def test_get_by_process_type_no_samples(self):
+        samples = Sample.objects.get_by_process_type(Process)
+        self.assertQuerysetEqual(samples, [])
+
+    def test_get_by_process_type_multiple(self):
+        processes = [
+            mommy.make(Process),
+            mommy.make(Process),
+            mommy.make(SplitProcess)
+        ]
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        for p, s in zip(processes, samples):
+            s.run_process(p)
+
+        process_samples = Sample.objects.get_by_process_type(Process)
+        self.assertListEqual(list(process_samples), samples[:-1])
+        split_samples = Sample.objects.get_by_process_type(SplitProcess)
+        self.assertEqual(split_samples.first(), samples[-1])
 
 
 class TestSample(TestCase):
