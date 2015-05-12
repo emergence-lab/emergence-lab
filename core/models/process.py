@@ -66,6 +66,10 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
                                     .values_list('sample', flat=True))
         return Sample.objects.filter(id__in=nodes).distinct()
 
+    @property
+    def nodes(self):
+        return self.processnode_set.all()
+
 
 class SplitProcess(Process):
     """

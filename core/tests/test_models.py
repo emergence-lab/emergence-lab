@@ -406,3 +406,12 @@ class TestProcess(TestCase):
         sample_list = process.samples
         self.assertListEqual(list(sample_list), samples[:-1])
 
+    def test_get_nodes(self):
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        process = Process.objects.create(comment='test', user=self.user)
+        nodes = [s.run_process(process) for s in samples]
+        self.assertListEqual(list(process.nodes), nodes)
