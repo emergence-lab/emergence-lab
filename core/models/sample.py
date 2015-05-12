@@ -52,6 +52,9 @@ class SampleManager(models.Manager):
     def get_by_uuid(self, uuid, clean=True):
         return self.get_queryset().get_by_uuid(uuid, clean)
 
+    def filter_process(self, **kwargs):
+        return self.get_queryset().filter_process(**kwargs)
+
     def by_process(self, uuid, clean=True):
         return self.get_queryset().by_process(uuid, clean)
 
@@ -70,6 +73,27 @@ class SampleQuerySet(models.query.QuerySet):
                 uuid = uuid[:-1]
             uuid = Sample.strip_uuid(uuid)
         return self.get(pk=uuid)
+
+    def filter_process(self, **kwargs):
+        """
+        Generic filtering on processes run on the sample. Keyword arguments
+        should be formatted as if it was filtering on the Process model.
+        Extra kwargs are as follows:
+            - uuid: The short or long uuid of the process
+            - type: A single Process (sub)classes
+        """
+        if 'uuid' in kwargs:
+            kwargs['uuid'] = Process.strip_uuid(kwargs['uuid'])
+        if 'type' in kwargs:
+            kwargs['polymorphic_ctype'] = ContentType.objects.get_for_models(kwargs.pop('type'))
+
+        kwargs = {'process__{}'.format(k): v for k, v in kwargs.items()}
+
+        trees = (ProcessNode.objects.filter(**kwargs)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
 
     def by_process(self, uuid, clean=True):
         if clean:
