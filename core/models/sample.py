@@ -45,19 +45,38 @@ class SampleManager(models.Manager):
 
         return sample
 
+    def get_queryset(self):
+        return SampleQuerySet(self.model, using=self._db)
+
+    def get_by_uuid(self, uuid, clean=True):
+        return self.get_queryset().get_by_uuid(uuid, clean)
+
+    def by_process(self, uuid, clean=True):
+        return self.get_queryset().by_process(uuid, clean)
+
+    def by_process_type(self, process_type):
+        return self.get_queryset().by_process_type(process_type)
+
+
+class SampleQuerySet(models.query.QuerySet):
+
     def get_by_uuid(self, uuid, clean=True):
         if clean:
             if uuid[-1].isalpha():  # has piece information attached
                 uuid = uuid[:-1]
             uuid = Sample.strip_uuid(uuid)
-        return Sample.objects.get(pk=uuid)
+        return self.get(pk=uuid)
 
-    def get_by_process(self, uuid, clean=True):
+    def by_process(self, uuid, clean=True):
         if clean:
             uuid = Process.strip_uuid(uuid)
-        return Process.objects.get(uuid_full__startswith=uuid).samples
+        trees = (ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
 
-    def get_by_process_type(self, process_type):
+    def by_process_type(self, process_type):
         if process_type != Process and Process not in process_type.__bases__:
             raise ValueError('{} is not a valid process, it does not inherit '
                              'from Process'.format(process_type.__name__))
@@ -67,7 +86,7 @@ class SampleManager(models.Manager):
                                     .order_by('tree_id')
                                     .values_list('tree_id', flat=True)
                                     .distinct())
-        return Sample.objects.filter(process_tree__tree_id__in=trees)
+        return self.filter(process_tree__tree_id__in=trees)
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):

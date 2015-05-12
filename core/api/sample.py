@@ -168,6 +168,6 @@ class SampleByProcessAPIView(views.APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        data = [i.uuid for i in SampleManager().get_by_process(
+        data = [i.uuid for i in SampleManager().by_process(
             kwargs.get('uuid'))]
         return Response(data)

@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from datetimewidget.widgets import DateWidget
 import django_filters
 
-from core.models import Sample, Process
+from core.models import Sample, Process, ProcessNode
 from d180.models import D180Growth
 from core.polymorphic import get_subclasses
 
