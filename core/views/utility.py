@@ -145,7 +145,7 @@ class AboutView(generic.TemplateView):
                 ['git', 'rev-parse', 'HEAD'],
                 cwd=settings.BASE_DIR).strip()
             tag = subprocess.check_output(
-                ['git', 'describe', '--tags'],
+                ['git', 'describe', '--tags', '--always'],
                 cwd=settings.BASE_DIR).strip()
         except subprocess.CalledProcessError as e:
             raise e
