@@ -21,4 +21,7 @@ urlpatterns = [
     url(r'^create/postrun/$',
         d180.views.WizardPostrunView.as_view(),
         name='create_growth_d180_postrun'),
+    url(r'^create/cancel/$',
+        d180.views.WizardCancelView.as_view(),
+        name='create_growth_d180_cancel'),
 ]

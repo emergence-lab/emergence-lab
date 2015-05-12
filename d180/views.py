@@ -11,12 +11,12 @@ from django.shortcuts import get_object_or_404
 
 from braces.views import LoginRequiredMixin
 
-from .models import D180Growth, D180Source, D180Readings, Platter
-from .forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
-                    WizardGrowthInfoForm, WizardFullForm,
-                    WizardPrerunChecklistForm, WizardPostrunChecklistForm,
-                    D180ReadingsFormSet, ReservationCloseForm,
-                    D180ReadingsForm)
+from d180.models import D180Growth, D180Source, D180Readings, Platter
+from d180.forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
+                        WizardGrowthInfoForm, WizardFullForm,
+                        WizardPrerunChecklistForm, WizardPostrunChecklistForm,
+                        D180ReadingsFormSet, ReservationCloseForm,
+                        D180ReadingsForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
 from core.models import Sample, Process, ProcessTemplate
@@ -272,7 +272,27 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
                 comment_form=comment_form))
 
 
-class ReadingsDetailView(generic.DetailView):
+class WizardCancelView(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        growth = D180Growth.objects.latest('created')
+
+        # remove readings
+        growth.readings.all().delete()
+        # remove investigations from many-to-many
+        for investigation in growth.investigations.all():
+            growth.investigations.remove(investigation)
+        # delete process node, removes all child nodes but there should be none
+        for node in growth.processnode_set.all():
+            node.delete()
+
+        growth.delete()
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('dashboard')
+
+
+class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
     model = D180Growth
     template_name = 'd180/readings_detail.html'
     context_object_name = 'growth'
@@ -308,7 +328,8 @@ class ReadingsDetailView(generic.DetailView):
         return context
 
 
-class UpdateReadingsView(generic.detail.SingleObjectMixin, generic.TemplateView):
+class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
+                         generic.TemplateView):
     context_object_name = 'growth'
     queryset = D180Growth.objects.all()
     template_name = 'd180/update_readings.html'
