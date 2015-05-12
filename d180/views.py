@@ -283,7 +283,7 @@ class WizardCancelView(LoginRequiredMixin, ActionReloadView):
         for investigation in growth.investigations.all():
             growth.investigations.remove(investigation)
         # delete process node, removes all child nodes but there should be none
-        for node in growth.processnode_set.all():
+        for node in growth.nodes:
             node.delete()
 
         growth.delete()
