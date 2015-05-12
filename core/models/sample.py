@@ -105,7 +105,7 @@ class SampleQuerySet(models.query.QuerySet):
                                     .distinct()
                  for process_type, content_type in content_types.items())
         q_filters = (models.Q(process_tree__tree_id__in=tree) for tree in trees)
-        op  = operator.and_ if combine_and else operator.or_
+        op = operator.and_ if combine_and else operator.or_
 
         return self.filter(reduce(op, q_filters))
 

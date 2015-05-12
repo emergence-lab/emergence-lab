@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 from datetimewidget.widgets import DateWidget
 import django_filters
 
-from core.models import Sample, Process, ProcessNode
+from core.models import Sample, Process
 from d180.models import D180Growth
 from core.polymorphic import get_subclasses
 
@@ -20,13 +20,8 @@ def _filter_process_type(queryset, value):
     if not value:
         return queryset
 
-    classes = [ContentType.objects.get_for_model(Process.get_process_class(slug))
-               for slug in value]
-    for sample in queryset:
-        q_filters = [Q(process__polymorphic_ctype=cls) for cls in classes]
-        if not sample.nodes.filter(reduce(operator.or_, q_filters)).exists():
-            queryset = queryset.exclude(id=sample.id)
-    return queryset
+    classes = [Process.get_process_class(slug) for slug in value]
+    return queryset.by_process_types(classes, combine_and=False)
 
 
 def _filter_d180_growth_tags(queryset, value):
