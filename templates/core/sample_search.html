@@ -38,6 +38,23 @@
                                 <span class="badge">{{sample.pieces|length}} Pieces</span>
                             {% endif %}
                         </h4>
+
+                        {% for process in sample.processes|slice:':7' %}
+                            <span class="label label-default label-process"
+                                  data-toggle="tooltip"
+                                  data-html="true"
+                                  title="{{process.created|date}}<p>{{process.comment|escape|truncatewords:50}}</p>">
+                                {{process.name}}
+                            </span>
+                        {% endfor %}
+                        {% if sample.processes|length > 7 %}
+                            <span class="label label-default label-process"
+                                  data-toggle="tooltip"
+                                  title="{{sample.processes|length|add:'-7'}} other processes">
+                                ...
+                            </span>
+                        {% endif %}
+
                         <p class="list-group-item-text">
                             {{sample.comment|safe|truncatewords:50}}
                             <div class="pull-right">

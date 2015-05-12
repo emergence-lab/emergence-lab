@@ -160,3 +160,7 @@ a.list-group-item.active-parent:focus {
 .hallotoolbar {
   z-index: 2000;
 }
+
+.label-process {
+  margin-right: 2px;
+}
