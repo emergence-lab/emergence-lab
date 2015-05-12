@@ -374,3 +374,35 @@ class TestSample(TestCase):
         self.sample.split(self.user, 2)
         self.assertTrue(self.sample.has_nodes_for_process_type(Process))
         self.assertTrue(self.sample.has_nodes_for_process_type(SplitProcess))
+
+
+class TestProcess(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('default', password='')
+
+    def test_get_samples_no_repeat(self):
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        process = Process.objects.create(comment='test', user=self.user)
+        for s in samples[:-1]:
+            s.run_process(process)
+        sample_list = process.samples
+        self.assertListEqual(list(sample_list), samples[:-1])
+
+    def test_get_samples_with_repeat(self):
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        process = Process.objects.create(comment='test', user=self.user)
+        for s in samples[:-1]:
+            s.run_process(process)
+        samples[0].run_process(process) # run process twice so it repeats
+        sample_list = process.samples
+        self.assertListEqual(list(sample_list), samples[:-1])
+
