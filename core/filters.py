@@ -53,14 +53,14 @@ def _filter_process_user(queryset, value):
     if not value:
         return queryset
 
-    for sample in queryset:
-        if not (sample.nodes.order_by()
-                            .exclude(process_id__isnull=True)
-                            .filter(process__user_id=value)
-                            .distinct()
-                            .exists()):
-            queryset = queryset.exclude(id=sample.id)
-    return queryset
+    return queryset.filter_process(user_id=value)
+
+
+def _filter_process_comment(queryset, value):
+    if not value:
+        return queryset
+
+    return queryset.filter_process(comment__icontains=value)
 
 
 class SampleFilterSet(django_filters.FilterSet):
