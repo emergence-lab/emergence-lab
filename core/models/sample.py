@@ -83,8 +83,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         possible_pieces = list(set(string.ascii_lowercase) - used_piece_names)
         return sorted(possible_pieces)[0]
 
-    def _insert_node(self, process, piece, parent, comment=''):
-        return ProcessNode.objects.create(process=process, piece=piece,
+    def _insert_node(self, process, piece, number, parent, comment=''):
+        return ProcessNode.objects.create(process=process, piece=piece, number=number,
                                           comment=comment, parent_id=parent.id)
 
     def refresh_tree(self):
@@ -130,17 +130,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
             #       the lft and rght items are not updated properly. Workarounds
             #       include manually updating the root node or requerying for
             #       the sample object which will force a refresh.
-            nodes.append(self._insert_node(process, new_piece, branch))
+            nodes.append(self._insert_node(process, new_piece, i + 1, branch))
         if force_refresh:  # workaround to force the root node to update
             self.refresh_tree()
         return nodes
 
-    def run_process(self, process, piece='a', comment='', force_refresh=True):
+    def run_process(self, process, piece='a', number=1, comment='', force_refresh=True):
         """
         Append a process to the specified branch.
 
         :param process: The process to run on the sample.
         :param piece: The piece to use for the process. Defaults to 'a'.
+        :param number: The sample number for the process. Defaults to 1.
         :param comment: An optional comment associated with the process for this
                         sample. Separate from the process comment.
         :param force_refresh: Specifies whether to update the sample in-place
@@ -150,7 +151,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         :returns: The ProcessNode associated with the process.
         """
         branch = self.get_piece(piece)
-        node = self._insert_node(process, piece, branch, comment)
+        node = self._insert_node(process, piece, number, branch, comment)
         if force_refresh:  # workaround to force the root node to update
             self.refresh_tree()
         return node

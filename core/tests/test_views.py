@@ -559,6 +559,31 @@ class TestProcessCRUD(TestCase):
         detail_url =  '/process/{}/'.format(process.uuid)
         self.assertRedirects(response, detail_url)
 
+    def test_process_wizard_valid_multiple(self):
+        url = reverse('process_create')
+        samples = [
+            Sample.objects.create(substrate=mommy.make(Substrate)),
+            Sample.objects.create(substrate=mommy.make(Substrate)),
+        ]
+        data = {
+            'process-comment': 'testing',
+            'process-user': self.user.id,
+            'sample-0-sample_uuid': samples[0].uuid,
+            'sample-1-sample_uuid': samples[1].uuid,
+            'sample-INITIAL_FORMS': '2',
+            'sample-MAX_NUM_FORMS': '',
+            'sample-TOTAL_FORMS': '2',
+        }
+        response = self.client.post(url, data)
+        process = Process.objects.last()
+        self.assertEqual(process.comment, data['process-comment'])
+        nodes = process.processnode_set.all()
+        for n, (node, sample) in enumerate(zip(nodes, samples)):
+            self.assertEqual(node.number, n + 1)
+            self.assertEqual(node.get_sample().uuid, sample.uuid)
+        detail_url = reverse('process_detail', args=(process.uuid,))
+        self.assertRedirects(response, detail_url)
+
     def test_process_wizard_ambiguous_piece(self):
         url = '/process/create/'
         sample = Sample.objects.create(mommy.make(Substrate))

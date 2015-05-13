@@ -278,6 +278,8 @@ class TestD180Wizard(TestCase):
             'sample-0-substrate_comment': 'test',
         }
         response = self.client.post(url, data)
+        node = ProcessNode.objects.last()
+        self.assertEqual(node.number, 1)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
 
     def test_start_valid_existing_sample(self):
