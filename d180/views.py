@@ -140,11 +140,11 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             logger.debug('Created process {} ({}) for {} samples'.format(
                 self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
             source_form.save()
-            for s in sample_formset:
+            for n, s in enumerate(sample_formset):
                 sample = s.save()
                 logger.debug('Created sample {}'.format(sample.uuid))
                 piece = s.cleaned_data['piece']
-                sample.run_process(self.object, piece)
+                sample.run_process(self.object, piece, n + 1)
             reservation = Reservation.get_latest(user=self.request.user,
                                                  tool_name='d180')
             if reservation and not reservation_form.cleaned_data['hold_open']:

@@ -74,11 +74,13 @@ class TestSample(TestCase):
         """
         root = self.sample.process_tree
         pieces = 'abc'
+        number = 1
         for piece in pieces:
             process = mommy.make(Process)
-            node = self.sample._insert_node(process, piece, root)
+            node = self.sample._insert_node(process, piece, number, root)
             self.assertEqual(node.parent_id, root.id)
             self.assertEqual(node.piece, piece)
+            self.assertEqual(node.number, number)
             self.assertEqual(node.process_id, process.id)
             self.assertEqual(node.comment, '')
         self.sample.refresh_tree()
@@ -102,7 +104,7 @@ class TestSample(TestCase):
         node_uuids = [node.uuid]
         levels = 4
         for level in range(levels):
-            node = self.sample._insert_node(None, 'a', node)
+            node = self.sample._insert_node(None, 'a', 1, node)
             node_uuids.append(node.uuid)
         qs = self.sample._get_tree_queryset()
         self.assertEqual(qs.count(), levels + 1)
@@ -117,7 +119,7 @@ class TestSample(TestCase):
         root = self.sample.process_tree
         pieces = 'abcdefg'
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
         leaf_nodes = list(self.sample.leaf_nodes)
         self.assertEqual(len(leaf_nodes), len(pieces))
         for node in leaf_nodes:
@@ -133,9 +135,9 @@ class TestSample(TestCase):
         levels = [1, 2, 4, 6, 7, 6, 2]
         expected_leaf_nodes = []
         for level, piece in zip(levels, pieces):
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             for l in range(level):
-                node = self.sample._insert_node(None, piece, node)
+                node = self.sample._insert_node(None, piece, 1, node)
             expected_leaf_nodes.append(node)
         leaf_nodes = list(self.sample.leaf_nodes)
         self.assertEqual(len(leaf_nodes), len(pieces))
@@ -153,9 +155,9 @@ class TestSample(TestCase):
         levels = [1, 2, 4, 6, 7, 6, 2]
         node_uuids = [root.uuid]
         for level, piece in zip(levels, pieces):
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             for l in range(level):
-                node = self.sample._insert_node(None, piece, node)
+                node = self.sample._insert_node(None, piece, 1, node)
                 node_uuids.append(node.uuid)
         for uuid in node_uuids:
             node = self.sample.get_node(uuid)
@@ -171,9 +173,9 @@ class TestSample(TestCase):
         levels = [1, 2, 4, 6, 7, 6, 2]
         node_uuids = [root.uuid_full]
         for level, piece in zip(levels, pieces):
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             for l in range(level):
-                node = self.sample._insert_node(None, piece, node)
+                node = self.sample._insert_node(None, piece, 1, node)
                 node_uuids.append(node.uuid_full)
         for uuid in node_uuids:
             node = self.sample.get_node(uuid)
@@ -186,7 +188,7 @@ class TestSample(TestCase):
         root = self.sample.process_tree
         pieces = 'abcdefg'
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
         self.assertListEqual(list(pieces), self.sample.pieces)
 
     def test_get_piece_single(self):
@@ -205,7 +207,7 @@ class TestSample(TestCase):
         pieces = 'abcdefg'
         node_uuids = []
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             node_uuids.append(node.uuid)
         for uuid, piece in zip(node_uuids, pieces):
             node = self.sample.get_piece(piece, full=False)
@@ -228,7 +230,7 @@ class TestSample(TestCase):
         pieces = 'abcdefg'
         nodes = []
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             nodes.append(node)
         for node, piece in zip(nodes, pieces):
             piece_nodes = self.sample.get_piece(piece, full=True)
@@ -238,7 +240,7 @@ class TestSample(TestCase):
         root = self.sample.process_tree
         pieces = 'abcdefg'
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
         self.sample.refresh_tree()
         self.assertEqual(self.sample.node_count, len(pieces) + 1)
 
@@ -272,8 +274,9 @@ class TestSample(TestCase):
         after = self.sample.node_count
         self.assertEqual(before + split_number, after)
         self.assertEqual(split_number, len(nodes))
-        for node in nodes:
+        for number, node in enumerate(nodes):
             self.assertEqual(node.parent_id, root.id)
+            self.assertEqual(node.number, number + 1)
             self.assertIn(node.piece, pieces)
         self.assertSetEqual(set(nodes), set(self.sample.leaf_nodes))
 
@@ -292,11 +295,13 @@ class TestSample(TestCase):
         nodes_second = self.sample.split(self.user, split_number, 'b')
         after = self.sample.node_count
         self.assertEqual(split_number * 2 + before, after)
-        for node in nodes_first:
+        for number, node in enumerate(nodes_first):
             self.assertEqual(node.parent_id, root_first.id)
+            self.assertEqual(node.number, number + 1)
             self.assertIn(node.piece, pieces_first)
-        for node in nodes_second:
+        for number, node in enumerate(nodes_second):
             self.assertEqual(node.parent_id, root_second.id)
+            self.assertEqual(node.number, number + 1)
             self.assertIn(node.piece, pieces_second)
 
     def test_insert_process_before(self):
