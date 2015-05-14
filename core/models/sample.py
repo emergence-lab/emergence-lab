@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import operator
 import string
 
 from django.contrib.contenttypes.models import ContentType
@@ -45,18 +46,92 @@ class SampleManager(models.Manager):
 
         return sample
 
+    def get_queryset(self):
+        return SampleQuerySet(self.model, using=self._db)
+
+    def get_by_uuid(self, uuid, clean=True):
+        return self.get_queryset().get_by_uuid(uuid, clean)
+
+    def filter_process(self, **kwargs):
+        return self.get_queryset().filter_process(**kwargs)
+
+    def by_process(self, uuid, clean=True):
+        return self.get_queryset().by_process(uuid, clean)
+
+    def by_process_type(self, process_type):
+        return self.get_queryset().by_process_type(process_type)
+
+    def by_process_types(self, process_types, combine_and=False):
+        return self.get_queryset().by_process_types(process_types, combine_and)
+
+
+class SampleQuerySet(models.query.QuerySet):
+
     def get_by_uuid(self, uuid, clean=True):
         if clean:
             if uuid[-1].isalpha():  # has piece information attached
                 uuid = uuid[:-1]
             uuid = Sample.strip_uuid(uuid)
-        return Sample.objects.get(pk=uuid)
+        return self.get(pk=uuid)
 
-    def get_by_process(self, uuid, clean=True):
+    def filter_process(self, **kwargs):
+        """
+        Generic filtering on processes run on the sample. Keyword arguments
+        should be formatted as if it was filtering on the Process model.
+        Extra kwargs are as follows:
+            - uuid: The short or long uuid of the process
+            - type: A single Process (sub)classes
+        """
+        if 'uuid' in kwargs:
+            kwargs['uuid'] = Process.strip_uuid(kwargs['uuid'])
+        if 'type' in kwargs:
+            kwargs['polymorphic_ctype'] = ContentType.objects.get_for_models(kwargs.pop('type'))
+
+        kwargs = {'process__{}'.format(k): v for k, v in kwargs.items()}
+
+        trees = (ProcessNode.objects.filter(**kwargs)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process(self, uuid, clean=True):
         if clean:
             uuid = Process.strip_uuid(uuid)
-        nodes = ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
-        return [node.get_sample() for node in nodes]
+        trees = (ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process_type(self, process_type):
+        if process_type != Process and Process not in process_type.__bases__:
+            raise ValueError('{} is not a valid process, it does not inherit '
+                             'from Process'.format(process_type.__name__))
+        content_type = ContentType.objects.get_for_model(process_type)
+
+        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process_types(self, process_types, combine_and=False):
+        for process_type in process_types:
+            if process_type != Process and Process not in process_type.__bases__:
+                raise ValueError('{} is not a valid process, it does not inherit '
+                                 'from Process'.format(process_type.__name__))
+        content_types = ContentType.objects.get_for_models(*process_types)
+
+        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct()
+                 for process_type, content_type in content_types.items())
+        q_filters = (models.Q(process_tree__tree_id__in=tree) for tree in trees)
+        op = operator.and_ if combine_and else operator.or_
+
+        return self.filter(reduce(op, q_filters))
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
@@ -220,11 +295,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         return node
 
     @property
+    def nodes(self):
+        """
+        Returns a queryset of the nodes currently associated with the sample.
+        """
+        return self._get_tree_queryset()
+
+    @property
     def leaf_nodes(self):
         """
         Returns all of the leaf nodes of the tree as a list.
         """
-        return self._get_tree_queryset().filter(lft=models.F('rght') - 1)
+        return self.nodes.filter(lft=models.F('rght') - 1)
 
     @property
     def root_node(self):
@@ -236,16 +318,19 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     @property
     def pieces(self):
         """
-        Returns a list of the pieces the sample is currently using.
+        Returns a queryset of the pieces the sample is currently using.
         """
-        return sorted([n.piece for n in self.leaf_nodes])
+        return (self.leaf_nodes.order_by('piece')
+                               .values_list('piece', flat=True))
 
     @property
-    def nodes(self):
+    def processes(self):
         """
-        Returns a list of the nodes currently associated with the sample.
+        Returns a queryset of distinct processes run on the sample.
         """
-        return self._get_tree_queryset()
+        nodes = (self.nodes.exclude(process__isnull=True)
+                           .values_list('process_id', flat=True))
+        return Process.objects.filter(id__in=nodes).distinct()
 
     @property
     def node_count(self):

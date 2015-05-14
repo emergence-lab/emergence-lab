@@ -192,8 +192,7 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super(WizardReadingsView, self).get_context_data(**kwargs)
         context_data['growth'] = self.object
-        context_data['samples'] = Sample.objects.get_by_process(
-            self.object.uuid_full)
+        context_data['samples'] = Sample.objects.by_process(self.object.uuid_full)
         return context_data
 
     def post(self, request, *args, **kwargs):
@@ -243,8 +242,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super(WizardPostrunView, self).get_context_data(**kwargs)
         context_data['growth'] = self.object
-        context_data['samples'] = Sample.objects.get_by_process(
-            self.object.uuid_full)
+        context_data['samples'] = Sample.objects.by_process(self.object.uuid_full)
         return context_data
 
     def get(self, request, *args, **kwargs):
@@ -283,7 +281,7 @@ class WizardCancelView(LoginRequiredMixin, ActionReloadView):
         for investigation in growth.investigations.all():
             growth.investigations.remove(investigation)
         # delete process node, removes all child nodes but there should be none
-        for node in growth.processnode_set.all():
+        for node in growth.nodes:
             node.delete()
 
         growth.delete()
