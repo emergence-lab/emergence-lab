@@ -8,8 +8,8 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from d180.models import D180Growth, Platter
-from core.models import Investigation, Sample
+from d180.models import D180Growth, D180Readings, Platter
+from core.models import Investigation, Sample, ProcessNode
 
 
 class TestPlatterCRUD(TestCase):
@@ -111,6 +111,48 @@ class TestD180Wizard(TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, 'd180/create_growth_postrun.html')
         self.assertEqual(response.status_code, 200)
+
+    def test_cancel(self):
+        # check url resolution
+        url = '/d180/growth/create/cancel/'
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'create_growth_d180_cancel')
+
+        # set up objects
+        investigation = mommy.make(Investigation)
+        growth = mommy.make(D180Growth)
+        growth.investigations.add(investigation)
+        readings = mommy.make(D180Readings, growth=growth)
+        sample = Sample.objects.create(substrate=mommy.make('Substrate'))
+        sample.run_process(growth)
+        nodes = growth.processnode_set.all()
+        self.assertListEqual(list(sample.get_nodes_for_process_type(D180Growth)),
+                             list(nodes))
+
+        # check url resolution
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse('dashboard'))
+
+        # refresh objects from db, some no longer exist
+        investigation = Investigation.objects.get(pk=investigation.pk)
+        sample = Sample.objects.get(pk=sample.pk)
+        nodes = ProcessNode.objects.filter(pk__in=[n.pk for n in nodes])
+
+        # growth no longer exists
+        with self.assertRaises(D180Growth.DoesNotExist):
+            growth = D180Growth.objects.get(pk=growth.pk)
+
+        # readings no longer exists
+        with self.assertRaises(D180Readings.DoesNotExist):
+            readings = D180Readings.objects.get(pk=readings.pk)
+
+        # process node no longer exists
+        self.assertListEqual([], list(nodes))
+        self.assertListEqual([],
+                             list(sample.get_nodes_for_process_type(D180Growth)))
+
+        # many-to-many relationship with investigation no longer exists
+        self.assertListEqual([], list(investigation.growths.all()))
 
     def test_start_empty_data(self):
         """
@@ -236,6 +278,8 @@ class TestD180Wizard(TestCase):
             'sample-0-substrate_comment': 'test',
         }
         response = self.client.post(url, data)
+        node = ProcessNode.objects.last()
+        self.assertEqual(node.number, 1)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
 
     def test_start_valid_existing_sample(self):

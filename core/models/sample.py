@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import operator
 import string
 
 from django.contrib.contenttypes.models import ContentType
@@ -45,18 +46,92 @@ class SampleManager(models.Manager):
 
         return sample
 
+    def get_queryset(self):
+        return SampleQuerySet(self.model, using=self._db)
+
+    def get_by_uuid(self, uuid, clean=True):
+        return self.get_queryset().get_by_uuid(uuid, clean)
+
+    def filter_process(self, **kwargs):
+        return self.get_queryset().filter_process(**kwargs)
+
+    def by_process(self, uuid, clean=True):
+        return self.get_queryset().by_process(uuid, clean)
+
+    def by_process_type(self, process_type):
+        return self.get_queryset().by_process_type(process_type)
+
+    def by_process_types(self, process_types, combine_and=False):
+        return self.get_queryset().by_process_types(process_types, combine_and)
+
+
+class SampleQuerySet(models.query.QuerySet):
+
     def get_by_uuid(self, uuid, clean=True):
         if clean:
             if uuid[-1].isalpha():  # has piece information attached
                 uuid = uuid[:-1]
             uuid = Sample.strip_uuid(uuid)
-        return Sample.objects.get(pk=uuid)
+        return self.get(pk=uuid)
 
-    def get_by_process(self, uuid, clean=True):
+    def filter_process(self, **kwargs):
+        """
+        Generic filtering on processes run on the sample. Keyword arguments
+        should be formatted as if it was filtering on the Process model.
+        Extra kwargs are as follows:
+            - uuid: The short or long uuid of the process
+            - type: A single Process (sub)classes
+        """
+        if 'uuid' in kwargs:
+            kwargs['uuid'] = Process.strip_uuid(kwargs['uuid'])
+        if 'type' in kwargs:
+            kwargs['polymorphic_ctype'] = ContentType.objects.get_for_models(kwargs.pop('type'))
+
+        kwargs = {'process__{}'.format(k): v for k, v in kwargs.items()}
+
+        trees = (ProcessNode.objects.filter(**kwargs)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process(self, uuid, clean=True):
         if clean:
             uuid = Process.strip_uuid(uuid)
-        nodes = ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
-        return [node.get_sample() for node in nodes]
+        trees = (ProcessNode.objects.filter(process__uuid_full__startswith=uuid)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process_type(self, process_type):
+        if process_type != Process and Process not in process_type.__bases__:
+            raise ValueError('{} is not a valid process, it does not inherit '
+                             'from Process'.format(process_type.__name__))
+        content_type = ContentType.objects.get_for_model(process_type)
+
+        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct())
+        return self.filter(process_tree__tree_id__in=trees)
+
+    def by_process_types(self, process_types, combine_and=False):
+        for process_type in process_types:
+            if process_type != Process and Process not in process_type.__bases__:
+                raise ValueError('{} is not a valid process, it does not inherit '
+                                 'from Process'.format(process_type.__name__))
+        content_types = ContentType.objects.get_for_models(*process_types)
+
+        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+                                    .order_by('tree_id')
+                                    .values_list('tree_id', flat=True)
+                                    .distinct()
+                 for process_type, content_type in content_types.items())
+        q_filters = (models.Q(process_tree__tree_id__in=tree) for tree in trees)
+        op = operator.and_ if combine_and else operator.or_
+
+        return self.filter(reduce(op, q_filters))
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
@@ -83,8 +158,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         possible_pieces = list(set(string.ascii_lowercase) - used_piece_names)
         return sorted(possible_pieces)[0]
 
-    def _insert_node(self, process, piece, parent, comment=''):
-        return ProcessNode.objects.create(process=process, piece=piece,
+    def _insert_node(self, process, piece, number, parent, comment=''):
+        return ProcessNode.objects.create(process=process, piece=piece, number=number,
                                           comment=comment, parent_id=parent.id)
 
     def refresh_tree(self):
@@ -130,17 +205,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
             #       the lft and rght items are not updated properly. Workarounds
             #       include manually updating the root node or requerying for
             #       the sample object which will force a refresh.
-            nodes.append(self._insert_node(process, new_piece, branch))
+            nodes.append(self._insert_node(process, new_piece, i + 1, branch))
         if force_refresh:  # workaround to force the root node to update
             self.refresh_tree()
         return nodes
 
-    def run_process(self, process, piece='a', comment='', force_refresh=True):
+    def run_process(self, process, piece='a', number=1, comment='', force_refresh=True):
         """
         Append a process to the specified branch.
 
         :param process: The process to run on the sample.
         :param piece: The piece to use for the process. Defaults to 'a'.
+        :param number: The sample number for the process. Defaults to 1.
         :param comment: An optional comment associated with the process for this
                         sample. Separate from the process comment.
         :param force_refresh: Specifies whether to update the sample in-place
@@ -150,7 +226,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         :returns: The ProcessNode associated with the process.
         """
         branch = self.get_piece(piece)
-        node = self._insert_node(process, piece, branch, comment)
+        node = self._insert_node(process, piece, number, branch, comment)
         if force_refresh:  # workaround to force the root node to update
             self.refresh_tree()
         return node
@@ -219,11 +295,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         return node
 
     @property
+    def nodes(self):
+        """
+        Returns a queryset of the nodes currently associated with the sample.
+        """
+        return self._get_tree_queryset()
+
+    @property
     def leaf_nodes(self):
         """
         Returns all of the leaf nodes of the tree as a list.
         """
-        return self._get_tree_queryset().filter(lft=models.F('rght') - 1)
+        return self.nodes.filter(lft=models.F('rght') - 1)
 
     @property
     def root_node(self):
@@ -235,16 +318,19 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     @property
     def pieces(self):
         """
-        Returns a list of the pieces the sample is currently using.
+        Returns a queryset of the pieces the sample is currently using.
         """
-        return sorted([n.piece for n in self.leaf_nodes])
+        return (self.leaf_nodes.order_by('piece')
+                               .values_list('piece', flat=True))
 
     @property
-    def nodes(self):
+    def processes(self):
         """
-        Returns a list of the nodes currently associated with the sample.
+        Returns a queryset of distinct processes run on the sample.
         """
-        return self._get_tree_queryset()
+        nodes = (self.nodes.exclude(process__isnull=True)
+                           .values_list('process_id', flat=True))
+        return Process.objects.filter(id__in=nodes).distinct()
 
     @property
     def node_count(self):

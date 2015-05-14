@@ -266,11 +266,11 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
             self.object = info_form.save()
             logger.debug('Created process {} ({}) for {} samples'.format(
                 self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
-            for s in sample_formset:
+            for n, s in enumerate(sample_formset):
                 sample = s.save()
                 logger.debug('Created sample {}'.format(sample.uuid))
                 piece = s.cleaned_data['piece']
-                sample.run_process(self.object, piece)
+                sample.run_process(self.object, piece, n + 1)
             return HttpResponseRedirect(reverse('process_detail',
                                                 kwargs={'uuid': self.object.uuid}))
         else:

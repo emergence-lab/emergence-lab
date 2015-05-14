@@ -19,7 +19,7 @@ with open(os.path.join(BASE_DIR, 'secrets.json')) as f:
     secrets = json.loads(f.read())
 
 
-def get_secret(setting, secrets=secrets):
+def get_secret(setting, default=None, secrets=secrets):
     """
     Get the secret variable or return exception.
     via Two Scoops of Django 1.6 pg 49
@@ -27,8 +27,11 @@ def get_secret(setting, secrets=secrets):
     try:
         return secrets[setting]
     except KeyError:
-        error_msg = 'Setting {0} is missing from the secrets file'.format(setting)
-        raise ImproperlyConfigured(error_msg)
+        if default is None:
+            error_msg = 'Setting {0} is missing from the secrets file'.format(setting)
+            raise ImproperlyConfigured(error_msg)
+        else:
+            return default
 
 
 SECRET_KEY = get_secret('SECRET_KEY')
@@ -42,7 +45,7 @@ ROOT_URLCONF = 'wbg.urls'
 
 WSGI_APPLICATION = 'wbg.wsgi.application'
 
-SUB_SITE = get_secret('SUB_SITE')
+SUB_SITE = get_secret('SUB_SITE', '')
 
 
 # User login
@@ -124,11 +127,11 @@ MIDDLEWARE_CLASSES = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': get_secret('DATABASE_NAME'),
-        'USER': get_secret('DATABASE_USER'),
-        'PASSWORD': get_secret('DATABASE_PASSWORD'),
-        'HOST': get_secret('DATABASE_HOST'),
-        'PORT': get_secret('DATABASE_PORT'),
+        'NAME': get_secret('DATABASE_NAME', 'db'),
+        'USER': get_secret('DATABASE_USER', 'user'),
+        'PASSWORD': get_secret('DATABASE_PASSWORD', ''),
+        'HOST': get_secret('DATABASE_HOST', 'localhost'),
+        'PORT': get_secret('DATABASE_PORT', 3306),
     }
 }
 
@@ -142,18 +145,18 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 AUTH_LDAP_BIND_DN = ''
 AUTH_LDAP_BIND_PASSWORD = ''
 
-AUTH_LDAP_USER_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_USER_SEARCH'),
+AUTH_LDAP_USER_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_USER_SEARCH', ''),
                                    ldap.SCOPE_SUBTREE, '(uid=%(user)s)')
 AUTH_LDAP_USER_ATTR_MAP = {
     'email': 'mail',
     'full_name': 'sn',
 }
 
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_GROUP_SEARCH'),
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_GROUP_SEARCH', ''),
                                     ldap.SCOPE_SUBTREE, '(objectClass=posixGroup)')
 AUTH_LDAP_GROUP_TYPE = PosixGroupType()
 
-AUTH_LDAP_USER_FLAGS_BY_GROUP = get_secret('AUTH_LDAP_USER_FLAGS_BY_GROUP')
+AUTH_LDAP_USER_FLAGS_BY_GROUP = get_secret('AUTH_LDAP_USER_FLAGS_BY_GROUP', {})
 
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_FIND_GROUP_PERMS = True
@@ -209,33 +212,33 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 # Gitlab
 
-GITLAB_HOST = get_secret('GITLAB_HOST')
-GITLAB_PRIVATE_TOKEN = get_secret('GITLAB_PRIVATE_TOKEN')
+GITLAB_HOST = get_secret('GITLAB_HOST', 'localhost')
+GITLAB_PRIVATE_TOKEN = get_secret('GITLAB_PRIVATE_TOKEN', '')
 
 
 # Amazon Cloud
 
-AWS_EC2_REGION = get_secret('AWS_EC2_REGION')
-AWS_ACCESS_KEY_ID = get_secret('AWS_EC2_KEY')
-AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET')
-AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET')
+AWS_EC2_REGION = get_secret('AWS_EC2_REGION', '')
+AWS_ACCESS_KEY_ID = get_secret('AWS_EC2_KEY', '')
+AWS_SECRET_ACCESS_KEY = get_secret('AWS_EC2_SECRET', '')
+AWS_STORAGE_BUCKET_NAME = get_secret('AWS_S3_BUCKET', '')
 S3_URL = 'https://{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
 
 
 # Redis
 
-REDIS_HOST = get_secret('REDIS_HOST')
-REDIS_PORT = get_secret('REDIS_PORT')
-REDIS_DB = get_secret('REDIS_DB')
+REDIS_HOST = get_secret('REDIS_HOST', 'localhost')
+REDIS_PORT = get_secret('REDIS_PORT', 6379)
+REDIS_DB = get_secret('REDIS_DB', 0)
 
 
 # RQ
 
 RQ_QUEUES = {
     'default': {
-        'HOST': get_secret('REDIS_HOST'),
-        'PORT': get_secret('REDIS_PORT'),
-        'DB': get_secret('REDIS_DB'),
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
+        'DB': REDIS_DB,
         'DEFAULT_TIMEOUT': 360,
     },
 }
@@ -303,9 +306,9 @@ FILE_UPLOAD_HANDLERS = (
 
 # External Links
 
-EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS')
+EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS', [])
 
 
 # Feedback
 
-ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK')
+ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK', False)

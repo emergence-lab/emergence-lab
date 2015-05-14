@@ -37,12 +37,17 @@ class TestSampleManager(TestCase):
         result = Sample.objects.get_by_uuid(sample.uuid_full)
         self.assertEqual(sample.uuid, result.uuid)
 
-    def test_get_by_process_nonexistant(self):
+    def test_by_process_nonexistant(self):
         process_uuid = Process.prefix + ''.zfill(Process.short_length)
-        results = Sample.objects.get_by_process(process_uuid)
-        self.assertListEqual(results, [])
+        samples = Sample.objects.by_process(process_uuid)
+        self.assertQuerysetEqual(samples, [])
 
-    def test_get_by_process_multiple(self):
+    def test_by_process_no_samples(self):
+        process = mommy.make(Process)
+        samples = Sample.objects.by_process(process.uuid)
+        self.assertQuerysetEqual(samples, [])
+
+    def test_by_process_multiple(self):
         process = mommy.make(Process)
         samples = [
             Sample.objects.create(substrate=mommy.make('core.Substrate')),
@@ -55,11 +60,78 @@ class TestSampleManager(TestCase):
         extra_sample = Sample.objects.create(
             substrate=mommy.make('core.Substrate'))
         extra_sample.run_process(extra_process)
-        results = Sample.objects.get_by_process(process.uuid)
+        results = Sample.objects.by_process(process.uuid)
         for sample in samples:
             self.assertIn(sample, results)
         self.assertNotIn(extra_sample, results)
 
+    def test_by_process_type_invalid(self):
+        with self.assertRaises(ValueError):
+            Sample.objects.by_process_type(Sample)
+
+    def test_by_process_type_no_samples(self):
+        samples = Sample.objects.by_process_type(Process)
+        self.assertQuerysetEqual(samples, [])
+
+    def test_by_process_type_multiple(self):
+        processes = [
+            mommy.make(Process),
+            mommy.make(Process),
+            mommy.make(SplitProcess)
+        ]
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        for p, s in zip(processes, samples):
+            s.run_process(p)
+
+        process_samples = Sample.objects.by_process_type(Process)
+        self.assertListEqual(list(process_samples), samples[:-1])
+        split_samples = Sample.objects.by_process_type(SplitProcess)
+        self.assertEqual(split_samples.first(), samples[-1])
+
+    def test_by_process_types_invalid(self):
+        with self.assertRaises(ValueError):
+            Sample.objects.by_process_types([Process, Sample])
+
+    def test_by_process_types_no_samples(self):
+        samples = Sample.objects.by_process_types([Process, SplitProcess])
+        self.assertQuerysetEqual(samples, [])
+
+    def test_by_process_types_valid(self):
+        process = mommy.make(Process)
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        user = get_user_model().objects.create_user('default', password='')
+
+        # run processes
+        # sample 0 has only Process
+        # sample 1 has only SplitProcess
+        # sample 2 has both Process and SplitProcess
+        # sample 3 has no processes
+        samples[0].run_process(process)
+        samples[1].split(user=user, number=2)
+        samples[2].run_process(process)
+        samples[2].split(user=user, number=2)
+
+        qs = Sample.objects.by_process_types([Process], combine_and=True)
+        self.assertQuerysetEqual(
+            qs, map(repr, [samples[0], samples[2]]),ordered=False)
+        qs = Sample.objects.by_process_types([SplitProcess], combine_and=True)
+        self.assertQuerysetEqual(
+            qs, map(repr, samples[1:3]), ordered=False)
+        qs = Sample.objects.by_process_types([Process, SplitProcess], combine_and=True)
+        self.assertQuerysetEqual(
+            qs, map(repr, [samples[2]]), ordered=False)
+        qs = Sample.objects.by_process_types([Process, SplitProcess], combine_and=False)
+        self.assertQuerysetEqual(
+            qs, map(repr, samples[0:3]), ordered=False)
 
 class TestSample(TestCase):
 
@@ -74,11 +146,13 @@ class TestSample(TestCase):
         """
         root = self.sample.process_tree
         pieces = 'abc'
+        number = 1
         for piece in pieces:
             process = mommy.make(Process)
-            node = self.sample._insert_node(process, piece, root)
+            node = self.sample._insert_node(process, piece, number, root)
             self.assertEqual(node.parent_id, root.id)
             self.assertEqual(node.piece, piece)
+            self.assertEqual(node.number, number)
             self.assertEqual(node.process_id, process.id)
             self.assertEqual(node.comment, '')
         self.sample.refresh_tree()
@@ -102,7 +176,7 @@ class TestSample(TestCase):
         node_uuids = [node.uuid]
         levels = 4
         for level in range(levels):
-            node = self.sample._insert_node(None, 'a', node)
+            node = self.sample._insert_node(None, 'a', 1, node)
             node_uuids.append(node.uuid)
         qs = self.sample._get_tree_queryset()
         self.assertEqual(qs.count(), levels + 1)
@@ -117,7 +191,7 @@ class TestSample(TestCase):
         root = self.sample.process_tree
         pieces = 'abcdefg'
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
         leaf_nodes = list(self.sample.leaf_nodes)
         self.assertEqual(len(leaf_nodes), len(pieces))
         for node in leaf_nodes:
@@ -133,9 +207,9 @@ class TestSample(TestCase):
         levels = [1, 2, 4, 6, 7, 6, 2]
         expected_leaf_nodes = []
         for level, piece in zip(levels, pieces):
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             for l in range(level):
-                node = self.sample._insert_node(None, piece, node)
+                node = self.sample._insert_node(None, piece, 1, node)
             expected_leaf_nodes.append(node)
         leaf_nodes = list(self.sample.leaf_nodes)
         self.assertEqual(len(leaf_nodes), len(pieces))
@@ -153,9 +227,9 @@ class TestSample(TestCase):
         levels = [1, 2, 4, 6, 7, 6, 2]
         node_uuids = [root.uuid]
         for level, piece in zip(levels, pieces):
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             for l in range(level):
-                node = self.sample._insert_node(None, piece, node)
+                node = self.sample._insert_node(None, piece, 1, node)
                 node_uuids.append(node.uuid)
         for uuid in node_uuids:
             node = self.sample.get_node(uuid)
@@ -171,9 +245,9 @@ class TestSample(TestCase):
         levels = [1, 2, 4, 6, 7, 6, 2]
         node_uuids = [root.uuid_full]
         for level, piece in zip(levels, pieces):
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             for l in range(level):
-                node = self.sample._insert_node(None, piece, node)
+                node = self.sample._insert_node(None, piece, 1, node)
                 node_uuids.append(node.uuid_full)
         for uuid in node_uuids:
             node = self.sample.get_node(uuid)
@@ -186,8 +260,8 @@ class TestSample(TestCase):
         root = self.sample.process_tree
         pieces = 'abcdefg'
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
-        self.assertListEqual(list(pieces), self.sample.pieces)
+            node = self.sample._insert_node(None, piece, 1, root)
+        self.assertListEqual(list(pieces), list(self.sample.pieces))
 
     def test_get_piece_single(self):
         """
@@ -205,7 +279,7 @@ class TestSample(TestCase):
         pieces = 'abcdefg'
         node_uuids = []
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             node_uuids.append(node.uuid)
         for uuid, piece in zip(node_uuids, pieces):
             node = self.sample.get_piece(piece, full=False)
@@ -228,7 +302,7 @@ class TestSample(TestCase):
         pieces = 'abcdefg'
         nodes = []
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
             nodes.append(node)
         for node, piece in zip(nodes, pieces):
             piece_nodes = self.sample.get_piece(piece, full=True)
@@ -238,7 +312,7 @@ class TestSample(TestCase):
         root = self.sample.process_tree
         pieces = 'abcdefg'
         for piece in pieces:
-            node = self.sample._insert_node(None, piece, root)
+            node = self.sample._insert_node(None, piece, 1, root)
         self.sample.refresh_tree()
         self.assertEqual(self.sample.node_count, len(pieces) + 1)
 
@@ -272,8 +346,9 @@ class TestSample(TestCase):
         after = self.sample.node_count
         self.assertEqual(before + split_number, after)
         self.assertEqual(split_number, len(nodes))
-        for node in nodes:
+        for number, node in enumerate(nodes):
             self.assertEqual(node.parent_id, root.id)
+            self.assertEqual(node.number, number + 1)
             self.assertIn(node.piece, pieces)
         self.assertSetEqual(set(nodes), set(self.sample.leaf_nodes))
 
@@ -292,11 +367,13 @@ class TestSample(TestCase):
         nodes_second = self.sample.split(self.user, split_number, 'b')
         after = self.sample.node_count
         self.assertEqual(split_number * 2 + before, after)
-        for node in nodes_first:
+        for number, node in enumerate(nodes_first):
             self.assertEqual(node.parent_id, root_first.id)
+            self.assertEqual(node.number, number + 1)
             self.assertIn(node.piece, pieces_first)
-        for node in nodes_second:
+        for number, node in enumerate(nodes_second):
             self.assertEqual(node.parent_id, root_second.id)
+            self.assertEqual(node.number, number + 1)
             self.assertIn(node.piece, pieces_second)
 
     def test_insert_process_before(self):
@@ -374,3 +451,44 @@ class TestSample(TestCase):
         self.sample.split(self.user, 2)
         self.assertTrue(self.sample.has_nodes_for_process_type(Process))
         self.assertTrue(self.sample.has_nodes_for_process_type(SplitProcess))
+
+
+class TestProcess(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('default', password='')
+
+    def test_get_samples_no_repeat(self):
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        process = Process.objects.create(comment='test', user=self.user)
+        for s in samples[:-1]:
+            s.run_process(process)
+        sample_list = process.samples
+        self.assertListEqual(list(sample_list), samples[:-1])
+
+    def test_get_samples_with_repeat(self):
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        process = Process.objects.create(comment='test', user=self.user)
+        for s in samples[:-1]:
+            s.run_process(process)
+        samples[0].run_process(process) # run process twice so it repeats
+        sample_list = process.samples
+        self.assertListEqual(list(sample_list), samples[:-1])
+
+    def test_get_nodes(self):
+        samples = [
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+            Sample.objects.create(substrate=mommy.make('core.Substrate')),
+        ]
+        process = Process.objects.create(comment='test', user=self.user)
+        nodes = [s.run_process(process) for s in samples]
+        self.assertListEqual(list(process.nodes), nodes)

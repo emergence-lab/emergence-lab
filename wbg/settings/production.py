@@ -8,21 +8,11 @@ TEMPLATE_DEBUG = False
 
 # Misc Settings
 
-ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS')
+ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS', [])
 
 
 # Media Files
 
-MEDIA_URL = '/wsgi/media/'
-MEDIA_ROOT = get_secret('MEDIA_ROOT')
+MEDIA_URL = '{}/media/'.format(SUB_SITE)
+MEDIA_ROOT = get_secret('MEDIA_ROOT', os.path.join(BASE_DIR, os.pardir, 'media'))
 SENDFILE_BACKEND = 'sendfile.backends.xsendfile'
-
-
-# Templates
-
-TEMPLATE_LOADERS = ('django.template.loaders.cached.Loader',) + TEMPLATE_LOADERS
-
-
-# Sessions
-
-SESSION_ENGINE 'django.contrib.sesstions.backend.cache'

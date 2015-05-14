@@ -54,22 +54,21 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
         except StopIteration:
             raise ValueError('Process slug {} not valid'.format(slug))
 
-    def samples(self, unique=False):
+    @property
+    def samples(self):
         """
         Retrieve a queryset of samples that have the process run on them.
-
-        :param unique: Specifies if the queryset should include duplicate
-                       samples.
         """
         from core.models import Sample
         trees = ProcessNode.objects.filter(process=self).values_list('tree_id', flat=True)
         nodes = (ProcessNode.objects.filter(tree_id__in=trees,
                                             sample__isnull=False)
                                     .values_list('sample', flat=True))
-        samples = Sample.objects.filter(id__in=nodes)
-        if unique:
-            return samples.distinct()
-        return samples
+        return Sample.objects.filter(id__in=nodes).distinct()
+
+    @property
+    def nodes(self):
+        return self.processnode_set.all()
 
 
 class SplitProcess(Process):
@@ -92,6 +91,7 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     parent = mptt.TreeForeignKey('self', null=True, related_name='children')
     process = models.ForeignKey(Process, null=True)
     piece = models.CharField(max_length=5)
+    number = models.IntegerField(default=1)
 
     def get_sample(self):
         return self.get_root().sample
@@ -115,7 +115,7 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('application/octet-stream', 'Binary File'),
         ('application/pdf', 'PDF File'),
         ('application/vnd.ms-excel', 'Excel File'),
-        ('application/vnd.openxmlformats-officedocument.spreadsheelml.sheet', 'Excel File'),
+        ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Excel File'),
         ('image/png', 'PNG Image'),
         ('image/bmp', 'BMP Image'),
         ('image/jpeg', 'JPEG Image'),

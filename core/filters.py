@@ -20,13 +20,8 @@ def _filter_process_type(queryset, value):
     if not value:
         return queryset
 
-    classes = [ContentType.objects.get_for_model(Process.get_process_class(slug))
-               for slug in value]
-    for sample in queryset:
-        q_filters = [Q(process__polymorphic_ctype=cls) for cls in classes]
-        if not sample.nodes.filter(reduce(operator.or_, q_filters)).exists():
-            queryset = queryset.exclude(id=sample.id)
-    return queryset
+    classes = [Process.get_process_class(slug) for slug in value]
+    return queryset.by_process_types(classes, combine_and=False)
 
 
 def _filter_d180_growth_tags(queryset, value):
@@ -58,14 +53,14 @@ def _filter_process_user(queryset, value):
     if not value:
         return queryset
 
-    for sample in queryset:
-        if not (sample.nodes.order_by()
-                            .exclude(process_id__isnull=True)
-                            .filter(process__user_id=value)
-                            .distinct()
-                            .exists()):
-            queryset = queryset.exclude(id=sample.id)
-    return queryset
+    return queryset.filter_process(user_id=value)
+
+
+def _filter_process_comment(queryset, value):
+    if not value:
+        return queryset
+
+    return queryset.filter_process(comment__icontains=value)
 
 
 class SampleFilterSet(django_filters.FilterSet):
@@ -114,21 +109,25 @@ class SampleFilterSet(django_filters.FilterSet):
         label='D180 Tags',
         action=_filter_d180_growth_tags
         )
+    process_comment = django_filters.CharFilter(
+        label='Process Comment',
+        action=_filter_process_comment
+        )
 
     def __init__(self, *args, **kwargs):
         super(SampleFilterSet, self).__init__(*args, **kwargs)
 
         process_types = get_subclasses(Process) + [Process]
-        self.filters['processes'] = django_filters.MultipleChoiceFilter(
+        self.filters['process_type'] = django_filters.MultipleChoiceFilter(
             choices=[(p.slug, p.name) for p in process_types],
             action=_filter_process_type)
         users = [(u.id, u.get_full_name())
                  for u in get_user_model().active_objects.all()]
-        self.filters['users'] = django_filters.ChoiceFilter(
+        self.filters['process_user'] = django_filters.ChoiceFilter(
             choices=[('', 'Any User')] + users,
             action=_filter_process_user)
 
     class Meta:
         model = Sample
-        order_by = ('created', 'modified', 'uuid')
-        fields = ('created', 'modified', 'd180_tags')
+        order_by = ('-created', 'created', '-modified', 'modified', 'uuid')
+        fields = ('created', 'modified', 'd180_tags', 'process_comment')
