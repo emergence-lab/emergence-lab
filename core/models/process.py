@@ -116,7 +116,7 @@ class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
         ('application/octet-stream', 'Binary File'),
         ('application/pdf', 'PDF File'),
         ('application/vnd.ms-excel', 'Excel File'),
-        ('application/vnd.openxmlformats-officedocument.spreadsheelml.sheet', 'Excel File'),
+        ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Excel File'),
         ('image/png', 'PNG Image'),
         ('image/bmp', 'BMP Image'),
         ('image/jpeg', 'JPEG Image'),
