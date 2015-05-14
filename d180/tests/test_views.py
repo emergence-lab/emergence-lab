@@ -26,7 +26,6 @@ class TestPlatterCRUD(TestCase):
         self.assertTemplateUsed(response, 'd180/platter_list.html')
         self.assertEqual(response.status_code, 200)
 
-
     def test_project_list_content(self):
         platters = [
             mommy.make(Platter),
@@ -668,3 +667,29 @@ class TestD180Wizard(TestCase):
         }
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('process_detail', args=(process.uuid,)))
+
+
+class TestD180ReadingsCRUD(TestCase):
+
+    def setUp(self):
+        get_user_model().objects.create_user('default', password='')
+        self.client.login(username='default', password='')
+
+    def test_readings_detail_resolution_template(self):
+        process = mommy.make(D180Growth)
+        reading = mommy.make(D180Readings, growth=process)
+        url = '/d180/readings/{}/'.format(process.uuid)
+        match = resolve(url)
+        self.assertEqual(match.url_name, 'd180_readings_detail')
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'd180/readings_detail.html')
+        self.assertEqual(response.status_code, 200)
+
+    def test_readings_detail_viii_no_alkyl(self):
+        process = mommy.make(D180Growth)
+        reading = mommy.make(D180Readings, growth=process,
+                             tmga1_flow=0, tmga2_flow=0,
+                             tega2_flow=0, tmin1_flow=0, tmal1_flow=0)
+        url = reverse('d180_readings_detail', args=(process.uuid,))
+        response = self.client.get(url)
+        self.assertEqual(response.context['readings_table'][28][1], 0.0)
