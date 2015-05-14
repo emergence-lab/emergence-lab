@@ -327,7 +327,10 @@ class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
             aklyl_molar = tmga_molar + tmga2_molar + tega_molar + tmin_molar + tmal_molar
 
             nh3_molar = float(readings[27]) / 22400
-            viii_ratio = nh3_molar / aklyl_molar
+            if aklyl_molar <= 0:
+                viii_ratio = 0
+            else:
+                viii_ratio = nh3_molar / aklyl_molar
 
             readings.insert(39, round(tmal_molar * 10 ** 6, 2))
             readings.insert(37, round(tmin_molar * 10 ** 6, 2))
