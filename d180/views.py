@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 
@@ -310,6 +310,33 @@ class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
         if not readings_list:
             return context
 
+        def molar_flow(temp, flow, press, a, b):
+            if press <= 0:
+                return 0.0
+            vapor_press = 10**(a - b / (temp + 273))
+            return (flow * vapor_press) / (press * 22400)
+
+        converted_readings = [list(l) for l in readings_list]
+
+        for n, readings in enumerate(converted_readings):
+            tmga_molar = molar_flow(0, float(readings[29]), float(readings[30]), 8.07, 1703)
+            tmga2_molar = molar_flow(0, float(readings[31]), float(readings[32]), 8.07, 1703)
+            tega_molar = molar_flow(18, float(readings[33]), float(readings[34]), 8.083, 2152)
+            tmin_molar = molar_flow(20, float(readings[35]), float(readings[36]), 10.52, 3014)
+            tmal_molar = molar_flow(18, float(readings[37]), float(readings[38]), 8.224, 2135)
+            aklyl_molar = tmga_molar + tmga2_molar + tega_molar + tmin_molar + tmal_molar
+
+            nh3_molar = float(readings[27]) / 22400
+            viii_ratio = nh3_molar / aklyl_molar
+
+            readings.insert(39, round(tmal_molar * 10**6, 2))
+            readings.insert(37, round(tmin_molar * 10**6, 2))
+            readings.insert(35, round(tega_molar * 10**6, 2))
+            readings.insert(33, round(tmga2_molar * 10**6, 2))
+            readings.insert(31, round(tmga_molar * 10**6, 2))
+            readings.insert(29, round(viii_ratio, 2))
+            readings.insert(29, round(nh3_molar * 10**3, 2))
+
         context['readings_table'] = zip(
             ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'ECP Temp',
              'Thermocouple Out', 'Thermocouple In', 'Motor RPM', 'GC Pressure',
@@ -317,11 +344,14 @@ class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
              'Current Out', 'Top VP Flow', 'Hydride Inner', 'Hydride Outer',
              'Alkyl Flow Inner', 'Alkyl Push Inner', 'Alkyl Flow Middle',
              'Alkyl Push Middle', 'Alkyl Flow Outer', 'Alkyl Push Outer',
-             'N2 Flow', 'H2 Flow', 'NH3 Flow', 'Hydride Pressure', 'TMGa1 Flow',
-             'TMGa1 Pressure', 'TMGa2 Flow', 'TMGa2 Pressure', 'TEGa1 FLow',
-             'TEGa1 Pressure', 'TMIn1 Flow', 'TMIn1 Pressure', 'TMAl1 Flow',
-             'TMAl1 Pressure', 'Cp2Mg Flow', 'Cp2Mg Pressure', 'Cp2Mg Dilution',
-             'SiH4 Flow', 'SiH4 Dilution', 'SiH4 Mix', 'SiH4 Pressure'], *readings_list)[2:]
+             'N2 Flow', 'H2 Flow', 'NH3 Flow', 'Hydride Pressure', 'NH3 Molar Flow', 'V/III Ratio',
+             'TMGa1 Flow', 'TMGa1 Pressure', 'TMGa1 Molar Flow',
+             'TMGa2 Flow', 'TMGa2 Pressure', 'TMGa2 Molar Flow',
+             'TEGa1 Flow', 'TEGa1 Pressure', 'TEGa Molar Flow',
+             'TMIn1 Flow', 'TMIn1 Pressure', 'TMIn Molar Flow',
+             'TMAl1 Flow', 'TMAl1 Pressure', 'TMAl Molar Flow',
+             'Cp2Mg Flow', 'Cp2Mg Pressure', 'Cp2Mg Dilution',
+             'SiH4 Flow', 'SiH4 Dilution', 'SiH4 Mix', 'SiH4 Pressure'], *converted_readings)[2:]
 
         return context
 
