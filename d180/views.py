@@ -313,7 +313,7 @@ class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
         def molar_flow(temp, flow, press, a, b):
             if press <= 0:
                 return 0.0
-            vapor_press = 10**(a - b / (temp + 273))
+            vapor_press = 10 ** (a - b / (temp + 273))
             return (flow * vapor_press) / (press * 22400)
 
         converted_readings = [list(l) for l in readings_list]
@@ -329,13 +329,13 @@ class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
             nh3_molar = float(readings[27]) / 22400
             viii_ratio = nh3_molar / aklyl_molar
 
-            readings.insert(39, round(tmal_molar * 10**6, 2))
-            readings.insert(37, round(tmin_molar * 10**6, 2))
-            readings.insert(35, round(tega_molar * 10**6, 2))
-            readings.insert(33, round(tmga2_molar * 10**6, 2))
-            readings.insert(31, round(tmga_molar * 10**6, 2))
+            readings.insert(39, round(tmal_molar * 10 ** 6, 2))
+            readings.insert(37, round(tmin_molar * 10 ** 6, 2))
+            readings.insert(35, round(tega_molar * 10 ** 6, 2))
+            readings.insert(33, round(tmga2_molar * 10 ** 6, 2))
+            readings.insert(31, round(tmga_molar * 10 ** 6, 2))
             readings.insert(29, round(viii_ratio, 2))
-            readings.insert(29, round(nh3_molar * 10**3, 2))
+            readings.insert(29, round(nh3_molar * 10 ** 3, 2))
 
         context['readings_table'] = zip(
             ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'ECP Temp',
