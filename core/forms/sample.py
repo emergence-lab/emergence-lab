@@ -141,6 +141,10 @@ class SampleSelectOrCreateForm(forms.Form):
                 self.add_error('sample_uuid', 'Sample {} not found'.format(uuid))
                 cleaned_data['sample'] = None
                 cleaned_data['piece'] = 'a'
+            except ValueError:
+                self.add_error('sample_uuid', 'Sample UUID is not in the correct format')
+                cleaned_data['sample'] = None
+                cleaned_data['piece'] = 'a'
 
         # Create new sample
         elif existing_or_new == 'new-sample':

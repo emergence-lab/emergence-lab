@@ -55,6 +55,16 @@ class TestSampleSelectOrCreateForm(TestCase):
         self.assertListEqual(errors.get('sample_uuid'),
                              ['Sample s0001 not found'])
 
+    def test_clean_incorrect_format(self):
+        form = SampleSelectOrCreateForm(data={
+            'existing_or_new': 'existing-sample',
+            'sample_uuid': 'testing',
+        })
+        errors = dict(form.errors)
+        self.assertIsNotNone(errors.get('sample_uuid'))
+        self.assertListEqual(errors.get('sample_uuid'),
+                             ['Sample UUID is not in the correct format'])
+
     def test_clean_specify_existing(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         form = SampleSelectOrCreateForm(data={

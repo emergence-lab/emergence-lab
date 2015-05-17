@@ -69,7 +69,10 @@ class SampleQuerySet(models.query.QuerySet):
 
     def get_by_uuid(self, uuid, clean=True):
         if clean:
-            uuid, _ = Sample.strip_uuid(uuid)
+            try:
+                uuid, _ = Sample.strip_uuid(uuid)
+            except ValueError:
+                raise ValueError('Sample UUID {} is ill-formed'.format(uuid))
         if not uuid:
             raise Sample.DoesNotExist
         return self.get(pk=uuid)
@@ -158,6 +161,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         if uuid[-1].isalpha():
             piece = uuid[-1]
             uuid = uuid[:-1]
+
         return (int(uuid[len(cls.prefix):]), piece)
 
     def _get_tree_queryset(self):
