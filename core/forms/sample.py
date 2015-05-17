@@ -98,9 +98,9 @@ class SampleSelectOrCreateForm(forms.Form):
                     self.add_error(
                         'sample_uuid',
                         'This field is required when existing sample is selected')
+                pk, piece = Sample.strip_uuid(uuid)
                 sample = Sample.objects.get_by_uuid(uuid)
-                piece = uuid[-1]
-                if not piece.isalpha():  # piece not specified
+                if piece is None:  # piece not specified
                     piece = 'a'
                     if sample.pieces.count() > 1:
                         self.add_error('sample_uuid',

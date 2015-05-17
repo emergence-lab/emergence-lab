@@ -69,9 +69,9 @@ class SampleQuerySet(models.query.QuerySet):
 
     def get_by_uuid(self, uuid, clean=True):
         if clean:
-            if uuid[-1].isalpha():  # has piece information attached
-                uuid = uuid[:-1]
-            uuid = Sample.strip_uuid(uuid)
+            uuid, _ = Sample.strip_uuid(uuid)
+        if not uuid:
+            raise Sample.DoesNotExist
         return self.get(pk=uuid)
 
     def filter_process(self, **kwargs):
@@ -148,6 +148,17 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
 
     objects = SampleManager()
+
+    @classmethod
+    def strip_uuid(cls, uuid):
+        piece = None
+        if isinstance(uuid, int) or not uuid:
+            return (uuid, piece)
+
+        if uuid[-1].isalpha():
+            piece = uuid[-1]
+            uuid = uuid[:-1]
+        return (int(uuid[len(cls.prefix):]), piece)
 
     def _get_tree_queryset(self):
         return ProcessNode.objects.filter(tree_id=self.process_tree.tree_id)

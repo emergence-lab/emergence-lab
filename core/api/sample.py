@@ -37,7 +37,7 @@ class SampleRetrieveAPIView(generics.RetrieveAPIView):
             'Expected view {} to be called with a URL keyword argument '
             'named "{}". Fix your URL conf.'.format(self.__class__.__name__,
                                                     self.lookup_url_kwarg))
-        uuid = Sample.strip_uuid(self.kwargs[self.lookup_url_kwarg])
+        uuid, _ = Sample.strip_uuid(self.kwargs[self.lookup_url_kwarg])
 
         obj = generics.get_object_or_404(queryset, pk=uuid)
 
