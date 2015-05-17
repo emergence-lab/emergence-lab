@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import six
-
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from betterforms import multiform
+from crispy_forms import helper, layout, bootstrap
 
 from core.models import Substrate, Sample
 
@@ -57,54 +56,100 @@ class SampleMultiForm(multiform.MultiModelForm):
 
 
 class SampleSelectOrCreateForm(forms.Form):
+    existing_or_new = forms.ChoiceField(
+        required=True,
+        label=_('Sample Type'),
+        choices=[
+            ('existing-sample', 'Use Existing Sample'),
+            ('new-sample', 'Create New Sample')],
+        widget=forms.RadioSelect())
+
     # use existing sample
-    sample_uuid = forms.CharField(required=False)
+    sample_uuid = forms.CharField(
+        required=False,
+        label=_('Sample UUID'))
 
     # create new sample
     sample_comment = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
+        required=False,
+        label=_('Sample Comment'),
+        widget=forms.Textarea(attrs={'class': 'hallo'}))
     substrate_comment = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={'class': 'hallo'}))
-    substrate_source = forms.CharField(required=False)
-    substrate_serial = forms.CharField(required=False)
+        required=False,
+        label=_('Substrate Comment'),
+        widget=forms.Textarea(attrs={'class': 'hallo'}))
+    substrate_source = forms.CharField(
+        required=False,
+        label=_('Substrate Source or Vendor'))
+    substrate_serial = forms.CharField(
+        required=False,
+        label=_('Substrate Serial Number'))
+
+    def __init__(self, *args, **kwargs):
+        super(SampleSelectOrCreateForm, self).__init__(*args, **kwargs)
+        prefix = kwargs.get('prefix', '')
+        self.helper = helper.FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-md-3'
+        self.helper.field_class = 'col-md-9'
+        self.helper.layout = layout.Layout(
+            bootstrap.InlineRadios('existing_or_new'),
+            layout.Div(
+                layout.Field('sample_uuid'),
+                id='new-sample_{}'.format(prefix)
+            ),
+            layout.Div(
+                layout.Field('sample_comment', css_class='hallo'),
+                layout.Field('substrate_comment', css_class='hallo'),
+                layout.Field('substrate_source'),
+                layout.Field('substrate_serial'),
+                id='existing-sample_{}'.format(prefix)
+            ),
+        )
 
     def clean(self):
         cleaned_data = super(SampleSelectOrCreateForm, self).clean()
+        existing_or_new = cleaned_data.get('existing_or_new')
+        if not existing_or_new:
+            raise ValidationError({'existing_or_new', 'This field is required.'})
 
-        # check if existing sample specified
-        uuid = cleaned_data.get('sample_uuid')
-        if uuid:
+        # Use existing sample
+        if existing_or_new == 'existing-sample':
             try:
-                cleaned_data['sample'] = Sample.objects.get_by_uuid(uuid)
-                if uuid[-1].isalpha():  # specified piece
-                    if uuid[-1] not in cleaned_data['sample'].pieces:
+                uuid = cleaned_data.get('sample_uuid')
+                if not uuid:
+                    self.add_error(
+                        'sample_uuid',
+                        'This field is required when existing sample is selected')
+                pk, piece = Sample.strip_uuid(uuid)
+                sample = Sample.objects.get_by_uuid(uuid)
+                if piece is None:  # piece not specified
+                    piece = 'a'
+                    if sample.pieces.count() > 1:
                         self.add_error('sample_uuid',
-                            'Sample {} does not have piece {}'.format(
-                                uuid[:-1], uuid[-1]))
-                    cleaned_data['piece'] = uuid[-1]
-                else:
-                    if len(cleaned_data['sample'].pieces) > 1:
-                        self.add_error('sample_uuid',
-                            'Sample {} is ambiguous, piece '
-                            'needs to be specified'.format(uuid))
-                cleaned_data['piece'] = uuid[-1] if uuid[-1].isalpha() else 'a'
-            except ObjectDoesNotExist:
-                self.add_error('sample_uuid',
-                               'Sample {} not found'.format(uuid))
-                return
-        else:
+                            'Sample {} is ambiguous, '
+                            'piece needs to be specified'.format(sample.uuid))
+                elif piece not in sample.pieces:  # piece specified, doesn't exist
+                    self.add_error(
+                        'sample_uuid',
+                        'Sample {} does not have a piece {}'.format(sample.uuid,
+                                                                    piece))
+                cleaned_data['sample'] = sample
+                cleaned_data['piece'] = piece
+            except Sample.DoesNotExist:
+                self.add_error('sample_uuid', 'Sample {} not found'.format(uuid))
+                cleaned_data['sample'] = None
+                cleaned_data['piece'] = 'a'
+            except ValueError:
+                self.add_error('sample_uuid', 'Sample UUID is not in the correct format')
+                cleaned_data['sample'] = None
+                cleaned_data['piece'] = 'a'
+
+        # Create new sample
+        elif existing_or_new == 'new-sample':
             cleaned_data['sample'] = None
             cleaned_data['piece'] = 'a'
-
-        # cannot create new sample and specify existing sample
-        if cleaned_data.get('sample') is not None:
-            if any([cleaned_data.get('sample_comment'),
-                    cleaned_data.get('substrate_comment'),
-                    cleaned_data.get('substrate_source'),
-                    cleaned_data.get('substrate_serial')]):
-                raise ValidationError('Existing sample cannot be specified in '
-                                      'addition to creating a new sample')
-        else:
             substrate_data = {
                 'comment': cleaned_data.get('substrate_comment'),
                 'serial': cleaned_data.get('substrate_serial'),
@@ -112,7 +157,7 @@ class SampleSelectOrCreateForm(forms.Form):
             }
             substrate_form = SubstrateForm(data=substrate_data)
             if not substrate_form.is_valid():
-                for field, error in six.iteritems(substrate_form.errors):
+                for field, error in substrate_form.errors.items():
                     if field == '__all__':
                         self.add_error(None, error)
                     else:

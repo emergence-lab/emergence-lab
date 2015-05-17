@@ -548,6 +548,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
             'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',
@@ -568,7 +569,9 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': samples[0].uuid,
+            'sample-1-existing_or_new': 'existing-sample',
             'sample-1-sample_uuid': samples[1].uuid,
             'sample-INITIAL_FORMS': '2',
             'sample-MAX_NUM_FORMS': '',
@@ -591,6 +594,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
             'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',
@@ -608,6 +612,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}{}'.format(sample.uuid, piece),
             'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',

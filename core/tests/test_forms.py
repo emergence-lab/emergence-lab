@@ -47,6 +47,7 @@ class TestSampleSelectOrCreateForm(TestCase):
 
     def test_clean_specify_nonexistant_sample(self):
         form = SampleSelectOrCreateForm(data={
+            'existing_or_new': 'existing-sample',
             'sample_uuid': 's0001',
         })
         errors = dict(form.errors)
@@ -54,9 +55,20 @@ class TestSampleSelectOrCreateForm(TestCase):
         self.assertListEqual(errors.get('sample_uuid'),
                              ['Sample s0001 not found'])
 
+    def test_clean_incorrect_format(self):
+        form = SampleSelectOrCreateForm(data={
+            'existing_or_new': 'existing-sample',
+            'sample_uuid': 'testing',
+        })
+        errors = dict(form.errors)
+        self.assertIsNotNone(errors.get('sample_uuid'))
+        self.assertListEqual(errors.get('sample_uuid'),
+                             ['Sample UUID is not in the correct format'])
+
     def test_clean_specify_existing(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         form = SampleSelectOrCreateForm(data={
+            'existing_or_new': 'existing-sample',
             'sample_uuid': sample.uuid,
         })
         errors = dict(form.errors)
@@ -65,6 +77,7 @@ class TestSampleSelectOrCreateForm(TestCase):
     def test_clean_specify_existing_and_new(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         form = SampleSelectOrCreateForm(data={
+            'existing_or_new': 'existing-sample',
             'sample_uuid': sample.uuid,
             'sample_comment': 'sample comment',
             'substrate_comment': 'substrate comment',
@@ -72,13 +85,11 @@ class TestSampleSelectOrCreateForm(TestCase):
             'substrate_source': 'substrate source',
         })
         errors = dict(form.errors)
-        self.assertIsNotNone(errors.get('__all__'))
-        self.assertListEqual(errors.get('__all__'),
-                             ['Existing sample cannot be specified in '
-                              'addition to creating a new sample'])
+        self.assertDictEqual(errors, {})
 
     def test_clean_new_sample(self):
         form = SampleSelectOrCreateForm(data={
+            'existing_or_new': 'new-sample',
             'sample_comment': 'sample comment',
             'substrate_comment': 'substrate comment',
             'substrate_serial': 'substrate serial',
@@ -90,9 +101,9 @@ class TestSampleSelectOrCreateForm(TestCase):
     def test_clean_empty(self):
         form = SampleSelectOrCreateForm(data={})
         errors = dict(form.errors)
-        self.assertIsNotNone(errors.get('__all__'))
-        self.assertListEqual(errors.get('__all__'),
-            ['Cannot leave all substrate fields blank.'])
+        self.assertIsNotNone(errors.get('existing_or_new'))
+        self.assertListEqual(errors.get('existing_or_new'),
+            ['This field is required.'])
 
 
 class TestTrackProjectForm(TestCase):

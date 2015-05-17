@@ -34,3 +34,4 @@ git+https://github.com/jmarini/nanoscope@0.10.1#egg=nanoscope
 WeasyPrint==0.23
 django-weasyprint==0.1
 django-rq==0.8.0
+django-crispy-forms==1.4.0

@@ -73,4 +73,15 @@
         });
     }
 
+    exports.set_up_sample_radio = function(new_sample_button, existing_sample_button, new_sample_form, existing_sample_form) {
+        $(new_sample_button).click(function() {
+            $(existing_sample_form).children('.form-group').removeClass('hidden');
+            $(new_sample_form).children('.form-group').addClass('hidden');
+        });
+        $(existing_sample_button).click(function() {
+            $(new_sample_form).children('.form-group').removeClass('hidden');
+            $(existing_sample_form).children('.form-group').addClass('hidden');
+        });
+    }
+
 })(this.process_wizard = {});

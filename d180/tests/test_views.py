@@ -183,8 +183,8 @@ class TestD180Wizard(TestCase):
             'This field is required.')
         self.assertFormError(response, 'source_form', 'cp2mg',
             'This field is required.')
-        self.assertFormsetError(response, 'sample_formset', 0, None,
-            'Cannot leave all substrate fields blank.')
+        self.assertFormsetError(response, 'sample_formset', 0, 'existing_or_new',
+            'This field is required.')
 
     def test_start_sample_formset_mixed_valid(self):
         """
@@ -226,7 +226,9 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'new-sample',
             'sample-0-substrate_comment': 'test',
+            'sample-1-existing_or_new': 'existing-sample',
             'sample-1-sample_uuid': 's0000',
         }
         response = self.client.post(url, data)
@@ -274,6 +276,7 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'new-sample',
             'sample-0-substrate_comment': 'test',
         }
         response = self.client.post(url, data)
@@ -323,6 +326,7 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': sample.uuid,
         }
         response = self.client.post(url, data)
@@ -373,6 +377,7 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}{}'.format(sample.uuid, piece),
         }
         response = self.client.post(url, data)
@@ -424,6 +429,7 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
         }
         response = self.client.post(url, data)
@@ -474,6 +480,7 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'new-sample',
             'sample-0-substrate_comment': 'test',
             'reservation-hold_open': 'on',
         }
@@ -526,6 +533,7 @@ class TestD180Wizard(TestCase):
             'source-tmga2': '0.00',
             'source-tmin1': '0.00',
             'source-tmin2': '0.00',
+            'sample-0-existing_or_new': 'new-sample',
             'sample-0-substrate_comment': 'test',
         }
         response = self.client.post(url, data)
