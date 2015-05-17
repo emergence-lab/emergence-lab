@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from betterforms import multiform
+from crispy_forms import helper, layout, bootstrap
 
 from core.models import Substrate, Sample
 
@@ -83,6 +84,29 @@ class SampleSelectOrCreateForm(forms.Form):
     substrate_serial = forms.CharField(
         required=False,
         label=_('Substrate Serial Number'))
+
+    def __init__(self, *args, **kwargs):
+        super(SampleSelectOrCreateForm, self).__init__(*args, **kwargs)
+        prefix = kwargs.get('prefix', '')
+        self.helper = helper.FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-md-3'
+        self.helper.field_class = 'col-md-9'
+        self.helper.layout = layout.Layout(
+            bootstrap.InlineRadios('existing_or_new'),
+            layout.Div(
+                layout.Field('sample_uuid'),
+                id='new-sample_{}'.format(prefix)
+            ),
+            layout.Div(
+                layout.Field('sample_comment', css_class='hallo'),
+                layout.Field('substrate_comment', css_class='hallo'),
+                layout.Field('substrate_source'),
+                layout.Field('substrate_serial'),
+                id='existing-sample_{}'.format(prefix)
+            ),
+        )
 
     def clean(self):
         cleaned_data = super(SampleSelectOrCreateForm, self).clean()

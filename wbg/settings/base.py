@@ -95,6 +95,7 @@ INSTALLED_APPS = (
     'storages',
     'django_ace',
     'django_rq',
+    'crispy_forms',
     # local apps
     'core',
     'dashboard',
@@ -312,3 +313,8 @@ EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS', [])
 # Feedback
 
 ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK', False)
+
+
+# Crispy Forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
