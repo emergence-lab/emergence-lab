@@ -108,6 +108,9 @@ urlpatterns = [
 
     # print test
     url(r'^print/', core.views.utility.PrintTemplate.as_view(), name='print_test'),
+
+    # project_management
+    url(r'^project_management/', include('project_management.urls')),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
