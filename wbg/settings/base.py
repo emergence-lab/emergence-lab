@@ -103,6 +103,7 @@ INSTALLED_APPS = (
     'd180',
     'afm',
     'hall',
+    'project_management',
     'simulations',
     'schedule_queue',
     'sem',
