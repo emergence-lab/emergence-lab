@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load crispy_forms_tags %}
 {% load wysiwyg %}
 
 {% block title %}Start Growth{% endblock title %}
@@ -109,19 +110,15 @@
                     {# Sample Tabs #}
                     <div class="tab-content">
                         <div class="tab-pane fade in empty-form" id="{{sample_formset.empty_form.prefix}}">
-                            <div class="row">
-                                <div class="col-xs-5">
-                                    {% bootstrap_form sample_formset.empty_form %}
-                                </div>
+                            <div class="form-horizontal">
+                                {% crispy sample_formset.empty_form %}
                             </div>
                         </div>
 
                         {% for sample_form in sample_formset %}
                             <div class="tab-pane fade in{% if forloop.first %} active{% endif %}" id="{{sample_form.prefix}}">
-                                <div class="row">
-                                    <div class="col-xs-5">
-                                        {% bootstrap_form sample_form %}
-                                    </div>
+                                <div class="form-horizontal">
+                                    {% crispy sample_form %}
                                 </div>
                             </div>
                         {% endfor %}
