@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<h1 class="page-header">{{milestone.name}}</h1>
+<div class="col-md-8 col-md-offset-2">
+  <div class="list-group">
+    {% for update in progress %}
+      <a class="list-group-item" href="#">
+        <h4 class="list-group-item-heading">{{update.created}}</h4>
+        <p class="list-group-item-text">
+          {% if update.process %}
+            {{update.process.name}}
+            {{update.process.uuid}}
+          {% endif %}
+          {% if update.datafile %}
+            {{update.datafile}}
+          {% endif %}
+        </p>
+      </a>
+
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
