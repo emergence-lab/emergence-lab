@@ -35,3 +35,4 @@ WeasyPrint==0.23
 django-weasyprint==0.1
 django-rq==0.8.0
 django-crispy-forms==1.4.0
+django-bower==5.0.4

@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'django_ace',
     'django_rq',
     'crispy_forms',
+    'djangobower',
     # local apps
     'core',
     'dashboard',
@@ -182,6 +183,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
+)
+
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, os.pardir, 'components')
+
+BOWER_INSTALLED_APPS = (
+    'jquery#2.1',
+    'bootstrap',
+)
 
 
 # RESTful API
