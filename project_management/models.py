@@ -39,6 +39,9 @@ class ProgressUpdate(ActiveStateMixin, TimestampMixin, models.Model):
                                 related_query_name='progress',
                                 null=True)
     description = fields.RichTextField(_('description'), blank=True)
+    milestone = models.ManyToManyField(Milestone,
+                                related_name='progress',
+                                related_query_name='progress',)
 
 
 # class Literature(TimestampMixin, models.Model):
