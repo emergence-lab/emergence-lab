@@ -23,3 +23,4 @@ class MilestoneCreateForm(forms.ModelForm):
 
     class Meta:
         model = Milestone
+        fields = '__all__'
