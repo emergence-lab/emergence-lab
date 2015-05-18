@@ -25,3 +25,15 @@ class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_success_url(self):
         return reverse('milestone_list')
+
+
+class MilestoneDetailView(LoginRequiredMixin, generic.DetailView):
+
+    model = Milestone
+    template_name = 'project_management/milestone_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MilestoneDetailView, self).get_context_data(**kwargs)
+        updates = [x for x in ProgressUpdate.objects.all().filter(milestone=self.object)]
+        context['progress'] = updates
+        return context

@@ -1,2 +1,3 @@
 from milestones import (MilestoneListView,
-                        MilestoneCreateView,)
+                        MilestoneCreateView,
+                        MilestoneDetailView,)
