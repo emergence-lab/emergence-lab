@@ -7,11 +7,8 @@
 
 {% block header %}
     {% load staticfiles %}
-    <script src="{% static 'core/js/jquery-ui.js' %}"></script>
-    <script src="{% static 'core/js/rangy-core.js' %}"></script>
-    <script src="{% static 'core/js/hallo.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'core/css/jquery-ui.css' %}">
-    <link rel="stylesheet" href="{% static 'core/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
 {% endblock header %}
 
 
@@ -150,6 +147,9 @@
 {% endblock content %}
 
 {% block scripts %}
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/django-formset.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/process_wizard.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/create_process.js' %}"></script>
