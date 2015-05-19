@@ -17,4 +17,23 @@ Web-based application written in Django with the following goals:
 Development Setup
 =================
 
-To get started for development install dependencies with pip install -r requirements/development.txt. Create a ``secrets.json`` file with database and ldap information. To run the tests, run ``tox`` in the command line to run tests and flake8. To only run tests, use ``tox -e py27``.
+Install Dependencies
+--------------------
+
+    $ pip install -r requirements/development.txt
+    $ bower install
+
+Configure Application
+---------------------
+
+Copy the template secrets file and edit with database and ldap configuration.
+
+    $ cp wbg/secrets.template.json wbg/secrets.json
+    $ vim wbg/secrets.json
+
+Running Tests
+-------------
+
+Tests are run using tox, environments configured are for python 2.7 and flake8. To run them, invoke tox from the command line.
+
+    $ tox
