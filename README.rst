@@ -4,9 +4,15 @@ Emergence Lab
 
 .. image:: https://travis-ci.org/wbg-optronix-lab/emergence-lab.svg?branch=master
     :target: https://travis-ci.org/wbg-optronix-lab/emergence-lab
+    :alt: Test Status
 
 .. image:: https://coveralls.io/repos/wbg-optronix-lab/emergence-lab/badge.svg
     :target: https://coveralls.io/r/wbg-optronix-lab/emergence-lab
+    :alt: Code Coverage
+
+.. image:: https://landscape.io/github/wbg-optronix-lab/emergence-lab/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/wbg-optronix-lab/emergence-lab/master
+    :alt: Code Health
 
 Web-based application written in Django with the following goals:
 
