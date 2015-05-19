@@ -8,8 +8,6 @@
 
     <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'core/css/wbg.css' %}" rel="stylesheet">
-    <script src="{% static 'jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
     {% block header %}
     {% endblock %}
 
@@ -230,41 +228,38 @@
     </section>
     {% endif %}
 
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'core/js/exception_handler.js' %}"></script>
     <script type="text/javascript">
-        function exception_handler() {
-            allvals = []
-            $('input:checked[type="checkbox"][name="tag"]').each(function(){allvals.push($(this).val())})
-            $.ajax({
-                url: '{% url "exception" %}',
-                type: 'POST',
-                data: {
-                    'csrfmiddlewaretoken': '{{csrf_token}}',
-                    'path': '{{request.path}}',
-                    'user': '{{user.username}}',
-                    'title': $('input[name="title"]').val(),
-                    'complaint': $('#exception-text').val(),
-                    'tag': allvals
-                },
-                success: function() {
-                    $('#exception-modal').modal('hide');
-                    $('input[name="title"]').val('Exception Form Issue');
-                    $('#exception-text').val('');
-                    $('input:checked[type="checkbox"][name="tag"]').each(function(){$(this).prop('checked', false)});
-                    console.log('sucessfully submitted');
-                },
-                error: function(response) {
-                    console.error(response.message);
-                }
-            });
-            return false
-        }
+        // Feedback Form
+        $(function() {
+            exception_handler.enable_exception_handling('#ajax-submit', '{% url "exception" %}')
+        });
 
-        $('#ajax-submit').click(exception_handler);
+        // Nav Search Button
+        $('#search-button').click(function(e) {
+            $('.navbar-search').removeClass('hidden')
+            $('#search-entry').focus();
+            $('.navbar-button').addClass('hidden')
+        });
+
+        $('#search-entry').focusout(function(e) {
+            $('.navbar-search').addClass('hidden')
+            $('.navbar-button').removeClass('hidden')
+        });
+
+        $('#search-close').click(function(e) {
+            e.preventDefault();
+            $('.navbar-button').removeClass('hidden')
+            $('.navbar-search').addClass('hidden')
+        });
+
+        // Bootstrap tooltip/popovers
+        $('[data-toggle="popover"]').popover();
+        $('[data-toggle="tooltip"]').tooltip();
+        $('[rel="tooltip"]').tooltip();
     </script>
-    <script src="{% static 'core/js/popover.js' %}"></script>
-    <script src="{% static 'core/js/tooltip.js' %}"></script>
-    <script src="{% static 'core/js/tooltip_rel.js' %}"></script>
-    <script src="{% static 'core/js/nav_search_helper.js' %}"></script>
     {% block scripts %}
     {% endblock %}
 
