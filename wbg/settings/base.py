@@ -192,14 +192,14 @@ STATICFILES_FINDERS = (
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, os.pardir, 'components')
 
 BOWER_INSTALLED_APPS = (
-    'jquery#2.1',
+    'jquery#1.9',
     'bootstrap',
     'bootstrap-table#~1.7.0',
     'hallo#~1.1.1',
     'dropzone#~3.7.4',
-    'jquery-ui#~1.11.4',
+    'jquery-ui#~1.10',
     'rangy#~1.2.3',
-    'font-awesome',
+    'font-awesome#~4.2',
 )
 
 
