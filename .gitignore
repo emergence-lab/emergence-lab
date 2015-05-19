@@ -61,4 +61,4 @@ static/
 secrets.json
 tunnel.sh
 media/
-components/
+bower_components/

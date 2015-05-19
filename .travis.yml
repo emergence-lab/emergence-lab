@@ -15,12 +15,10 @@ install:
     - pip install tox
     - pip install coveralls
     - npm install -g bower
+    - bower install
 
 before_script:
     - cp wbg/secrets.travis.json wbg/secrets.json
-    - tox --recreate --notest
-    - python ./manage.py bower install
-    - python ./manage.py collectstatic
 
 script:
     - tox

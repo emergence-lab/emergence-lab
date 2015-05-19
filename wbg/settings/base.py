@@ -96,7 +96,6 @@ INSTALLED_APPS = (
     'django_ace',
     'django_rq',
     'crispy_forms',
-    'djangobower',
     # local apps
     'core',
     'dashboard',
@@ -186,20 +185,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
 )
-
-BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, os.pardir, 'components')
-
-BOWER_INSTALLED_APPS = (
-    'jquery#1.9',
-    'bootstrap',
-    'bootstrap-table#~1.7.0',
-    'hallo#~1.1.1',
-    'dropzone#~3.7.4',
-    'jquery-ui#~1.10',
-    'rangy#~1.2.3',
-    'font-awesome#~4.2',
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, os.pardir, 'bower_components'),
 )
 
 
