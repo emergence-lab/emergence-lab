@@ -60,7 +60,7 @@ def _save_sample_files(process, file_object):
     directory structure:
       processes/<process.uuid_full.hex>/
     """
-    for sample in process.samples(unique=True):
+    for sample in process.samples:
         sample_dir = os.path.abspath(os.path.join(
             settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
         target_dir = os.path.join(sample_dir, process.uuid_full.hex)
