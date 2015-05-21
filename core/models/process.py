@@ -22,6 +22,14 @@ def get_file_path(instance, filename):
     return os.path.join('processes', instance.process.uuid_full.hex, filename)
 
 
+
+class ProcessType(models.Model):
+    slug = models.SlugField(primary_key=True, max_length=100, default='generic-process')
+    name = models.CharField(max_length=100, blank=True)
+    full_name = models.CharField(max_length=255, blank=True)
+    is_destructive = models.BooleanField(default=True)
+
+
 class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     """
     Base class for all processes. A process represents anything done to a
@@ -45,6 +53,7 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
+    type = models.ForeignKey(ProcessType, null=True)
 
     @staticmethod
     def get_process_class(slug):
