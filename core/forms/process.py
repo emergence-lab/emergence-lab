@@ -51,13 +51,9 @@ class EditProcessTemplateForm(forms.ModelForm):
 
 class WizardBasicInfoForm(forms.ModelForm):
 
-    comment = forms.CharField(
-        label="Run Comments",
-        required=False,
-        widget=forms.Textarea(attrs={'class': 'hallo'}))
-
     def __init__(self, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
+        self.fields['investigations'].required = False
         self.helper = helper.FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True
@@ -72,3 +68,8 @@ class WizardBasicInfoForm(forms.ModelForm):
     class Meta:
         model = Process
         fields = ('user', 'comment', 'investigations',)
+        labels = {
+            'comment': 'Process Comments',
+            'user': 'User',
+            'investigations': 'Associated Investigations',
+        }

@@ -69,34 +69,6 @@ class D180Growth(Process):
     slug = 'd180-growth'
     is_destructive = True
 
-    # general info
-    platter = models.ForeignKey(Platter,
-                                limit_choices_to={'is_active': True})
-
-    # layer materials
-    has_gan = models.BooleanField(default=False)
-    has_aln = models.BooleanField(default=False)
-    has_inn = models.BooleanField(default=False)
-    has_algan = models.BooleanField(default=False)
-    has_ingan = models.BooleanField(default=False)
-    other_material = models.CharField(max_length=50, blank=True)
-
-    # layer orientation
-    orientation = models.CharField(max_length=10, default='0001')
-
-    # growth features
-    is_template = models.BooleanField(default=False)
-    is_buffer = models.BooleanField(default=False)
-    has_pulsed = models.BooleanField(default=False)
-    has_superlattice = models.BooleanField(default=False)
-    has_mqw = models.BooleanField(default=False)
-    has_graded = models.BooleanField(default=False)
-
-    # doping features
-    has_n = models.BooleanField(default=False)
-    has_p = models.BooleanField(default=False)
-    has_u = models.BooleanField(default=False)
-
     class Meta:
         verbose_name = _('d180 growth')
         verbose_name_plural = _('d180 growths')

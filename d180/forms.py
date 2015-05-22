@@ -4,22 +4,23 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import D180Growth, D180Readings, D180Source
+from .models import D180Growth, D180Readings, D180Source, D180GrowthInfo
 from core.forms import ChecklistForm
 
 
-class WizardBasicInfoForm(forms.ModelForm):
+class WizardBasicProcessForm(forms.ModelForm):
 
     class Meta:
         model = D180Growth
-        fields = ('user', 'investigations', 'platter', 'legacy_identifier',)
+        fields = ('user', 'investigations', 'legacy_identifier',)
 
 
 class WizardGrowthInfoForm(forms.ModelForm):
 
     class Meta:
-        model = D180Growth
-        fields = ('has_gan', 'has_aln', 'has_inn', 'has_algan',
+        model = D180GrowthInfo
+        fields = ('platter',
+                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
                   'has_ingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_pulsed',
                   'has_superlattice', 'has_mqw', 'has_graded',
@@ -60,31 +61,11 @@ class WizardGrowthInfoForm(forms.ModelForm):
         return cleaned_data
 
 
-class WizardFullForm(forms.ModelForm):
+class WizardFullProcessForm(forms.ModelForm):
 
     class Meta:
         model = D180Growth
-        fields = ('user', 'investigations', 'platter', 'legacy_identifier',
-                  'comment',
-                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
-                  'has_ingan', 'other_material', 'orientation',
-                  'is_template', 'is_buffer', 'has_pulsed',
-                  'has_superlattice', 'has_mqw', 'has_graded',
-                  'has_n', 'has_p', 'has_u',)
-
-    def clean(self):
-        cleaned_data = super(WizardFullForm, self).clean()
-        material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
-        materials = [field for field in material_fields if cleaned_data[field]]
-        if not materials:
-            raise forms.ValidationError('At least one material must be specified')
-
-        doping_fields = ['has_n', 'has_p', 'has_u']
-        doping = [field for field in doping_fields if cleaned_data[field]]
-        if not doping:
-            raise forms.ValidationError('At least one doping type must be specified')
-
-        return cleaned_data
+        fields = ('user', 'investigations', 'comment', 'legacy_identifier',)
 
 
 class WizardPrerunChecklistForm(ChecklistForm):

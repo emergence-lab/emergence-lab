@@ -11,9 +11,9 @@ from django.shortcuts import get_object_or_404
 
 from braces.views import LoginRequiredMixin
 
-from d180.models import D180Growth, D180Source, D180Readings, Platter, D180GrowthInfo
-from d180.forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
-                        WizardGrowthInfoForm, WizardFullForm,
+from d180.models import D180Growth, D180Source, D180Readings, Platter
+from d180.forms import (CommentsForm, SourcesForm,
+                        WizardBasicProcessForm, WizardGrowthInfoForm, WizardFullProcessForm,
                         WizardPrerunChecklistForm, WizardPostrunChecklistForm,
                         D180ReadingsFormSet, ReservationCloseForm,
                         D180ReadingsForm)
@@ -101,17 +101,17 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             growth_number = 'g1000'
 
         return {
-            'info_form': WizardBasicInfoForm(
+            'info_form': WizardBasicProcessForm(
                 initial={
                     'user': self.request.user,
                     'legacy_identifier': growth_number
                 },
-                prefix='growth'),
+                prefix='process'),
             'growth_form': WizardGrowthInfoForm(prefix='growth'),
             'checklist_form': WizardPrerunChecklistForm(prefix='checklist'),
             'source_form': SourcesForm(instance=previous_source,
                                        prefix='source'),
-            'comment_form': CommentsForm(prefix='growth'),
+            'comment_form': CommentsForm(prefix='process'),
             'sample_formset': SampleFormSet(prefix='sample'),
             'reservation_form': ReservationCloseForm(prefix='reservation'),
         }
@@ -125,20 +125,22 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        growth_form = WizardFullForm(request.POST, prefix='growth')
+        process_form = WizardFullProcessForm(request.POST, prefix='process')
+        growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')
         checklist_form = WizardPrerunChecklistForm(request.POST,
                                                    prefix='checklist')
         source_form = SourcesForm(request.POST, prefix='source')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
         reservation_form = ReservationCloseForm(request.POST, prefix='reservation')
 
-        if all([growth_form.is_valid(), source_form.is_valid(),
-                checklist_form.is_valid(), sample_formset.is_valid(),
-                reservation_form.is_valid()]):
+        if all([process_form.is_valid(), growth_info_form.is_valid(),
+                source_form.is_valid(), checklist_form.is_valid(),
+                sample_formset.is_valid(), reservation_form.is_valid()]):
             logger.debug('Creating new growth')
-            self.object = growth_form.save()
-            D180GrowthInfo.objects.create(process=self.object,
-                                          platter=self.object.platter)
+            self.object = process_form.save()
+            info = growth_info_form.save(commit=False)
+            info.process = self.object
+            info.save()
             logger.debug('Created process {} ({}) for {} samples'.format(
                 self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
             source_form.save()
@@ -154,11 +156,11 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
 
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
-            basic_info_form = WizardBasicInfoForm(request.POST, prefix='growth')
+            process_form = WizardBasicProcessForm(request.POST, prefix='process')
             growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')
-            comment_form = CommentsForm(request.POST, prefix='growth')
+            comment_form = CommentsForm(request.POST, prefix='process')
             return self.render_to_response(self.get_context_data(
-                info_form=basic_info_form,
+                info_form=process_form,
                 growth_form=growth_info_form,
                 checklist_form=checklist_form,
                 source_form=source_form,
