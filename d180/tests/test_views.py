@@ -151,7 +151,7 @@ class TestD180Wizard(TestCase):
                              list(sample.get_nodes_for_process_type(D180Growth)))
 
         # many-to-many relationship with investigation no longer exists
-        self.assertListEqual([], list(investigation.growths.all()))
+        self.assertListEqual([], list(investigation.processes.all()))
 
     def test_start_empty_data(self):
         """

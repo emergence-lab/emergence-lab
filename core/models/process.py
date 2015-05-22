@@ -11,7 +11,7 @@ from mptt import models as mptt
 import polymorphic
 
 from core.models.mixins import TimestampMixin, UUIDMixin
-from core.models import fields
+from core.models import fields, Investigation
 from core.polymorphic import get_subclasses
 
 
@@ -53,6 +53,9 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
     type = models.ForeignKey(ProcessType, null=True)
+
+    investigations = models.ManyToManyField(Investigation,
+        related_name='processes', related_query_name='process',)
 
     @staticmethod
     def get_process_class(slug):
