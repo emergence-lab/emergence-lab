@@ -5,6 +5,8 @@ import string
 
 from django import forms
 
+from crispy_forms import helper, layout
+
 from core.models import DataFile, Process, ProcessTemplate
 
 
@@ -54,6 +56,19 @@ class WizardBasicInfoForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={'class': 'hallo'}))
 
+    def __init__(self, *args, **kwargs):
+        super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
+        self.helper = helper.FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-md-2'
+        self.helper.field_class = 'col-md-10'
+        self.helper.layout = layout.Layout(
+            layout.Field('user'),
+            layout.Field('comment', css_class='hallo'),
+            layout.Field('investigations'),
+        )
+
     class Meta:
         model = Process
-        fields = ('user', 'comment',)
+        fields = ('user', 'comment', 'investigations',)
