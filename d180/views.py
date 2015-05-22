@@ -5,13 +5,13 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.views import generic
 from django.shortcuts import get_object_or_404
 
 from braces.views import LoginRequiredMixin
 
-from d180.models import D180Growth, D180Source, D180Readings, Platter
+from d180.models import D180Growth, D180Source, D180Readings, Platter, D180GrowthInfo
 from d180.forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
                         WizardGrowthInfoForm, WizardFullForm,
                         WizardPrerunChecklistForm, WizardPostrunChecklistForm,
@@ -137,6 +137,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 reservation_form.is_valid()]):
             logger.debug('Creating new growth')
             self.object = growth_form.save()
+            D180GrowthInfo.objects.create(process=self.object,
+                                          platter=self.object.platter)
             logger.debug('Created process {} ({}) for {} samples'.format(
                 self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
             source_form.save()
@@ -208,7 +210,7 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
                 self.object.save()
             for reading_form in readings_formset:
                 if reading_form.has_changed():
-                    reading_form.save(growth=self.object)
+                    reading_form.save(process=self.object)
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
             return self.render_to_response(self.get_context_data(
@@ -290,25 +292,25 @@ class WizardCancelView(LoginRequiredMixin, ActionReloadView):
         return reverse('dashboard')
 
 
-class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
-    model = D180Growth
+class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
+    model = D180Readings
     template_name = 'd180/readings_detail.html'
-    context_object_name = 'growth'
+    context_object_name = 'readings'
 
-    def get_object(self):
+    def get_queryset(self):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
-        return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
+        try:
+            process = Process.objects.non_polymorphic().get(uuid_full__startswith=uuid)
+            self.process = process
+        except Process.DoesNotExist:
+            raise Http404('Process {} does not exist'.format(self.kwargs['uuid']))
+        return self.model.objects.filter(process=process).order_by('layer')
 
     def get_context_data(self, **kwargs):
         context = super(ReadingsDetailView, self).get_context_data(**kwargs)
-        context['growth'] = self.object
+        context['process'] = self.process
 
-        # turn list organized by column into a list organized by row
-        #  and add labels to first column
-        readings_list = D180Readings.objects.filter(
-            growth=self.object).order_by('layer').values_list()
-        if not readings_list:
-            return context
+        readings_list = self.object_list.values_list()
 
         def molar_flow(temp, flow, press, a, b):
             if press <= 0:
@@ -370,10 +372,10 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
         return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
 
     def get_context_data(self, **kwargs):
-        self.object = None
         context = super(UpdateReadingsView, self).get_context_data(**kwargs)
-        context["growth"] = self.get_object()
-        allreadings = D180Readings.objects.filter(growth=self.get_object()).order_by('layer')
+        self.object = self.get_object()
+        context["growth"] = self.object
+        allreadings = D180Readings.objects.filter(process=self.object).order_by('layer')
         context["readings"] = allreadings
         formlist = []
         numberofreadings = 0
@@ -382,7 +384,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
             rform = D180ReadingsForm(instance=D180Readings(),
                                      prefix=('reading' + str(numberofreadings)),
                                   initial={'growth': reading.growth,
-                'layer': reading.layer, 'layer_desc': reading.layer_desc,
+                'layer': reading.layer, 'description': reading.description,
                 'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in,
                 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
                 'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm,
@@ -413,14 +415,14 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
         return context
 
     def post(self, request, **kwargs):
-        numberofreadings = len(D180Readings.objects.filter(growth=self.get_object()))
+        numberofreadings = len(D180Readings.objects.filter(process=self.get_object()))
         print (numberofreadings)
         for x in range(0, numberofreadings):
             rform = D180ReadingsForm(request.POST, prefix=('reading' + str(x + 1)))
             if rform.is_valid():
                 newgrowth = self.get_object()
                 newlayer = rform.cleaned_data['layer']
-                newlayer_desc = rform.cleaned_data['layer_desc']
+                newlayer_desc = rform.cleaned_data['description']
                 newpyro_out = rform.cleaned_data['pyro_out']
                 newpyro_in = rform.cleaned_data['pyro_in']
                 newecp_temp = rform.cleaned_data['ecp_temp']
@@ -463,9 +465,9 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
                 newsilane_dilution = rform.cleaned_data['silane_dilution']
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
-                thisreading = D180Readings.objects.filter(growth=newgrowth, layer=newlayer)
+                thisreading = D180Readings.objects.filter(process=newgrowth, layer=newlayer)
                 thisreading.update(growth=newgrowth, layer=newlayer,
-                                   layer_desc=newlayer_desc, pyro_out=newpyro_out,
+                                   description=newlayer_desc, pyro_out=newpyro_out,
                                    pyro_in=newpyro_in, ecp_temp=newecp_temp,
                                    tc_out=newtc_out, tc_in=newtc_in, motor_rpm=newmotor_rpm,
                                    gc_pressure=newgc_pressure, gc_position=newgc_position,

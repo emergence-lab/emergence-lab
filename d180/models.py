@@ -25,6 +25,40 @@ class Platter(ActiveStateMixin, models.Model):
         return self.name
 
 
+class D180GrowthInfo(models.Model):
+    """
+    Stores information related to a growth on the d180 including tagging for
+    material and device properties.
+    """
+    process = models.OneToOneField(Process, related_name='info')
+    platter = models.ForeignKey(Platter,
+                                limit_choices_to={'is_active': True})
+
+    # layer materials
+    has_gan = models.BooleanField(default=False)
+    has_aln = models.BooleanField(default=False)
+    has_inn = models.BooleanField(default=False)
+    has_algan = models.BooleanField(default=False)
+    has_ingan = models.BooleanField(default=False)
+    other_material = models.CharField(max_length=50, blank=True)
+
+    # layer orientation
+    orientation = models.CharField(max_length=10, default='0001')
+
+    # growth features
+    is_template = models.BooleanField(default=False)
+    is_buffer = models.BooleanField(default=False)
+    has_pulsed = models.BooleanField(default=False)
+    has_superlattice = models.BooleanField(default=False)
+    has_mqw = models.BooleanField(default=False)
+    has_graded = models.BooleanField(default=False)
+
+    # doping features
+    has_n = models.BooleanField(default=False)
+    has_p = models.BooleanField(default=False)
+    has_u = models.BooleanField(default=False)
+
+
 @python_2_unicode_compatible
 class D180Growth(Process):
     """
@@ -79,9 +113,9 @@ class D180Readings(models.Model):
     Stores readings (i.e. temperature) from a d180 growth.
     """
     # growth and layer info
-    growth = models.ForeignKey(D180Growth, related_name='readings')
+    process = models.ForeignKey(Process, related_name='readings')
     layer = models.IntegerField()
-    layer_desc = models.CharField(max_length=45, blank=True)
+    description = models.CharField(max_length=100, blank=True)
 
     # readings
     pyro_out = models.DecimalField(max_digits=7, decimal_places=2)
@@ -132,7 +166,7 @@ class D180Readings(models.Model):
         verbose_name_plural = _('readings')
 
     def __str__(self):
-        return self.growth.__str__()
+        return self.process.__str__()
 
 
 @python_2_unicode_compatible
@@ -140,7 +174,7 @@ class D180RecipeLayer(models.Model):
     """
     Stores layers used in the recipes for a d180 growth.
     """
-    growth = models.ForeignKey(D180Growth)
+    process = models.ForeignKey(Process, related_name='recipe')
 
     layer_num = models.IntegerField()
     loop_num = models.IntegerField()
@@ -200,7 +234,7 @@ class D180RecipeLayer(models.Model):
         verbose_name_plural = _('layers')
 
     def __str__(self):
-        return self.growth.__str__()
+        return self.process.__str__()
 
 
 @python_2_unicode_compatible

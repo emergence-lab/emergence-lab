@@ -129,7 +129,7 @@ class D180ReadingsForm(forms.ModelForm):
 
     class Meta:
         model = D180Readings
-        fields = ('layer', 'layer_desc',
+        fields = ('layer', 'description',
                   'pyro_out', 'pyro_in', 'ecp_temp', 'tc_out', 'tc_in',
                   'motor_rpm', 'gc_pressure', 'gc_position', 'voltage_in',
                   'voltage_out', 'current_in', 'current_out', 'top_vp_flow',
@@ -145,7 +145,7 @@ class D180ReadingsForm(forms.ModelForm):
                   'silane_pressure',)
         labels = {
             'layer': _('Layer number'),
-            'layer_desc': _('Layer description'),
+            'description': _('Layer description'),
             'pyro_out': _('Outer pyro [°C]'),
             'pyro_in': _('Inner pyro [°C]'),
             'ecp_temp': _('ECP temperature [°C]'),
@@ -190,9 +190,9 @@ class D180ReadingsForm(forms.ModelForm):
             'silane_pressure': _('Silane pressure [torr]'),
         }
 
-    def save(self, growth, commit=True):
+    def save(self, process, commit=True):
         self.instance = super(D180ReadingsForm, self).save(commit=False)
-        self.instance.growth = growth
+        self.instance.process = process
         if commit:
             self.instance.save()
 

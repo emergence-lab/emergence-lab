@@ -22,7 +22,6 @@ def get_file_path(instance, filename):
     return os.path.join('processes', instance.process.uuid_full.hex, filename)
 
 
-
 class ProcessType(models.Model):
     slug = models.SlugField(primary_key=True, max_length=100, default='generic-process')
     name = models.CharField(max_length=100, blank=True)

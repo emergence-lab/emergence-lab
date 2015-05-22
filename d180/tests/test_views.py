@@ -8,7 +8,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from d180.models import D180Growth, D180Readings, Platter
+from d180.models import D180Growth, D180Readings, Platter, D180GrowthInfo
 from core.models import Investigation, Sample, ProcessNode
 
 
@@ -121,7 +121,7 @@ class TestD180Wizard(TestCase):
         investigation = mommy.make(Investigation)
         growth = mommy.make(D180Growth)
         growth.investigations.add(investigation)
-        readings = mommy.make(D180Readings, growth=growth)
+        readings = mommy.make(D180Readings, process=growth)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
         sample.run_process(growth)
         nodes = growth.processnode_set.all()
@@ -545,7 +545,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where no data is sent.
         """
-        mommy.make(D180Growth)
+        process = mommy.make(D180Growth)
+        mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         with self.assertRaises(ValidationError) as cm:
             self.client.post(url, {})
@@ -557,7 +558,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where only managementform data is passed.
         """
-        mommy.make(D180Growth)
+        process = mommy.make(D180Growth)
+        mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
             'reading-INITIAL_FORMS': '0',
@@ -568,20 +570,22 @@ class TestD180Wizard(TestCase):
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
 
     def test_readings_readings_formset_invalid(self):
-        mommy.make(D180Growth)
+        process = mommy.make(D180Growth)
+        mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
             'reading-INITIAL_FORMS': '0',
             'reading-MAX_NUM_FORMS': '',
             'reading-TOTAL_FORMS': '1',
-            'reading-0-layer_desc': 'test',
+            'reading-0-description': 'test',
         }
         response = self.client.post(url, data)
         self.assertFormsetError(response, 'readings_formset', 0, 'layer',
             'This field is required.')
 
     def test_readings_readings_formset_valid(self):
-        growth = mommy.make(D180Growth)
+        process = mommy.make(D180Growth)
+        mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
             'reading-INITIAL_FORMS': '0',
@@ -606,7 +610,7 @@ class TestD180Wizard(TestCase):
             'reading-0-hydride_outer': '0.0',
             'reading-0-hydride_pressure': '0.0',
             'reading-0-layer': '1',
-            'reading-0-layer_desc': 'test',
+            'reading-0-description': 'test',
             'reading-0-motor_rpm': '0.0',
             'reading-0-n2_flow': '0.0',
             'reading-0-nh3_flow': '0.0',
@@ -634,8 +638,8 @@ class TestD180Wizard(TestCase):
         }
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
-        self.assertEqual(growth.readings.count(), 1)
-        self.assertEqual(growth.readings.first().layer_desc, 'test')
+        self.assertEqual(process.readings.count(), 1)
+        self.assertEqual(process.readings.first().description, 'test')
 
     def test_postrun_empty_data(self):
         """
@@ -685,7 +689,7 @@ class TestD180ReadingsCRUD(TestCase):
 
     def test_readings_detail_resolution_template(self):
         process = mommy.make(D180Growth)
-        reading = mommy.make(D180Readings, growth=process)
+        reading = mommy.make(D180Readings, process=process)
         url = '/d180/readings/{}/'.format(process.uuid)
         match = resolve(url)
         self.assertEqual(match.url_name, 'd180_readings_detail')
@@ -695,7 +699,7 @@ class TestD180ReadingsCRUD(TestCase):
 
     def test_readings_detail_viii_no_alkyl(self):
         process = mommy.make(D180Growth)
-        reading = mommy.make(D180Readings, growth=process,
+        reading = mommy.make(D180Readings, process=process,
                              tmga1_flow=0, tmga2_flow=0,
                              tega2_flow=0, tmin1_flow=0, tmal1_flow=0)
         url = reverse('d180_readings_detail', args=(process.uuid,))
