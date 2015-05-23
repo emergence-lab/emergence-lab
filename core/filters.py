@@ -5,14 +5,12 @@ import operator
 
 from django import forms
 from django.db.models import Q
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 
 from datetimewidget.widgets import DateWidget
 import django_filters
 
 from core.models import Sample, Process
-from d180.models import D180Growth
 from core.polymorphic import get_subclasses
 
 
@@ -28,25 +26,10 @@ def _filter_d180_growth_tags(queryset, value):
     if not value:
         return queryset
 
-    growth_ctype = ContentType.objects.get_for_model(D180Growth).id
+    filter_args = ({'process__info__{}'.format(v): True} for v in value)
+    q_filters = (Q(**arg) for arg in filter_args)
 
-    for sample in queryset:
-        d180_process_ids = (sample.nodes.order_by()
-                                        .exclude(process_id__isnull=True)
-                                        .filter(process__polymorphic_ctype=growth_ctype)
-                                        .values_list('process_id', flat=True)
-                                        .distinct())
-        d180_processes = D180Growth.objects.filter(id__in=d180_process_ids)
-        filter_args = []
-        for v in value:
-            tmp = {}
-            tmp[v] = True
-            filter_args.append(tmp)
-        q_filters = [Q(**arg) for arg in filter_args]
-        d180_processes = d180_processes.filter(reduce(operator.and_, q_filters))
-        if not d180_processes.exists():
-            queryset = queryset.exclude(id=sample.id)
-    return queryset
+    return queryset.filter_process(reduce(operator.and_, q_filters))
 
 
 def _filter_process_user(queryset, value):

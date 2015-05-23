@@ -4,15 +4,19 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import D180Growth, D180Readings, D180Source, D180GrowthInfo
 from core.forms import ChecklistForm
+from core.models import Process
+from d180.models import D180Readings, D180Source, D180GrowthInfo
 
 
 class WizardBasicProcessForm(forms.ModelForm):
 
     class Meta:
-        model = D180Growth
-        fields = ('user', 'investigations', 'legacy_identifier',)
+        model = Process
+        fields = ('user', 'investigations', 'legacy_identifier', 'type')
+        widgets = {
+            'type': forms.HiddenInput(),
+        }
 
 
 class WizardGrowthInfoForm(forms.ModelForm):
@@ -64,8 +68,8 @@ class WizardGrowthInfoForm(forms.ModelForm):
 class WizardFullProcessForm(forms.ModelForm):
 
     class Meta:
-        model = D180Growth
-        fields = ('user', 'investigations', 'comment', 'legacy_identifier',)
+        model = Process
+        fields = ('user', 'investigations', 'comment', 'legacy_identifier', 'type')
 
 
 class WizardPrerunChecklistForm(ChecklistForm):

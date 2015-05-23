@@ -8,8 +8,8 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from d180.models import D180Growth, D180Readings, Platter, D180GrowthInfo
-from core.models import Investigation, Sample, ProcessNode
+from d180.models import D180Readings, Platter, D180GrowthInfo
+from core.models import Investigation, Sample, ProcessNode, Process, ProcessType
 
 
 class TestPlatterCRUD(TestCase):
@@ -94,7 +94,7 @@ class TestD180Wizard(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_readings_resolution_template(self):
-        mommy.make(D180Growth)
+        mommy.make(Process, type_id='d180-growth')
         url = '/d180/growth/create/readings/'
         match = resolve(url)
         self.assertEqual(match.url_name, 'create_growth_d180_readings')
@@ -103,7 +103,7 @@ class TestD180Wizard(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_postrun_resolution_template(self):
-        mommy.make(D180Growth)
+        mommy.make(Process, type_id='d180-growth')
         url = '/d180/growth/create/postrun/'
         match = resolve(url)
         self.assertEqual(match.url_name, 'create_growth_d180_postrun')
@@ -119,13 +119,13 @@ class TestD180Wizard(TestCase):
 
         # set up objects
         investigation = mommy.make(Investigation)
-        growth = mommy.make(D180Growth)
+        growth = mommy.make(Process, type_id='d180-growth')
         growth.investigations.add(investigation)
         readings = mommy.make(D180Readings, process=growth)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
         sample.run_process(growth)
         nodes = growth.processnode_set.all()
-        self.assertListEqual(list(sample.get_nodes_for_process_type(D180Growth)),
+        self.assertListEqual(list(sample.get_nodes_for_process_type('d180-growth')),
                              list(nodes))
 
         # check url resolution
@@ -138,8 +138,8 @@ class TestD180Wizard(TestCase):
         nodes = ProcessNode.objects.filter(pk__in=[n.pk for n in nodes])
 
         # growth no longer exists
-        with self.assertRaises(D180Growth.DoesNotExist):
-            growth = D180Growth.objects.get(pk=growth.pk)
+        with self.assertRaises(Process.DoesNotExist):
+            growth = Process.objects.get(pk=growth.pk)
 
         # readings no longer exists
         with self.assertRaises(D180Readings.DoesNotExist):
@@ -148,7 +148,7 @@ class TestD180Wizard(TestCase):
         # process node no longer exists
         self.assertListEqual([], list(nodes))
         self.assertListEqual([],
-                             list(sample.get_nodes_for_process_type(D180Growth)))
+                             list(sample.get_nodes_for_process_type('d180-growth')))
 
         # many-to-many relationship with investigation no longer exists
         self.assertListEqual([], list(investigation.processes.all()))
@@ -217,6 +217,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
+            'process-type': 'd180-growth',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
             'source-sih4': '0.00',
@@ -266,6 +267,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
+            'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
@@ -316,6 +318,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
+            'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
@@ -367,6 +370,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
+            'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
@@ -382,7 +386,7 @@ class TestD180Wizard(TestCase):
         }
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
-        nodes = sample.get_nodes_for_process_type(D180Growth)
+        nodes = sample.get_nodes_for_process_type('d180-growth')
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].piece, piece)
 
@@ -419,6 +423,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
+            'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
@@ -470,6 +475,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
+            'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
@@ -523,6 +529,7 @@ class TestD180Wizard(TestCase):
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': '1',
+            'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',
             'source-nh3': '0.00',
@@ -545,7 +552,7 @@ class TestD180Wizard(TestCase):
         """
         Test a post where no data is sent.
         """
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         with self.assertRaises(ValidationError) as cm:
@@ -558,7 +565,7 @@ class TestD180Wizard(TestCase):
         """
         Test a post where only managementform data is passed.
         """
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
@@ -570,7 +577,7 @@ class TestD180Wizard(TestCase):
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
 
     def test_readings_readings_formset_invalid(self):
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
@@ -584,7 +591,7 @@ class TestD180Wizard(TestCase):
             'This field is required.')
 
     def test_readings_readings_formset_valid(self):
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
@@ -645,7 +652,7 @@ class TestD180Wizard(TestCase):
         """
         Test a post where no data is sent.
         """
-        mommy.make(D180Growth)
+        mommy.make(Process, type_id='d180-growth')
         url = reverse('create_growth_d180_postrun')
         response = self.client.post(url, {})
         self.assertFormError(response, 'source_form', 'cp2mg',
@@ -654,7 +661,7 @@ class TestD180Wizard(TestCase):
             'This field is required.')
 
     def test_postrun_valid(self):
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         url = reverse('create_growth_d180_postrun')
         data = {
             'checklist-field_0': 'on',
@@ -688,7 +695,7 @@ class TestD180ReadingsCRUD(TestCase):
         self.client.login(username='default', password='')
 
     def test_readings_detail_resolution_template(self):
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         reading = mommy.make(D180Readings, process=process)
         url = '/d180/readings/{}/'.format(process.uuid)
         match = resolve(url)
@@ -698,7 +705,7 @@ class TestD180ReadingsCRUD(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_readings_detail_viii_no_alkyl(self):
-        process = mommy.make(D180Growth)
+        process = mommy.make(Process, type_id='d180-growth')
         reading = mommy.make(D180Readings, process=process,
                              tmga1_flow=0, tmga2_flow=0,
                              tega2_flow=0, tmin1_flow=0, tmal1_flow=0)

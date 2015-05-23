@@ -9,11 +9,13 @@ def create_default_process_types(apps, schema_editor):
     ProcessType.objects.create(type='generic-process',
                                is_destructive=True,
                                name='Generic',
-                               full_name='Generic Process')
+                               full_name='Generic Process',
+                               description='A generic process not covered by existing types.')
     ProcessType.objects.create(type='split-process',
                                is_destructive=False,
                                name='Split',
-                               full_name='Split Sample')
+                               full_name='Split Sample',
+                               description='Splitting a sample into multiple pieces.')
 
 
 class Migration(migrations.Migration):
@@ -30,6 +32,7 @@ class Migration(migrations.Migration):
                 ('is_destructive', models.BooleanField(default=True)),
                 ('name', models.CharField(max_length=100, blank=True)),
                 ('full_name', models.CharField(max_length=255, blank=True)),
+                ('description', models.TextField(blank=True)),
             ],
             options={
             },

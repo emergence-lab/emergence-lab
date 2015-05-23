@@ -16,8 +16,7 @@ from braces.views import LoginRequiredMixin
 from core.forms import (DropzoneForm, ProcessCreateForm,
                         EditProcessTemplateForm, SampleFormSet,
                         WizardBasicInfoForm)
-from core.models import Process, Sample, DataFile, ProcessTemplate
-from core.polymorphic import get_subclasses
+from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType
 from core.tasks import process_file, save_files
 from core.views import ActionReloadView
 
@@ -43,12 +42,11 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
-        context['samples'] = set(node.get_sample() for node in
-                                 self.object.processnode_set.get_queryset())
+        context['samples'] = self.object.samples
         context['datafiles'] = {k: list(g)
                                 for k, g in groupby(self.object.datafiles.all(),
                                              lambda x: type(x))}
-        if type(self.object).name == 'D180 Growth':
+        if self.object.type_id == 'd180-growth':
             context['readings'] = True
         return context
 
@@ -67,7 +65,7 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['process_list'] = get_subclasses(Process) + [Process]
+        context['process_list'] = ProcessType.objects.all()
         context['user_list'] = get_user_model().objects.all().filter(is_active=True)
         context['slug'] = self.kwargs.get('slug', 'all')
         context['username'] = self.kwargs.get('username', 'all')
@@ -80,7 +78,7 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
         if username != 'all':
             queryset = queryset.filter(user__username=username)
         if slug != 'all':
-            queryset = [i for i in queryset if i.slug == slug]
+            queryset = queryset.filter(type_id=slug)
         return queryset
 
 
@@ -129,6 +127,12 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
 class RunProcessView(CreateUploadProcessView):
     model = Process
     form_class = ProcessCreateForm
+    process_type = 'generic-process'
+
+    def get_form_kwargs(self):
+        kwargs = super(RunProcessView, self).get_form_kwargs()
+        kwargs['process_type'] = self.process_type
+        return kwargs
 
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):
@@ -179,12 +183,12 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
         queryset = super(ProcessTemplateListView, self).get_queryset()
         queryset = queryset.filter(user=self.request.user).order_by('-created')
         if slug != 'all':
-            queryset = [i for i in queryset if i.process.slug == slug]
+            queryset = queryset.filter(type_id=slug)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
-        context['process_list'] = get_subclasses(Process) + [Process]
+        context['process_list'] = ProcessType.objects.all()
         context['slug'] = self.kwargs.get('slug', 'all')
         return context
 

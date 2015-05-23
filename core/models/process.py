@@ -23,13 +23,30 @@ def get_file_path(instance, filename):
 
 
 class ProcessType(models.Model):
-    slug = models.SlugField(primary_key=True, max_length=100, default='generic-process')
+    type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
     name = models.CharField(max_length=100, blank=True)
     full_name = models.CharField(max_length=255, blank=True)
     is_destructive = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self.__class__.__name__, self.type)
 
 
-class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
+class ProcessTypeManager(models.Manager):
+    """
+    Manager to filter on the ``active`` field.
+    """
+    def __init__(self, process_type):
+        super(ProcessTypeManager, self).__init__()
+        self.process_type = process_type
+
+    def get_queryset(self):
+        return (super(ProcessTypeManager, self)
+                    .get_queryset().filter(type_id=self.process_type))
+
+
+class Process(UUIDMixin, TimestampMixin, models.Model):
     """
     Base class for all processes. A process represents anything done to a
     sample which results in data (numerical or visual) or alters the properties
@@ -44,18 +61,18 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     """
     prefix = 'p'
 
-    name = 'Generic Process'
-    slug = 'generic-process'
-    is_destructive = True
-
     comment = fields.RichTextField(blank=True)
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
-    type = models.ForeignKey(ProcessType, null=True)
+    type = models.ForeignKey(ProcessType, null=True, default='generic-process')
 
     investigations = models.ManyToManyField(Investigation,
         related_name='processes', related_query_name='process',)
+
+    objects = models.Manager()
+    generic = ProcessTypeManager(process_type='generic-process')
+    split = ProcessTypeManager(process_type='split-process')
 
     @staticmethod
     def get_process_class(slug):
@@ -74,21 +91,13 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
         trees = ProcessNode.objects.filter(process=self).values_list('tree_id', flat=True)
         nodes = (ProcessNode.objects.filter(tree_id__in=trees,
                                             sample__isnull=False)
+                                    .order_by('number')
                                     .values_list('sample', flat=True))
         return Sample.objects.filter(id__in=nodes).distinct()
 
     @property
     def nodes(self):
         return self.processnode_set.all()
-
-
-class SplitProcess(Process):
-    """
-    Process representing splitting a sample into multiple parts or pieces.
-    """
-    name = 'Split Sample'
-    slug = 'split-process'
-    is_destructive = False
 
 
 class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
@@ -151,8 +160,8 @@ class ProcessTemplate(TimestampMixin, models.Model):
     Model for templating existing process details for later reference
     """
     process = models.ForeignKey(Process,
-                                related_name='process',
-                                related_query_name='process')
+                                related_name='templates',
+                                related_query_name='templates')
     name = models.CharField(max_length=50, blank=True)
     comment = fields.RichTextField(blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,

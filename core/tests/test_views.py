@@ -619,7 +619,7 @@ class TestProcessCRUD(TestCase):
             'sample-TOTAL_FORMS': '1'
         }
         response = self.client.post(url, data)
-        nodes = sample.get_nodes_for_process_type(Process)
+        nodes = sample.get_nodes_for_process_type('generic-process')
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].piece, piece)
 

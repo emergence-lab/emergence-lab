@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample, Process, SplitProcess
+from core.models import Sample, Process
 
 
 class TestSampleManager(TestCase):
@@ -67,17 +67,17 @@ class TestSampleManager(TestCase):
 
     def test_by_process_type_invalid(self):
         with self.assertRaises(ValueError):
-            Sample.objects.by_process_type(Sample)
+            Sample.objects.by_process_type('nonexistant')
 
     def test_by_process_type_no_samples(self):
-        samples = Sample.objects.by_process_type(Process)
+        samples = Sample.objects.by_process_type('generic-process')
         self.assertQuerysetEqual(samples, [])
 
     def test_by_process_type_multiple(self):
         processes = [
-            mommy.make(Process),
-            mommy.make(Process),
-            mommy.make(SplitProcess)
+            mommy.make(Process, type_id='generic-process'),
+            mommy.make(Process, type_id='generic-process'),
+            mommy.make(Process, type_id='split-process'),
         ]
         samples = [
             Sample.objects.create(substrate=mommy.make('core.Substrate')),
@@ -87,21 +87,22 @@ class TestSampleManager(TestCase):
         for p, s in zip(processes, samples):
             s.run_process(p)
 
-        process_samples = Sample.objects.by_process_type(Process)
+        process_samples = Sample.objects.by_process_type('generic-process')
         self.assertListEqual(list(process_samples), samples[:-1])
-        split_samples = Sample.objects.by_process_type(SplitProcess)
+        split_samples = Sample.objects.by_process_type('split-process')
         self.assertEqual(split_samples.first(), samples[-1])
 
     def test_by_process_types_invalid(self):
         with self.assertRaises(ValueError):
-            Sample.objects.by_process_types([Process, Sample])
+            Sample.objects.by_process_types(['generic-process', 'nonexistant'])
 
     def test_by_process_types_no_samples(self):
-        samples = Sample.objects.by_process_types([Process, SplitProcess])
+        samples = Sample.objects.by_process_types(['generic-process',
+                                                   'split-process'])
         self.assertQuerysetEqual(samples, [])
 
     def test_by_process_types_valid(self):
-        process = mommy.make(Process)
+        process = mommy.make(Process, type_id='generic-process')
         samples = [
             Sample.objects.create(substrate=mommy.make('core.Substrate')),
             Sample.objects.create(substrate=mommy.make('core.Substrate')),
@@ -111,25 +112,25 @@ class TestSampleManager(TestCase):
         user = get_user_model().objects.create_user('default', password='')
 
         # run processes
-        # sample 0 has only Process
-        # sample 1 has only SplitProcess
-        # sample 2 has both Process and SplitProcess
+        # sample 0 has only generic-process
+        # sample 1 has only split-process
+        # sample 2 has both generic-process and split-process
         # sample 3 has no processes
         samples[0].run_process(process)
         samples[1].split(user=user, number=2)
         samples[2].run_process(process)
         samples[2].split(user=user, number=2)
 
-        qs = Sample.objects.by_process_types([Process], combine_and=True)
+        qs = Sample.objects.by_process_types(['generic-process'], combine_and=True)
         self.assertQuerysetEqual(
             qs, map(repr, [samples[0], samples[2]]),ordered=False)
-        qs = Sample.objects.by_process_types([SplitProcess], combine_and=True)
+        qs = Sample.objects.by_process_types(['split-process'], combine_and=True)
         self.assertQuerysetEqual(
             qs, map(repr, samples[1:3]), ordered=False)
-        qs = Sample.objects.by_process_types([Process, SplitProcess], combine_and=True)
+        qs = Sample.objects.by_process_types(['generic-process', 'split-process'], combine_and=True)
         self.assertQuerysetEqual(
             qs, map(repr, [samples[2]]), ordered=False)
-        qs = Sample.objects.by_process_types([Process, SplitProcess], combine_and=False)
+        qs = Sample.objects.by_process_types(['generic-process', 'split-process'], combine_and=False)
         self.assertQuerysetEqual(
             qs, map(repr, samples[0:3]), ordered=False)
 
@@ -425,32 +426,32 @@ class TestSample(TestCase):
 
     def test_get_nodes_for_process_type_invalid(self):
         self.assertListEqual(
-            [], list(self.sample.get_nodes_for_process_type(Process)))
+            [], list(self.sample.get_nodes_for_process_type('generic-process')))
         with self.assertRaises(ValueError):
-            self.sample.get_nodes_for_process_type(Sample)
+            self.sample.get_nodes_for_process_type('nonexistant')
 
     def test_get_nodes_for_process_type_valid(self):
-        process_1 = mommy.make(Process)
+        process_1 = mommy.make(Process, type_id='generic-process')
         self.sample.run_process(process_1)
         p1_node = list(self.sample.leaf_nodes)
         process_2 = self.sample.split(self.user, 2)[0].process
         p2_nodes = list(self.sample.leaf_nodes)
         self.assertListEqual(
-            p1_node, list(self.sample.get_nodes_for_process_type(Process)))
+            p1_node, list(self.sample.get_nodes_for_process_type('generic-process')))
         self.assertListEqual(
-            p2_nodes, list(self.sample.get_nodes_for_process_type(SplitProcess)))
+            p2_nodes, list(self.sample.get_nodes_for_process_type('split-process')))
 
     def test_has_nodes_for_process_type_invalid(self):
-        self.assertFalse(self.sample.has_nodes_for_process_type(Process))
+        self.assertFalse(self.sample.has_nodes_for_process_type('generic-process'))
         with self.assertRaises(ValueError):
-            self.sample.get_nodes_for_process_type(Sample)
+            self.sample.get_nodes_for_process_type('nonexistant')
 
     def test_has_nodes_for_process_type_valid(self):
-        self.sample.run_process(mommy.make(Process))
-        self.assertFalse(self.sample.has_nodes_for_process_type(SplitProcess))
+        self.sample.run_process(mommy.make(Process, type_id='generic-process'))
+        self.assertFalse(self.sample.has_nodes_for_process_type('split-process'))
         self.sample.split(self.user, 2)
-        self.assertTrue(self.sample.has_nodes_for_process_type(Process))
-        self.assertTrue(self.sample.has_nodes_for_process_type(SplitProcess))
+        self.assertTrue(self.sample.has_nodes_for_process_type('generic-process'))
+        self.assertTrue(self.sample.has_nodes_for_process_type('split-process'))
 
 
 class TestProcess(TestCase):

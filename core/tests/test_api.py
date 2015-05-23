@@ -9,9 +9,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from rest_framework.test import APIClient
 
-from core.models import (DataFile, Process, ProcessNode, Sample, SplitProcess,
-                         Substrate,)
-from .models import ChildProcess, ParentProcess
+from core.models import DataFile, Process, ProcessNode, Sample, Substrate
 
 
 class TestProcessAPI(TestCase):
@@ -22,10 +20,9 @@ class TestProcessAPI(TestCase):
         self.client = APIClient()
         self.client.login(username='username1', password='')
 
-    def test_list_view_get_homogeneous(self):
+    def test_list_view_get(self):
         """
-        Test that the list api returns correct items if they are all the same
-        process class.
+        Test that the list api returns correct items .
         """
         processes = [
             mommy.make(Process),
@@ -38,50 +35,11 @@ class TestProcessAPI(TestCase):
         for process, result in zip(processes, results.get('results')):
             self.assertEqual(result.get('uuid_full'), process.uuid_full.hex)
 
-    def test_list_view_get_heterogeneous(self):
-        """
-        Test that the list api returns correct items if they are different
-        process classes without polymorphic fields.
-        """
-        processes = [
-            mommy.make(Process),
-            mommy.make(SplitProcess),
-        ]
-        response = self.client.get('/api/v0/process/')
-        results = json.loads(response.content)
-        self.assertEqual(results.get('count'), len(processes))
-        for process, result in zip(processes, results.get('results')):
-            self.assertEqual(result.get('uuid_full'), process.uuid_full.hex)
-
-    def test_list_view_get_polymorphic(self):
-        """
-        Test that the list api returns correct items if they are different
-        models that provide polymorphic fields.
-        """
-        processes = [
-            mommy.make(Process),
-            mommy.make(SplitProcess),
-            mommy.make(ParentProcess),
-            mommy.make(ChildProcess),
-        ]
-        response = self.client.get('/api/v0/process/')
-        results = json.loads(response.content)
-        self.assertEqual(results.get('count'), len(processes))
-        for process, result in zip(processes, results.get('results')):
-            self.assertEqual(result.get('uuid_full'), process.uuid_full.hex)
-            self.assertIsNotNone(result.get('comment'))
-            polymorphic_ctype = result.get('polymorphic_ctype')
-            if polymorphic_ctype == 'ParentProcess':
-                self.assertIsNotNone(result.get('parent_field'))
-            elif polymorphic_ctype == 'ChildProcess':
-                self.assertIsNotNone(result.get('parent_field'))
-                self.assertIsNotNone(result.get('child_field'))
-
     def test_retrieve_view_get_full_uuid(self):
         """
         Test retrieval of a process using the full uuid.
         """
-        process = mommy.make(ChildProcess)
+        process = mommy.make(Process)
         response = self.client.get(
             '/api/v0/process/{}/'.format(process.uuid_full.hex))
         self.assertEqual(response.status_code, 200)
@@ -93,7 +51,7 @@ class TestProcessAPI(TestCase):
         """
         Test retrieval of a process using the short uuid.
         """
-        process = mommy.make(ChildProcess)
+        process = mommy.make(Process)
         response = self.client.get(
             '/api/v0/process/{}/'.format(process.uuid))
         results = json.loads(response.content)

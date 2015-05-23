@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 import operator
 import string
 
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -12,7 +11,7 @@ from mptt import models as mptt
 import polymorphic
 
 from .mixins import AutoUUIDMixin, TimestampMixin
-from .process import Process, ProcessNode, SplitProcess
+from .process import Process, ProcessNode, ProcessType
 from . import fields
 
 
@@ -87,8 +86,6 @@ class SampleQuerySet(models.query.QuerySet):
         """
         if 'uuid' in kwargs:
             kwargs['uuid'] = Process.strip_uuid(kwargs['uuid'])
-        if 'type' in kwargs:
-            kwargs['polymorphic_ctype'] = ContentType.objects.get_for_models(kwargs.pop('type'))
 
         kwargs = {'process__{}'.format(k): v for k, v in kwargs.items()}
 
@@ -108,29 +105,29 @@ class SampleQuerySet(models.query.QuerySet):
         return self.filter(process_tree__tree_id__in=trees)
 
     def by_process_type(self, process_type):
-        if process_type != Process and Process not in process_type.__bases__:
-            raise ValueError('{} is not a valid process, it does not inherit '
-                             'from Process'.format(process_type.__name__))
-        content_type = ContentType.objects.get_for_model(process_type)
+        if not ProcessType.objects.filter(type=process_type).exists():
+            raise ValueError('{} is not a valid process type'.format(process_type))
 
-        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+        trees = (ProcessNode.objects.filter(process__type_id=process_type)
                                     .order_by('tree_id')
                                     .values_list('tree_id', flat=True)
                                     .distinct())
         return self.filter(process_tree__tree_id__in=trees)
 
     def by_process_types(self, process_types, combine_and=False):
-        for process_type in process_types:
-            if process_type != Process and Process not in process_type.__bases__:
-                raise ValueError('{} is not a valid process, it does not inherit '
-                                 'from Process'.format(process_type.__name__))
-        content_types = ContentType.objects.get_for_models(*process_types)
+        invalid_types = [
+            process_type
+            for process_type in process_types
+            if not ProcessType.objects.filter(type=process_type).exists()
+        ]
+        if invalid_types:
+            raise ValueError('Invalid process types {} passed'.format(invalid_types))
 
-        trees = (ProcessNode.objects.filter(process__polymorphic_ctype=content_type)
+        trees = (ProcessNode.objects.filter(process__type_id=process_type)
                                     .order_by('tree_id')
                                     .values_list('tree_id', flat=True)
                                     .distinct()
-                 for process_type, content_type in content_types.items())
+                 for process_type in process_types)
         q_filters = (models.Q(process_tree__tree_id__in=tree) for tree in trees)
         op = operator.and_ if combine_and else operator.or_
 
@@ -203,7 +200,9 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         if comment is None:
             comment = 'Split sample into {0} pieces'.format(number)
 
-        process = SplitProcess.objects.create(comment=comment, user=user)
+        process = Process.objects.create(comment=comment,
+                                         user=user,
+                                         type_id='split-process')
         nodes = []
 
         branch = self.get_piece(piece)
@@ -428,9 +427,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         :raises ValueError: If the provided process type class is not a valid
                             process.
         """
-        if process_type != Process and Process not in process_type.__bases__:
-            raise ValueError('{} is not a valid process, it does not inherit '
-                             'from Process'.format(process_type.__name__))
-        content_type = ContentType.objects.get_for_model(process_type).id
-        return self._get_tree_queryset().filter(
-            process__polymorphic_ctype=content_type)
+        if not ProcessType.objects.filter(type=process_type).exists():
+            raise ValueError('{} is not a valid process type'.format(process_type))
+
+        return self._get_tree_queryset().filter(process__type_id=process_type)

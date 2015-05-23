@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 
 from braces.views import LoginRequiredMixin
 
-from d180.models import D180Growth, D180Source, D180Readings, Platter
+from d180.models import D180Source, D180Readings, Platter
 from d180.forms import (CommentsForm, SourcesForm,
                         WizardBasicProcessForm, WizardGrowthInfoForm, WizardFullProcessForm,
                         WizardPrerunChecklistForm, WizardPostrunChecklistForm,
@@ -19,7 +19,7 @@ from d180.forms import (CommentsForm, SourcesForm,
                         D180ReadingsForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
-from core.models import Sample, Process, ProcessTemplate
+from core.models import Sample, Process, ProcessTemplate, ProcessType
 from schedule_queue.models import Reservation
 
 
@@ -92,7 +92,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             previous_source = None
 
         try:
-            previous_growth = D180Growth.objects.latest('created')
+            previous_growth = (Process.objects.filter(type_id='d180-growth')
+                                              .latest('created'))
             growth_number = 'g{}'.format(
                 str(int(previous_growth.legacy_identifier[1:]) + 1).zfill(4))
         except ObjectDoesNotExist:
@@ -104,7 +105,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             'info_form': WizardBasicProcessForm(
                 initial={
                     'user': self.request.user,
-                    'legacy_identifier': growth_number
+                    'legacy_identifier': growth_number,
+                    'type': ProcessType.objects.get(type='d180-growth'),
                 },
                 prefix='process'),
             'growth_form': WizardGrowthInfoForm(prefix='growth'),
@@ -175,7 +177,7 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'd180/create_growth_readings.html'
 
     def get_object(self):
-        return D180Growth.objects.latest('created')
+        return Process.objects.filter(type_id='d180-growth').latest('created')
 
     def build_forms(self, **kwargs):
         comment_form = CommentsForm(prefix='comment',
@@ -225,7 +227,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'd180/create_growth_postrun.html'
 
     def get_object(self):
-        return D180Growth.objects.latest('created')
+        return Process.objects.filter(type_id='d180-growth').latest('created')
 
     def build_forms(self):
         try:
@@ -277,7 +279,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
 class WizardCancelView(LoginRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        growth = D180Growth.objects.latest('created')
+        growth = Process.objects.filter(type_id='d180-growth').latest('created')
 
         # remove readings
         growth.readings.all().delete()
@@ -302,11 +304,10 @@ class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
         try:
-            process = Process.objects.non_polymorphic().get(uuid_full__startswith=uuid)
-            self.process = process
+            self.process = Process.objects.get(uuid_full__startswith=uuid)
         except Process.DoesNotExist:
             raise Http404('Process {} does not exist'.format(self.kwargs['uuid']))
-        return self.model.objects.filter(process=process).order_by('layer')
+        return self.model.objects.filter(process=self.process).order_by('layer')
 
     def get_context_data(self, **kwargs):
         context = super(ReadingsDetailView, self).get_context_data(**kwargs)
@@ -366,12 +367,12 @@ class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
 class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
                          generic.TemplateView):
     context_object_name = 'growth'
-    queryset = D180Growth.objects.all()
+    queryset = Process.objects.filter(type_id='d180-growth')
     template_name = 'd180/update_readings.html'
 
     def get_object(self):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
-        return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
+        return get_object_or_404(Process, uuid_full__startswith=uuid)
 
     def get_context_data(self, **kwargs):
         context = super(UpdateReadingsView, self).get_context_data(**kwargs)
@@ -503,7 +504,7 @@ class TemplateWizardStartView(WizardStartView):
         if 'id' in self.kwargs:
             comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
         elif 'uuid' in self.kwargs:
-            comment = D180Growth.objects.get(uuid_full__startswith=Process.strip_uuid(
+            comment = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
                 self.kwargs.get('uuid', None))).comment
         output = super(TemplateWizardStartView, self).build_forms()
         output['comment_form'] = CommentsForm(initial={'comment': comment}, prefix='growth')

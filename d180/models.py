@@ -60,24 +60,6 @@ class D180GrowthInfo(models.Model):
 
 
 @python_2_unicode_compatible
-class D180Growth(Process):
-    """
-    Stores information related to a growth on the d180 including tagging for
-    material and device properties.
-    """
-    name = 'D180 Growth'
-    slug = 'd180-growth'
-    is_destructive = True
-
-    class Meta:
-        verbose_name = _('d180 growth')
-        verbose_name_plural = _('d180 growths')
-
-    def __str__(self):
-        return self.uuid
-
-
-@python_2_unicode_compatible
 class D180Readings(models.Model):
     """
     Stores readings (i.e. temperature) from a d180 growth.
