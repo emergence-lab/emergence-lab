@@ -22,7 +22,7 @@ def migrate_investigations_backward(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0017_auto_20150521_1736'),
+        ('core', '0015_processtype'),
         ('d180', '0011_rename_investigations'),
     ]
 
