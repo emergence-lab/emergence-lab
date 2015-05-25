@@ -23,21 +23,15 @@ class AutoCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
+
         super(AutoCreateForm, self).__init__(*args, **kwargs)
+
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
 
-        try:
-            process_type = self.Meta.process_type
-        except AttributeError:
-            process_type = self.kwargs.get('process_type') or 'generic-process'
-        self.fields['type'] = forms.CharField(initial=process_type,
-                                              widget=forms.HiddenInput())
-
     class Meta:
         model = Process
-        process_type = 'generic-process'
-        fields = ('comment',)
+        fields = ('comment', 'type')
 
 
 ProcessCreateForm = AutoCreateForm

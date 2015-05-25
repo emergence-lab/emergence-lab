@@ -129,10 +129,10 @@ class RunProcessView(CreateUploadProcessView):
     form_class = ProcessCreateForm
     process_type = 'generic-process'
 
-    def get_form_kwargs(self):
-        kwargs = super(RunProcessView, self).get_form_kwargs()
-        kwargs['process_type'] = self.process_type
-        return kwargs
+    def get_initial(self):
+        initial = super(RunProcessView, self).get_initial()
+        initial['type'] = self.process_type
+        return initial
 
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):
