@@ -275,15 +275,20 @@ LOGGING = {
         },
     },
     'loggers': {
-        'core.views.process': {
-            'handlers': ['file'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
         'django': {
             'handlers': ['file'],
             'propogate': True,
             'level': 'WARNING',
+        },
+        'rq.worker': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'core.views.process': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
         },
         'd180.views': {
             'handlers': ['file'],
