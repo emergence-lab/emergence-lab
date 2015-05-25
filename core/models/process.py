@@ -6,6 +6,7 @@ import os
 from django.core.files.storage import default_storage as labshare
 from django.conf import settings
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
 import polymorphic
@@ -22,6 +23,7 @@ def get_file_path(instance, filename):
     return os.path.join('processes', instance.process.uuid_full.hex, filename)
 
 
+@python_2_unicode_compatible
 class ProcessType(models.Model):
     type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
     name = models.CharField(max_length=100, blank=True)
@@ -31,6 +33,9 @@ class ProcessType(models.Model):
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)
+
+    def __str__(self):
+        return self.full_name
 
 
 class ProcessTypeManager(models.Manager):
