@@ -8,13 +8,13 @@ def external_links(request):
     """
     Add external links to context for all views for use in header bar.
     """
-    external_links = settings.EXTERNAL_LINKS or {}
-    return {'external_links': external_links}
+    links = settings.EXTERNAL_LINKS or {}
+    return {'external_links': links}
 
 
 def feedback(request):
     """
     Add feedback form for reporting bugs.
     """
-    feedback = settings.ENABLE_FEEDBACK or False
-    return {'feedback': feedback}
+    enable_feedback = settings.ENABLE_FEEDBACK or False
+    return {'feedback': enable_feedback}

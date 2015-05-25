@@ -16,6 +16,7 @@ requirements:
 
 ignore-paths:
     - docs
+    - __init__\.py
 
 pep8:
     full: true
