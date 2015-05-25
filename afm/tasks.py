@@ -13,6 +13,7 @@ import nanoscope
 from PIL import Image, ImageDraw, ImageFont
 import six
 
+from afm import utils
 from core.tasks import AsyncDjangoFile
 
 
@@ -21,15 +22,12 @@ logger = logging.getLogger(__name__)
 
 @django_rq.job
 def process_nanoscope_file(raw_file):
-    scan_number = int(os.path.splitext(raw_file.name)[-1][1:])
-    if '_' in raw_file.name:
-        location = os.path.splitext(raw_file.name)[0].split('_')[-1]
-        if location not in 'rRcCfFeE':
-            location = 'c'
-    else:
-        location = 'c'
+    scan_number = utils.extract_scan_number(raw_file.name)
+    location = utils.extract_scan_location(raw_file.name)
     logger.debug(
         'Extracted scan_number={}, location={}'.format(scan_number, location))
+
+    # read & parse file
     raw = six.BytesIO(raw_file.read())
     raw.mode = 'b'
     scan = nanoscope.read(raw, encoding='cp1252')
@@ -40,7 +38,9 @@ def process_nanoscope_file(raw_file):
                         dict(image_type='Raw', state='raw',
                              rms=0.0, zrange=0.0,
                              size=0.0, scan_number=scan_number,
+                             location=location,
                              content_type='application/octet-stream'))]
+    scan_size = 0.0
     for img in scan:
         img.process()
         logger.debug('Processed {} scan'.format(img.type))
