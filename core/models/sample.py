@@ -45,24 +45,6 @@ class SampleManager(models.Manager):
 
         return sample
 
-    def get_queryset(self):
-        return SampleQuerySet(self.model, using=self._db)
-
-    def get_by_uuid(self, uuid, clean=True):
-        return self.get_queryset().get_by_uuid(uuid, clean)
-
-    def filter_process(self, **kwargs):
-        return self.get_queryset().filter_process(**kwargs)
-
-    def by_process(self, uuid, clean=True):
-        return self.get_queryset().by_process(uuid, clean)
-
-    def by_process_type(self, process_type):
-        return self.get_queryset().by_process_type(process_type)
-
-    def by_process_types(self, process_types, combine_and=False):
-        return self.get_queryset().by_process_types(process_types, combine_and)
-
 
 class SampleQuerySet(models.query.QuerySet):
 
@@ -147,7 +129,7 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     substrate = models.OneToOneField(Substrate)
     process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
 
-    objects = SampleManager()
+    objects = SampleManager.from_queryset(SampleQuerySet)()
 
     @classmethod
     def strip_uuid(cls, uuid):
