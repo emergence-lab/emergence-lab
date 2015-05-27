@@ -198,7 +198,8 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super(WizardReadingsView, self).get_context_data(**kwargs)
         context_data['growth'] = self.object
-        context_data['samples'] = Sample.objects.by_process(self.object.uuid_full)
+        nodes = self.object.nodes.order_by('number')
+        context_data['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         return context_data
 
     def post(self, request, *args, **kwargs):
@@ -248,7 +249,8 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super(WizardPostrunView, self).get_context_data(**kwargs)
         context_data['growth'] = self.object
-        context_data['samples'] = Sample.objects.by_process(self.object.uuid_full)
+        nodes = self.object.nodes.order_by('number')
+        context_data['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         return context_data
 
     def get(self, request, *args, **kwargs):

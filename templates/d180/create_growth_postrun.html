@@ -129,6 +129,7 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
+                                <td><strong>Number</strong></td>
                                 <td><strong>UUID</strong></td>
                                 <td><strong>Substrate</strong></td>
                                 <td><strong>Serial</strong></td>
@@ -136,9 +137,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for sample in samples %}
+                            {% for sample, node in sample_info %}
                                 <tr>
-                                    <td>{{sample.uuid}}</td>
+                                    <td>{{node.number}}</td>
+                                    <td>
+                                        {{sample.uuid}}{% if sample.pieces|length > 1 %}{{node.piece}}{% endif %}
+                                    </td>
                                     <td>{{sample.substrate.comment|safe}}</td>
                                     <td>{{sample.substrate.serial}}</td>
                                     <td>{{sample.comment|safe}}</td>
