@@ -48,11 +48,15 @@ class TestProcessFiles(TestCase):
         self.assertDictEqual(job.result[0].kwargs, data)
 
     def test_process_image_data(self):
+        """
+        Test that the task will properly process the file and extract the
+        relevant parameters properly.
+        """
         file_data = ('\\*File list\n'
                      '\\Version: 0x05120130\n'
                      '\\@Sens. Zscan: V 9 nm/V\n'
                      '\\*Ciao image list\n'
-                     '\\Data offset: 368\n'
+                     '\\Data offset: 362\n'
                      '\\Data length: 12\n'
                      '\\Bytes/pixel: 1\n'
                      '\\Number of lines: 2\n'
@@ -63,9 +67,8 @@ class TestProcessFiles(TestCase):
                      '\\@2:Z scale: V [Sens. Amplitude] (1 V/LSB) 1 V\n'
                      '\\@2:Z offset: V [Sens. Amplitude] (1 V/LSB) 1 V\n'
                      '\\*File list end\n'
-                     '......'
-                     '\n 2\n 2'
-                     '\n 2\n 2\n')
+                     '\n 2\n 2'     # 10, 32, 50, 10, 32, 50
+                     '\n 2\n 2\n')  # 10, 32, 50, 10, 32, 50
         scan_file = SimpleUploadedFile('s0001a_r.001',
                                        file_data.encode('cp1252'),
                                        content_type='text/plain')
@@ -88,6 +91,7 @@ class TestProcessFiles(TestCase):
         self.assertDictEqual(job.result[-1].kwargs, data)
 
     def test_process_wrong_filetype(self):
+        """Test that the task fails if given an incorrect file."""
         file_data = 'plain text data'
         scan_file = SimpleUploadedFile('s0001a_r.001',
                                        file_data.encode('cp1252'),
