@@ -34,12 +34,18 @@ def process_nanoscope_file(raw_file):
     logger.debug('Read in file {}'.format(raw_file.name))
 
     processed_files = [
-        AsyncDjangoFile(raw_file,
-                        dict(image_type='Raw', state='raw',
-                             rms=0.0, zrange=0.0,
-                             size=0.0, scan_number=scan_number,
-                             location=location,
-                             content_type='application/octet-stream'))]
+        AsyncDjangoFile(
+            raw_file,
+            {
+                'image_type': 'Raw',
+                'state': 'raw',
+                'rms': 0.0,
+                'zrange': 0.0,
+                'size': 0.0,
+                'scan_number': scan_number,
+                'location': location,
+                'content_type': 'application/octet-stream'
+            })]
     scan_size = 0.0
     for img in scan:
         img.process()
@@ -48,10 +54,18 @@ def process_nanoscope_file(raw_file):
         logger.debug('Created image file for {} scan'.format(img.type))
         scan_size = math.sqrt(img.scan_area)
         processed_files.append(
-            AsyncDjangoFile(processed_image,
-                            dict(image_type=img.type, state='extracted',
-                                 rms=img.rms, zrange=img.zrange,
-                                 size=scan_size, scan_number=scan_number)))
+            AsyncDjangoFile(
+                processed_image,
+                {
+                    'image_type': img.type,
+                    'state': 'extracted',
+                    'rms': img.rms,
+                    'zrange': img.zrange,
+                    'size': scan_size,
+                    'scan_number': scan_number,
+                    'location': location,
+                    'content_type': processed_image.content_type
+                }))
     processed_files[0].kwargs['size'] = scan_size
     return processed_files
 
