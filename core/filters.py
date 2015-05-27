@@ -18,8 +18,7 @@ def _filter_process_type(queryset, value):
     if not value:
         return queryset
 
-    classes = [Process.get_process_class(slug) for slug in value]
-    return queryset.by_process_types(classes, combine_and=False)
+    return queryset.by_process_types(value, combine_and=False)
 
 
 def _filter_d180_growth_tags(queryset, value):

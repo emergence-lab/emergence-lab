@@ -25,6 +25,9 @@ def get_file_path(instance, filename):
 
 @python_2_unicode_compatible
 class ProcessType(models.Model):
+    """
+    Holds information about types of processes.
+    """
     type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
     name = models.CharField(max_length=100, blank=True)
     full_name = models.CharField(max_length=255, blank=True)
@@ -40,7 +43,7 @@ class ProcessType(models.Model):
 
 class ProcessTypeManager(models.Manager):
     """
-    Manager to filter on the ``active`` field.
+    Manager to filter on the ``type`` field.
     """
     def __init__(self, process_type):
         super(ProcessTypeManager, self).__init__()
@@ -53,16 +56,8 @@ class ProcessTypeManager(models.Manager):
 
 class Process(UUIDMixin, TimestampMixin, models.Model):
     """
-    Base class for all processes. A process represents anything done to a
-    sample which results in data (numerical or visual) or alters the properties
-    of the sample.
-
-    name: The human readable name for the process
-    slug: The computer-consumed identifier to tell which type of process the
-          instance is. Used to help identify which fields are availiable.
-    is_destructive: Boolean that identifies whether the process is destructive,
-                    meaning that the sample is altered in some way and that
-                    repeating past processes may give different results.
+    A process represents anything done to a sample which results in data
+    (numerical or visual) or alters the properties of the sample.
     """
     prefix = 'p'
 
@@ -79,14 +74,6 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     generic = ProcessTypeManager(process_type='generic-process')
     split = ProcessTypeManager(process_type='split-process')
 
-    @staticmethod
-    def get_process_class(slug):
-        classes = get_subclasses(Process) + [Process]
-        try:
-            return next(p for p in classes if p.slug == slug)
-        except StopIteration:
-            raise ValueError('Process slug {} not valid'.format(slug))
-
     @property
     def samples(self):
         """
@@ -96,7 +83,6 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
         trees = ProcessNode.objects.filter(process=self).values_list('tree_id', flat=True)
         nodes = (ProcessNode.objects.filter(tree_id__in=trees,
                                             sample__isnull=False)
-                                    .order_by('number')
                                     .values_list('sample', flat=True))
         return Sample.objects.filter(id__in=nodes).distinct()
 
