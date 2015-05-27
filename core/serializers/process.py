@@ -7,12 +7,13 @@ from .polymorphic import PolymorphicModelSerializer
 from core.models import DataFile, Process, ProcessNode
 
 
-class ProcessSerializer(PolymorphicModelSerializer):
+class ProcessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Process
-        fields = ('uuid_full', 'uuid', 'created', 'modified', 'user', 'comment',
-                  'is_destructive')
+        fields = ('id', 'uuid_full', 'uuid', 'legacy_identifier', 'type',
+                  'created', 'modified', 'user', 'investigations',
+                  'comment',)
 
 
 class ProcessNodeSerializer(serializers.ModelSerializer):

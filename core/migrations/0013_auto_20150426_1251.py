@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
                 ('name', models.CharField(max_length=50, blank=True)),
                 ('comment', core.models.fields.RichTextField(blank=True)),
-                ('process', models.ForeignKey(related_query_name='process', related_name='process', to='core.Process')),
+                ('process', models.ForeignKey(related_query_name='templates', related_name='templates', to='core.Process')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={

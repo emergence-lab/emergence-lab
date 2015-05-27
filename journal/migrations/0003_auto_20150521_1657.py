@@ -2,19 +2,20 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import autoslug.fields
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('afm', '0002_afmfile_image_type'),
+        ('journal', '0002_auto_20150207_1404'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='afmfile',
-            name='image_type',
-            field=models.CharField(default='Height', max_length=45, choices=[('Height', 'Height'), ('Amplitude', 'Amplitude'), ('Phase', 'Phase')]),
+            model_name='journalentry',
+            name='slug',
+            field=autoslug.fields.AutoSlugField(populate_from='title', unique_with=('author',), editable=False),
             preserve_default=True,
         ),
     ]

@@ -15,7 +15,6 @@ from redis import StrictRedis
 from core.models import User, Project, Investigation
 from core.streams import project_stream, investigation_stream
 from core.views import ActionReloadView
-from d180.models import D180Growth
 from schedule_queue.models import Reservation, tools
 from users.redis_config import ActionItem
 
@@ -59,8 +58,7 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
-        context['growths'] = (D180Growth.objects.filter(user=self.object)
-                                                .order_by('-uuid_full')[:25])
+        context['growths'] = []
         context['tools'] = tools.get_tool_list()
         return context
 

@@ -3,16 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 
-from core.models import Process, DataFile
-
-
-class Hall(Process):
-    """
-    Stores hall characterization information.
-    """
-    name = 'Hall'
-    slug = 'hall'
-    is_destructive = False
+from core.models import DataFile
 
 
 class HallData(DataFile):

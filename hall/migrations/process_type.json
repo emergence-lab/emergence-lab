@@ -1,0 +1,7 @@
+{
+    "type": "hall",
+    "is_destructive": false,
+    "name": "Hall",
+    "full_name": "Hall Effect Measurement",
+    "description": "Measurement for carrier concentration and carrier mobility based on the Hall effect."
+}

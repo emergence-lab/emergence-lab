@@ -3,7 +3,19 @@ from __future__ import absolute_import, unicode_literals
 
 from rest_framework import serializers
 
-from .models import D180Growth, D180Readings
+from core.models import Process
+from d180.models import D180GrowthInfo, D180Readings
+
+
+class D180GrowthInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = D180GrowthInfo
+        fields = ('platter', 'orientation', 'other_material',
+                  'has_gan', 'has_aln', 'has_inn', 'has_algan', 'has_ingan',
+                  'is_template', 'is_buffer', 'has_pulsed',
+                  'has_superlattice', 'has_mqw', 'has_graded',
+                  'has_n', 'has_p', 'has_u',)
 
 
 class D180GrowthSerializer(serializers.ModelSerializer):
@@ -11,26 +23,23 @@ class D180GrowthSerializer(serializers.ModelSerializer):
     Serializes the growth model.
     """
 
+    info = D180GrowthInfoSerializer()
+
     class Meta:
-        model = D180Growth
-        fields = ('id', 'uuid', 'created', 'modified', 'user',
-                  'investigations', 'platter', 'comment',
-                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
-                  'has_ingan', 'other_material', 'orientation',
-                  'is_template', 'is_buffer', 'has_pulsed',
-                  'has_superlattice', 'has_mqw', 'has_graded',
-                  'has_n', 'has_p', 'has_u', 'legacy_identifier',)
+        model = Process
+        fields = ('id', 'uuid_full', 'legacy_identifier', 'type',
+                  'created', 'modified', 'user', 'investigations',
+                  'comment', 'info',)
 
 
 class D180ReadingsSerializer(serializers.ModelSerializer):
     """
     Serializes the readings model.
     """
-    growth_id = serializers.IntegerField()
 
     class Meta:
         model = D180Readings
-        fields = ('id', 'growth_id', 'layer', 'layer_desc', 'pyro_out', 'pyro_in',
+        fields = ('id', 'process_id', 'layer', 'description', 'pyro_out', 'pyro_in',
                   'tc_in', 'tc_out', 'motor_rpm', 'gc_pressure', 'gc_position',
                   'voltage_in', 'current_in', 'voltage_out', 'current_out',
                   'top_vp_flow', 'hydride_inner', 'hydride_outer',

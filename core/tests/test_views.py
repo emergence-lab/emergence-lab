@@ -619,9 +619,59 @@ class TestProcessCRUD(TestCase):
             'sample-TOTAL_FORMS': '1'
         }
         response = self.client.post(url, data)
-        nodes = sample.get_nodes_for_process_type(Process)
+        nodes = sample.get_nodes_for_process_type('generic-process')
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].piece, piece)
+
+    def test_process_autocreate_resolution_template(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        test_resolution_template(self,
+            url='/process/autocreate/{}/'.format(sample.uuid),
+            url_name='process_autocreate',
+            template_file='core/process_create.html',
+            response_code=200)
+
+    def test_autocreate_empty_data(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'pieces', 'This field is required.')
+
+    def test_process_autocreate_invalid_pieces(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'pieces': ['b'],
+            'type': 'generic-process',
+        }
+        response = self.client.post(url, data)
+
+        msg = 'Select a valid choice. b is not one of the available choices.'
+        self.assertFormError(response, 'form', 'pieces', msg)
+
+    def test_process_autocreate_invalid_type(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'pieces': ['a'],
+            'type': 'nonexistant',
+        }
+        response = self.client.post(url, data)
+
+        msg = 'Select a valid choice. That choice is not one of the available choices.'
+        self.assertFormError(response, 'form', 'type', msg)
+
+    def test_process_autocreate_valid_data(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'pieces': ['a'],
+            'type': 'generic-process',
+        }
+        response = self.client.post(url, data)
+        process = Process.objects.last()
+        self.assertRedirects(response, reverse('process_detail', args=[process.uuid]))
 
 
 class TestProcessTemplateCRUD(TestCase):

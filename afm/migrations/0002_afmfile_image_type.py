@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='afmfile',
             name='image_type',
-            field=models.CharField(default='height', max_length=45, choices=[('height', 'Height'), ('amplitude', 'Amplitude'), ('phase', 'Phase')]),
+            field=models.CharField(default='Height', max_length=45, choices=[('Raw', 'Raw'), ('Height', 'Height'), ('Amplitude', 'Amplitude'), ('Phase', 'Phase')]),
             preserve_default=True,
         ),
     ]

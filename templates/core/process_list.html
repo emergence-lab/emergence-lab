@@ -45,7 +45,7 @@
         <ul class="nav nav-pills nav-stacked">
             <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_list' slug='all' username='all' %}">All</a></li>
         {% for process_type in process_list %}
-            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_list' slug=process_type.slug username=username %}">{{process_type.name}}</a></li>
+            <li role="presentation" {% if slug == process_type.slug %}class="active"{% endif %}><a href="{% url 'process_list' slug=process_type.type username=username %}">{{process_type.name}}</a></li>
         {% endfor %}
         </ul>
         <p></p>

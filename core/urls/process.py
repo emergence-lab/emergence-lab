@@ -12,7 +12,7 @@ urlpatterns = [
         core.views.ProcessListView.as_view(), name='process_list'),
     url(r'^create/$', core.views.ProcessWizardView.as_view(),
         name='process_create'),
-    url(r'^autocreate/(?P<uuid>s[0-9]+)(?P<piece>[a-z]+)?/$',
+    url(r'^autocreate/(?P<uuid>s[0-9]+)/$',
         core.views.RunProcessView.as_view(), name='process_autocreate'),
     url(r'^(?P<uuid>p[0-9a-f\-]{7,})/$', core.views.ProcessDetailView.as_view(),
         name='process_detail'),
