@@ -3,9 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 import logging
 import math
-import os
 
-from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import django_rq
@@ -84,13 +83,10 @@ def _create_scan_png(scan, filename, scan_number):
     processed_image.paste(image,
                           (20, 20, image.size[0] + 20, image.size[1] + 20))
 
-    calibri = ImageFont.truetype(
-        os.path.join(settings.STATIC_ROOT, 'afm', 'fonts', 'calibrib.ttf'),
-        20)
+    calibri = ImageFont.truetype(finders.find('afm/fonts/calibrib.ttf'), 20)
     draw = ImageDraw.Draw(processed_image)
 
-    scale_image = Image.open(
-        os.path.join(settings.STATIC_ROOT, 'afm', 'img', 'scale_12.png'))
+    scale_image = Image.open(finders.find('afm/img/scale_12.png'))
     processed_image.paste(scale_image,
                          (28 + image.size[0],
                           30,
