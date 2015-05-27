@@ -63,7 +63,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if not samples %}
+        {% if not sample_info %}
             <div class="alert alert-warning">
                 <h3>This process doesn't have any associated samples</h3>
                 <p>Get started by running this process on an existing or new sample(s).</p>
@@ -84,20 +84,22 @@
                        data-toggle="table"
                        data-search="true"
                        data-show-columns="true"
-                       data-sort-name="uuid"
+                       data-sort-name="number"
                        data-sort-order="asc">
                     <thead>
                         <tr>
-                            <th data-field="uuid" data-sortable="true" data-switchable="false">UUID</th>
+                            <th data-field="number" data-sortable="true" data-switchable="false">Number</th>
+                            <th data-field="uuid" data-sortable="true" data-switchable="false">Sample</th>
                             <th data-field="created" data-sortable="true">Created</th>
                             <th data-field="modified" data-sortable="true">Modified</th>
                             <th data-field="pieces" data-sortable="true">Pieces</th>
                         </tr>
                     </thead>
-                    {% for sample in samples %}
+                    {% for sample, node in sample_info %}
                         <tr>
+                            <td>{{node.number}}</td>
                             <td><a href="{% url 'sample_detail' uuid=sample.uuid %}">
-                                {{sample.uuid}}
+                                {{sample.uuid}}{% if sample.pieces|length > 1 %}{{node.piece}}{% endif %}
                             </a></td>
                             <td>{{sample.created}}</td>
                             <td>{{sample.modified}}</td>

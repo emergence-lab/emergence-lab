@@ -22,8 +22,12 @@
 
     <header>
         <h1 class="page-header">
-            Upload files for {{process.name}} {{process}}
+            Upload files for {{process.uuid}}
             <div class="pull-right">
+                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#process-modal">
+                    {% bootstrap_icon 'file' %}
+                    Process
+                </button>
                 <a class="btn btn-default" href="{% url 'process_detail' uuid=process %}">
                     {% bootstrap_icon 'arrow-left' %}
                     Back
@@ -39,6 +43,53 @@
             <button type="submit"></button>
         </div>
     </form>
+
+    {# process modal #}
+    <div class="modal fade" id="process-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">{{process.uuid_full}}{% if process.legacy_identifier %} ({{process.legacy_identifier}}){% endif %}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {{process.type.full_name}}
+                        created by {{process.user.get_full_name}}
+                        on {{process.created}}
+                    </p>
+                    <h4 class="page-header">Samples</h4>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <td><strong>Number</strong></td>
+                                <td><strong>UUID</strong></td>
+                                <td><strong>Substrate</strong></td>
+                                <td><strong>Serial</strong></td>
+                                <td><strong>Comment</strong></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sample, node in sample_info %}
+                                <tr>
+                                    <td>{{node.number}}</td>
+                                    <td>
+                                        {{sample.uuid}}{% if sample.pieces|length > 1 %}{{node.piece}}{% endif %}
+                                    </td>
+                                    <td>{{sample.substrate.comment|safe}}</td>
+                                    <td>{{sample.substrate.serial}}</td>
+                                    <td>{{sample.comment|safe}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

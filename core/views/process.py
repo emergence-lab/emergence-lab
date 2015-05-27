@@ -42,7 +42,8 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
-        context['samples'] = self.object.samples
+        nodes = self.object.nodes.order_by('number')
+        context['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         context['datafiles'] = {k: list(g)
                                 for k, g in groupby(self.object.datafiles.all(),
                                              lambda x: type(x))}
@@ -150,7 +151,11 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(UploadFileView, self).get_context_data(**kwargs)
-        context['process'] = self.kwargs['uuid']
+        uuid = Process.strip_uuid(self.kwargs.get('uuid'))
+        process = Process.objects.get(uuid_full__startswith=uuid)
+        context['process'] = process
+        nodes = process.nodes.order_by('number')
+        context['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         return context
 
     def form_valid(self, form):
