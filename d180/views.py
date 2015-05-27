@@ -19,7 +19,7 @@ from d180.forms import (CommentsForm, SourcesForm,
                         D180ReadingsForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
-from core.models import Sample, Process, ProcessTemplate, ProcessType
+from core.models import Process, ProcessTemplate, ProcessType
 from schedule_queue.models import Reservation
 
 

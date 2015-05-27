@@ -13,7 +13,6 @@ import polymorphic
 
 from core.models.mixins import TimestampMixin, UUIDMixin
 from core.models import fields, Investigation
-from core.polymorphic import get_subclasses
 
 
 def get_file_path(instance, filename):
