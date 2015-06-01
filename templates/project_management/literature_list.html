@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <div class="col-md-6">
+    <form action={% url 'mendeley_search' %} method="get">
+      <input id="query" type="text" name="query" class="form-control">
+      <button class="btn btn-info" type="submit">Search</button>
+  </div>
+  <div class=col-md-6>
+    <ul class="list-group">
+
+    {% for item in literature.items %}
+      <li class="list-group-item">
+        ID: <br>{{item.id}}</br>
+        Title: <br>{{item.title}}</br>
+        Type: <br>{{item.type}}</br>
+        Source: <br>{{item.source}}</br>
+        Year: <br>{{item.year}}</br>
+        DOI: <br>{{item.identifiers.doi}}</br>
+        Keywords: <br>{{item.keywords}}</br>
+        Abstract: <br>{{item.abstract|truncatewords:10}}</br>
+        Authors: <br>{%for author in item.authors%}{{author.first_name}} {{author.last_name}},{%endfor%}</br>
+        Created: <br>{{item.created}}</br>
+        Tags: <br>{{item.tags}}</br>
+
+        {% if item.file_attached %}
+          <!-- <a href="{{item.files.list.items.0.download_url}}" class="btn btn-default">Download</a> -->
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+    {{literature.count}}
+  </div>
+</div>
+{% endblock %}
