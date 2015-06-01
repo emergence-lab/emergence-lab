@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.conf.urls import url
+from django.conf.urls import include, url
 
 import project_management.views as views
 
 
 urlpatterns = [
-    url(r'^list/$',
-        views.MilestoneListView.as_view(),
-        name='milestone_list'),
-    url(r'^create/$',
-        views.MilestoneCreateView.as_view(),
-        name='milestone_create'),
-    url(r'^detail/(?P<pk>[0-9]+)$',
-        views.MilestoneDetailView.as_view(),
-        name="milestone_detail"),
+    url(r'^milestones/', include('project_management.urls.milestones')),
+    url(r'^literature/', include('project_management.urls.literature')),
     ]
