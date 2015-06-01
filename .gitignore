@@ -57,8 +57,8 @@ docs/_build/
 target/
 
 # Project-specific
-static/
+/static/
 secrets.json
 tunnel.sh
-media/
-bower_components/
+/media/
+/bower_components/
