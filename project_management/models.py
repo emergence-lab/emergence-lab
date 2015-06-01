@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.db import models
+from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -44,15 +45,16 @@ class ProgressUpdate(ActiveStateMixin, TimestampMixin, models.Model):
                                 related_query_name='progress',)
 
 
-# class Literature(TimestampMixin, models.Model):
-#     """
-#     Scientific articles.
-#     """
-#     title = models.CharField(max_length=500)
-#     file = models.FileField(upload_to='')
-#     abstract = fields.RichTextField(_('abstract'), blank=True)
-#     doi_number = models.CharField(max_length=500, blank=True)
-#
+class Literature(TimestampMixin, models.Model):
+    """
+    Scientific articles.
+    """
+    title = models.CharField(max_length=500)
+    external_id = models.CharField(max_length=100)
+    abstract = fields.RichTextField(_('abstract'), blank=True)
+    doi_number = models.CharField(max_length=100, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+
 #
 # class Keyword(models.Model):
 #     name = models.CharField(max_length=45)
