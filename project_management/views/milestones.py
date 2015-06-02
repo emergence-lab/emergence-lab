@@ -15,6 +15,10 @@ class MilestoneListView(LoginRequiredMixin, generic.ListView):
     model = Milestone
     template_name = 'project_management/milestone_list.html'
 
+    def get_queryset(self):
+        queryset = super(MilestoneListView, self).get_queryset()
+        return queryset.filter(user=self.request.user)
+
 
 class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
 
@@ -31,9 +35,3 @@ class MilestoneDetailView(LoginRequiredMixin, generic.DetailView):
 
     model = Milestone
     template_name = 'project_management/milestone_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MilestoneDetailView, self).get_context_data(**kwargs)
-        updates = [x for x in ProgressUpdate.objects.all().filter(milestone=self.object)]
-        context['progress'] = updates
-        return context
