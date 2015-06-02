@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Literature{% endblock title %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <h2 class="page-header">Project Management <small>Literature</small></h2>
+</div>
+<div class="col-md-8 col-md-offset-2">
+  <div class="jumbotron">
+    <h2>{{object_list|length}} Literature Articles Tracked</h2>
+    <p>
+      This module tracks literature that you've associated with your research.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

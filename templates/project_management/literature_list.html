@@ -28,6 +28,7 @@
         {% if item.file_attached %}
           <!-- <a href="{{item.files.list.items.0.download_url}}" class="btn btn-default">Download</a> -->
         {% endif %}
+        <a href="{% url 'add_mendeley_object' milestone='1' external_id=item.id %}" class="btn btn-success">Add</a>
       </li>
     {% endfor %}
     </ul>
