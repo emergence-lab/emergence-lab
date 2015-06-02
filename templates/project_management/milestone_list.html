@@ -24,11 +24,16 @@
             <span class="pull-right">Due: {{milestone.due_date}}</span>
           </h4>
           <p class="list-group-item-text">
-            {{milestone.progress.all|length}} Progress Updates
+            {{milestone.investigation.target_actions.all|length}} Progress Updates
+            &emsp;&emsp;
+            {{milestone.literature.all|length}} Literature Documents
             <br></br>
           </p>
           <p class="list-group-item-text">
             <div class="well">{{milestone.description}}</div>
+          </p>
+          <p>
+
           </p>
         </a>
       {% endfor %}
