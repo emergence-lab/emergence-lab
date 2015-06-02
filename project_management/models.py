@@ -25,24 +25,8 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
                                 related_name='milestone',
                                 related_query_name='milestone',
                                 null=True)
-
-
-class ProgressUpdate(ActiveStateMixin, TimestampMixin, models.Model):
-    """
-    Records updates to a milestone based on project activity.
-    """
-    process = models.ForeignKey(Process,
-                                related_name='progress',
-                                related_query_name='progress',
-                                null=True)
-    datafile = models.ForeignKey(DataFile,
-                                related_name='progress',
-                                related_query_name='progress',
-                                null=True)
-    description = fields.RichTextField(_('description'), blank=True)
-    milestone = models.ManyToManyField(Milestone,
-                                related_name='progress',
-                                related_query_name='progress',)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                limit_choices_to={'is_active': True})
 
 
 class Literature(TimestampMixin, models.Model):
