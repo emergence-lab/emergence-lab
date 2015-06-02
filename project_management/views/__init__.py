@@ -3,4 +3,6 @@ from milestones import (MilestoneListView,
                         MilestoneDetailView,)
 from literature import (MendeleyOAuth,
                         LiteratureListView,
-                        MendeleyLibrarySearchView,)
+                        MendeleyLibrarySearchView,
+                        LiteratureLandingView,
+                        AddMendeleyObjectView,)

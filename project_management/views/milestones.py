@@ -6,7 +6,7 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from project_management.models import Milestone, ProgressUpdate
+from project_management.models import Milestone
 from project_management.forms import MilestoneCreateForm
 
 

@@ -12,6 +12,8 @@ from mendeley.session import MendeleySession
 from oauthlib.oauth2 import TokenExpiredError
 
 from core.views import ActionReloadView
+from core.models import Investigation
+from project_management.models import Literature, Milestone
 
 
 def pagination_helper(page, count, queryset):
@@ -101,3 +103,36 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
         #         literature = literature.next_page
         context['literature'] = pagination_helper(page, literature.count, literature)
         return context
+
+
+class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
+
+    template_name = 'project_management/literature_landing.html'
+    model = Literature
+
+    def get_queryset(self):
+        queryset = super(LiteratureLandingView, self).get_queryset()
+        return queryset.filter(user=self.request.user)
+
+
+class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        if not Literature.objects.filter(
+                user=self.request.user).filter(external_id=self.kwargs['external_id']).exists():
+            document = self.session.documents.get(self.kwargs['external_id'])
+            literature = Literature.objects.create(external_id=document.id,
+                                                    title=document.title,
+                                                    journal=document.source,
+                                                    year=document.year,
+                                                    abstract=document.abstract,
+                                                    doi_number=document.identifiers.get('doi',
+                                                                                        None),
+                                                    user=self.request.user)
+            if 'milestone' in self.kwargs:
+                literature.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
+            if 'investigation' in self.kwargs:
+                literature.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('literature_list')

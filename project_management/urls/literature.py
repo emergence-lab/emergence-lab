@@ -12,4 +12,13 @@ urlpatterns = [
     url(r'^search$',
         views.MendeleyLibrarySearchView.as_view(),
         name="mendeley_search"),
+    url(r'^$',
+        views.LiteratureLandingView.as_view(),
+        name="literature_landing"),
+    url(r'^add/(?P<milestone>[0-9]+)/(?P<external_id>[0-9a-f\w-]{36,})$',
+        views.AddMendeleyObjectView.as_view(),
+        name="add_mendeley_object"),
+    url(r'^add/(?P<investigation>[0-9]+)/(?P<external_id>[0-9a-f\w-]{36,})$',
+        views.AddMendeleyObjectView.as_view(),
+        name="add_mendeley_object"),
     ]
