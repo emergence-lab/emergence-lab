@@ -26,6 +26,8 @@ Development Setup
 Install Dependencies
 --------------------
 
+.. code::
+
     $ pip install -r requirements/development.txt
     $ bower install
 
@@ -34,6 +36,8 @@ Configure Application
 
 Copy the template secrets file and edit with database and ldap configuration.
 
+.. code::
+
     $ cp wbg/secrets.template.json wbg/secrets.json
     $ vim wbg/secrets.json
 
@@ -41,5 +45,7 @@ Running Tests
 -------------
 
 Tests are run using tox, environments configured are for python 2.7 and flake8. To run them, invoke tox from the command line.
+
+.. code::
 
     $ tox
