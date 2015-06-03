@@ -1,7 +1,9 @@
 {% extends 'project_management/pm_base.html' %}
 
-{% if milestone.user == request.user %}
+
 {% block pm_content %}
+
+{% if milestone.user == request.user %}
 
 <div>
   <div class="list-group">
@@ -19,5 +21,5 @@
     {% endfor %}
   </div>
 </div>
-{% endblock %}
 {% endif %}
+{% endblock %}
