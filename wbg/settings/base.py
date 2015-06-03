@@ -331,3 +331,10 @@ ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK', False)
 # Crispy Forms
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+
+# Mendeley
+
+ENABLE_MENDELEY = get_secret('ENABLE_MENDELEY', True)
+MENDELEY_ID = get_secret('MENDELEY_ID', '')
+MENDELEY_SECRET = get_secret('MENDELEY_SECRET', '')
