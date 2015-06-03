@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <h2 class="page-header">Project Management</h2>
+  <div class="col-md-2">
+    <ul class="nav nav-pils nav-stacked">
+      <li role="presentation"><a href="{% url 'pm_investigation_list' %}"><span class="glyphicon glyphicon-road"></span> Investigations</a></li>
+      <li role="presentation"><a href="{% url 'milestone_list' %}"><span class="glyphicon glyphicon-time"></span> Milstones</a></li>
+      <li role="presentation"><a href="{% url 'mendeley_search' %}"><span class="glyphicon glyphicon-book"></span> Literature</a></li>
+    </ul>
+  </div>
+  <div class="col-md-10">
+    {% block pm_content %}{% endblock %}
+  </div>
+</div>
+
+{% endblock content %}
