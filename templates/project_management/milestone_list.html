@@ -1,21 +1,14 @@
-{% extends 'core/base.html' %}
+{% extends 'project_management/pm_base.html' %}
 
 {% block title %}Milestones{% endblock title %}
 
-{% block content %}
+{% block pm_content %}
 
 <div class="container-fluid">
-  <h2 class="page-header">Project Management <small>Milestones</small></h2>
-  <div class=col-md-2>
-    <ul class="nav nav-pills nav-stacked">
-      <li role="presentation" class="active"><a href="#"><span class="glyphicon glyphicon-time"> Milestones</a></li>
-      <li role="presentation"><a href="#"><span class="glyphicon glyphicon-book"> Literature</a></li>
-    </ul>
-  </div>
-  <div class="col-md-10">
+  <div class="col-md-12">
     <div class="list-group">
       {% for milestone in object_list %}
-        <a href="#" class="list-group-item">
+        <a href="{% url 'milestone_detail' pk=milestone.id %}" class="list-group-item">
           <h4 class="list-group-item-heading">
             {{milestone.name}}
             <span class="label label-default">

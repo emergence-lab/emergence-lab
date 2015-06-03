@@ -1,21 +1,18 @@
-{% extends 'core/base.html' %}
+{% extends 'project_management/pm_base.html' %}
 
-{% block content %}
+{% if milestone.user == request.user %}
+{% block pm_content %}
 
-<h1 class="page-header">{{milestone.name}}</h1>
-<div class="col-md-8 col-md-offset-2">
+<div>
   <div class="list-group">
-    {% for update in progress %}
+    {% for update in milestone.investigation.target_actions.all %}
       <a class="list-group-item" href="#">
-        <h4 class="list-group-item-heading">{{update.created}}</h4>
+        <h4 class="list-group-item-heading">{{update.timestamp}}</h4>
         <p class="list-group-item-text">
-          {% if update.process %}
-            {{update.process.name}}
-            {{update.process.uuid}}
-          {% endif %}
-          {% if update.datafile %}
-            {{update.datafile}}
-          {% endif %}
+          {{update.action_object.type}}
+        </p>
+        <p class="list-group-item-text">
+          {{update.action_object.uuid}}
         </p>
       </a>
 
@@ -23,3 +20,4 @@
   </div>
 </div>
 {% endblock %}
+{% endif %}

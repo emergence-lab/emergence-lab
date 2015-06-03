@@ -1,14 +1,15 @@
-{% extends 'core/base.html' %}
+{% extends 'project_management/pm_base.html' %}
 
-{% block content %}
+{% block pm_content %}
 
 <div class="container-fluid">
-  <div class="col-md-6">
+  <div class="col-md-10">
     <form action={% url 'mendeley_search' %} method="get">
       <input id="query" type="text" name="query" class="form-control">
       <button class="btn btn-info" type="submit">Search</button>
   </div>
-  <div class=col-md-6>
+  <div class="spacer"></div>
+  <div class=col-md-10>
     <ul class="list-group">
 
     {% for item in literature.items %}
@@ -28,11 +29,26 @@
         {% if item.file_attached %}
           <!-- <a href="{{item.files.list.items.0.download_url}}" class="btn btn-default">Download</a> -->
         {% endif %}
-        <a href="{% url 'add_mendeley_object' milestone='1' external_id=item.id %}" class="btn btn-success">Add</a>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Add to... <span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li role="presentation" class="dropdown-header">Milestones</li>
+            {% for milestone in milestones %}
+            <li>
+              <a href="{% url 'add_mendeley_object_milestone' milestone=milestone.id external_id=item.id %}">{{milestone.name}}</a>
+            </li>
+            {% endfor %}
+            <li role="presentation" class="dropdown-header">Investigations</li>
+            {% for investigation in investigations %}
+            <li>
+              <a href="{% url 'add_mendeley_object_investigation' investigation=investigation.id external_id=item.id  %}">{{investigation.name|truncatewords:5}}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
       </li>
     {% endfor %}
     </ul>
-    {{literature.count}}
   </div>
 </div>
 {% endblock %}
