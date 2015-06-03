@@ -9,4 +9,5 @@ import project_management.views as views
 urlpatterns = [
     url(r'^milestones/', include('project_management.urls.milestones')),
     url(r'^literature/', include('project_management.urls.literature')),
+    url(r'^investigations/', include('project_management.urls.investigations')),
     ]
