@@ -76,13 +76,9 @@ class LiteratureListView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView
         context = super(LiteratureListView, self).get_context_data(**kwargs)
         literature = self.session.documents.list(page_size=10,view='tags')
         # literature = session.documents.search('Basic').list()
-        count = literature.count
-        if page and int(page) > 1 and int(page) <= count/10 :
-            number = int(page) - 1
-            # literature = session.documents.list(page_size=10,view='client')
-            for i in range(0,number):
-                literature = literature.next_page
-        context['literature'] = literature
+        context['literature'] = pagination_helper(page, literature.count, literature)
+        context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
+        context['investigations'] = Investigation.objects.all().filter(is_active=True)
         return context
 
 
@@ -94,14 +90,10 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
         page = self.request.GET.get('page', None)
         query = str(self.request.GET.get('query', None))
         context = super(MendeleyLibrarySearchView, self).get_context_data(**kwargs)
-        # literature = self.session.documents.list(page_size=10,view='tags')
         literature = self.session.documents.search(query).list()
-        # literature = pagination_helper(page, count, self.session.documents.search(query).list())
-        # if page and int(page) > 1 and int(page) <= count/10 :
-        #     number = int(page) - 1
-        #     for i in range(0,number):
-        #         literature = literature.next_page
         context['literature'] = pagination_helper(page, literature.count, literature)
+        context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
+        context['investigations'] = Investigation.objects.all().filter(is_active=True)
         return context
 
 
@@ -118,11 +110,18 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        if not Literature.objects.filter(
-                user=self.request.user).filter(external_id=self.kwargs['external_id']).exists():
+        tmp = Literature.objects.all().filter(external_id=self.kwargs['external_id'])
+        if tmp.filter(user=self.request.user).exists():
+            obj = tmp.filter(user=self.request.user).first()
+            if 'milestone' in self.kwargs and Milestone.objects.get(id=self.kwargs['milestone']) not in obj.milestones.all():
+                obj.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
+            if 'investigation' in self.kwargs and Investigation.objects.get(id=self.kwargs['investigation']) not in obj.investigations.all():
+                obj.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
+            obj.save()
+        else:
             document = self.session.documents.get(self.kwargs['external_id'])
             literature = Literature.objects.create(external_id=document.id,
-                                                    title=document.title,
+                                                    title=unicode(document.title),
                                                     journal=document.source,
                                                     year=document.year,
                                                     abstract=document.abstract,
@@ -133,6 +132,7 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
                 literature.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
             if 'investigation' in self.kwargs:
                 literature.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
+            literature.save()
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('literature_list')
