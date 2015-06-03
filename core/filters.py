@@ -10,8 +10,7 @@ from django.contrib.auth import get_user_model
 from datetimewidget.widgets import DateWidget
 import django_filters
 
-from core.models import Sample, Process
-from core.polymorphic import get_subclasses
+from core.models import Sample, ProcessType
 
 
 def _filter_process_type(queryset, value):
@@ -99,9 +98,8 @@ class SampleFilterSet(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super(SampleFilterSet, self).__init__(*args, **kwargs)
 
-        process_types = get_subclasses(Process) + [Process]
         self.filters['process_type'] = django_filters.MultipleChoiceFilter(
-            choices=[(p.slug, p.name) for p in process_types],
+            choices=[(p.type, p.name) for p in ProcessType.objects.all()],
             action=_filter_process_type)
         users = [(u.id, u.get_full_name())
                  for u in get_user_model().active_objects.all()]
