@@ -6,3 +6,4 @@ from literature import (MendeleyOAuth,
                         MendeleyLibrarySearchView,
                         LiteratureLandingView,
                         AddMendeleyObjectView,)
+from investigations import (InvestigationListView,)
