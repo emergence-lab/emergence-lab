@@ -6,6 +6,12 @@
 
 <div class="container-fluid">
   <div class="col-md-12">
+    <div>
+        <a href="{% url 'milestone_create' %}" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus"></span> Add Milestone
+        </a>
+    </div>
+    <div class="spacer-xs"></div>
     <div class="list-group">
       {% for milestone in object_list %}
         <a href="{% url 'milestone_detail' pk=milestone.id %}" class="list-group-item">

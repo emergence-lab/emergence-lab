@@ -1,11 +1,26 @@
 {% extends 'project_management/pm_base.html' %}
 
+{% block subtitle %}{{milestone.name}}{% endblock %}
 
 {% block pm_content %}
 
 {% if milestone.user == request.user %}
 
-<div>
+<div class="col-md-12">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      Description
+      <span class="pull-right"><span class="glyphicon glyphicon-time"></span> {{milestone.due_date}}</span>
+    </div>
+    <div class="panel-body">
+      {{milestone.description}}
+    </div>
+  </div>
+</div>
+<div class="col-md-6">
+  <div>
+    <h4>Processes</h4>
+  </div>
   <div class="list-group">
     {% for update in milestone.investigation.target_actions.all %}
       <a class="list-group-item" href="#">
@@ -15,6 +30,25 @@
         </p>
         <p class="list-group-item-text">
           {{update.action_object.uuid}}
+        </p>
+      </a>
+
+    {% endfor %}
+  </div>
+</div>
+<div class="col-md-6">
+  <div>
+    <h4>Literature</h4>
+  </div>
+  <div class="list-group">
+    {% for update in milestone.literature.all %}
+      <a class="list-group-item" href="#">
+        <h4 class="list-group-item-heading">{{update.title}}</h4>
+        <p class="list-group-item-text">
+          {{update.created}}
+        </p>
+        <p class="list-group-item-text">
+          {{update.doi}}
         </p>
       </a>
 
