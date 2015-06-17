@@ -4,8 +4,9 @@ from django.core.urlresolvers import reverse
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
+from actstream.models import model_stream
 
-from core.models import ProjectTracking, Investigation
+from core.models import ProjectTracking, Investigation, Process
 from project_management.models import Milestone, Literature
 
 
@@ -20,4 +21,14 @@ class LandingPageView(LoginRequiredMixin, generic.TemplateView):
         context['investigations'] = Investigation.objects.all().filter(project__in=projects)
         context['milestones'] = Milestone.objects.all().filter(user=self.request.user).filter(is_active=True)
         context['literature'] = Literature.objects.all().filter(user=self.request.user)
+        return context
+
+
+class NewsfeedView(LoginRequiredMixin, generic.TemplateView):
+
+    template_name = 'project_management/newsfeed.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(NewsfeedView, self).get_context_data(**kwargs)
+        context['process_stream'] = model_stream(Process)[:20]
         return context

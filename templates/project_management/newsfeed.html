@@ -1,0 +1,22 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block pm_content %}
+
+<div class="col-md-8 col-md-offset-1">
+  <ul class="media-list">
+    {% for process in process_stream %}
+    <li class="media">
+      <div class="media-left">
+        <a href="#"><span class="glyphicon glyphicon-user"></span></a>
+      </div>
+      <div class="media-body">
+        <p class="media-text">
+          {{process.actor.full_name}} {{process.verb}} a {{process.action_object.type}} <a href="{% url 'process_detail' process.action_object.uuid %}">({{process.action_object.uuid}})</a>
+          <span class="pull-right">{{process.timestamp|timesince}} ago</span>
+        </p>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

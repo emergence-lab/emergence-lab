@@ -12,4 +12,5 @@ from literature import (MendeleyOAuth,
 from investigations import (InvestigationListView,
                             InvestigationDetailView,)
 from projects import (ProjectListView,)
-from utility import (LandingPageView,)
+from utility import (LandingPageView,
+                        NewsfeedView,)
