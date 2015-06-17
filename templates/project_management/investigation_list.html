@@ -6,10 +6,12 @@
 
 <div class="container-fluid">
 </div>
-<div class="col-md-10">
+<div class="col-md-12">
+  <h4>This page lists investigations for the projects you track</h4>
+  <div class="spacer-xs"></div>
   <div class="list-group">
     {% for investigation in object_list %}
-    <div class="list-group-item">
+    <a href="{% url 'pm_investigation_detail' investigation.id %}" class="list-group-item">
       <h4 class="list-group-item-heading">
         {{ investigation.name }}
       </h4>
@@ -21,10 +23,10 @@
           {{ investigation.description|truncatewords:50 }}
         </div>
         {% for milestone in investigation.milestone.all %}
-          <span class="label label-primary">{{milestone.name}}</span>
+          <span class="label label-primary" href="{% url 'milestone_detail' milestone.id %}">{{milestone.name}}</span>
         {% endfor %}
       </p>
-    </div>
+    </a>
 
 
     {% endfor %}
