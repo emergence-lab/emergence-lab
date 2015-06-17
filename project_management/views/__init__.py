@@ -5,5 +5,10 @@ from literature import (MendeleyOAuth,
                         LiteratureListView,
                         MendeleyLibrarySearchView,
                         LiteratureLandingView,
-                        AddMendeleyObjectView,)
-from investigations import (InvestigationListView,)
+                        AddMendeleyObjectView,
+                        LiteratureRedirectorView,
+                        AddLiteratureObjectView,)
+from investigations import (InvestigationListView,
+                            InvestigationDetailView,)
+from projects import (ProjectListView,)
+from utility import (LandingPageView,)
