@@ -1,5 +1,7 @@
 {% extends 'project_management/pm_base.html' %}
 
+{% block subtitle %}Literature Search{% endblock %}
+
 {% block pm_content %}
 
 <div class="container-fluid">
@@ -9,7 +11,7 @@
           <input id="query" type="text" name="query" class="form-control">
         </div>
         <div class="col-md-2">
-          <button class="btn btn-info" type="submit">Search</button>
+          <button class="btn btn-info" type="submit"><span class="glyphicon glyphicon-search"></span> Search</button>
         </div>
       </form>
   </div>
