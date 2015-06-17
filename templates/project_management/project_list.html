@@ -1,0 +1,58 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+    {% if active_projects %}
+    <div>
+        <a href="{% url 'project_list' %}" class="btn btn-primary">
+            <span class="glyphicon glyphicon-star"></span> Track Project
+        </a>
+    </div>
+    <div class="spacer-xs"></div>
+    {% endif %}
+    {% for p in active_projects %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
+                <a href="{% url 'project_untrack' slug=p.slug %}" data-toggle="tooltip" data-title="Untrack" class="pull-right"><span class="glyphicon glyphicon-thumbs-down"></span></a>
+            </h3>
+
+        </div>
+        <div class="panel-body">
+            {{ p.description|safe|truncatewords:50 }}
+        </div>
+        <ul id="invest_list_{{p.id}}" class="list-group">
+            {% for i in p.investigation_set.all %}
+            <li class="list-group-item">
+                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}"> {{ i }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+<section class="col-lg-12 col-xs-12">
+    {% if active_projects %}
+
+    {# No projects being tracked #}
+    {% else %}
+        <div class="alert alert-info">
+            <h3>You don't have any active projects</h3>
+            <p>Get started by creating a new project or tracking an existing one.</p>
+            <div class="top-spacer-sm">
+                <a href="{% url 'project_create' %}" class="btn btn-success right-spacer-xs">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Create New Project
+                </a>
+                <a href="{% url 'project_list' %}" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-star"></span>
+                    Track Project
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}
