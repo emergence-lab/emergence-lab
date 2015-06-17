@@ -12,10 +12,9 @@
     <p>
       This module tracks literature that you've associated with your research.
     </p>
+    <a href="{% url 'literature_create' %}" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add New</a>
     {% if mendeley %}
-    <a href="{% url 'mendeley_search' %}" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Search Mendeley</a>
-    {% else %}
-    <a href="#" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add</a>
+    <a href="{% url 'mendeley_search' %}" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Add From Mendeley</a>
     {% endif %}
   </div>
   <ul class="list-group">

@@ -170,3 +170,9 @@ class AddLiteratureObjectView(LoginRequiredMixin, ActionReloadView):
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('literature_list')
+
+
+class CreateLiteratureObjectView(LoginRequiredMixin, generic.CreateView):
+
+    model = Literature
+    template_name = 'project_management/create_literature.html'

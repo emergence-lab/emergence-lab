@@ -24,4 +24,7 @@ urlpatterns = [
     url(r'^add/investigation/(?P<investigation>[0-9]+)/(?P<pk>[0-9]+)$',
         views.AddMendeleyObjectView.as_view(),
         name="add_literature_object_investigation"),
+    url(r'^create$',
+        views.CreateLiteratureObjectView.as_view(),
+        name="literature_create"),
     ]

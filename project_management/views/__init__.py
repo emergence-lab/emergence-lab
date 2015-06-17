@@ -7,7 +7,8 @@ from literature import (MendeleyOAuth,
                         LiteratureLandingView,
                         AddMendeleyObjectView,
                         LiteratureRedirectorView,
-                        AddLiteratureObjectView,)
+                        AddLiteratureObjectView,
+                        CreateLiteratureObjectView,)
 from investigations import (InvestigationListView,
                             InvestigationDetailView,)
 from projects import (ProjectListView,)
