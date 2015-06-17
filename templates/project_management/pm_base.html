@@ -3,12 +3,15 @@
 {% block content %}
 
 <div class="container-fluid">
-  <h2 class="page-header">Project Management</h2>
+  <h2 class="page-header">Project Management <small>{% block subtitle %}{% endblock subtitle %}</small></h2>
   <div class="col-md-2">
     <ul class="nav nav-pils nav-stacked">
+      <li role="presentation"><a href="{% url 'pm_landing' %}"><span class="glyphicon glyphicon-th-large"></span> Dashboard</a></li>
+      <li role="presentation"><a href="#"><span class="glyphicon glyphicon-tasks"></span> Newsfeed</a></li>
+      <li role="presentation"><a href="{% url 'pm_project_list' %}"><span class="glyphicon glyphicon-blackboard"></span> Projects</a></li>
       <li role="presentation"><a href="{% url 'pm_investigation_list' %}"><span class="glyphicon glyphicon-road"></span> Investigations</a></li>
       <li role="presentation"><a href="{% url 'milestone_list' %}"><span class="glyphicon glyphicon-time"></span> Milstones</a></li>
-      <li role="presentation"><a href="{% url 'mendeley_search' %}"><span class="glyphicon glyphicon-book"></span> Literature</a></li>
+      <li role="presentation"><a href="{% url 'literature_landing' %}"><span class="glyphicon glyphicon-book"></span> Literature</a></li>
     </ul>
   </div>
   <div class="col-md-10">
