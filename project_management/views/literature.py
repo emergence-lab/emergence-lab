@@ -151,7 +151,7 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
             literature.save()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('literature_list')
+        return reverse('literature_landing')
 
 
 class AddLiteratureObjectView(LoginRequiredMixin, ActionReloadView):
@@ -169,7 +169,7 @@ class AddLiteratureObjectView(LoginRequiredMixin, ActionReloadView):
         literature.save()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('literature_list')
+        return reverse('literature_landing')
 
 
 class CreateLiteratureObjectView(LoginRequiredMixin, generic.CreateView):
