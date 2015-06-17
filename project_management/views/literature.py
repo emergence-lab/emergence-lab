@@ -64,7 +64,7 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
         if 'token' not in self.request.session:
             return self.auth.get_login_url()
         else:
-            return reverse('literature_list')
+            return reverse('mendeley_search')
 
 
 class LiteratureListView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView):
@@ -97,6 +97,15 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
         return context
 
 
+class LiteratureRedirectorView(LoginRequiredMixin, generic.RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        if settings.ENABLE_MENDELEY:
+            return reverse('mendeley_search')
+        else:
+            return reverse('literature_landing')
+
+
 class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 
     template_name = 'project_management/literature_landing.html'
@@ -105,6 +114,13 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         queryset = super(LiteratureLandingView, self).get_queryset()
         return queryset.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super(LiteratureLandingView, self).get_context_data(**kwargs)
+        context['mendeley'] = settings.ENABLE_MENDELEY
+        context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
+        context['investigations'] = Investigation.objects.all().filter(is_active=True)
+        return context
 
 
 class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView):
@@ -133,6 +149,24 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
             if 'investigation' in self.kwargs:
                 literature.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
             literature.save()
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('literature_list')
+
+
+class AddLiteratureObjectView(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        literature = Literature.objects.all().get(id=self.kwargs.pk)
+        if 'milestone' in self.kwargs:
+            milestone = Milestone.objects.get(id=self.kwargs['milestone'])
+            if milestone not in literature.milestones:
+                literature.milestones.add(milestone)
+        if 'investigation' in self.kwargs:
+            investigation = Investigations.objects.get(id=self.kwargs['investigation'])
+            if milestone not in literature.milestones:
+                literature.investigations.add(investigation)
+        literature.save()
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('literature_list')

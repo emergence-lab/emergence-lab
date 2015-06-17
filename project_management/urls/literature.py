@@ -6,9 +6,6 @@ import project_management.views as views
 
 
 urlpatterns = [
-    url(r'^list$',
-        views.LiteratureListView.as_view(),
-        name="literature_list"),
     url(r'^search$',
         views.MendeleyLibrarySearchView.as_view(),
         name="mendeley_search"),
@@ -21,4 +18,10 @@ urlpatterns = [
     url(r'^add/investigation/(?P<investigation>[0-9]+)/(?P<external_id>[0-9a-f\w-]{36,})$',
         views.AddMendeleyObjectView.as_view(),
         name="add_mendeley_object_investigation"),
+    url(r'^add/milestone/(?P<milestone>[0-9]+)/(?P<pk>[0-9]+)$',
+        views.AddMendeleyObjectView.as_view(),
+        name="add_literature_object_milestone"),
+    url(r'^add/investigation/(?P<investigation>[0-9]+)/(?P<pk>[0-9]+)$',
+        views.AddMendeleyObjectView.as_view(),
+        name="add_literature_object_investigation"),
     ]
