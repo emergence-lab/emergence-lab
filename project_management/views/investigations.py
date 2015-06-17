@@ -8,10 +8,21 @@ from django.conf import settings
 from braces.views import LoginRequiredMixin
 
 from core.views import ActiveListView
-from core.models import Investigation
+from core.models import Investigation, ProjectTracking
 
 
 class InvestigationListView(LoginRequiredMixin, ActiveListView):
 
     template_name = 'project_management/investigation_list.html'
+    model = Investigation
+
+    def get_queryset(self):
+        queryset = super(InvestigationListView, self).get_queryset()
+        projects = [x.project for x in ProjectTracking.objects.all().filter(user=self.request.user)]
+        return queryset.filter(project__in=projects)
+
+
+class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
+
+    template_name = 'project_management/investigation_detail.html'
     model = Investigation

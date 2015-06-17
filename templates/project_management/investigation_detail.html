@@ -1,0 +1,55 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block subtitle %}{{investigation.name}}{% endblock %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      Description
+    </div>
+    <div class="panel-body">
+      {{investigation.description}}
+    </div>
+  </div>
+</div>
+<div class="col-md-6">
+  <div>
+    <h4>Processes</h4>
+  </div>
+  <div class="list-group">
+    {% for update in investigation.target_actions.all %}
+      <a class="list-group-item" href="{% url 'process_detail' update.action_object.uuid %}">
+        <h4 class="list-group-item-heading">{{update.timestamp}}</h4>
+        <p class="list-group-item-text">
+          {{update.action_object.type}}
+        </p>
+        <p class="list-group-item-text">
+          {{update.action_object.uuid}}
+        </p>
+      </a>
+
+    {% endfor %}
+  </div>
+</div>
+<div class="col-md-6">
+  <div>
+    <h4>Literature</h4>
+  </div>
+  <div class="list-group">
+    {% for update in investigation.literature.all %}
+      <a class="list-group-item" href="#">
+        <h4 class="list-group-item-heading">{{update.title}}</h4>
+        <p class="list-group-item-text">
+          {{update.created}}
+        </p>
+        <p class="list-group-item-text">
+          {{update.doi}}
+        </p>
+      </a>
+
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
