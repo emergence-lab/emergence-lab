@@ -168,7 +168,7 @@ def process_actstream(sender, instance=None, created=False, **kwargs):
         print(instance.user)
         print(investigation)
         action.send(instance.user,
-                    verb='created process',
+                    verb='created',
                     action_object=instance,
                     target=investigation)
         print('Action sent.')
