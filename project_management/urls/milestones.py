@@ -15,4 +15,7 @@ urlpatterns = [
     url(r'^detail/(?P<pk>[0-9]+)$',
         views.MilestoneDetailView.as_view(),
         name="milestone_detail"),
+    url(r'^edit/(?P<pk>[0-9]+)$',
+        views.MilestoneUpdateView.as_view(),
+        name="milestone_edit"),
     ]

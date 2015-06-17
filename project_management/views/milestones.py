@@ -7,7 +7,7 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 
 from project_management.models import Milestone
-from project_management.forms import MilestoneCreateForm
+from project_management.forms import MilestoneForm
 
 
 class MilestoneListView(LoginRequiredMixin, generic.ListView):
@@ -25,7 +25,18 @@ class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
     model = Milestone
     template_name = 'project_management/milestone_create.html'
     fields = '__all__'
-    form_class = MilestoneCreateForm
+    form_class = MilestoneForm
+
+    def get_success_url(self):
+        return reverse('milestone_list')
+
+
+class MilestoneUpdateView(LoginRequiredMixin, generic.UpdateView):
+
+    model = Milestone
+    template_name = 'project_management/milestone_update.html'
+    fields = '__all__'
+    form_class = MilestoneForm
 
     def get_success_url(self):
         return reverse('milestone_list')
