@@ -26,7 +26,7 @@
         <ul id="invest_list_{{p.id}}" class="list-group">
             {% for i in p.investigation_set.all %}
             <li class="list-group-item">
-                <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}"> {{ i }}</a>
+                <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
             </li>
             {% endfor %}
         </ul>
