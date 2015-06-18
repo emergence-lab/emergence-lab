@@ -10,6 +10,7 @@
         <a href="{% url 'milestone_create' %}" class="btn btn-success">
             <span class="glyphicon glyphicon-plus"></span> Add Milestone
         </a>
+        <h4 class="pull-right">This page lists milestones you've created for your investigations.</h4>
     </div>
     <div class="spacer-xs"></div>
     <div class="list-group">
@@ -23,7 +24,7 @@
             <span class="pull-right">Due: {{milestone.due_date}}</span>
           </h4>
           <p class="list-group-item-text">
-            {{milestone.investigation.target_actions.all|length}} Progress Updates
+            {{milestone.processes.all|length}} Progress Updates
             &emsp;&emsp;
             {{milestone.literature.all|length}} Literature Documents
             <br></br>

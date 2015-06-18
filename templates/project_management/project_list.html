@@ -5,9 +5,13 @@
 <div class="col-md-12">
     {% if active_projects %}
     <div>
-        <a href="{% url 'project_list' %}" class="btn btn-primary">
-            <span class="glyphicon glyphicon-star"></span> Track Project
-        </a>
+      <a href="{% url 'project_create' %}" class="btn btn-success">
+          <span class="glyphicon glyphicon-plus"></span> Add New Project
+      </a>
+      <a href="{% url 'project_list' %}" class="btn btn-primary">
+          <span class="glyphicon glyphicon-star"></span> Track Existing Project
+      </a>
+      <h4 class="pull-right">This page lists the projects that you track.</h4>
     </div>
     <div class="spacer-xs"></div>
     {% endif %}

@@ -9,6 +9,7 @@ from braces.views import LoginRequiredMixin
 
 from core.views import ActiveListView
 from core.models import Investigation, ProjectTracking
+from project_management.forms import InvestigationForm
 
 
 class InvestigationListView(LoginRequiredMixin, ActiveListView):
@@ -26,3 +27,14 @@ class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
 
     template_name = 'project_management/investigation_detail.html'
     model = Investigation
+
+
+class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
+
+    model = Investigation
+    template_name = 'project_management/investigation_create.html'
+
+    # def get_form(self, form_class=None):
+    #     user = self.request.user
+    #     form_class = super(InvestigationCreateView, self).get_form(form_class(user))
+    #     return form_class
