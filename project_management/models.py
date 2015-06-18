@@ -9,8 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 import autoslug
 
 from core.models import ActiveStateMixin, TimestampMixin, fields
-from core.models import Investigation, Process, DataFile
-
+from core.models import Investigation
 
 
 class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
@@ -27,6 +26,13 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
                                 null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
+
+    class Meta:
+        verbose_name = _('milestone')
+        verbose_name_plural = _('milestones')
+
+    def __str__(self):
+        return self.name
 
 
 class Literature(TimestampMixin, models.Model):

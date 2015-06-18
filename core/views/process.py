@@ -257,6 +257,7 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
                 initial={
                     'user': self.request.user,
                 },
+                user=self.request.user,
                 prefix='process'),
             'sample_formset': SampleFormSet(prefix='sample'),
         }

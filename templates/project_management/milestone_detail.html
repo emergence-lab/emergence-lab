@@ -22,14 +22,14 @@
     <h4>Processes</h4>
   </div>
   <div class="list-group">
-    {% for update in milestone.investigation.target_actions.all %}
+    {% for process in milestone.processes.all %}
       <a class="list-group-item" href="#">
-        <h4 class="list-group-item-heading">{{update.timestamp}}</h4>
+        <h4 class="list-group-item-heading">{{process.created}}</h4>
         <p class="list-group-item-text">
-          {{update.action_object.type}}
+          {{process.type}}
         </p>
         <p class="list-group-item-text">
-          {{update.action_object.uuid}}
+          {{process.uuid}}
         </p>
       </a>
 

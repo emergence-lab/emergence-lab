@@ -15,6 +15,7 @@ import polymorphic
 
 from core.models.mixins import TimestampMixin, UUIDMixin
 from core.models import fields, Investigation
+from project_management.models import Milestone
 
 
 def get_file_path(instance, filename):
@@ -70,6 +71,9 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
 
     investigations = models.ManyToManyField(Investigation,
         related_name='processes', related_query_name='process',)
+
+    milestones = models.ManyToManyField(Milestone,
+        related_name='processes', related_query_name='milestone',)
 
     objects = models.Manager()
     generic = ProcessTypeManager(process_type='generic-process')
