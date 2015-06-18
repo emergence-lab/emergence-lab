@@ -268,7 +268,7 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        info_form = WizardBasicInfoForm(request.POST, prefix='process')
+        info_form = WizardBasicInfoForm(self.request.user, request.POST, prefix='process')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
 
         if sample_formset.is_valid():
@@ -284,7 +284,8 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
             return HttpResponseRedirect(reverse('process_detail',
                                                 kwargs={'uuid': self.object.uuid}))
         else:
-            basic_info_form = WizardBasicInfoForm(request.POST, prefix='process')
+            basic_info_form = WizardBasicInfoForm(self.request.user, request.POST,
+                                                    prefix='process')
             return self.render_to_response(self.get_context_data(
                 info_form=basic_info_form,
                 sample_formset=sample_formset))

@@ -108,6 +108,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                     'legacy_identifier': growth_number,
                     'type': ProcessType.objects.get(type='d180-growth'),
                 },
+                user=self.request.user,
                 prefix='process'),
             'growth_form': WizardGrowthInfoForm(prefix='growth'),
             'checklist_form': WizardPrerunChecklistForm(prefix='checklist'),
@@ -158,7 +159,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
 
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
-            process_form = WizardBasicProcessForm(request.POST, prefix='process')
+            process_form = WizardBasicProcessForm(self.request.user, request.POST,
+                                                    prefix='process')
             growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')
             comment_form = CommentsForm(request.POST, prefix='process')
             return self.render_to_response(self.get_context_data(

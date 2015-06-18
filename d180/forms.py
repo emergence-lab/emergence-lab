@@ -7,13 +7,18 @@ from django.utils.translation import ugettext_lazy as _
 from core.forms import ChecklistForm
 from core.models import Process
 from d180.models import D180Readings, D180Source, D180GrowthInfo
+from project_management.models import Milestone
 
 
 class WizardBasicProcessForm(forms.ModelForm):
 
+    def __init__(self, user, *args, **kwargs):
+        super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
+        self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
+
     class Meta:
         model = Process
-        fields = ('user', 'investigations', 'legacy_identifier', 'type')
+        fields = ('user', 'investigations', 'legacy_identifier', 'type', 'milestones')
         widgets = {
             'type': forms.HiddenInput(),
         }
@@ -69,7 +74,8 @@ class WizardFullProcessForm(forms.ModelForm):
 
     class Meta:
         model = Process
-        fields = ('user', 'investigations', 'comment', 'legacy_identifier', 'type')
+        fields = ('user', 'investigations', 'comment', 'legacy_identifier', 'type',
+                    'milestones')
 
 
 class WizardPrerunChecklistForm(ChecklistForm):
