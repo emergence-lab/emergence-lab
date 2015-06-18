@@ -5,16 +5,18 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.models import User, Project
+from core.views import NeverCacheMixin
+from core.models import ProjectTracking, Project
 
 
-class ProjectListView(LoginRequiredMixin, generic.TemplateView):
+class ProjectListView(LoginRequiredMixin, NeverCacheMixin, generic.TemplateView):
 
     template_name = 'project_management/project_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
-        projects = (User.objects.filter(pk=self.request.user.id)
-                                .values_list('projects__id', flat=True))
-        context['active_projects'] = Project.active_objects.filter(id__in=projects)
+        projects_tracked = [x.project_id for x in ProjectTracking.objects.filter(user=self.request.user)]
+        context['my_active_projects'] = Project.active_objects.filter(id__in=projects_tracked)
+        context['active_projects'] = Project.active_objects.exclude(id__in=projects_tracked)
+        context['inactive_projects'] = Project.inactive_objects.all()
         return context

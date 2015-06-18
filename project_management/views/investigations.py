@@ -34,7 +34,7 @@ class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
     model = Investigation
     template_name = 'project_management/investigation_create.html'
 
-    # def get_form(self, form_class=None):
-    #     user = self.request.user
-    #     form_class = super(InvestigationCreateView, self).get_form(form_class(user))
-    #     return form_class
+    def get_form_kwargs(self):
+        kwargs = super(InvestigationCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
