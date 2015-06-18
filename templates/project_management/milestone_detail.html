@@ -22,7 +22,7 @@
     <h4>Processes</h4>
   </div>
   <div class="list-group">
-    {% for process in milestone.processes.all %}
+    {% for process in milestone.processes.all reversed %}
       <a class="list-group-item" href="#">
         <h4 class="list-group-item-heading">{{process.created}}</h4>
         <p class="list-group-item-text">
@@ -41,7 +41,7 @@
     <h4>Literature</h4>
   </div>
   <div class="list-group">
-    {% for update in milestone.literature.all %}
+    {% for update in milestone.literature.all reversed %}
       <a class="list-group-item" href="#">
         <h4 class="list-group-item-heading">{{update.title}}</h4>
         <p class="list-group-item-text">
