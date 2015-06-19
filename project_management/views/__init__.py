@@ -1,7 +1,9 @@
 from milestones import (MilestoneListView,
                         MilestoneCreateView,
                         MilestoneDetailView,
-                        MilestoneUpdateView,)
+                        MilestoneUpdateView,
+                        MilestoneCloseView,
+                        MilestoneReOpenView,)
 from literature import (MendeleyOAuth,
                         LiteratureListView,
                         MendeleyLibrarySearchView,

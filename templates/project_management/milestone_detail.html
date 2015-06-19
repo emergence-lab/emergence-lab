@@ -7,9 +7,17 @@
 {% if milestone.user == request.user %}
 
 <div class="col-md-12">
-  <div class="panel panel-info">
+  <div>
+    {% if milestone.is_active %}
+    <a href="{% url 'milestone_close' milestone.slug %}" class="btn btn-danger">Close Milestone</a>
+    {% else %}
+    <a href="{% url 'milestone_open' milestone.slug %}" class="btn btn-success">Re-Open Milestone</a>
+    {% endif %}
+  </div>
+  <div class="spacer-xs"></div>
+  <div class="panel {% if milestone.is_active and milestone.due_date < today.date %}panel-warning{%else%}panel-info{%endif%}">
     <div class="panel-heading">
-      Description
+      {% if milestone.is_active and milestone.due_date < today.date %}<strong>Expired</strong>{%else%}Description{%endif%}
       <span class="pull-right"><span class="glyphicon glyphicon-time"></span> {{milestone.due_date}}</span>
     </div>
     <div class="panel-body">
@@ -29,7 +37,7 @@
           {{process.type}}
         </p>
         <p class="list-group-item-text">
-          {{process.uuid}}
+          {{process.uuid}} {% if process.legacy_identifier %}({{process.legacy_identifier}}){% endif %}
         </p>
       </a>
 

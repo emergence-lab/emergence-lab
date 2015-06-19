@@ -21,7 +21,7 @@
         <div class="list-group">
           {% for milestone in object_list %}
           {% if milestone.is_active %}
-            <a href="{% url 'milestone_detail' pk=milestone.id %}" class="list-group-item">
+            <a href="{% url 'milestone_detail' slug=milestone.slug %}" class="list-group-item {% if milestone.due_date < today.date %}list-group-item-warning{%endif%}">
               <h4 class="list-group-item-heading">
                 {{milestone.name}}
                 <span class="label label-default">
@@ -38,8 +38,7 @@
               <p class="list-group-item-text">
                 <div class="well">{{milestone.description}}</div>
               </p>
-              <p>
-
+              <p class="list-group-item-text">
               </p>
             </a>
           {% endif %}
@@ -50,7 +49,7 @@
         <div class="list-group">
           {% for milestone in object_list %}
           {% if not milestone.is_active %}
-            <a href="{% url 'milestone_detail' pk=milestone.id %}" class="list-group-item">
+            <a href="{% url 'milestone_detail' slug=milestone.slug %}" class="list-group-item">
               <h4 class="list-group-item-heading">
                 {{milestone.name}}
                 <span class="label label-default">
