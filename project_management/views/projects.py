@@ -20,3 +20,13 @@ class ProjectListView(LoginRequiredMixin, NeverCacheMixin, generic.TemplateView)
         context['active_projects'] = Project.active_objects.exclude(id__in=projects_tracked)
         context['inactive_projects'] = Project.inactive_objects.all()
         return context
+
+
+class ProjectUpdateView(LoginRequiredMixin, generic.UpdateView):
+
+    model = Project
+    template_name = 'project_management/project_edit.html'
+    fields = '__all__'
+
+    def get_success_url(self):
+        return reverse('pm_project_list')
