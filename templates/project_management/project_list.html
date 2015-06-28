@@ -29,7 +29,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title">
-                <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
+                <a href="{% url 'pm_project_edit' slug=p.slug %}">{{ p }}</a>
                 <a href="{% url 'project_untrack' slug=p.slug %}" data-toggle="tooltip" data-title="Untrack" class="pull-right"><span class="glyphicon glyphicon-star"></span></a>
                 <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down">&emsp;</span></a>
             </h3>
@@ -52,7 +52,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">
-                <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
+                <a href="{% url 'pm_project_edit' slug=p.slug %}">{{ p }}</a>
                 <a href="{% url 'project_track' slug=p.slug %}" data-toggle="tooltip" data-title="Track" class="pull-right"><span class="glyphicon glyphicon-star-empty"></span></a>
                 <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down">&emsp;</span></a>
             </h3>
@@ -75,7 +75,7 @@
     <div class="panel panel-danger">
         <div class="panel-heading">
             <h3 class="panel-title">
-                <a href="{% url 'project_detail_dashboard' slug=p.slug %}">{{ p }}</a>
+                <a href="{% url 'pm_project_edit' slug=p.slug %}">{{ p }}</a>
             </h3>
 
         </div>
