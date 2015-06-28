@@ -110,6 +110,7 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 
     template_name = 'project_management/literature_landing.html'
     model = Literature
+    paginate_by = 25
 
     def get_queryset(self):
         queryset = super(LiteratureLandingView, self).get_queryset()
