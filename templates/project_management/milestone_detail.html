@@ -8,6 +8,7 @@
 
 <div class="col-md-12">
   <div>
+    <a href="{% url 'milestone_edit' milestone.slug %}" class="btn btn-warning">Edit Milestone</a>
     {% if milestone.is_active %}
     <a href="{% url 'milestone_close' milestone.slug %}" class="btn btn-danger">Close Milestone</a>
     {% else %}
