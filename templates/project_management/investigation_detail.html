@@ -20,15 +20,13 @@
   </div>
   <div class="list-group">
     {% for update in investigation.target_actions.all %}
-      <a class="list-group-item" href="{% url 'process_detail' update.action_object.uuid %}">
-        <h4 class="list-group-item-heading">{{update.timestamp}}</h4>
+      <div class="list-group-item">
+        <h4 class="list-group-item-heading">{{update.action_object.type}} <a data-toggle="tooltip" title="{{update.action_object.comment|safe}}" href="{% url 'process_detail' update.action_object.uuid %}">({{update.action_object.uuid}}{% if update.action_object.legacy_identifier %}, {{update.action_object.legacy_identifier}}{%endif%})</a></h4>
         <p class="list-group-item-text">
-          {{update.action_object.type}}
+          {{update.timestamp}}
+
         </p>
-        <p class="list-group-item-text">
-          {{update.action_object.uuid}}
-        </p>
-      </a>
+      </div>
 
     {% endfor %}
   </div>

@@ -32,15 +32,15 @@
   </div>
   <div class="list-group">
     {% for process in milestone.processes.all reversed %}
-      <a class="list-group-item" href="#">
-        <h4 class="list-group-item-heading">{{process.created}}</h4>
+      <div class="list-group-item" href="#">
+        <h4 class="list-group-item-heading">{{process.type}} <a href="{% url 'process_detail' process.uuid %}" data-toggle="tooltip" title="{{process.comment|safe}}">({{process.uuid}}{% if process.legacy_identifier %}, {{process.legacy_identifier}}{% endif %})</a></h4>
         <p class="list-group-item-text">
           {{process.type}}
         </p>
         <p class="list-group-item-text">
           {{process.uuid}} {% if process.legacy_identifier %}({{process.legacy_identifier}}){% endif %}
         </p>
-      </a>
+      </div>
 
     {% endfor %}
   </div>
