@@ -11,7 +11,10 @@ from literature import (MendeleyOAuth,
                         AddMendeleyObjectView,
                         LiteratureRedirectorView,
                         AddLiteratureObjectView,
-                        CreateLiteratureObjectView,)
+                        CreateLiteratureObjectView,
+                        LiteratureDetailView,
+                        LiteratureDetailRedirector,
+                        MendeleyDetailView,)
 from investigations import (InvestigationListView,
                             InvestigationDetailView,
                             InvestigationCreateView,)

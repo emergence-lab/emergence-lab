@@ -27,4 +27,13 @@ urlpatterns = [
     url(r'^create$',
         views.CreateLiteratureObjectView.as_view(),
         name="literature_create"),
+    url(r'^detail/redirect/(?P<pk>[0-9]+)$',
+        views.LiteratureDetailRedirector.as_view(),
+        name="literature_detail_redirector"),
+    url(r'^detail/internal/(?P<pk>[0-9]+)$',
+        views.LiteratureDetailView.as_view(),
+        name="literature_detail"),
+    url(r'^detail/external/(?P<external_id>[0-9a-f\w-]{36,})$',
+        views.MendeleyDetailView.as_view(),
+        name="mendeley_detail"),
     ]

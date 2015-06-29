@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+from time import sleep
+
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.conf import settings
@@ -9,6 +11,7 @@ from django.http import HttpResponseRedirect
 from braces.views import LoginRequiredMixin
 from mendeley import Mendeley
 from mendeley.session import MendeleySession
+from mendeley.exception import MendeleyApiException
 from oauthlib.oauth2 import TokenExpiredError
 
 from core.views import ActionReloadView
@@ -90,7 +93,14 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
         page = self.request.GET.get('page', None)
         query = str(self.request.GET.get('query', None))
         context = super(MendeleyLibrarySearchView, self).get_context_data(**kwargs)
-        literature = self.session.documents.search(query).list()
+        try:
+            literature = self.session.documents.search(query).list()
+        except MendeleyApiException:
+            try:
+                sleep(1)
+                literature = self.session.documents.search(query).list()
+            except:
+                raise
         context['literature'] = pagination_helper(page, literature.count, literature)
         context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
         context['investigations'] = Investigation.objects.all().filter(is_active=True)
@@ -144,7 +154,7 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
                                                     abstract=document.abstract,
                                                     doi_number=document.identifiers.get('doi',
                                                                                         None),
-                                                    user=self.request.user)
+                                                    user=self.request.user,)
             if 'milestone' in self.kwargs:
                 literature.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
             if 'investigation' in self.kwargs:
@@ -177,3 +187,33 @@ class CreateLiteratureObjectView(LoginRequiredMixin, generic.CreateView):
 
     model = Literature
     template_name = 'project_management/create_literature.html'
+
+
+class LiteratureDetailRedirector(LoginRequiredMixin, generic.RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        literature = Literature.objects.get(id=self.kwargs['pk'])
+        if literature.user == self.request.user:
+            if literature.external_id:
+                return reverse('mendeley_detail', kwargs={'external_id': literature.external_id})
+            else:
+                return reverse('literature_detail', kwargs={'pk': literature.id})
+        else:
+            return reverse('literature_landing')
+
+
+class LiteratureDetailView(LoginRequiredMixin, generic.DetailView):
+
+    model = Literature
+    template_name = 'project_management/literature_detail.html'
+
+
+class MendeleyDetailView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView):
+
+    template_name = 'project_management/literature_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MendeleyDetailView, self).get_context_data(**kwargs)
+        context['literature'] = self.session.documents.get(self.kwargs['external_id'])
+        print(context['literature'].title)
+        return context

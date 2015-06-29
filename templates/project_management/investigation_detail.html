@@ -39,7 +39,7 @@
   </div>
   <div class="list-group">
     {% for update in investigation.literature.all reversed %}
-      <a class="list-group-item" href="#">
+      <a class="list-group-item" href="{% url 'literature_detail_redirector' update.id %}">
         <h4 class="list-group-item-heading">{{update.title}}</h4>
         <p class="list-group-item-text">
           {{update.created}}
