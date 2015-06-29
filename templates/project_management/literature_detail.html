@@ -1,0 +1,23 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block subtitle %}Literature Detail{% endblock %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+  <h4>{{literature.title}}</h4>
+  {% if literature.authors %}
+  <p>Authors <strong>{% for author in literature.authors %}&mdash; {{author.first_name}} {{author.last_name}} {%endfor%}&mdash;</strong></p>
+  {% endif %}
+  {% if literature.abstract %}<p><strong>Abstract:</strong> {{literature.abstract}}</p>{%endif%}
+  {% if literature.identifiers.doi %} <p><strong>DOI:</strong> {{literature.identifiers.doi}}</p> {% endif %}
+  {% if literature.doi_number %} <p><strong>DOI:</strong> {{literature.doi_number}}</p> {% endif %}
+  {% if literature.year %} <p><strong>Year:</strong> {{literature.year}}</p> {% endif %}
+  {% if literature.journal %} <p><strong>Journal:</strong> {{literature.journal}}</p> {% endif %}
+  {% if literature.source %} <p><strong>Source:</strong> {{literature.source}}</p> {% endif %}
+  {% if literature.keywords %} <p><strong>Keywords:</strong> {{literature.keywords}}</p> {% endif %}
+  {% if literature.files %}
+  <a href="{{literature.files.list.items.0.download_url}}" class="btn btn-default">Download</a>
+  {% endif %}
+</div>
+{% endblock %}
