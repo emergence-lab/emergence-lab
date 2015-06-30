@@ -39,3 +39,6 @@ class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
         kwargs = super(InvestigationCreateView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+
+    def get_success_url(self):
+        return reverse('pm_investigation_list')
