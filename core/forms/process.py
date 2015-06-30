@@ -7,8 +7,7 @@ from django import forms
 
 from crispy_forms import helper, layout
 
-from core.models import DataFile, Process, ProcessTemplate
-from project_management.models import Milestone
+from core.models import DataFile, Process, ProcessTemplate, Milestone
 
 
 class DropzoneForm(forms.ModelForm):

@@ -6,8 +6,8 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 from actstream.models import model_stream
 
-from core.models import ProjectTracking, Investigation, Process
-from project_management.models import Milestone, Literature
+from core.models import ProjectTracking, Investigation, Process, Milestone
+from project_management.models import Literature
 
 
 class LandingPageView(LoginRequiredMixin, generic.TemplateView):

@@ -5,9 +5,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from core.forms import ChecklistForm
-from core.models import Process
+from core.models import Process, Milestone
 from d180.models import D180Readings, D180Source, D180GrowthInfo
-from project_management.models import Milestone
 
 
 class WizardBasicProcessForm(forms.ModelForm):

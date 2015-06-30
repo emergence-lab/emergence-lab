@@ -14,8 +14,7 @@ from actstream import action
 import polymorphic
 
 from core.models.mixins import TimestampMixin, UUIDMixin
-from core.models import fields, Investigation
-from project_management.models import Milestone
+from core.models import fields, Investigation, Milestone
 
 
 def get_file_path(instance, filename):

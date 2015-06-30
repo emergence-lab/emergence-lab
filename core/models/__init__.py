@@ -10,6 +10,7 @@ from .mixins import (
 from .project import (
     Project,
     Investigation,
+    Milestone,
     ProjectTracking,
 )
 from .user import User

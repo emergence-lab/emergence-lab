@@ -3,36 +3,9 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-import autoslug
-
-from core.models import ActiveStateMixin, TimestampMixin, fields
-from core.models import Investigation
-
-
-class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
-    """
-    Stores information related to short-term project goals.
-    """
-    due_date = models.DateField()
-    name = models.CharField(_('name'), max_length=45)
-    slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
-    description = fields.RichTextField(_('description'), blank=True)
-    investigation = models.ForeignKey(Investigation,
-                                related_name='milestone',
-                                related_query_name='milestone',
-                                null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                limit_choices_to={'is_active': True})
-
-    class Meta:
-        verbose_name = _('milestone')
-        verbose_name_plural = _('milestones')
-
-    def __str__(self):
-        return self.name
+from core.models import TimestampMixin, fields, Milestone, Investigation
 
 
 class Literature(TimestampMixin, models.Model):

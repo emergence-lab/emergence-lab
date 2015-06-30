@@ -5,8 +5,7 @@ from django import forms
 
 from datetimewidget.widgets import DateWidget
 
-from .models import Milestone
-from core.models import Investigation, ProjectTracking, Project
+from core.models import Investigation, ProjectTracking, Project, Milestone
 
 
 class MilestoneForm(forms.ModelForm):

@@ -15,8 +15,8 @@ from mendeley.exception import MendeleyApiException
 from oauthlib.oauth2 import TokenExpiredError
 
 from core.views import ActionReloadView
-from core.models import Investigation
-from project_management.models import Literature, Milestone
+from core.models import Investigation, Milestone
+from project_management.models import Literature
 
 
 def pagination_helper(page, count, queryset):

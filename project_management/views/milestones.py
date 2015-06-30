@@ -9,8 +9,8 @@ from datetime import datetime
 from braces.views import LoginRequiredMixin
 
 from core.views import ActionReloadView
+from core.models import Milestone
 
-from project_management.models import Milestone
 from project_management.forms import MilestoneForm
 
 
