@@ -137,7 +137,7 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        tmp = Literature.objects.all().filter(external_id=self.kwargs['external_id'])
+        tmp = Literature.objects.all().filter(id=self.kwargs['pk'])
         if tmp.filter(user=self.request.user).exists():
             obj = tmp.filter(user=self.request.user).first()
             if 'milestone' in self.kwargs and Milestone.objects.get(id=self.kwargs['milestone']) not in obj.milestones.all():
@@ -146,7 +146,7 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
                 obj.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
             obj.save()
         else:
-            document = self.session.documents.get(self.kwargs['external_id'])
+            document = self.session.documents.get(tmp.external_id)
             literature = Literature.objects.create(external_id=document.id,
                                                     title=unicode(document.title),
                                                     journal=document.source,
