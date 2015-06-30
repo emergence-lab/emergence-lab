@@ -6,7 +6,7 @@ from django import forms
 from datetimewidget.widgets import DateWidget
 
 from .models import Milestone
-from core.models import Investigation, ProjectTracking
+from core.models import Investigation, ProjectTracking, Project
 
 
 class MilestoneForm(forms.ModelForm):
@@ -31,9 +31,11 @@ class MilestoneForm(forms.ModelForm):
 class InvestigationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
+        user=kwargs.pop('user')
         super(InvestigationForm, self).__init__(*args, **kwargs)
-        queryset = [x.project for x in ProjectTracking.objects.filter(user=self.kwargs['user'])]
-        self.fields['project'].queryset = queryset
+        project_tracking = [x.project_id for x in ProjectTracking.objects.all().filter(user=user)]
+        projects = Project.objects.all().filter(id__in=project_tracking)
+        self.fields['project'].queryset = projects
 
     class Meta:
         model = Investigation
