@@ -39,7 +39,7 @@
         <h3 class="page-header">
             <div class="clearfix">
                 {{process.name}} Details
-                {% if readings %}
+                {% if process.type_id == 'd180-growth' %}
                     <a class="pull-right btn btn-info" href="{% url 'd180_readings_detail' process %}">
                         {% bootstrap_icon 'list' %}
                         Readings
@@ -49,6 +49,13 @@
         </h3>
         <p>Created by {{process.user.get_full_name}} on {{process.created}}</p>
         <p>Last modified {{process.modified}}</p>
+        {% if process.type_id == 'd180-growth' %}
+            <p>
+                Growth of ({{process.info.orientation}}) {{process.info.material}}
+                with {{process.info.doping}} doping(s){% if process.info.growth_features %} and {{process.info.growth_features}}{% endif %}.
+            </p>
+            <p>Run using {{process.info.platter.name}}</p>
+        {% endif %}
         {% if process.comment %}
             <p>{{process.comment|safe}}</p>
         {% else %}
