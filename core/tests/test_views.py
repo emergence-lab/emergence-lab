@@ -165,7 +165,7 @@ class TestProjectCRUD(TestCase):
     def test_project_activate(self):
         obj = Project.objects.filter(is_active=False).first()
         url = reverse('project_activate', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Project.objects.get(id=obj.id)
 
@@ -175,7 +175,7 @@ class TestProjectCRUD(TestCase):
     def test_project_deactivate(self):
         obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_deactivate', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Project.objects.get(id=obj.id)
 
@@ -185,7 +185,7 @@ class TestProjectCRUD(TestCase):
     def test_project_track(self):
         obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_track', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 
@@ -197,7 +197,7 @@ class TestProjectCRUD(TestCase):
         obj = Project.objects.filter(is_active=True).first()
         tracking = ProjectTracking.objects.create(user=self.user, project=obj)
         url = reverse('project_untrack', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 

@@ -165,13 +165,8 @@ class ProcessTemplate(TimestampMixin, models.Model):
 
 @receiver(models.signals.m2m_changed, sender=Process.investigations.through)
 def process_actstream(sender, instance=None, created=False, **kwargs):
-    print(instance.investigations.all())
     for investigation in instance.investigations.all():
-        print(instance)
-        print(instance.user)
-        print(investigation)
         action.send(instance.user,
                     verb='created',
                     action_object=instance,
                     target=investigation)
-        print('Action sent.')

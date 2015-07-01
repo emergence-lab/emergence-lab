@@ -14,6 +14,7 @@ class WizardBasicProcessForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
         self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
+        self.fields['milestones'].required = False
 
     class Meta:
         model = Process
@@ -70,6 +71,10 @@ class WizardGrowthInfoForm(forms.ModelForm):
 
 
 class WizardFullProcessForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(WizardFullProcessForm, self).__init__(*args, **kwargs)
+        self.fields['milestones'].required = False
 
     class Meta:
         model = Process

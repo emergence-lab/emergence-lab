@@ -544,6 +544,10 @@ class TestD180Wizard(TestCase):
             'sample-0-substrate_comment': 'test',
         }
         response = self.client.post(url, data)
+        # print(response.context['info_form'].errors)
+        # print(dict(response.context['comment_form'].errors))
+        # print(dict(response.context['growth_form'].errors))
+        # print(dict(response.context['checklist_form'].errors))
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
         reservation = type(reservation).objects.get(id=reservation.id)
         self.assertFalse(reservation.is_active)
