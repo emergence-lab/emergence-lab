@@ -94,6 +94,7 @@ class D180GrowthInfo(models.Model):
         ])
         return ', '.join(v for k, v in features.items() if k)
 
+
 @python_2_unicode_compatible
 class D180Readings(models.Model):
     """
