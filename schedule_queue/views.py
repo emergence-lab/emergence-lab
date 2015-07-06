@@ -27,7 +27,7 @@ class ReservationListByTool(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         tool_slug = self.kwargs['tool_slug']
         return Reservation.objects.exclude(is_active=False).filter(
-            tool=tool_slug).order_by('priority_field')
+            tool=tool_slug).order_by('priority')
 
     def get_context_data(self, **kwargs):
         tool_slug = self.kwargs['tool_slug']
@@ -48,7 +48,7 @@ class ReservationCreate(LoginRequiredMixin, generic.CreateView):
         If the form is valid, save the associated model.
         """
         self.object = form.save(commit=False)
-        self.object.priority_field = int(10 * time.time())
+        self.object.priority = int(10 * time.time())
         self.object.user = self.request.user
 
         num_reservations = (Reservation.active_objects.filter(tool=self.object.tool)
@@ -78,12 +78,12 @@ class IncreasePriority(LoginRequiredMixin, ActionReloadView):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
         tmp = (Reservation.active_objects.filter(
-            priority_field__lt=reservation_obj.priority_field)
-            .order_by('-priority_field'))
+            priority__lt=reservation_obj.priority)
+            .order_by('-priority'))
         if tmp.first():
             tmp = tmp.first()
-            reservation_obj.priority_field, tmp.priority_field = \
-                tmp.priority_field, reservation_obj.priority_field
+            reservation_obj.priority, tmp.priority = \
+                tmp.priority, reservation_obj.priority
             reservation_obj.save()
             tmp.save()
         self.tool = reservation_obj.tool
@@ -98,12 +98,12 @@ class DecreasePriority(LoginRequiredMixin, ActionReloadView):
         pk = kwargs.pop('pk')
         reservation_obj = Reservation.objects.get(pk=pk)
         tmp = (Reservation.active_objects.filter(
-            priority_field__gt=reservation_obj.priority_field)
-            .order_by('priority_field'))
+            priority__gt=reservation_obj.priority)
+            .order_by('priority'))
         if tmp.first():
             tmp = tmp.first()
-            reservation_obj.priority_field, tmp.priority_field = \
-                tmp.priority_field, reservation_obj.priority_field
+            reservation_obj.priority, tmp.priority = \
+                tmp.priority, reservation_obj.priority
             reservation_obj.save()
             tmp.save()
         self.tool = reservation_obj.tool

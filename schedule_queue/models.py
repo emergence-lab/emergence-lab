@@ -17,8 +17,8 @@ class Reservation(ActiveStateMixin, TimestampMixin, models.Model):
     @staticmethod
     def get_latest(user, tool_name):
         item = (Reservation.active_objects.filter(tool=tool_name)
-                                          .order_by('priority_field').first())
-        if item and item.user == user:
+                                          .order_by('priority').first())
+        if item and item.user_id == user.id:
             return item
         else:
             return None
@@ -31,7 +31,7 @@ class Reservation(ActiveStateMixin, TimestampMixin, models.Model):
     comment = models.CharField(max_length=500, blank=True)
     bake_length = models.IntegerField()
     max_integer_value = 9223372036854775807
-    priority_field = models.BigIntegerField(default=max_integer_value)
+    priority = models.BigIntegerField(default=max_integer_value)
 
     def __str__(self):
         return '{0}, {1}, {2}'.format(str(self.tool),

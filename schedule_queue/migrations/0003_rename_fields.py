@@ -21,4 +21,9 @@ class Migration(migrations.Migration):
             old_name='growth_length_in_hours',
             new_name='growth_length',
         ),
+        migrations.RenameField(
+            model_name='reservation',
+            old_name='priority_field',
+            new_name='priority',
+        ),
     ]
