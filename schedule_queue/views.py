@@ -40,7 +40,7 @@ class ReservationListByTool(LoginRequiredMixin, generic.ListView):
 
 class ReservationCreate(LoginRequiredMixin, generic.CreateView):
     model = Reservation
-    fields = ['tool', 'platter', 'growth_length_in_hours', 'comment', 'bake_length_in_minutes']
+    fields = ['tool', 'platter', 'growth_length', 'comment', 'bake_length']
     template_name = 'schedule_queue/reservation_form.html'
 
     def form_valid(self, form):
@@ -64,8 +64,8 @@ class ReservationCreate(LoginRequiredMixin, generic.CreateView):
 
 class ReservationEdit(LoginRequiredMixin, generic.UpdateView):
     model = Reservation
-    fields = ['tool', 'platter', 'growth_length_in_hours',
-              'comment', 'bake_length_in_minutes']
+    fields = ['tool', 'platter', 'growth_length',
+              'comment', 'bake_length']
     template_name = 'schedule_queue/reservation_edit.html'
 
     def get_success_url(self):

@@ -2,34 +2,35 @@
 
 {% block content %}
 
-<div class="col-md-6 col-md-offset-3">
-  <h2 class="text-center">Reservations</h2>
-</div>
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Reservations</li>
+        </ol>
+    </nav>
 
+    <header>
+        <h2 class="page-header">
+            Reservations
+            <a href="{% url 'reservation_create' %}" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-plus"></span>
+                Create Reservation
+            </a>
+        </h2>
+    </header>
 
+    <div class="row">
+        <div class="list-group col-md-6 col-md-offset-3">
+            {% for item in object_list %}
+                <a class="list-group-item" href="{% url 'reservation_list_by_tool' item %}"
+                   data-toggle="tooltip" data-placement="left" title="description">
+                    {{item.upper}}
+                    <span class="badge pull-right">2 Open</span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
 
-<br></br>
-
-
-<div class="col-md-6 col-md-offset-3 text-center">
-  <table class="table">
-    <tr>
-      <td><strong>Tool Name</strong></td>
-      <td><strong>Actions</strong></td>
-    </tr>
-    {% for item in object_list %}
-      <tr>
-        <td>{{ item.upper }}</td>
-        <td>
-            <a class="glyphicon glyphicon-plus" href="{% url 'reservation_create' %}"></a>
-
-            <a class="glyphicon glyphicon-th-list" href="{% url 'reservation_list_by_tool' item %}"></a>
-        </td>
-      </tr>
-    {% endfor %}
-    <tr>
-        <td></td><td><a class="glyphicon glyphicon-plus" href="#" data-toggle="tooltip" title="Create Template"></a></td>
-    </tr>
-  </table>
-</div>
-{% endblock %}
+</main>
+{% endblock content %}

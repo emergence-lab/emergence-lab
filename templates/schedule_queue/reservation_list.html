@@ -1,51 +1,74 @@
 {% extends "core/base.html" %}
+{% load humanize %}
 
 
 {% block content %}
-<h2 class="text-center">Reservations</h2>
 
-{% if tool_name %}
-    <h3 class="text-center">{{ tool_name }}</h3>
-{% endif %}
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'reservation_landing' %}">Reservations</a></li>
+            <li class='active'>{{tool_name}} Reservations</li>
+        </ol>
+    </nav>
 
-<br>
-<div class="text-center">
-    {% if object_list|length < max_reservations %} <a class='btn btn-success' href="{% url 'reservation_create' %}">New Reservation</a>
-    {% else %} <a class='btn btn-default disabled' href="{% url 'reservation_create' %}"><strong>Reservation Limit Reached</strong></a>
-    {% endif %}
-</div>
+    <header>
+        <h2 class="page-header">
+            {{tool_name}} Reservations
+            {% if object_list|length < max_reservations %}
+                <a href="{% url 'reservation_create' %}" class="btn btn-success pull-right">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Create Reservation
+                </a>
+            {% else %}
+                <button class="btn btn-default disabled pull-right">
+                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    Reservation Limit Reached
+                </button>
+            {% endif %}
+        </h2>
+    </header>
 
-<br>
 
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-
-        <ul class="list-group">
-            {% for reservation in object_list %}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <ul class="list-group">
+                {% for reservation in object_list %}
                     <li class="list-group-item">
-
-                        <div class="pull-right">
-                            <div class="btn-group">
-                                {% if reservation.user == request.user %}<a class='btn btn-warning' href={% url 'reservation_edit' pk=reservation.id %}>Edit</a>{% endif %}
-                                <a class='btn btn-primary' href="{% url 'increase_priority' pk=reservation.id %}"><span class="glyphicon glyphicon-plus"></span> Move Up</a>
-                                <a class='btn btn-primary' href="{% url 'decrease_priority' pk=reservation.id %}"><span class="glyphicon glyphicon-minus"></span> Move Down</a>
-                                {% if reservation.user == request.user %}<a class='btn btn-danger' href="{% url 'cancel_reservation' pk=reservation.id %}">Cancel</a>{% endif %}
-                            </div>
+                        <div class="pull-right btn-group">
+                            {% if reservation.user == request.user %}
+                                <a class='btn btn-warning' href={% url 'reservation_edit' pk=reservation.id %}>
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                    Edit
+                                </a>
+                            {% endif %}
+                            <a class='btn btn-primary' href="{% url 'increase_priority' pk=reservation.id %}">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Move Up
+                            </a>
+                            <a class='btn btn-primary' href="{% url 'decrease_priority' pk=reservation.id %}">
+                                <span class="glyphicon glyphicon-minus"></span>
+                                Move Down
+                            </a>
+                            {% if reservation.user == request.user %}
+                                <a class='btn btn-danger' href="{% url 'cancel_reservation' pk=reservation.id %}">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Cancel
+                                </a>
+                            {% endif %}
                         </div>
 
-                        {{ reservation.user.full_name }}
-                        <br>Bake <strong>{{ reservation.platter }}</strong> platter for <strong>{{ reservation.bake_length_in_minutes }} minutes </strong>
-                        <br>Expected growth duration is <strong> {{ reservation.growth_length_in_hours }}
-                        {% if reservation.growth_length_in_hours > 1 %} hours {% else %} hour {% endif %} </strong>
-                        <br> {% if reservation.comment %} <strong>Comment: </strong>{{ reservation.comment }} {% endif %}
+                        Created by {{reservation.user.full_name }} {{reservation.created|naturaltime}} <br>
+                        Bake <strong>{{reservation.platter}}</strong> platter for <strong>{{reservation.bake_length}} minute{{reservation.bake_length|pluralize}}</strong> <br>
+                        Expected growth duration is <strong>{{reservation.growth_length}} hour{{growth_length|pluralize}}</strong> <br>
+                        {% if reservation.comment %}
+                            <strong>Comment: </strong>{{reservation.comment}}
+                        {% endif %}
                     </li>
-            {% endfor %}
-            <br>
-            <br>
-
-        </ul>
-
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-</div>
 
-{% endblock %}
+{% endblock content %}

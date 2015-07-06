@@ -47,9 +47,14 @@ class D75(object):
         return 'd75'
 
 # custom attributes for tools
-tool = {'d180': {'slug': D180.get_slug(),
-                 'max_reservations': 5,
-                 'process_start_url': 'create_growth_d180_start'},
-    'd75': {'slug': D75.get_slug(),
-            'max_reservations': 3}
-        }
+tool = {
+    'd180': {
+        'slug': D180.get_slug(),
+        'max_reservations': 8,
+        'process_start_url': 'create_growth_d180_start',
+    },
+    'd75': {
+        'slug': D75.get_slug(),
+        'max_reservations': 8,
+    },
+}

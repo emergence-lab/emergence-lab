@@ -29,7 +29,7 @@ class TestReservationCRUD(TestCase):
         res_obj = mommy.make(Reservation,
                              tool=self.tool_obj,
                              user=self.user_obj,
-                             growth_length_in_hours=5)
+                             growth_length=5)
         res_id = Reservation.objects.all().filter(user=self.user_obj).first().id
         url = reverse('reservation_edit', kwargs={'pk': res_obj.id})
         match = resolve('/scheduling/edit/{0}/'.format(res_obj.id))
@@ -42,8 +42,8 @@ class TestReservationCRUD(TestCase):
         url = reverse('reservation_create')
         match = resolve('/scheduling/new/')
         response = self.client.post(url, {'tool': self.tool_obj, 'platter': self.platter_obj,
-                                          'user': self.user_obj, 'growth_length_in_hours': 6,
-                                          'bake_length_in_minutes': 30,
+                                          'user': self.user_obj, 'growth_length': 6,
+                                          'bake_length': 30,
                                           'priority_field': 10*time.time()})
         self.assertEqual(match.url_name, 'reservation_create')
         self.assertEqual(response.status_code, 200)
@@ -53,11 +53,11 @@ class TestReservationCRUD(TestCase):
         res_obj = mommy.make(Reservation,
                              tool=self.tool_obj,
                              user=self.user_obj,
-                             growth_length_in_hours=5)
+                             growth_length=5)
         url = reverse('reservation_edit', kwargs={'pk': res_obj.id})
         match = resolve('/scheduling/edit/{0}/'.format(res_obj.id))
-        response = self.client.post(url, {'growth_length_in_hours': 6,
-                                          'bake_length_in_minutes': 30})
+        response = self.client.post(url, {'growth_length': 6,
+                                          'bake_length': 30})
         self.assertEqual(match.url_name, 'reservation_edit')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'schedule_queue/reservation_edit.html')
@@ -66,11 +66,11 @@ class TestReservationCRUD(TestCase):
         res_obj_1 = mommy.make(Reservation,
                                tool=self.tool_obj,
                                user=self.user_obj,
-                               growth_length_in_hours=5, priority_field=int(10*time.time()))
+                               growth_length=5, priority_field=int(10*time.time()))
         res_obj_2 = mommy.make(Reservation,
                                tool=self.tool_obj,
                                user=self.user_obj,
-                               growth_length_in_hours=4, priority_field=int((10*time.time())+1))
+                               growth_length=4, priority_field=int((10*time.time())+1))
         url = reverse('increase_priority',
                       kwargs={'pk': res_obj_2.id})
         match = resolve('/scheduling/increase/{0}/'.format(res_obj_2.id))
@@ -84,11 +84,11 @@ class TestReservationCRUD(TestCase):
         res_obj_1 = mommy.make(Reservation,
                                tool=self.tool_obj,
                                user=self.user_obj,
-                               growth_length_in_hours=5, priority_field=int(10*time.time()))
+                               growth_length=5, priority_field=int(10*time.time()))
         res_obj_2 = mommy.make(Reservation,
                                tool=self.tool_obj,
                                user=self.user_obj,
-                               growth_length_in_hours=4, priority_field=int((10*time.time())+1))
+                               growth_length=4, priority_field=int((10*time.time())+1))
         url = reverse('decrease_priority',
                       kwargs={'pk': res_obj_1.id})
         match = resolve('/scheduling/decrease/{0}/'.format(res_obj_1.id))
@@ -102,7 +102,7 @@ class TestReservationCRUD(TestCase):
         res_obj = mommy.make(Reservation,
                              tool=self.tool_obj,
                              user=self.user_obj,
-                             growth_length_in_hours=5)
+                             growth_length=5)
         match = resolve('/scheduling/cancel/{0}/'.format(res_obj.id))
         url = reverse('cancel_reservation', kwargs={'pk': res_obj.id})
         response = self.client.get(url)
@@ -114,12 +114,12 @@ class TestReservationCRUD(TestCase):
         res_obj_1 = mommy.make(Reservation,
                                tool=self.tool_obj,
                                user=self.user_obj,
-                               growth_length_in_hours=5,
+                               growth_length=5,
                                priority_field=int(10*time.time()))
         res_obj_2 = mommy.make(Reservation,
                                tool=self.tool_obj,
                                user=self.user_obj,
-                               growth_length_in_hours=4,
+                               growth_length=4,
                                priority_field=int((10*time.time())+1))
         match = resolve('/scheduling/{0}/'.format(self.tool_obj))
         url = reverse('reservation_list_by_tool', kwargs={'tool_slug': self.tool_obj})

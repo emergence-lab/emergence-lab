@@ -213,7 +213,7 @@
                                     <div class="panel-body">
                                         <strong>Tool:</strong> {{ reservation.tool.upper }} <br>
                                         <strong>Operator:</strong> {{ reservation.user.full_name }} <br>
-                                        <strong>Run Time:</strong> {{ reservation.growth_length_in_hours }} hours
+                                        <strong>Run Time:</strong> {{ reservation.growth_length }} hours
                                         {% if reservation.comment %}
                                             <br><strong>Comment:</strong> {{ reservation.comment }}
                                         {% endif %}
