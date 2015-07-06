@@ -61,7 +61,7 @@
 
                         Created by {{reservation.user.full_name }} {{reservation.created|naturaltime}} <br>
                         Bake <strong>{{reservation.platter}}</strong> platter for <strong>{{reservation.bake_length}} minute{{reservation.bake_length|pluralize}}</strong> <br>
-                        Expected growth duration is <strong>{{reservation.growth_length}} hour{{growth_length|pluralize}}</strong> <br>
+                        Expected growth duration is <strong>{{reservation.growth_length}} hour{{reservation.growth_length|pluralize}}</strong> <br>
                         {% if reservation.comment %}
                             <strong>Comment: </strong>{{reservation.comment}}
                         {% endif %}
