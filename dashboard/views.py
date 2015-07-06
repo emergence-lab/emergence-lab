@@ -29,15 +29,8 @@ class DashboardMixin(object):
                                 .values_list('projects__id', flat=True))
         kwargs['active_projects'] = Project.active_objects.filter(id__in=projects)
         kwargs['inactive_projects'] = Project.inactive_objects.filter(id__in=projects)
-        reservation_list = []
-        for i in tools.get_tool_list():
-            tmp_res = (Reservation.objects.filter(is_active=True, tool=i)
-                                          .order_by('priority_field').first())
-            if tmp_res and tmp_res.user == self.request.user:
-                tmp_res.url = tools.get_tool_info(i).get('process_start_url',
-                                                         None)
-                reservation_list.append(tmp_res)
-        kwargs['reservations'] = reservation_list
+
+        kwargs['reservations'] = []
         r = StrictRedis(settings.REDIS_HOST,
                         settings.REDIS_PORT,
                         settings.REDIS_DB)
