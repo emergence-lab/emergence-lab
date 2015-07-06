@@ -23,7 +23,7 @@
     <div class="row">
         <div class="list-group col-md-6 col-md-offset-3">
             {% for item in object_list %}
-                <a class="list-group-item" href="{% url 'reservation_list_by_tool' item %}"
+                <a class="list-group-item" href="{% url 'reservation_list' item %}"
                    data-toggle="tooltip" data-placement="left" title="description">
                     {{item.upper}}
                     <span class="badge pull-right">2 Open</span>

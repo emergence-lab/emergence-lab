@@ -10,17 +10,18 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
+from core.models import ProcessType
 from core.views import ActionReloadView
 from schedule_queue import config as tools
 
 
 class ReservationLanding(LoginRequiredMixin, generic.ListView):
     model = Reservation
-    queryset = tools.get_tool_list()
+    queryset = ProcessType.objects.all()
     template_name = 'schedule_queue/reservation_landing.html'
 
 
-class ReservationListByTool(LoginRequiredMixin, generic.ListView):
+class ReservationList(LoginRequiredMixin, generic.ListView):
     model = Reservation
     template_name = 'schedule_queue/reservation_list.html'
 
@@ -35,7 +36,7 @@ class ReservationListByTool(LoginRequiredMixin, generic.ListView):
             kwargs['max_reservations'] = tools.get_tool_info(tool_slug)['max_reservations']
         if 'tool_name' not in kwargs:
             kwargs['tool_name'] = tool_slug
-        return super(ReservationListByTool, self).get_context_data(**kwargs)
+        return super(ReservationList, self).get_context_data(**kwargs)
 
 
 class ReservationCreate(LoginRequiredMixin, generic.CreateView):
@@ -56,7 +57,7 @@ class ReservationCreate(LoginRequiredMixin, generic.CreateView):
         max_reservations = tools.get_tool_info(self.object.tool)['max_reservations']
         if num_reservations < max_reservations:
             self.object.save()
-            return HttpResponseRedirect(reverse('reservation_list_by_tool',
+            return HttpResponseRedirect(reverse('reservation_list',
                                                 args=(self.object.tool,)))
         else:
             raise Exception("Reservation List Full")
@@ -65,11 +66,11 @@ class ReservationCreate(LoginRequiredMixin, generic.CreateView):
 class ReservationEdit(LoginRequiredMixin, generic.UpdateView):
     model = Reservation
     fields = ['tool', 'platter', 'growth_length',
-              'comment', 'bake_length']
+              'bake_length', 'comment']
     template_name = 'schedule_queue/reservation_edit.html'
 
     def get_success_url(self):
-        return reverse('reservation_list_by_tool', args=(self.object.tool,))
+        return reverse('reservation_list', args=(self.object.tool,))
 
 
 class IncreasePriority(LoginRequiredMixin, ActionReloadView):
@@ -89,7 +90,7 @@ class IncreasePriority(LoginRequiredMixin, ActionReloadView):
         self.tool = reservation_obj.tool
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('reservation_list_by_tool', args=(self.tool,))
+        return reverse('reservation_list', args=(self.tool,))
 
 
 class DecreasePriority(LoginRequiredMixin, ActionReloadView):
@@ -109,7 +110,7 @@ class DecreasePriority(LoginRequiredMixin, ActionReloadView):
         self.tool = reservation_obj.tool
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('reservation_list_by_tool', args=(self.tool,))
+        return reverse('reservation_list', args=(self.tool,))
 
 
 class CancelReservation(LoginRequiredMixin, ActionReloadView):
@@ -123,7 +124,7 @@ class CancelReservation(LoginRequiredMixin, ActionReloadView):
         self.tool = reservation_obj.tool
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('reservation_list_by_tool', args=(self.tool,))
+        return reverse('reservation_list', args=(self.tool,))
 
 
 class CloseReservation(LoginRequiredMixin, ActionReloadView):

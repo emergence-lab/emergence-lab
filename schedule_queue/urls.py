@@ -7,7 +7,7 @@ from schedule_queue import views
 
 urlpatterns = [
     url(r'^$', views.ReservationLanding.as_view(), name='reservation_landing'),
-    url(r'^new/$',
+    url(r'^create/$',
         views.ReservationCreate.as_view(), name='reservation_create'),
     url(r'^edit/(?P<pk>\d+)/$',
         views.ReservationEdit.as_view(), name='reservation_edit'),
@@ -19,6 +19,6 @@ urlpatterns = [
         views.IncreasePriority.as_view(), name='increase_priority'),
     url(r'^decrease/(?P<pk>\d+)/$',
         views.DecreasePriority.as_view(), name='decrease_priority'),
-    url(r'^(?P<tool_slug>[a-z0-9\-]+)/$',
-        views.ReservationListByTool.as_view(), name='reservation_list_by_tool'),
+    url(r'^list/(?P<tool_slug>[a-z0-9\-]+)/$',
+        views.ReservationList.as_view(), name='reservation_list'),
 ]
