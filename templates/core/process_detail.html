@@ -38,7 +38,7 @@
     <div>
         <h3 class="page-header">
             <div class="clearfix">
-                {{process.name}} Details
+                {{process.type.name}} Process Details
                 {% if process.type_id == 'd180-growth' %}
                     <a class="pull-right btn btn-info" href="{% url 'd180_readings_detail' process %}">
                         {% bootstrap_icon 'list' %}

@@ -109,7 +109,7 @@
                     {% recursetree sample.nodes %}
                             {% if not node.is_root_node %}
                                 <li>
-                                    {{node.process.name}}
+                                    {{node.process.type.name}}
                                     (<a href="{% url 'process_detail' uuid=node.process.uuid %}"
                                         data-toggle="tooltip"
                                         data-html="true"
