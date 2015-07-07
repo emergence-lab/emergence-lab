@@ -98,7 +98,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     # local apps
     'core',
-    'dashboard',
+    # 'dashboard',
     'journal',
     'd180',
     'afm',

@@ -94,8 +94,8 @@ urlpatterns = [
     url(r'^d180/', include('d180.urls')),
 
     # # dashboard views
-    # url(r'^dashboard/', include('dashboard.urls')),
-    url(r'^dashboard/', RedirectView.as_view(pattern_name='pm_landing')),
+    url(r'^dashboard/', include('project_management.urls')),
+    # url(r'^dashboard/', RedirectView.as_view(pattern_name='pm_landing')),
 
     # # journal urls
     url(r'^notebook/', include('journal.urls')),
@@ -113,7 +113,7 @@ urlpatterns = [
     url(r'^print/', core.views.utility.PrintTemplate.as_view(), name='print_test'),
 
     # project_management
-    url(r'^project_management/', include('project_management.urls')),
+    # url(r'^project_management/', include('project_management.urls')),
     url(r'^oauth$', project_management.views.MendeleyOAuth.as_view(), name='mendeley_oauth')
 ]
 
