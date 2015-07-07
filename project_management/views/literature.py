@@ -20,9 +20,9 @@ from project_management.models import Literature
 
 
 def pagination_helper(page, count, queryset):
-    if page and int(page) > 1 and int(page) <= count/10 :
+    if page and int(page) > 1 and int(page) <= count / 10:
         number = int(page) - 1
-        for i in range(0,number):
+        for i in range(0, number):
             queryset = queryset.next_page
     return queryset
 
@@ -32,7 +32,9 @@ class MendeleyMixin(object):
     def get(self, request, *args, **kwargs):
         if 'token' in request.session:
             try:
-                self.mendeley = Mendeley(settings.MENDELEY_ID, settings.MENDELEY_SECRET, 'http://localhost:8000/oauth')
+                self.mendeley = Mendeley(settings.MENDELEY_ID,
+                                            settings.MENDELEY_SECRET,
+                                            'http://localhost:8000/oauth')
                 self.session = MendeleySession(self.mendeley, request.session['token'])
                 return super(MendeleyMixin, self).get(request, *args, **kwargs)
             except TokenExpiredError:
@@ -46,7 +48,9 @@ class MendeleyMixin(object):
 class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        mendeley = Mendeley(settings.MENDELEY_ID, settings.MENDELEY_SECRET, 'http://localhost:8000/oauth')
+        mendeley = Mendeley(settings.MENDELEY_ID,
+                            settings.MENDELEY_SECRET,
+                            'http://localhost:8000/oauth')
         self.auth = mendeley.start_authorization_code_flow(request.session.get('state', ''))
         if 'state' not in request.session:
             request.session['state'] = self.auth.state
@@ -77,7 +81,7 @@ class LiteratureListView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView
     def get_context_data(self, **kwargs):
         page = self.request.GET.get('page', None)
         context = super(LiteratureListView, self).get_context_data(**kwargs)
-        literature = self.session.documents.list(page_size=10,view='tags')
+        literature = self.session.documents.list(page_size=10, view='tags')
         # literature = session.documents.search('Basic').list()
         context['literature'] = pagination_helper(page, literature.count, literature)
         context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
@@ -140,9 +144,11 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
         tmp = Literature.objects.all().filter(id=self.kwargs['pk'])
         if tmp.filter(user=self.request.user).exists():
             obj = tmp.filter(user=self.request.user).first()
-            if 'milestone' in self.kwargs and Milestone.objects.get(id=self.kwargs['milestone']) not in obj.milestones.all():
+            if 'milestone' in self.kwargs and Milestone.objects.get(
+                    id=self.kwargs['milestone']) not in obj.milestones.all():
                 obj.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
-            if 'investigation' in self.kwargs and Investigation.objects.get(id=self.kwargs['investigation']) not in obj.investigations.all():
+            if 'investigation' in self.kwargs and Investigation.objects.get(
+                    id=self.kwargs['investigation']) not in obj.investigations.all():
                 obj.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
             obj.save()
         else:
@@ -158,7 +164,8 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
             if 'milestone' in self.kwargs:
                 literature.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
             if 'investigation' in self.kwargs:
-                literature.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
+                literature.investigations.add(Investigation.objects.get(
+                    id=self.kwargs['investigation']))
             literature.save()
 
     def get_redirect_url(self, *args, **kwargs):
@@ -174,7 +181,7 @@ class AddLiteratureObjectView(LoginRequiredMixin, ActionReloadView):
             if milestone not in literature.milestones:
                 literature.milestones.add(milestone)
         if 'investigation' in self.kwargs:
-            investigation = Investigations.objects.get(id=self.kwargs['investigation'])
+            investigation = Investigation.objects.get(id=self.kwargs['investigation'])
             if milestone not in literature.milestones:
                 literature.investigations.add(investigation)
         literature.save()

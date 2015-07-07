@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 
-from django.core.urlresolvers import reverse
 from django.views import generic
 
 from braces.views import LoginRequiredMixin
@@ -19,7 +18,8 @@ class LandingPageView(LoginRequiredMixin, generic.TemplateView):
         projects = [x.project for x in ProjectTracking.objects.all().filter(user=self.request.user)]
         context['projects'] = projects
         context['investigations'] = Investigation.objects.all().filter(project__in=projects)
-        context['milestones'] = Milestone.objects.all().filter(user=self.request.user).filter(is_active=True)
+        context['milestones'] = Milestone.objects.all().filter(
+            user=self.request.user).filter(is_active=True)
         context['literature'] = Literature.objects.all().filter(user=self.request.user)
         return context
 

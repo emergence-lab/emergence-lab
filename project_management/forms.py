@@ -30,7 +30,7 @@ class MilestoneForm(forms.ModelForm):
 class InvestigationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        user=kwargs.pop('user')
+        user = kwargs.pop('user')
         super(InvestigationForm, self).__init__(*args, **kwargs)
         project_tracking = [x.project_id for x in ProjectTracking.objects.all().filter(user=user)]
         projects = Project.objects.all().filter(id__in=project_tracking)

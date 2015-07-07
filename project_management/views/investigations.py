@@ -3,7 +3,6 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.views import generic
-from django.conf import settings
 
 from braces.views import LoginRequiredMixin
 

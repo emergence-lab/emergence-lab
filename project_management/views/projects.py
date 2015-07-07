@@ -15,7 +15,8 @@ class ProjectListView(LoginRequiredMixin, NeverCacheMixin, generic.TemplateView)
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
-        projects_tracked = [x.project_id for x in ProjectTracking.objects.filter(user=self.request.user)]
+        projects_tracked = [x.project_id for x in ProjectTracking.objects.filter(
+            user=self.request.user)]
         context['my_active_projects'] = Project.active_objects.filter(id__in=projects_tracked)
         context['active_projects'] = Project.active_objects.exclude(id__in=projects_tracked)
         context['inactive_projects'] = Project.inactive_objects.all()
