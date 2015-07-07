@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
+from django.views.generic import RedirectView
 
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -93,7 +94,8 @@ urlpatterns = [
     url(r'^d180/', include('d180.urls')),
 
     # # dashboard views
-    url(r'^dashboard/', include('dashboard.urls')),
+    # url(r'^dashboard/', include('dashboard.urls')),
+    url(r'^dashboard/', RedirectView.as_view(pattern_name='pm_landing')),
 
     # # journal urls
     url(r'^notebook/', include('journal.urls')),
