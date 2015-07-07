@@ -1,0 +1,54 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block subtitle %}{{investigation.name}}{% endblock %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      Description
+      <a class="pull-right" href="{% url 'pm_investigation_edit' investigation.slug %}"><span class="glyphicon glyphicon-edit"></span></a>
+    </div>
+    <div class="panel-body">
+      {{investigation.description}}
+    </div>
+  </div>
+</div>
+<div class="col-md-6">
+  <div>
+    <h4>Processes</h4>
+  </div>
+  <div class="list-group">
+    {% for update in investigation.target_actions.all %}
+      <div class="list-group-item">
+        <h4 class="list-group-item-heading">{{update.action_object.type}} <a data-toggle="tooltip" title="{{update.action_object.comment|safe}}" href="{% url 'process_detail' update.action_object.uuid %}">({{update.action_object.uuid}}{% if update.action_object.legacy_identifier %}, {{update.action_object.legacy_identifier}}{%endif%})</a></h4>
+        <p class="list-group-item-text">
+          {{update.timestamp}}
+
+        </p>
+      </div>
+
+    {% endfor %}
+  </div>
+</div>
+<div class="col-md-6">
+  <div>
+    <h4>Literature</h4>
+  </div>
+  <div class="list-group">
+    {% for update in investigation.literature.all reversed %}
+      <a class="list-group-item" href="{% url 'literature_detail_redirector' update.id %}">
+        <h4 class="list-group-item-heading">{{update.title}}</h4>
+        <p class="list-group-item-text">
+          {{update.created}}
+        </p>
+        <p class="list-group-item-text">
+          {{update.doi}}
+        </p>
+      </a>
+
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

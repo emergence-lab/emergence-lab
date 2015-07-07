@@ -1,0 +1,22 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% load bootstrap3 %}
+
+{% block header %}
+  {% load staticfiles %}
+  {{form.media}}
+{% endblock header %}
+
+{% block pm_content %}
+
+<h2 class="text-center">New Investigation</h2>
+<div class="container-fluid">
+  <form action="" method="post">{%csrf_token%}
+    <div class="col-md-8 col-md-offset-2">
+      {% bootstrap_form form %}
+      <button type="submit" class="btn btn-success" value="Create">Submit</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

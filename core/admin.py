@@ -24,3 +24,4 @@ class ProjectTrackingInline(admin.TabularInline):
 admin.site.register(core.models.Project, ProjectAdmin)
 admin.site.register(core.models.Investigation, InvestigationAdmin)
 admin.site.register(core.models.ProjectTracking)
+admin.site.register(core.models.Milestone)

@@ -5,6 +5,7 @@ from django.contrib.auth.views import login, logout
 from rest_framework.urlpatterns import format_suffix_patterns
 
 import core.views
+import project_management.views
 
 
 admin.autodiscover()
@@ -92,7 +93,8 @@ urlpatterns = [
     url(r'^d180/', include('d180.urls')),
 
     # # dashboard views
-    url(r'^dashboard/', include('dashboard.urls')),
+    url(r'^dashboard/', include('project_management.urls')),
+    # url(r'^dashboard/', RedirectView.as_view(pattern_name='pm_landing')),
 
     # # journal urls
     url(r'^notebook/', include('journal.urls')),
@@ -108,6 +110,10 @@ urlpatterns = [
 
     # print test
     url(r'^print/', core.views.utility.PrintTemplate.as_view(), name='print_test'),
+
+    # project_management
+    # url(r'^project_management/', include('project_management.urls')),
+    url(r'^oauth$', project_management.views.MendeleyOAuth.as_view(), name='mendeley_oauth')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -6,13 +6,15 @@ import os
 from django.core.files.storage import default_storage as labshare
 from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
+from actstream import action
 import polymorphic
 
 from core.models.mixins import TimestampMixin, UUIDMixin
-from core.models import fields, Investigation
+from core.models import fields, Investigation, Milestone
 
 
 def get_file_path(instance, filename):
@@ -68,6 +70,9 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
 
     investigations = models.ManyToManyField(Investigation,
         related_name='processes', related_query_name='process',)
+
+    milestones = models.ManyToManyField(Milestone,
+        related_name='processes', related_query_name='milestone',)
 
     objects = models.Manager()
     generic = ProcessTypeManager(process_type='generic-process')
@@ -156,3 +161,12 @@ class ProcessTemplate(TimestampMixin, models.Model):
     comment = fields.RichTextField(blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                          limit_choices_to={'is_active': True})
+
+
+@receiver(models.signals.m2m_changed, sender=Process.investigations.through)
+def process_actstream(sender, instance=None, created=False, **kwargs):
+    for investigation in instance.investigations.all():
+        action.send(instance.user,
+                    verb='created',
+                    action_object=instance,
+                    target=investigation)

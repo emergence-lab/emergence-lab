@@ -92,7 +92,7 @@ class TrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
                                               defaults={'is_owner': False})
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('project_list')
+        return reverse('pm_project_list')
 
 
 class UntrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
@@ -109,7 +109,7 @@ class UntrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
             tracking.delete()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('project_list')
+        return reverse('pm_project_list')
 
 
 class ActivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
@@ -123,7 +123,7 @@ class ActivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
         project.activate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('project_list')
+        return reverse('pm_project_list')
 
 
 class DeactivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
@@ -137,7 +137,7 @@ class DeactivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
         project.deactivate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('project_list')
+        return reverse('pm_project_list')
 
 
 class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):

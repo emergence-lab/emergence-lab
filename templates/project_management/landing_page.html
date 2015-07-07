@@ -1,0 +1,39 @@
+{% extends 'project_management/pm_base.html' %}
+
+
+{% block pm_content %}
+
+<div class="col-md-5">
+  <a style="text-decoration:none; color:#000000;" href="{% url 'pm_project_list' %}">
+    <div class="jumbotron" href="{% url 'pm_project_list' %}">
+      <h2><span class="glyphicon glyphicon-blackboard"></span> &emsp; Projects</h2>
+      <p>{{projects|length}} Projects</p>
+    </div>
+  </a>
+</div>
+<div class="col-md-5 col-md-offset-1">
+  <a style="text-decoration:none; color:#000000;" href="{% url 'pm_investigation_list' %}">
+    <div class="jumbotron">
+      <h2><span class="glyphicon glyphicon-road"></span> &emsp; Investigations</h2>
+      <p>{{investigations|length}} Investigations</p>
+    </div>
+  </a>
+</div>
+<div class="col-md-5">
+  <a style="text-decoration:none; color:#000000;" href="{% url 'milestone_list' %}">
+    <div class="jumbotron">
+      <h2><span class="glyphicon glyphicon-time"></span> &emsp; Milestones</h2>
+      <p>{{milestones|length}} Open Milestones</p>
+    </div>
+  </a>
+</div>
+<div class="col-md-5 col-md-offset-1">
+  <a style="text-decoration:none; color:#000000;" href="{% url 'literature_landing' %}">
+    <div class="jumbotron">
+      <h2><span class="glyphicon glyphicon-book"></span> &emsp; Literature</h2>
+      <p>{{literature|length}} Articles Read</p>
+    </div>
+  </a>
+</div>
+
+{% endblock %}

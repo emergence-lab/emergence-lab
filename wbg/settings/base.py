@@ -99,11 +99,12 @@ INSTALLED_APPS = (
     'crispy_forms',
     # local apps
     'core',
-    'dashboard',
+    # 'dashboard',
     'journal',
     'd180',
     'afm',
     'hall',
+    'project_management',
     'simulations',
     'schedule_queue',
     'sem',
@@ -331,3 +332,10 @@ ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK', False)
 # Crispy Forms
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+
+# Mendeley
+
+ENABLE_MENDELEY = get_secret('ENABLE_MENDELEY', True)
+MENDELEY_ID = get_secret('MENDELEY_ID', '')
+MENDELEY_SECRET = get_secret('MENDELEY_SECRET', '')

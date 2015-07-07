@@ -1,0 +1,64 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block title %}Literature{% endblock title %}
+
+{% block subtitle %}Literature{% endblock subtitle %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+  <div class="jumbotron">
+    <h2>{{object_list|length}} Literature Articles Tracked</h2>
+    <p>
+      This module tracks literature that you've associated with your research.
+    </p>
+    <a href="{% url 'literature_create' %}" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add New</a>
+    {% if mendeley %}
+    <a href="{% url 'mendeley_search' %}" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Add From Mendeley</a>
+    {% endif %}
+  </div>
+  <ul class="list-group">
+    {% for object in object_list %}
+    <li class="list-group-item">
+      <h4 class="list-group-item-heading">
+        <a href="{% url 'literature_detail_redirector' object.id %}">{{object.title|truncatewords:8}}</a>
+        <div class="btn-group pull-right" role="group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Add to... <span class="caret"></span></button>
+          <ul class="dropdown-menu" role="menu">
+            <li role="presentation" class="dropdown-header">Milestones</li>
+            {% for milestone in milestones %}
+            <li>
+              <a href="{% url 'add_literature_object_milestone' milestone=milestone.id pk=object.id %}">{{milestone.name}}</a>
+            </li>
+            {% endfor %}
+            <li role="presentation" class="dropdown-header">Investigations</li>
+            {% for investigation in investigations %}
+            <li>
+              <a href="{% url 'add_literature_object_investigation' investigation=investigation.id pk=object.id  %}">{{investigation.name|truncatewords:5}}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </h4>
+      <p class="list-group-item-text">{{object.created}}</p>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if is_paginated %}
+  <nav>
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+      <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
+      {% endif %}
+      {% for page in paginator.page_range %}
+          <li {% if page_obj.number == forloop.counter %}class="active"{% endif %}><a href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+      <li><a href="?page={{ page_obj.next_page_number }}">{% if not page_obj.has_next %}<span aria-hidden="true">{% endif %}Next &raquo;</span><span class="sr-only">Next</span></a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -13,4 +13,5 @@ class CoreAppConfig(AppConfig):
     def ready(self):
         registry.register(self.get_model('Project'))
         registry.register(self.get_model('Investigation'))
+        registry.register(self.get_model('Process'))
         registry.register(get_user_model())

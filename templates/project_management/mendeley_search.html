@@ -1,0 +1,72 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block subtitle %}Literature Search{% endblock %}
+
+{% block pm_content %}
+
+<div class="container-fluid">
+  <div class="col-md-12">
+      <form action={% url 'mendeley_search' %} method="get">
+        <div class="col-md-10">
+          <input id="query" type="text" name="query" class="form-control">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-info" type="submit"><span class="glyphicon glyphicon-search"></span> Search</button>
+        </div>
+      </form>
+  </div>
+  <div class="spacer"></div>
+
+  <div class="col-md-12">
+    <div class="list-group">
+
+    {% for item in literature.items %}
+      <div class="list-group-item">
+        <h4 class="list-group-item-heading">
+          {{item.title|truncatewords:8}}
+          <div class="btn-group pull-right" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Add to... <span class="caret"></span></button>
+            <ul class="dropdown-menu" role="menu">
+              <li role="presentation" class="dropdown-header">Milestones</li>
+              {% for milestone in milestones %}
+              <li>
+                <a href="{% url 'add_mendeley_object_milestone' milestone=milestone.id external_id=item.id %}">{{milestone.name}}</a>
+              </li>
+              {% endfor %}
+              <li role="presentation" class="dropdown-header">Investigations</li>
+              {% for investigation in investigations %}
+              <li>
+                <a href="{% url 'add_mendeley_object_investigation' investigation=investigation.id external_id=item.id  %}">{{investigation.name|truncatewords:5}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </h4>
+        <p class="list-group-item-text">
+          Source: {{item.source}}
+        </p>
+        <p class="list-group-item-text">
+          DOI: {{item.identifiers.doi}}
+        </p>
+        <p class="list-group-item-text">
+          Authors: {%for author in item.authors%}{{author.first_name}} {{author.last_name}},{%endfor%}
+        </p>
+        <p class="list-group-item-text">
+          Created: {{item.created}}
+        </p>
+        <p class="list-group-item-text">
+          Tags: {% for tag in item.tags %}{{tag}}{%endfor%}
+        </p>
+        <p class="list-group-item-text">
+          Abstract: {{item.abstract|truncatewords:10}}
+        </p>
+          {% if item.file_attached %}
+            <!-- <a href="{{item.files.list.items.0.download_url}}" class="btn btn-default">Download</a> -->
+          {% endif %}
+        </p>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
