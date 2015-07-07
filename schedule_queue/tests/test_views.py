@@ -10,122 +10,159 @@ from django.contrib.auth import get_user_model
 
 from model_mommy import mommy
 
+from core.models import ProcessType
+from core.tests.helpers import test_resolution_template
 from d180.models import Platter
-import schedule_queue.config as tools
 from schedule_queue.models import Reservation
-from schedule_queue.views import ReservationLanding
-from schedule_queue.urls import urlpatterns
 
 
 class TestReservationCRUD(TestCase):
 
     def setUp(self):
-        self.user_obj = get_user_model().objects.create_user('default', password='')
-        self.platter_obj = Platter.objects.create(name='test_platter')
-        self.tool_obj = tool_obj = tools.get_tool_list()[0]
+        self.user = get_user_model().objects.create_user('default', password='')
         self.client.login(username='default', password='')
 
-    def test_create_reservation(self):
-        res_obj = mommy.make(Reservation,
-                             tool=self.tool_obj,
-                             user=self.user_obj,
-                             growth_length=5)
-        res_id = Reservation.objects.all().filter(user=self.user_obj).first().id
-        url = reverse('reservation_edit', kwargs={'pk': res_obj.id})
-        match = resolve('/scheduling/edit/{0}/'.format(res_obj.id))
-        response = self.client.get(url)
-        self.assertEqual(match.url_name, 'reservation_edit')
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'schedule_queue/reservation_edit.html')
+    def test_reservation_edit_resolution_template(self):
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        reservation = mommy.make(Reservation,
+                                 tool=process_type,
+                                 user=self.user)
+        test_resolution_template(self,
+            url='/scheduling/edit/{}/'.format(reservation.id),
+            url_name='reservation_edit',
+            template_file='schedule_queue/reservation_edit.html')
 
-    def test_create_reservation_form(self):
+    def test_reservation_create_resolution_template(self):
+        test_resolution_template(self,
+            url='/scheduling/create/',
+            url_name='reservation_create',
+            template_file='schedule_queue/reservation_form.html')
+
+    def test_create_reservation_valid_data(self):
+        process_type = mommy.make(ProcessType, type='test-process')
         url = reverse('reservation_create')
-        match = resolve('/scheduling/new/')
-        response = self.client.post(url, {'tool': self.tool_obj, 'platter': self.platter_obj,
-                                          'user': self.user_obj, 'growth_length': 6,
-                                          'bake_length': 30,
-                                          'priority_field': 10*time.time()})
-        self.assertEqual(match.url_name, 'reservation_create')
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'schedule_queue/reservation_form.html')
+        data =  {
+            'tool': process_type.type,
+            'platter': mommy.make(Platter).id,
+            'user': self.user,
+            'growth_length': 6,
+            'bake_length': 30,
+            'priority': 10,
+            'comment': 'testing'
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('reservation_list', args=(process_type.type,)))
+        self.assertEqual(Reservation.objects.first().comment, 'testing')
 
-    def test_edit_reservation_form(self):
-        res_obj = mommy.make(Reservation,
-                             tool=self.tool_obj,
-                             user=self.user_obj,
-                             growth_length=5)
-        url = reverse('reservation_edit', kwargs={'pk': res_obj.id})
-        match = resolve('/scheduling/edit/{0}/'.format(res_obj.id))
-        response = self.client.post(url, {'growth_length': 6,
-                                          'bake_length': 30})
-        self.assertEqual(match.url_name, 'reservation_edit')
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'schedule_queue/reservation_edit.html')
+    def test_reservation_edit_valid_data(self):
+        process_type = mommy.make(ProcessType, type='test-process',
+                                  scheduling_type='simple')
+        reservation = mommy.make(Reservation,
+                             tool=process_type,
+                             user=self.user)
+        url = reverse('reservation_edit', kwargs={'pk': reservation.id})
+        data = {
+            'tool': process_type.type,
+            'platter': reservation.platter_id,
+            'user': reservation.user,
+            'growth_length': 6,
+            'bake_length': 30,
+            'comment': 'testing',
+        }
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('reservation_list', args=(process_type.type,)))
+        self.assertEqual(Reservation.objects.first().comment, 'testing')
+
+    def test_increase_priority_resolution(self):
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=10),
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=20),
+        ]
+        match = resolve('/scheduling/increase/{}/'.format(reservations[-1].id))
+        self.assertEqual(match.url_name, 'increase_priority')
+
+    def test_decrease_priority_resolution(self):
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=10),
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=20),
+        ]
+        match = resolve('/scheduling/decrease/{}/'.format(reservations[0].id))
+        self.assertEqual(match.url_name, 'decrease_priority')
 
     def test_increase_priority(self):
-        res_obj_1 = mommy.make(Reservation,
-                               tool=self.tool_obj,
-                               user=self.user_obj,
-                               growth_length=5, priority_field=int(10*time.time()))
-        res_obj_2 = mommy.make(Reservation,
-                               tool=self.tool_obj,
-                               user=self.user_obj,
-                               growth_length=4, priority_field=int((10*time.time())+1))
-        url = reverse('increase_priority',
-                      kwargs={'pk': res_obj_2.id})
-        match = resolve('/scheduling/increase/{0}/'.format(res_obj_2.id))
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=10, comment='a'),
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=20, comment='b'),
+        ]
+        url = reverse('increase_priority', kwargs={'pk': reservations[-1].id})
         response = self.client.get(url)
-        res_list = Reservation.objects.all().filter(
-            priority_field__lte=int((10*time.time())+2)).order_by('-priority_field')
-        self.assertEqual(match.url_name, 'increase_priority')
-        self.assertTrue(res_list[1].priority_field < res_list[0].priority_field, msg=None)
+        reservations = [Reservation.objects.get(id=r.id) for r in reservations]
+        self.assertEqual(reservations[0].priority, 20)
+        self.assertEqual(reservations[1].priority, 10)
 
     def test_decrease_priority(self):
-        res_obj_1 = mommy.make(Reservation,
-                               tool=self.tool_obj,
-                               user=self.user_obj,
-                               growth_length=5, priority_field=int(10*time.time()))
-        res_obj_2 = mommy.make(Reservation,
-                               tool=self.tool_obj,
-                               user=self.user_obj,
-                               growth_length=4, priority_field=int((10*time.time())+1))
-        url = reverse('decrease_priority',
-                      kwargs={'pk': res_obj_1.id})
-        match = resolve('/scheduling/decrease/{0}/'.format(res_obj_1.id))
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=10),
+            mommy.make(Reservation, tool=process_type,
+                       user=self.user, priority=20),
+        ]
+        url = reverse('decrease_priority', kwargs={'pk': reservations[0].id})
         response = self.client.get(url)
-        res_list = Reservation.objects.all().filter(
-            priority_field__lte=int((10*time.time())+2)).order_by('-priority_field')
-        self.assertEqual(match.url_name, 'decrease_priority')
-        self.assertTrue(res_list[1].priority_field < res_list[0].priority_field, msg=None)
+        reservations = [Reservation.objects.get(id=r.id) for r in reservations]
+        self.assertEqual(reservations[0].priority, 20)
+        self.assertEqual(reservations[1].priority, 10)
+
+    def test_deactivate_reservation_resolution(self):
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        reservation = mommy.make(Reservation,
+                                 tool=process_type, user=self.user)
+        match = resolve('/scheduling/cancel/{}/'.format(reservation.id))
+        self.assertEqual(match.url_name, 'cancel_reservation')
 
     def test_deactivate_reservation(self):
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
         res_obj = mommy.make(Reservation,
-                             tool=self.tool_obj,
-                             user=self.user_obj,
+                             tool=process_type,
+                             user=self.user,
                              growth_length=5)
         match = resolve('/scheduling/cancel/{0}/'.format(res_obj.id))
         url = reverse('cancel_reservation', kwargs={'pk': res_obj.id})
         response = self.client.get(url)
-        res_act_field = Reservation.objects.all().filter(user=self.user_obj).first().is_active
+        res_act_field = Reservation.objects.all().filter(user=self.user).first().is_active
         self.assertEqual(match.url_name, 'cancel_reservation')
         self.assertFalse(res_act_field, msg=None)
 
     def test_list_view(self):
-        res_obj_1 = mommy.make(Reservation,
-                               tool=self.tool_obj,
-                               user=self.user_obj,
-                               growth_length=5,
-                               priority_field=int(10*time.time()))
-        res_obj_2 = mommy.make(Reservation,
-                               tool=self.tool_obj,
-                               user=self.user_obj,
-                               growth_length=4,
-                               priority_field=int((10*time.time())+1))
-        match = resolve('/scheduling/{0}/'.format(self.tool_obj))
-        url = reverse('reservation_list_by_tool', kwargs={'tool_slug': self.tool_obj})
+        process_type = mommy.make(ProcessType, type='test-process')
+        reservations = [
+            mommy.make(Reservation, tool=process_type, user=self.user),
+            mommy.make(Reservation, tool=process_type, user=self.user),
+        ]
+        url = reverse('reservation_list', kwargs={'process': process_type.type})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'schedule_queue/reservation_list.html')
         self.assertEqual(len(response.context['object_list']),
-                         len(Reservation.objects.all().filter(tool=self.tool_obj)))
-        self.assertEqual(match.url_name, 'reservation_list_by_tool')
+                         len(Reservation.objects.all().filter(tool=process_type)))
+
+    def test_reservation_list_resolution_template(self):
+        process_type = mommy.make(ProcessType, type='test-process')
+        reservations = [
+            mommy.make(Reservation, tool=process_type, user=self.user),
+            mommy.make(Reservation, tool=process_type, user=self.user),
+        ]
+        test_resolution_template(self,
+            url='/scheduling/list/{}/'.format(process_type.type),
+            url_name='reservation_list',
+            template_file='schedule_queue/reservation_list.html')
+
+

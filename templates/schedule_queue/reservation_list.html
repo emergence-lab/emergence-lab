@@ -1,6 +1,8 @@
 {% extends "core/base.html" %}
 {% load humanize %}
 
+{% block title %}{{process_type.name}} Reservations{% endblock title %}
+
 
 {% block content %}
 
@@ -9,13 +11,13 @@
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li><a href="{% url 'reservation_landing' %}">Reservations</a></li>
-            <li class='active'>{{tool_name}} Reservations</li>
+            <li class='active'>{{process_type.name}} Reservations</li>
         </ol>
     </nav>
 
     <header>
         <h2 class="page-header">
-            {{tool_name}} Reservations
+            {{process_type.name}} Reservations
             {% if object_list|length < max_reservations %}
                 <a href="{% url 'reservation_create' %}" class="btn btn-success pull-right">
                     <span class="glyphicon glyphicon-plus"></span>
@@ -29,7 +31,6 @@
             {% endif %}
         </h2>
     </header>
-
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
