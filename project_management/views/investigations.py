@@ -42,3 +42,18 @@ class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_success_url(self):
         return reverse('pm_investigation_list')
+
+
+class InvestigationUpdateView(LoginRequiredMixin, generic.UpdateView):
+
+    model = Investigation
+    template_name = 'project_management/investigation_create.html'
+    form_class = InvestigationForm
+
+    def get_form_kwargs(self):
+        kwargs = super(InvestigationUpdateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('pm_investigation_list')

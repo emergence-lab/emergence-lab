@@ -8,6 +8,7 @@
   <div class="panel panel-info">
     <div class="panel-heading">
       Description
+      <a class="pull-right" href="{% url 'pm_investigation_edit' investigation.slug %}"><span class="glyphicon glyphicon-edit"></span></a>
     </div>
     <div class="panel-body">
       {{investigation.description}}

@@ -12,4 +12,6 @@ urlpatterns = [
         name='pm_investigation_detail'),
     url(r'^create$', views.InvestigationCreateView.as_view(),
         name='pm_investigation_create'),
+    url(r'^edit/(?P<slug>[\w-]+)$', views.InvestigationUpdateView.as_view(),
+        name='pm_investigation_edit'),
 ]
