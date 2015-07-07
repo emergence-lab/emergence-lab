@@ -1,5 +1,7 @@
 {% extends "core/base.html" %}
 
+{% block title %}Reservations{% endblock title %}
+
 {% block content %}
 
 <main class="container">
@@ -22,15 +24,16 @@
 
     <div class="row">
         <div class="list-group col-md-6 col-md-offset-3">
-            {% for item in object_list %}
-                <a class="list-group-item" href="{% url 'reservation_list' item %}"
-                   data-toggle="tooltip" data-placement="left" title="description">
-                    {{item.upper}}
-                    <span class="badge pull-right">2 Open</span>
+            {% for process_type in object_list %}
+                <a class="list-group-item" href="{% url 'reservation_list' process_type.type %}"
+                   data-toggle="tooltip" data-placement="left" title="{{process_type.description}}">
+                    {{process_type.name}}
+                    <span class="badge pull-right">{{process_type.open_reservations}} Open</span>
                 </a>
             {% endfor %}
         </div>
     </div>
 
 </main>
+
 {% endblock content %}

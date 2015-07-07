@@ -12,10 +12,9 @@ from django.views.generic import DetailView
 from braces.views import LoginRequiredMixin
 from redis import StrictRedis
 
-from core.models import User, Project, Investigation
+from core.models import User, Project, Investigation, ProcessType
 from core.streams import project_stream, investigation_stream
 from core.views import ActionReloadView
-from schedule_queue.models import Reservation, tools
 from users.redis_config import ActionItem
 
 
@@ -52,7 +51,7 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
         context['growths'] = []
-        context['tools'] = tools.get_tool_list()
+        context['tools'] = ProcessType.objects.values_list('name', flat=True)
         return context
 
     def get_object(self, queryset=None):

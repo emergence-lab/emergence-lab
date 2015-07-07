@@ -122,7 +122,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
     def get(self, request, *args, **kwargs):
         self.object = None
         reservation = Reservation.get_latest(user=self.request.user,
-                                             tool_name='d180')
+                                             process_type='d180-growth')
         return self.render_to_response(self.get_context_data(
             reservation=reservation, **self.build_forms()))
 
@@ -153,7 +153,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 piece = s.cleaned_data['piece']
                 sample.run_process(self.object, piece, n + 1)
             reservation = Reservation.get_latest(user=self.request.user,
-                                                 tool_name='d180')
+                                                 process_type=self.object.type)
             if reservation and not reservation_form.cleaned_data['hold_open']:
                 reservation.deactivate()
 
@@ -172,7 +172,7 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 sample_formset=sample_formset,
                 reservation_form=reservation_form,
                 reservation=Reservation.get_latest(user=self.request.user,
-                                                   tool_name='d180')))
+                                                   process_type='d180-growth')))
 
 
 class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):

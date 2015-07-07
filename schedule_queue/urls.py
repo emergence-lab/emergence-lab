@@ -19,6 +19,6 @@ urlpatterns = [
         views.IncreasePriority.as_view(), name='increase_priority'),
     url(r'^decrease/(?P<pk>\d+)/$',
         views.DecreasePriority.as_view(), name='decrease_priority'),
-    url(r'^list/(?P<tool_slug>[a-z0-9\-]+)/$',
+    url(r'^list/(?P<process>[a-z0-9\-]+)/$',
         views.ReservationList.as_view(), name='reservation_list'),
 ]

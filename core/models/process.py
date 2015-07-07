@@ -29,11 +29,20 @@ class ProcessType(models.Model):
     """
     Holds information about types of processes.
     """
+    SCHEDULING_TYPE = (
+        ('none', 'None'),
+        ('simple', 'Simple'),
+        ('full', 'Full'),
+        ('external', 'External')
+    )
+
     type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
     name = models.CharField(max_length=100, blank=True)
     full_name = models.CharField(max_length=255, blank=True)
     is_destructive = models.BooleanField(default=True)
     description = models.TextField(blank=True)
+    scheduling_type = models.CharField(max_length=10, choices=SCHEDULING_TYPE,
+                                       default='none', blank=True, null=True)
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)

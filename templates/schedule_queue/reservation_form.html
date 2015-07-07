@@ -1,19 +1,37 @@
 {% extends "core/base.html" %}
-
 {% load bootstrap3 %}
+
+{% block title %}Create Reservation{% endblock title %}
 
 {% block content %}
 
-<h2 class="text-center">New Reservation</h2>
-<form action="" method="post">{% csrf_token %}
-    <div class="col-md-4 col-md-offset-4">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    {% bootstrap_form form %}
-                </li>
-            </ul>
-        <button class="btn btn-success pull-right" type="submit" value="Create">Create</button>
-    </div>
-</form>
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'reservation_landing' %}">Reservations</a></li>
+            <li class="active">Create Reservation</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h2 class="page-header">
+            Create Reservation
+            <a href="{% url 'reservation_landing' %}" class="btn btn-default pull-right">
+                <span class="glyphicon glyphicon-arrow-left"></span>
+                Back
+            </a>
+        </h2>
+    </header>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="col-md-4 col-md-offset-4">
+            {% bootstrap_form form %}
+            <button class="btn btn-success pull-right" type="submit" value="Create">Create</button>
+        </div>
+    </form>
+
+</main>
 
 {% endblock %}
