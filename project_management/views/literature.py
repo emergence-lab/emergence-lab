@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from time import sleep
+import os
 
 from django.core.urlresolvers import reverse
 from django.views import generic
@@ -34,7 +35,7 @@ class MendeleyMixin(object):
             try:
                 self.mendeley = Mendeley(settings.MENDELEY_ID,
                                             settings.MENDELEY_SECRET,
-                                            'http://localhost:8000/oauth')
+                                            settings.MENDELEY_REDIRECT)
                 self.session = MendeleySession(self.mendeley, request.session['token'])
                 return super(MendeleyMixin, self).get(request, *args, **kwargs)
             except TokenExpiredError:
@@ -50,14 +51,16 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
     def perform_action(self, request, *args, **kwargs):
         mendeley = Mendeley(settings.MENDELEY_ID,
                             settings.MENDELEY_SECRET,
-                            'http://localhost:8000/oauth')
+                            settings.MENDELEY_REDIRECT)
         self.auth = mendeley.start_authorization_code_flow(request.session.get('state', ''))
         if 'state' not in request.session:
             request.session['state'] = self.auth.state
             print(request.session['state'])
         try:
-            print(request.get_full_path())
-            print(request.session['state'])
+            # print(request.get_full_path())
+            # print(request.session['state'])
+            if not settings.MENDELEY_SSL_VERIFY:
+                os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
             mendeley_session = self.auth.authenticate(request.get_full_path())
             request.session['token'] = mendeley_session.token
             # self.session['state'] = self.auth.state
@@ -141,7 +144,7 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        tmp = Literature.objects.all().filter(id=self.kwargs['pk'])
+        tmp = Literature.objects.all().filter(external_id=self.kwargs['external_id'])
         if tmp.filter(user=self.request.user).exists():
             obj = tmp.filter(user=self.request.user).first()
             if 'milestone' in self.kwargs and Milestone.objects.get(
@@ -152,15 +155,20 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
                 obj.investigations.add(Investigation.objects.get(id=self.kwargs['investigation']))
             obj.save()
         else:
-            document = self.session.documents.get(tmp.external_id)
-            literature = Literature.objects.create(external_id=document.id,
-                                                    title=unicode(document.title),
-                                                    journal=document.source,
-                                                    year=document.year,
-                                                    abstract=document.abstract,
-                                                    doi_number=document.identifiers.get('doi',
-                                                                                        None),
-                                                    user=self.request.user,)
+            document = self.session.documents.get(self.kwargs.get('external_id', None))
+            external_id=getattr(document, 'id', None)
+            title=unicode(getattr(document, 'title', None))
+            journal=getattr(document, 'journal', None)
+            year=getattr(document, 'year', None)
+            abstract=getattr(document, 'abstract', None)
+            if document.identifiers and document.identifiers.get('doi', None):
+                doi_number=document.identifiers.get('doi', None)
+            else:
+                doi_number=None
+            user=self.request.user
+            literature = Literature.objects.create(external_id=external_id, title=title,
+                                                    journal=journal, year=year, abstract=abstract,
+                                                    doi_number=doi_number, user=user)
             if 'milestone' in self.kwargs:
                 literature.milestones.add(Milestone.objects.get(id=self.kwargs['milestone']))
             if 'investigation' in self.kwargs:

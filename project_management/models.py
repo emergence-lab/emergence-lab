@@ -15,9 +15,9 @@ class Literature(TimestampMixin, models.Model):
     title = models.CharField(max_length=500)
     external_id = models.CharField(max_length=100, blank=True)
     abstract = fields.RichTextField(_('abstract'), blank=True, null=True)
-    doi_number = models.CharField(max_length=100, blank=True)
-    year = models.CharField(max_length=4, blank=True)
-    journal = models.CharField(max_length=200, blank=True)
+    doi_number = models.CharField(max_length=100, blank=True, null=True)
+    year = models.CharField(max_length=4, blank=True, null=True)
+    journal = models.CharField(max_length=200, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     investigations = models.ManyToManyField(Investigation,
                                         related_name='literature',

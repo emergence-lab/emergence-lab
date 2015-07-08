@@ -336,6 +336,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # Mendeley
 
-ENABLE_MENDELEY = get_secret('ENABLE_MENDELEY', True)
+ENABLE_MENDELEY = get_secret('ENABLE_MENDELEY', False)
 MENDELEY_ID = get_secret('MENDELEY_ID', '')
 MENDELEY_SECRET = get_secret('MENDELEY_SECRET', '')
+MENDELEY_REDIRECT = get_secret('MENDELEY_REDIRECT', '')
+MENDELEY_SSL_VERIFY = get_secret('MENDELEY_SSL_VERIFY', False)
