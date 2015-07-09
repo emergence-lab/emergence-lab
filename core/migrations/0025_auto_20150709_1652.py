@@ -9,7 +9,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0023_add_field_user_milestone'),
+        ('core', '0024_processtype_scheduling'),
     ]
 
     operations = [
