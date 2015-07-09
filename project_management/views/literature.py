@@ -156,16 +156,16 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
             obj.save()
         else:
             document = self.session.documents.get(self.kwargs.get('external_id', None))
-            external_id=getattr(document, 'id', None)
-            title=unicode(getattr(document, 'title', None))
-            journal=getattr(document, 'journal', None)
-            year=getattr(document, 'year', None)
-            abstract=getattr(document, 'abstract', None)
+            external_id = getattr(document, 'id', None)
+            title = unicode(getattr(document, 'title', None))
+            journal = getattr(document, 'journal', None)
+            year = getattr(document, 'year', None)
+            abstract = getattr(document, 'abstract', None)
             if document.identifiers and document.identifiers.get('doi', None):
-                doi_number=document.identifiers.get('doi', None)
+                doi_number = document.identifiers.get('doi', None)
             else:
-                doi_number=None
-            user=self.request.user
+                doi_number = None
+            user = self.request.user
             literature = Literature.objects.create(external_id=external_id, title=title,
                                                     journal=journal, year=year, abstract=abstract,
                                                     doi_number=doi_number, user=user)
