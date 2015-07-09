@@ -448,8 +448,9 @@ class TestD180Wizard(TestCase):
         mommy.make(Investigation)
         mommy.make(Platter)
         user = get_user_model().objects.first()
+        d180 = ProcessType.objects.get(type='d180-growth')
         reservation = mommy.make('schedule_queue.Reservation',
-                                 user=user, is_active=True, tool='d180')
+                                 user=user, is_active=True, tool=d180)
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '1',
@@ -502,8 +503,9 @@ class TestD180Wizard(TestCase):
         mommy.make(Investigation)
         mommy.make(Platter)
         user = get_user_model().objects.first()
+        d180 = ProcessType.objects.get(type='d180-growth')
         reservation = mommy.make('schedule_queue.Reservation',
-                                 user=user, is_active=True, tool='d180')
+                                 user=user, is_active=True, tool=d180)
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '1',
