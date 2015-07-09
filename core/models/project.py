@@ -74,6 +74,33 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
         return self.name
 
 
+class MilestoneNote(TimestampMixin, models.Model):
+    """
+    Stores a note attached to a milestone object
+    """
+    note = fields.RichTextField(_('note'), blank=True)
+    milestone = models.ForeignKey(Milestone,
+                                related_name='note',
+                                related_query_name='note',
+                                null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                limit_choices_to={'is_active': True})
+
+
+class Task(ActiveStateMixin, TimestampMixin, models.Model):
+    """
+    Stores a task with potential relation to a milestone.
+    """
+    description = fields.RichTextField(_('description'), blank=True)
+    due_date = models.DateField()
+    milestone = models.ForeignKey(Milestone,
+                                related_name='task',
+                                related_query_name='task',
+                                null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                limit_choices_to={'is_active': True})
+
+
 class ProjectTracking(models.Model):
     """
     Stores ownership and tracking information for projects.
