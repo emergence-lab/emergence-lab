@@ -5,7 +5,7 @@ from django import forms
 
 from datetimewidget.widgets import DateWidget
 
-from core.models import Investigation, ProjectTracking, Project, Milestone
+from core.models import Investigation, ProjectTracking, Project, Milestone, Task
 
 
 class MilestoneForm(forms.ModelForm):
@@ -39,3 +39,22 @@ class InvestigationForm(forms.ModelForm):
     class Meta:
         model = Investigation
         fields = ('name', 'description', 'project',)
+
+
+class TaskForm(forms.ModelForm):
+
+    due_date = forms.DateField(widget=DateWidget(
+        attrs={'class': 'datetime'},
+        bootstrap_version=3,
+        usel10n=True,
+        options={'minView': '2',
+                'startView': '2',
+                'todayBtn': 'false',
+                'todayHighlight': 'true',
+                'clear_Btn': 'true',
+                'format': 'yyyy-mm-dd'}
+    ))
+
+    class Meta:
+        model = Task
+        fields = '__all__'

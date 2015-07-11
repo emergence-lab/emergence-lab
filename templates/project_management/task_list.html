@@ -1,0 +1,59 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block title %}Tasks{% endblock title %}
+
+{% block pm_content %}
+
+<div class="container-fluid">
+  <div class="col-md-12">
+    <div>
+        <ul class="nav nav-pills">
+          <li role="presentation" class="active"><a href="#open" aria-controls="open" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-exclamation-sign"></span> Open</a></li>
+          <li role="presentation"><a href="#closed" aria-controls="closed" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-ok-sign"></span> Closed</a></li>
+          <li role="presentation"><a href="{% url 'task_create' %}"><span class="glyphicon glyphicon-plus"></span> New</a></li>
+          <h4 class="pull-right">This page lists tasks you've created for your milestones.</h4>
+        </ul>
+    </div>
+    <div class="spacer-xs"></div>
+
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel" id="open">
+        <div class="list-group">
+          {% for task in object_list %}
+          {% if task.is_active %}
+            <div href="#" class="list-group-item {% if task.due_date < today.date %}list-group-item-warning{%endif%}">
+              <h4 class="list-group-item-heading">
+                {{task.description}}
+                <span class="pull-right">Due: {{task.due_date}}</span>
+              </h4>
+              <p class="list-group-item-text">
+                <span class="label label-default">{{task.milestone.investigation}}/{{task.milestone}}</span>
+              </p>
+            </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="tab-pane" role="tabpanel" id="closed">
+        <div class="list-group">
+          {% for task in object_list %}
+          {% if not task.is_active %}
+            <div href="#" class="list-group-item">
+              <h4 class="list-group-item-heading">
+                {{task.description}}
+                <span class="pull-right">Due: {{task.due_date}}</span>
+              </h4>
+              <p>
+
+              </p>
+            </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

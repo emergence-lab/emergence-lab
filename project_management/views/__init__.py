@@ -21,5 +21,9 @@ from investigations import (InvestigationListView,
                             InvestigationUpdateView,)
 from projects import (ProjectListView,
                         ProjectUpdateView,)
+from tasks import (TaskListView,
+                    TaskCreateView,
+                    TaskCloseView,
+                    TaskReOpenView,)
 from utility import (LandingPageView,
                         NewsfeedView,)
