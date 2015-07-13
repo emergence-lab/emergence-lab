@@ -3,7 +3,8 @@ from milestones import (MilestoneListView,
                         MilestoneDetailView,
                         MilestoneUpdateView,
                         MilestoneCloseView,
-                        MilestoneReOpenView,)
+                        MilestoneReOpenView,
+                        MilestoneNoteAction,)
 from literature import (MendeleyOAuth,
                         LiteratureListView,
                         MendeleyLibrarySearchView,

@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.views import generic
+from django.http import HttpResponseRedirect
 
 from datetime import datetime
 
@@ -51,17 +52,6 @@ class MilestoneUpdateView(LoginRequiredMixin, generic.UpdateView):
         return reverse('milestone_list')
 
 
-class MilestoneDetailView(LoginRequiredMixin, generic.DetailView):
-
-    model = Milestone
-    template_name = 'project_management/milestone_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MilestoneDetailView, self).get_context_data(**kwargs)
-        context['today'] = datetime.now()
-        return context
-
-
 class MilestoneCloseView(LoginRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
@@ -82,3 +72,35 @@ class MilestoneReOpenView(LoginRequiredMixin, ActionReloadView):
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('milestone_list')
+
+
+class MilestoneDetailView(LoginRequiredMixin, generic.ListView):
+
+    model = MilestoneNote
+    template_name = 'project_management/milestone_detail.html'
+    paginate_by = 5
+
+    def get_queryset(self):
+        milestone = Milestone.objects.get(slug=self.kwargs.get('slug'))
+        queryset = MilestoneNote.objects.all().filter(milestone=milestone)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(MilestoneNewDetailView, self).get_context_data(**kwargs)
+        context['today'] = datetime.now()
+        context['milestone'] = Milestone.objects.get(slug=self.kwargs.get('slug'))
+        context['processes'] = context['milestone'].processes.order_by('-created')[:10]
+        context['literature'] = context['milestone'].literature.order_by('-created')[:10]
+        return context
+
+
+class MilestoneNoteAction(LoginRequiredMixin, generic.View):
+
+    def post(self, request, *args, **kwargs):
+        note = request.POST.get('note')
+        slug = request.POST.get('slug')
+        #user_id = request.POST.get('user')
+        MilestoneNote.objects.create(note=note,
+                                        user=request.user,
+                                        milestone=Milestone.objects.get(slug=slug))
+        return HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': slug}))

@@ -24,4 +24,7 @@ urlpatterns = [
     url(r'^close/(?P<slug>[\w-]+)$',
         views.MilestoneCloseView.as_view(),
         name="milestone_close"),
+    url(r'^note/$',
+        views.MilestoneNoteAction.as_view(),
+        name='milestone_note_action'),
     ]
