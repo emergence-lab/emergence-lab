@@ -13,6 +13,7 @@ from braces.views import LoginRequiredMixin
 
 from core.models import ProcessType
 from core.views import ActionReloadView
+from d180.models import Platter
 
 
 class ReservationLanding(LoginRequiredMixin, generic.ListView):
@@ -44,6 +45,11 @@ class ReservationCreate(LoginRequiredMixin, generic.CreateView):
     model = Reservation
     fields = ['tool', 'platter', 'growth_length', 'comment', 'bake_length']
     template_name = 'schedule_queue/reservation_form.html'
+
+    def get_form(self, form_class=None):
+        form = super(ReservationCreate, self).get_form(form_class)
+        form.fields['platter'].queryset = Platter.active_objects.all()
+        return form
 
     def form_valid(self, form):
         """
