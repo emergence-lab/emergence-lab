@@ -6,7 +6,6 @@ from milestones import (MilestoneListView,
                         MilestoneReOpenView,
                         MilestoneNoteAction,)
 from literature import (MendeleyOAuth,
-                        LiteratureListView,
                         MendeleyLibrarySearchView,
                         LiteratureLandingView,
                         AddMendeleyObjectView,

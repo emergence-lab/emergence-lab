@@ -16,7 +16,7 @@ from mendeley.exception import MendeleyApiException
 from oauthlib.oauth2 import TokenExpiredError
 
 from core.views import ActionReloadView
-from core.models import Investigation, Milestone
+from core.models import ProjectTracking, Investigation, Milestone
 from project_management.models import Literature
 
 
@@ -57,14 +57,10 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
             request.session['state'] = self.auth.state
             print(request.session['state'])
         try:
-            # print(request.get_full_path())
-            # print(request.session['state'])
             if not settings.MENDELEY_SSL_VERIFY:
                 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
             mendeley_session = self.auth.authenticate(request.get_full_path())
             request.session['token'] = mendeley_session.token
-            # self.session['state'] = self.auth.state
-            # print(self.kwargs['state'])
         except Exception as e:
             print(self.auth.get_login_url())
             print(e)
@@ -75,21 +71,6 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
             return self.auth.get_login_url()
         else:
             return reverse('mendeley_search')
-
-
-class LiteratureListView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView):
-
-    template_name = 'project_management/literature_list.html'
-
-    def get_context_data(self, **kwargs):
-        page = self.request.GET.get('page', None)
-        context = super(LiteratureListView, self).get_context_data(**kwargs)
-        literature = self.session.documents.list(page_size=10, view='tags')
-        # literature = session.documents.search('Basic').list()
-        context['literature'] = pagination_helper(page, literature.count, literature)
-        context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
-        context['investigations'] = Investigation.objects.all().filter(is_active=True)
-        return context
 
 
 class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView):
@@ -108,9 +89,13 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
                 literature = self.session.documents.search(query).list()
             except:
                 raise
+        projects = [x.project for x in ProjectTracking.objects.all().filter(
+            user=self.request.user)]
         context['literature'] = pagination_helper(page, literature.count, literature)
-        context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
-        context['investigations'] = Investigation.objects.all().filter(is_active=True)
+        context['milestones'] = Milestone.objects.all().filter(
+            user=self.request.user).filter(is_active=True)
+        context['investigations'] = Investigation.objects.all().filter(
+            is_active=True).filter(project__in=projects)
         return context
 
 
@@ -135,9 +120,13 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(LiteratureLandingView, self).get_context_data(**kwargs)
+        projects = [x.project for x in ProjectTracking.objects.all().filter(
+            user=self.request.user)]
         context['mendeley'] = settings.ENABLE_MENDELEY
-        context['milestones'] = Milestone.objects.all().filter(user=self.request.user)
-        context['investigations'] = Investigation.objects.all().filter(is_active=True)
+        context['milestones'] = Milestone.objects.all().filter(
+            user=self.request.user).filter(is_active=True)
+        context['investigations'] = Investigation.objects.all().filter(
+            is_active=True).filter(project__in=projects)
         return context
 
 
