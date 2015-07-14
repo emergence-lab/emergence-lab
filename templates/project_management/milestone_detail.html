@@ -1,5 +1,7 @@
 {% extends 'project_management/pm_base.html' %}
 
+{% load dashboard_tags %}
+
 {% block subtitle %}{{milestone.name}}{% endblock %}
 
 {% block pm_content %}
@@ -25,7 +27,7 @@
   </div>
 
   <div>
-      <ul class="nav nav-pills">
+      <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#details" aria-controls="details" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-list-alt"></span> Updates</a></li>
         <li role="presentation"><a href="#activity" aria-controls="activity" data-toggle="pill" role="tab"><span class="glyphicon
          glyphicon-stats"></span> Activity</a></li>
@@ -43,7 +45,7 @@
       <div class="list-group">
         {% for note in object_list reversed %}
           <div class="list-group-item" href="#">
-            <p class="list-group-item-text">{{note.note}}</p>
+            <p class="list-group-item-text">{{note.note|convert_to_links}}</p>
             <p class="list-group-item-text"><small>{{note.created}}</small></p>
           </div>
         {% endfor %}
@@ -147,13 +149,13 @@
               <form action="{% url 'milestone_note_action' %}" method="post" role="form">
                 {% csrf_token %}
                 <div class="modal-body">
+                  <p>
+                    Enter the text for your note below. Shortcuts to tag processes and literature are shown at right. You can tag a sample or process by adding a hashtag ("#") before the process or sample UUID. (i.e. #s0001)
+                  </p>
                   <div class="row">
                     <div class="col-md-8">
-                      <p>
-                        Test instructions
-                      </p>
                       <div class="form-group">
-                        <label>Description</label>
+                        <!-- <label>Description</label> -->
                         <textarea name="note" id="note-text" cols="30" rows="3" class="form-control" placeholder="Type note text here..."></textarea>
                         <input class="form-control hidden" type="textbox" name="user_id" value="{{milestone.user.id}}">
                         <input class="form-control hidden" type="textbox" name="slug" value="{{milestone.slug}}">
@@ -161,7 +163,7 @@
                     </div>
                     <div class="col-md-4">
                       <div>
-                          <ul class="nav nav-pills">
+                          <ul class="nav nav-tabs">
                             <li role="presentation" class="active"><a href="#processes-modal" aria-controls="processes-modal" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-exclamation-sign"></span> Processes</a></li>
                             <li role="presentation"><a href="#literature-modal" aria-controls="literature-modal" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-ok-sign"></span> Literature</a></li>
                           </ul>
@@ -171,7 +173,7 @@
                         <div class="tab-pane active" role="tabpanel" id="processes-modal">
                           <div class="list-group">
                             {% for process in processes %}
-                              <div class="list-group-item" data-toggle="tooltip" data-placement="bottom" data-title="{{process.comment}}">
+                              <div class="list-group-item text-add" data-toggle="tooltip" data-placement="bottom" data-title="{{process.comment|safe}}" data-append="#{{process.uuid}} ">
                                 <p class="list-group-item-text">
                                   {{process.uuid}}{% if process.legacy_identifier %}({{process.legacy_identifier}}){% endif %}
                                 </p>
@@ -184,7 +186,7 @@
                         <div class="tab-pane" role="tabpanel" id="literature-modal">
                           <div class="list-group">
                             {% for update in literature %}
-                              <div class="list-group-item" data-toggle="tooltip" data-placement="bottom" data-title="{{update.title}}">
+                              <div class="list-group-item text-add" data-toggle="tooltip" data-placement="bottom" data-title="{{update.title}}" data-append="#lit-{{update.id}} ">
                                 <p class="list-group-item-text">
                                   {{update.id}}: {{update.title|truncatewords:4}}
                                 </p>
@@ -206,6 +208,14 @@
           </div>
       </div>
   </section>
+
+  <script>
+    $(document).ready(function(){
+      $(".text-add").click(function(){
+        $('#note-text').append($(this).attr("data-append"));
+      });
+    });
+</script>
 
 {% endif %}
 {% endblock %}

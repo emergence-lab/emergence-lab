@@ -86,7 +86,7 @@ class MilestoneDetailView(LoginRequiredMixin, generic.ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        context = super(MilestoneNewDetailView, self).get_context_data(**kwargs)
+        context = super(MilestoneDetailView, self).get_context_data(**kwargs)
         context['today'] = datetime.now()
         context['milestone'] = Milestone.objects.get(slug=self.kwargs.get('slug'))
         context['processes'] = context['milestone'].processes.order_by('-created')[:10]
