@@ -318,6 +318,12 @@ class ProcessTypeDetailView(LoginRequiredMixin, generic.DetailView):
     context_object_name = 'processtype'
     slug_field = 'type'
 
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTypeDetailView, self).get_context_data(**kwargs)
+        context['recent_processes'] = (Process.objects.filter(type_id=self.object.type)
+                                                      .order_by('-created')[:10])
+        return context
+
 
 class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = ProcessType
