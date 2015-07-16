@@ -60,4 +60,5 @@ from .process import (
     TemplateProcessWizardView,
     ProcessTypeListView,
     ProcessTypeDetailView,
+    ProcessTypeUpdateView,
 )

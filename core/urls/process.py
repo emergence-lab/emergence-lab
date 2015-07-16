@@ -39,4 +39,6 @@ urlpatterns = [
         core.views.ProcessTypeListView.as_view(), name='processtype_list'),
     url(r'^type/(?P<slug>[\w-]+)/$',
         core.views.ProcessTypeDetailView.as_view(), name='processtype_detail'),
+    url(r'^type/(?P<slug>[\w-]+)/edit/$',
+        core.views.ProcessTypeUpdateView.as_view(), name='processtype_edit'),
 ]

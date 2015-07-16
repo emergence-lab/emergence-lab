@@ -741,3 +741,36 @@ class TestProcessTypeCRUD(TestCase):
         url = reverse('processtype_detail', args=(processtype.type,))
         response = self.client.get(url)
         self.assertContains(response, processtype.full_name)
+
+    def test_processtype_edit_resolution_template(self):
+        processtype = mommy.make(ProcessType, type='test')
+        test_resolution_template(self,
+            url='/process/type/{}/edit/'.format(processtype.type),
+            url_name='processtype_edit',
+            template_file='core/processtype_edit.html',
+            response_code=200,
+            valid_lookup='test',
+            invalid_lookup='invalid')
+
+    def test_processtype_edit_empty_data(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = '/process/type/{}/edit/'.format(processtype.type)
+        data = {}
+        response = self.client.post(url, data)
+        before = processtype.description
+        processtype = ProcessType.objects.get(type=processtype.type)
+        self.assertEqual(processtype.description, before)
+        detail_url =  '/process/type/{}/'.format(processtype.type)
+        self.assertRedirects(response, detail_url)
+
+    def test_processtype_edit_valid_data(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = '/process/type/{}/edit/'.format(processtype.type)
+        data = {
+            'description': 'testing',
+        }
+        response = self.client.post(url, data)
+        processtype = ProcessType.objects.get(type=processtype.type)
+        self.assertEqual(processtype.description, data['description'])
+        detail_url =  '/process/type/{}/'.format(processtype.type)
+        self.assertRedirects(response, detail_url)
