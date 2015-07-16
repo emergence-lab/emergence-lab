@@ -1,0 +1,46 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}{{processtype.full_name}}{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'processtype_list' %}">Process Types</a></li>
+            <li class='active'>{{processtype.name}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            {{processtype.full_name}}
+            <div class="pull-right">
+                <a href="#" class="btn btn-warning">
+                    {% bootstrap_icon 'edit' %}
+                    Edit
+                </a>
+                {% if processtype.scheduling_type == 'simple' %}
+                    <a href="#" class="btn btn-success">
+                        {% bootstrap_icon 'bookmark' %}
+                        Create Reservation
+                    </a>
+                {% endif %}
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <h3 class="page-header">
+            {{processtype.full_name}} ({{processtype.name}})
+        </h3>
+        <p>{{processtype.description}}</p>
+    </div>
+
+    <div class="spacer-lg"></div>
+
+</main>
+
+{% endblock content %}

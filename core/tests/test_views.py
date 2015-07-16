@@ -11,7 +11,7 @@ from model_mommy import mommy
 
 from .helpers import test_resolution_template
 from core.models import (Investigation, Process, Project, ProjectTracking,
-                         Sample, Substrate, ProcessTemplate)
+                         Sample, Substrate, ProcessTemplate, ProcessType)
 
 
 class TestHomepageAbout(TestCase):
@@ -714,3 +714,43 @@ class TestProcessTemplateCRUD(TestCase):
         with self.assertRaises(ProcessTemplate.DoesNotExist):
             ProcessTemplate.objects.get(id=template.id)
         self.assertEqual(response.status_code, 200)
+
+
+class TestProcessTypeCRUD(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
+        self.client.login(username='username1', password='')
+
+    def test_processtype_list_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/type/',
+            url_name='processtype_list',
+            template_file='core/processtype_list.html',
+            response_code=200)
+
+    def test_processtype_list_content(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = reverse('processtype_list')
+        response = self.client.get(url)
+        self.assertContains(response, processtype.full_name)
+
+    def test_processtype_detail_resolution_template(self):
+        processtype = mommy.make(ProcessType, type='test')
+        test_resolution_template(self,
+            url='/process/type/{}/'.format(processtype.type),
+            url_name='processtype_detail',
+            template_file='core/processtype_detail.html',
+            response_code=200)
+
+    def test_processtype_detail_invalid(self):
+        url = reverse('processtype_detail', args=('test',))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_processtype_detail_content(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = reverse('processtype_detail', args=(processtype.type,))
+        response = self.client.get(url)
+        self.assertContains(response, processtype.full_name)

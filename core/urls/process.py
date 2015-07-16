@@ -35,4 +35,8 @@ urlpatterns = [
         core.views.ProcessTemplateEditView.as_view(), name='process_template_edit'),
     url(r'^templates/remove/(?P<pk>[0-9]+)/$',
         core.views.RemoveProcessTemplateView.as_view(), name='remove_process_template'),
+    url(r'^type/$',
+        core.views.ProcessTypeListView.as_view(), name='processtype_list'),
+    url(r'^type/(?P<slug>[\w-]+)/$',
+        core.views.ProcessTypeDetailView.as_view(), name='processtype_detail'),
 ]

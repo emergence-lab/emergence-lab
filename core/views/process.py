@@ -301,3 +301,16 @@ class TemplateProcessWizardView(ProcessWizardView):
         output['info_form'] = WizardBasicInfoForm(initial={'user': self.request.user,
                                                            'comment': comment}, prefix='process')
         return output
+
+
+class ProcessTypeListView(LoginRequiredMixin, generic.ListView):
+    model = ProcessType
+    template_name = 'core/processtype_list.html'
+    context_object_name = 'processtypes'
+
+
+class ProcessTypeDetailView(LoginRequiredMixin, generic.DetailView):
+    model = ProcessType
+    template_name = 'core/processtype_detail.html'
+    context_object_name = 'processtype'
+    slug_field = 'type'

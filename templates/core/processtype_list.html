@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}Process Types{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Process Types</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Process Types
+            <div class="btn-toolbar pull-right">
+                <a class="btn btn-primary" href="#">
+                    {% bootstrap_icon 'plus' %}
+                    Create Process Type
+                </a>
+            </div>
+        </h1>
+    </header>
+
+    <div>
+        <div class="list-group">
+            {% for processtype in processtypes %}
+                <a class="list-group-item" href="{% url 'processtype_detail' processtype.type %}"
+                   data-toggle="tooltip" data-placement="left" title="{{processtype.description}}">
+                    {{processtype.full_name}}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+</main>
+
+{% endblock content %}
