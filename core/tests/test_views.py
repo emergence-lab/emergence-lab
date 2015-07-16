@@ -684,7 +684,7 @@ class TestProcessTemplateCRUD(TestCase):
         process = mommy.make(Process)
         template = ProcessTemplate.objects.create(process=process,
                                                   user=self.user)
-        url = '/process/templates/edit/{}/'.format(template.id)
+        url = '/process/templates/{}/edit/'.format(template.id)
         data = {
             'name': 'test',
             'comment': 'test_comment'
@@ -699,7 +699,7 @@ class TestProcessTemplateCRUD(TestCase):
         process = mommy.make(Process)
         template = ProcessTemplate.objects.create(process=process,
                                                   user=self.user)
-        url = '/process/templates/remove/{}/'.format(template.id)
+        url = '/process/templates/{}/remove/'.format(template.id)
         response = self.client.post(url, args=(template.id,), follow=True)
         with self.assertRaises(ProcessTemplate.DoesNotExist):
             ProcessTemplate.objects.get(id=template.id)
