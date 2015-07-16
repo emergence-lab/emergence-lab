@@ -383,18 +383,15 @@ class TestSampleCRUD(TestCase):
             url='/samples/{}/'.format(sample.uuid),
             url_name='sample_detail',
             template_file='core/sample_detail.html',
-            response_code=200)
+            response_code=200,
+            valid_lookup=sample.uuid,
+            invalid_lookup='s1000')
 
     def test_sample_detail_content(self):
         sample = Sample.objects.create(mommy.make(Substrate))
         url = reverse('sample_detail', args=(sample.uuid,))
         response = self.client.get(url)
         self.assertContains(response, sample.uuid)
-
-    def test_sample_detail_invalid(self):
-        url = reverse('sample_detail', args=('s1000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
 
     def test_sample_create_resolution_template(self):
         test_resolution_template(self,
@@ -431,12 +428,9 @@ class TestSampleCRUD(TestCase):
             url='/samples/{}/edit/'.format(sample.uuid),
             url_name='sample_edit',
             template_file='core/sample_edit.html',
-            response_code=200)
-
-    def test_sample_edit_invalid(self):
-        url = reverse('sample_edit', args=('s1000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup=sample.uuid,
+            invalid_lookup='s1000')
 
     def test_sample_edit_valid_data(self):
         sample = Sample.objects.create(mommy.make(Substrate))
@@ -475,12 +469,9 @@ class TestProcessCRUD(TestCase):
             url='/process/{}/'.format(process.uuid),
             url_name='process_detail',
             template_file='core/process_detail.html',
-            response_code=200)
-
-    def test_process_detail_invalid(self):
-        url = reverse('process_detail', args=('p0000000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup=process.uuid,
+            invalid_lookup='p0000000')
 
     def test_process_detail_content(self):
         process = mommy.make(Process)
@@ -497,12 +488,9 @@ class TestProcessCRUD(TestCase):
             url='/process/{}/edit/'.format(process.uuid),
             url_name='process_edit',
             template_file='core/process_edit.html',
-            response_code=200)
-
-    def test_process_edit_invalid(self):
-        url = reverse('process_edit', args=('p0000000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup=process.uuid,
+            invalid_lookup='p0000000')
 
     def test_process_edit_empty_data(self):
         process = mommy.make(Process)
@@ -629,7 +617,9 @@ class TestProcessCRUD(TestCase):
             url='/process/autocreate/{}/'.format(sample.uuid),
             url_name='process_autocreate',
             template_file='core/process_create.html',
-            response_code=200)
+            response_code=200,
+            valid_lookup=sample.uuid,
+            invalid_lookup='s1000')
 
     def test_autocreate_empty_data(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
@@ -742,12 +732,9 @@ class TestProcessTypeCRUD(TestCase):
             url='/process/type/{}/'.format(processtype.type),
             url_name='processtype_detail',
             template_file='core/processtype_detail.html',
-            response_code=200)
-
-    def test_processtype_detail_invalid(self):
-        url = reverse('processtype_detail', args=('test',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup='test',
+            invalid_lookup='invalid')
 
     def test_processtype_detail_content(self):
         processtype = mommy.make(ProcessType, type='test')

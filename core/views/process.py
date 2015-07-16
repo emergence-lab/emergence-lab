@@ -6,7 +6,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
@@ -106,7 +106,10 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
     template_name = 'core/process_create.html'
 
     def get_form(self, form_class):
-        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        try:
+            sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        except Sample.DoesNotExist as e:
+            raise Http404(e)
         return form_class(pieces=sample.pieces, **self.get_form_kwargs())
 
     def form_valid(self, form):
