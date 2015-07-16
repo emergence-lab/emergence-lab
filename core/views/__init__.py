@@ -61,4 +61,5 @@ from .process import (
     ProcessTypeListView,
     ProcessTypeDetailView,
     ProcessTypeUpdateView,
+    ProcessTypeCreateView,
 )

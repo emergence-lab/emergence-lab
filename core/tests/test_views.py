@@ -774,3 +774,32 @@ class TestProcessTypeCRUD(TestCase):
         self.assertEqual(processtype.description, data['description'])
         detail_url =  '/process/type/{}/'.format(processtype.type)
         self.assertRedirects(response, detail_url)
+
+    def test_processtype_create_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/type/create/',
+            url_name='processtype_create',
+            template_file='core/processtype_create.html',
+            response_code=200)
+
+    def test_processtype_create_empty_data(self):
+        url = reverse('processtype_create')
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'type',
+                             'This field is required.')
+
+    def test_processtype_create_valid_data(self):
+        url = reverse('processtype_create')
+        data = {
+            'type': 'test',
+            'name': 'Test',
+            'full_name': 'Test Process',
+            'description': 'testing',
+            'is_destructive': True,
+            'scheduling_type': 'none',
+        }
+        response = self.client.post(url, data)
+        processtype = ProcessType.objects.last()
+        self.assertRedirects(response, reverse('processtype_detail',
+                                               args=(processtype.type,)))
