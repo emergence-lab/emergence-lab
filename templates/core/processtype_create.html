@@ -23,7 +23,10 @@
         <h1 class="page-header">
             Create Process Type
             <div class="pull-right">
-                <a href="{% url 'processtype_list' %}" class="btn btn-danger">Cancel</a>
+                <a href="{% url 'processtype_list' %}" class="btn btn-danger">
+                    {% bootstrap_icon 'remove' %}
+                    Cancel
+                </a>
             </div>
         </h1>
     </header>

@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %}Processes{% endblock title %}
 
@@ -17,15 +18,15 @@
             Processes
             <div class="btn-toolbar pull-right">
                 <a class="btn btn-info" href="{% url 'process_templates' slug='all'%}">
-                    <span class="glyphicon glyphicon-star"></span>
+                    {% bootstrap_icon 'star' %}
                     Favorites
                 </a>
                 <a class="btn btn-info" href="{% url 'processtype_list' %}">
-                    <span class="glyphicon glyphicon-th-list"></span>
+                    {% bootstrap_icon 'th-list' %}
                     Process Types
                 </a>
                 <a class="btn btn-primary" href="{% url 'process_create' %}">
-                    <span class="glyphicon glyphicon-plus"></span>
+                    {% bootstrap_icon 'plus' %}
                     Create Process
                 </a>
             </div>
