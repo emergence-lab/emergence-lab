@@ -1,8 +1,7 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-
-{% block title %}Edit {{processtemplate.name}}{% endblock title %}
+{% block title %}Edit {{processtype.full_name}}{% endblock title %}
 
 {% block header %}
     {% load staticfiles %}
@@ -12,22 +11,20 @@
 {% block content %}
 
 <main class="container">
-
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
-            <li><a href="{% url 'process_templates' slug='all' %}">Favorites</a></li>
-            <li><a href="{% url 'process_template_detail' pk=processtemplate.id %}">Detail</a></li>
-            <li class="active">Edit</li>
+            <li><a href="{% url 'processtype_list' %}">Process Types</a></li>
+            <li><a href="{% url 'processtype_detail' processtype.type %}">{{processtype.name}}</a></li>
+            <li class='active'>Edit</li>
         </ol>
     </nav>
 
     <header>
         <h1 class="page-header">
-            Edit {{processtemplate.name}}
+            Edit {{processtype.full_name}}
             <div class="pull-right">
-                <a href="{% url 'process_template_detail' pk=processtemplate.id %}" class="btn btn-default">
+                <a href="{% url 'processtype_detail' processtype.type %}" class="btn btn-default">
                     {% bootstrap_icon 'arrow-left' %}
                     Back
                 </a>
@@ -35,17 +32,15 @@
         </h1>
     </header>
 
-    <div>
-        <form action="" method="post">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button class="btn btn-warning" type="submit">Update</button>
-        </form>
-    </div>
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="btn btn-warning" type="submit">Update</button>
+    </form>
 
 </main>
 
-{% endblock %}
+{% endblock content %}
 
 {% block scripts %}
     <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>

@@ -6,7 +6,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
@@ -106,7 +106,10 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
     template_name = 'core/process_create.html'
 
     def get_form(self, form_class):
-        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        try:
+            sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        except Sample.DoesNotExist as e:
+            raise Http404(e)
         return form_class(pieces=sample.pieces, **self.get_form_kwargs())
 
     def form_valid(self, form):
@@ -301,3 +304,43 @@ class TemplateProcessWizardView(ProcessWizardView):
         output['info_form'] = WizardBasicInfoForm(initial={'user': self.request.user,
                                                            'comment': comment}, prefix='process')
         return output
+
+
+class ProcessTypeListView(LoginRequiredMixin, generic.ListView):
+    model = ProcessType
+    template_name = 'core/processtype_list.html'
+    context_object_name = 'processtypes'
+
+
+class ProcessTypeDetailView(LoginRequiredMixin, generic.DetailView):
+    model = ProcessType
+    template_name = 'core/processtype_detail.html'
+    context_object_name = 'processtype'
+    slug_field = 'type'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTypeDetailView, self).get_context_data(**kwargs)
+        context['recent_processes'] = (Process.objects.filter(type_id=self.object.type)
+                                                      .order_by('-created')[:10])
+        return context
+
+
+class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = ProcessType
+    template_name = 'core/processtype_edit.html'
+    context_object_name = 'processtype'
+    slug_field = 'type'
+    fields = ('name', 'full_name', 'description', 'scheduling_type',)
+
+    def get_success_url(self):
+        return reverse('processtype_detail', args=(self.object.type,))
+
+
+class ProcessTypeCreateView(LoginRequiredMixin, generic.CreateView):
+    model = ProcessType
+    template_name = 'core/processtype_create.html'
+    fields = ('type', 'name', 'full_name', 'description',
+              'is_destructive', 'scheduling_type')
+
+    def get_success_url(self):
+        return reverse('processtype_detail', args=(self.object.type,))
