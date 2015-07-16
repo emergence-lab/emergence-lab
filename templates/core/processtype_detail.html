@@ -23,7 +23,7 @@
                     Edit
                 </a>
                 {% if processtype.scheduling_type == 'simple' %}
-                    <a href="#" class="btn btn-success">
+                    <a href="{% url 'reservation_create' %}" class="btn btn-success">
                         {% bootstrap_icon 'bookmark' %}
                         Create Reservation
                     </a>

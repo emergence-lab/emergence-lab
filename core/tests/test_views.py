@@ -754,7 +754,7 @@ class TestProcessTypeCRUD(TestCase):
 
     def test_processtype_edit_empty_data(self):
         processtype = mommy.make(ProcessType, type='test')
-        url = '/process/type/{}/edit/'.format(processtype.type)
+        url = reverse('processtype_edit', args=(processtype.type,))
         data = {}
         response = self.client.post(url, data)
         before = processtype.description
@@ -765,7 +765,7 @@ class TestProcessTypeCRUD(TestCase):
 
     def test_processtype_edit_valid_data(self):
         processtype = mommy.make(ProcessType, type='test')
-        url = '/process/type/{}/edit/'.format(processtype.type)
+        url = reverse('processtype_edit', args=(processtype.type,))
         data = {
             'description': 'testing',
         }
