@@ -40,7 +40,7 @@ class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
         return kwargs
 
     def get_success_url(self):
-        return reverse('pm_investigation_list')
+        return reverse('pm_project_list')
 
 
 class InvestigationUpdateView(LoginRequiredMixin, generic.UpdateView):
@@ -55,4 +55,4 @@ class InvestigationUpdateView(LoginRequiredMixin, generic.UpdateView):
         return kwargs
 
     def get_success_url(self):
-        return reverse('pm_investigation_list')
+        return reverse('pm_project_list')

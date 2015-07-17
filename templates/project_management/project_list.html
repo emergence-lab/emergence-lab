@@ -64,23 +64,39 @@
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigation_set.all %}
-                <li class="list-group-item">
-                    <h4 class="list-group-item-heading">
-                      <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
-                    </h4>
-                    <p class="list-group-item-text">
-                      {{i.description|safe|truncatewords:50}}
-                    </p>
-                    <p class="list-group-item-text">
-                      <strong>Milestones: &emsp;</strong>
-                      {% for m in i.milestone.all %}
-                        {% if m.is_active and m.user == request.user %}
-                        <span class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-toggle="tooltip" title="{{m.description|safe|truncatewords:20}}">{{m.name}}</span>
-                        {% endif %}
-                      {% endfor %}
-                      &emsp;<a href="{% url 'milestone_create' %}"><span data-toggle="tooltip" data-title="Create a milestone" class="glyphicon glyphicon-plus"></span></a>
-                    </p>
-                </li>
+                  {% if i.is_active %}
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">
+                          <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
+                          <a href="{% url 'investigation_deactivate' project=p.slug slug=i.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down">&emsp;</span></a>
+                        </h4>
+                        <p class="list-group-item-text">
+                          {{i.description|safe|truncatewords:50}}
+                        </p>
+                        <p class="list-group-item-text">
+                          <strong>Milestones: &emsp;</strong>
+                          {% for m in i.milestone.all %}
+                            {% if m.is_active and m.user == request.user %}
+                            <span class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-toggle="tooltip" title="{{m.description|safe|truncatewords:20}}">{{m.name}}</span>
+                            {% endif %}
+                          {% endfor %}
+                          &emsp;<a href="{% url 'milestone_create' %}"><span data-toggle="tooltip" data-title="Create a milestone" class="glyphicon glyphicon-plus"></span></a>
+                        </p>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+                {% for i in p.investigation_set.all %}
+                  {% if not i.is_active %}
+                    <li class="list-group-item list-group-item-danger">
+                        <h4 class="list-group-item-heading">
+                          <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> <del>{{ i }}</del></a>
+                          <a href="{% url 'investigation_activate' project=p.slug slug=i.slug %}" data-toggle="tooltip" data-title="Make Active" class="pull-right"><span class="glyphicon glyphicon-thumbs-up">&emsp;</span></a>
+                        </h4>
+                        <p class="list-group-item-text">
+                          {{i.description|safe|truncatewords:50}}
+                        </p>
+                    </li>
+                  {% endif %}
                 {% endfor %}
             </ul>
         </div>
