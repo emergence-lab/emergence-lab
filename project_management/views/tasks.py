@@ -17,10 +17,18 @@ class TaskListView(LoginRequiredMixin, generic.ListView):
 
     model = Task
     template_name = 'project_management/task_list.html'
+    paginate_by = 25
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskListView, self).get_context_data(**kwargs)
+        context['today'] = datetime.now()
+        context['inactive_tasks'] = Task.objects.all().filter(
+            user=self.request.user).filter(is_active=False).order_by("due_date")
+        return context
 
     def get_queryset(self):
-        queryset = super(TaskListView, self).get_queryset()
-        return queryset.filter(user=self.request.user)
+        queryset = super(TaskListView, self).get_queryset().filter(user=self.request.user)
+        return queryset.filter(is_active=True).order_by("due_date")
 
 
 class TaskCreateView(LoginRequiredMixin, generic.CreateView):
@@ -42,15 +50,15 @@ class TaskCloseView(LoginRequiredMixin, ActionReloadView):
             task.deactivate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('task_list')
+        return reverse('pm_task_list')
 
 
 class TaskReOpenView(LoginRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        task = Task.objects.get(slug=kwargs.pop('pk'))
+        task = Task.objects.get(id=kwargs.pop('pk'))
         if task.user == request.user:
             task.activate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('task_list')
+        return reverse('pm_task_list')

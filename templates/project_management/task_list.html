@@ -31,34 +31,45 @@
       <div class="tab-pane active" role="tabpanel" id="open">
         <div class="list-group">
           {% for task in object_list %}
-          {% if task.is_active %}
             <div href="#" class="list-group-item {% if task.due_date < today.date %}list-group-item-warning{%endif%}">
               <h4 class="list-group-item-heading">
-                {{task.description}}
+                <a href="{% url 'task_close' pk=task.id %}" data-toggle="tooltip" data-title="Mark complete"><span class="glyphicon glyphicon-ok"></span></a> {{task.description}}
                 <span class="pull-right">Due: {{task.due_date}}</span>
               </h4>
               <p class="list-group-item-text">
                 <span class="label label-default">{{task.milestone.investigation}}/{{task.milestone}}</span>
               </p>
             </div>
-          {% endif %}
           {% endfor %}
         </div>
+        {% if is_paginated %}
+        <nav>
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
+            {% endif %}
+            {% for page in paginator.page_range %}
+                <li {% if page_obj.number == forloop.counter %}class="active"{% endif %}><a href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}">{% if not page_obj.has_next %}<span aria-hidden="true">{% endif %}Next &raquo;</span><span class="sr-only">Next</span></a></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
       </div>
       <div class="tab-pane" role="tabpanel" id="closed">
         <div class="list-group">
-          {% for task in object_list %}
-          {% if not task.is_active %}
+          {% for task in inactive_tasks|slice:":10" %}
             <div href="#" class="list-group-item">
               <h4 class="list-group-item-heading">
-                {{task.description}}
+                <a href="{% url 'task_open' pk=task.id %}" data-toggle="tooltip" data-title="Re-Open"><span class="glyphicon glyphicon-repeat"></span></a> {{task.description}}
                 <span class="pull-right">Due: {{task.due_date}}</span>
               </h4>
               <p>
-
+                <span class="label label-default">{{task.milestone.investigation}}/{{task.milestone}}</span>
               </p>
             </div>
-          {% endif %}
           {% endfor %}
         </div>
       </div>
