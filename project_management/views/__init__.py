@@ -24,6 +24,7 @@ from projects import (ProjectListView,
 from tasks import (TaskListView,
                     TaskCreateView,
                     TaskCloseView,
-                    TaskReOpenView,)
+                    TaskReOpenView,
+                    TaskCreateAction,)
 from utility import (LandingPageView,
                         NewsfeedView,)

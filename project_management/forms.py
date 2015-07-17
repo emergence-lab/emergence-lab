@@ -57,4 +57,4 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ('due_date', 'description',)

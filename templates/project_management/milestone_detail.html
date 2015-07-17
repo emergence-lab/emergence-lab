@@ -1,5 +1,12 @@
 {% extends 'project_management/pm_base.html' %}
 
+{% load bootstrap3 %}
+
+{% block header %}
+  {% load staticfiles %}
+  {{task_form.media}}
+{% endblock header %}
+
 {% load dashboard_tags %}
 
 {% block breadcrumb %}
@@ -38,11 +45,14 @@
 
   <div>
       <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="#details" aria-controls="details" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-list-alt"></span> Updates</a></li>
-        <li role="presentation"><a href="#activity" aria-controls="activity" data-toggle="pill" role="tab"><span class="glyphicon
-         glyphicon-stats"></span> Activity</a></li>
+        <li role="presentation" class="active"><a href="#details" aria-controls="details" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-list-alt"></span> Notes</a></li>
         <li role="presentation"><a href="#tasks" aria-controls="tasks" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-list"></span> Tasks</a></li>
-        <li role="presentation"><a data-toggle="modal" data-target="#note-modal"><span class="glyphicon glyphicon-plus"></span> Note</a></li>
+        <li role="presentation"><a href="#processes" aria-controls="processes" data-toggle="pill" role="tab"><span class="glyphicon
+         glyphicon-stats"></span> Processes</a></li>
+         <li role="presentation"><a href="#literature" aria-controls="literature" data-toggle="pill" role="tab"><span class="glyphicon
+          glyphicon-book"></span> Literature</a></li>
+        <li role="presentation" class="pull-right"><a data-toggle="modal" data-target="#note-modal"><span class="glyphicon glyphicon-plus"></span> Note</a></li>
+        <li role="presentation" class="pull-right"><a data-toggle="modal" data-target="#task-modal"><span class="glyphicon glyphicon-plus"></span> Task</a></li>
       </ul>
   </div>
 
@@ -79,31 +89,26 @@
 
     </div>
 
-    <div class="tab-pane" role="tabpanel" id="activity">
-      <div class="col-md-6">
-        <div>
-          <h4>Processes</h4>
-        </div>
+    <div class="tab-pane" role="tabpanel" id="processes">
+      <div>
         <div class="list-group">
           {% for process in processes %}
             <div class="list-group-item" href="#">
-              <h4 class="list-group-item-heading">{{process.type}} <a href="{% url 'process_detail' process.uuid %}" data-toggle="tooltip" title="{{process.comment|safe}}">({{process.uuid}}{% if process.legacy_identifier %}, {{process.legacy_identifier}}{% endif %})</a></h4>
+              <h4 class="list-group-item-heading">
+                {{process.type}} <a href="{% url 'process_detail' process.uuid %}" data-toggle="tooltip" data-html="true" title="{{process.comment|escape|truncatewords:50}}">({{process.uuid}}{% if process.legacy_identifier %}, {{process.legacy_identifier}}{% endif %})</a>
+              </h4>
               <p class="list-group-item-text">
-                {{process.type}}
-              </p>
-              <p class="list-group-item-text">
-                {{process.uuid}} {% if process.legacy_identifier %}({{process.legacy_identifier}}){% endif %}
+                <small>{{process.created}}</small>
               </p>
             </div>
 
           {% endfor %}
         </div>
       </div>
+    </div>
 
-      <div class="col-md-6">
-        <div>
-          <h4>Literature</h4>
-        </div>
+    <div class="tab-pane" role="tabpanel" id="literature">
+      <div>
         <div class="list-group">
           {% for update in literature %}
             <a class="list-group-item" href="{% url 'literature_detail_redirector' update.id %}">
@@ -123,26 +128,50 @@
       </div>
 
       <div class="tab-pane" role="tabpanel" id="tasks">
-        <div>
-          <div class="list-group">
-            {% for task in milestone.tasks.all reversed %}
-              {% if task.is_active and task.user == request.user %}
-                <div class="list-group-item" href="#">
-                  <h4 class="list-group-item-heading">{{process.type}} <a href="{% url 'process_detail' process.uuid %}" data-toggle="tooltip" title="{{process.comment|safe}}">({{process.uuid}}{% if process.legacy_identifier %}, {{process.legacy_identifier}}{% endif %})</a></h4>
-                  <p class="list-group-item-text">
-                    {{process.type}}
-                  </p>
-                  <p class="list-group-item-text">
-                    {{process.uuid}} {% if process.legacy_identifier %}({{process.legacy_identifier}}){% endif %}
-                  </p>
+        <div class="col-md-2 pull-right">
+            <ul class="nav nav-pills nav-stacked">
+              <li role="presentation" class="active"><a href="#active_tasks" aria-controls="active_taks" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-exclamation-sign"></span> Open</a></li>
+              <li role="presentation"><a href="#inactive_tasks" aria-controls="inactive_tasks" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-ok-sign"></span> Closed</a></li>
+            </ul>
+        </div>
+        <div class="col-md-10">
+          <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="active_tasks">
+              <div>
+                <div class="list-group">
+                  {% for task in active_tasks reversed %}
+                      <div class="list-group-item" href="#">
+                        <p class="list-group-item-text">
+                          <a href="{% url 'task_close' slug=milestone.slug pk=task.id %}" data-toggle="tooltip" data-title="Mark complete"><span class="glyphicon glyphicon-ok"></span></a>&emsp;
+                          {{task.description|truncatewords:10}}
+                          <span class="pull-right"><strong>Due:</strong> {{task.due_date}}</span>
+                        </p>
+                      </div>
+
+                  {% endfor %}
                 </div>
-              {% endif %}
+              </div>
+            </div>
+            <div class="tab-pane" role="tabpanel" id="inactive_tasks">
+              <div>
+                <div class="list-group">
+                  {% for task in inactive_tasks reversed %}
+                      <div class="list-group-item" href="#">
+                        <p class="list-group-item-text">
+                          <a href="{% url 'task_open' slug=milestone.slug pk=task.id %}" data-toggle="tooltip" data-title="Re-Open"><span class="glyphicon glyphicon-repeat"></span></a>&emsp;
+                          {{task.description|truncatewords:10}}
+                          <span class="pull-right"><strong>Due:</strong> {{task.due_date}}</span>
+                        </p>
+                      </div>
 
-            {% endfor %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
         </div>
+      </div>
 
     </div>
 
@@ -219,13 +248,40 @@
       </div>
   </section>
 
+  <section id="task-modal" class="modal fade">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <header class="modal-header">
+                  <button class="close" type="button" data-dismiss="modal">&times;</button>
+                  <h3 class="modal-title">New Task</h3>
+              </header>
+              <form action="{% url 'milestone_task_action' %}" method="post" role="form">
+                {% csrf_token %}
+                <div class="modal-body">
+                  <div class="form-group">
+                    <!-- <label>Description</label> -->
+                    {% bootstrap_form task_form %}
+                    <input class="form-control hidden" type="textbox" name="user_id" value="{{milestone.user.id}}">
+                    <input class="form-control hidden" type="textbox" name="slug" value="{{milestone.slug}}">
+                  </div>
+                </div>
+                <footer class="modal-footer">
+                    <a class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </footer>
+              </form>
+          </div>
+      </div>
+  </section>
+
   <script>
     $(document).ready(function(){
       $(".text-add").click(function(){
         $('#note-text').append($(this).attr("data-append"));
       });
     });
-</script>
+  </script>
+
 
 {% endif %}
 {% endblock %}

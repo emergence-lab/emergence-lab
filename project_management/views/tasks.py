@@ -3,13 +3,14 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.views import generic
+from django.http import HttpResponseRedirect
 
 from datetime import datetime
 
 from braces.views import LoginRequiredMixin
 
 from core.views import ActionReloadView
-from core.models import Task
+from core.models import Task, Milestone
 from project_management.forms import TaskForm
 
 
@@ -50,7 +51,7 @@ class TaskCloseView(LoginRequiredMixin, ActionReloadView):
             task.deactivate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('pm_task_list')
+        return reverse('milestone_detail', kwargs={'slug': kwargs.pop('slug')})
 
 
 class TaskReOpenView(LoginRequiredMixin, ActionReloadView):
@@ -61,4 +62,17 @@ class TaskReOpenView(LoginRequiredMixin, ActionReloadView):
             task.activate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('pm_task_list')
+        return reverse('milestone_detail', kwargs={'slug': kwargs.pop('slug')})
+
+
+class TaskCreateAction(LoginRequiredMixin, generic.View):
+
+    def post(self, request, *args, **kwargs):
+        due_date = request.POST.get('due_date')
+        description = request.POST.get('description')
+        slug = request.POST.get('slug')
+        Task.objects.create(description=description,
+                            due_date=due_date,
+                            user=request.user,
+                            milestone=Milestone.objects.get(slug=slug))
+        return HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': slug}))

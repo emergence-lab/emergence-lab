@@ -12,7 +12,7 @@ from braces.views import LoginRequiredMixin
 from core.views import ActionReloadView
 from core.models import Milestone, MilestoneNote
 
-from project_management.forms import MilestoneForm
+from project_management.forms import MilestoneForm, TaskForm
 
 
 class MilestoneListView(LoginRequiredMixin, generic.ListView):
@@ -87,10 +87,15 @@ class MilestoneDetailView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(MilestoneDetailView, self).get_context_data(**kwargs)
+        milestone = Milestone.objects.get(slug=self.kwargs.get('slug'))
+        tasks = milestone.task.filter(user=self.request.user).order_by('due_date')
         context['today'] = datetime.now()
-        context['milestone'] = Milestone.objects.get(slug=self.kwargs.get('slug'))
-        context['processes'] = context['milestone'].processes.order_by('-created')[:10]
-        context['literature'] = context['milestone'].literature.order_by('-created')[:10]
+        context['milestone'] = milestone
+        context['processes'] = milestone.processes.order_by('-created')[:20]
+        context['literature'] = milestone.literature.order_by('-created')[:20]
+        context['active_tasks'] = tasks.filter(is_active=True)[:20]
+        context['inactive_tasks'] = tasks.filter(is_active=False)[:20]
+        context['task_form'] = TaskForm()
         return context
 
 
@@ -99,7 +104,6 @@ class MilestoneNoteAction(LoginRequiredMixin, generic.View):
     def post(self, request, *args, **kwargs):
         note = request.POST.get('note')
         slug = request.POST.get('slug')
-        #user_id = request.POST.get('user')
         MilestoneNote.objects.create(note=note,
                                         user=request.user,
                                         milestone=Milestone.objects.get(slug=slug))
