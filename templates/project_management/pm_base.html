@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="container-fluid">
-  <h2 class="page-header">Project Management <small>{% block subtitle %}{% endblock subtitle %}</small></h2>
+  <div>{% block breadcrumb %}{% endblock breadcrumb %}</div>
   <div class="col-md-2">
     <ul class="nav nav-pils nav-stacked">
       <li role="presentation"><a href="{% url 'dashboard' %}"><span class="glyphicon glyphicon-th-large"></span> Dashboard</a></li>

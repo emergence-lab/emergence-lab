@@ -2,7 +2,17 @@
 
 {% load dashboard_tags %}
 
-{% block subtitle %}{{milestone.name}}{% endblock %}
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'milestone_list' %}">Milestones</a></li>
+        <li class='active'>{{milestone.name|truncatewords:4}}</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
 
 {% block pm_content %}
 

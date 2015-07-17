@@ -7,6 +7,18 @@
   {{form.media}}
 {% endblock header %}
 
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'literature_landing' %}">Literature</a></li>
+        <li class="active">Create</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
 {% block pm_content %}
 
 <h2 class="text-center">New Literature Object</h2>

@@ -2,6 +2,18 @@
 
 {% block subtitle %}Literature Search{% endblock %}
 
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'literature_landing' %}">Literature</a></li>
+        <li class="active">Mendeley Search</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
 {% block pm_content %}
 
 <div class="container-fluid">
