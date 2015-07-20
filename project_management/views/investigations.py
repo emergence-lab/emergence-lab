@@ -7,8 +7,8 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 
 from core.views import ActiveListView
-from core.models import Investigation, ProjectTracking
-from project_management.forms import InvestigationForm
+from core.models import Investigation, Milestone, ProjectTracking
+from project_management.forms import InvestigationForm, MilestoneForm
 
 
 class InvestigationListView(LoginRequiredMixin, ActiveListView):
@@ -26,6 +26,18 @@ class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
 
     template_name = 'project_management/investigation_detail.html'
     model = Investigation
+
+    def get_context_data(self, **kwargs):
+        context = super(InvestigationDetailView, self).get_context_data(**kwargs)
+        investigation = context['investigation']
+        context['literature'] = investigation.literature.all()[:20]
+        context['processes'] = investigation.target_actions.all().order_by('-timestamp')[:20]
+        context['milestones'] = Milestone.objects.filter(
+            user=self.request.user).order_by('due_date')
+        context['milestone_form'] = MilestoneForm()
+        context['active_milestones'] = context['milestones'].filter(is_active=True)
+        context['inactive_milestones'] = context['milestones'].filter(is_active=False)
+        return context
 
 
 class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):

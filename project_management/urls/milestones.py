@@ -27,4 +27,7 @@ urlpatterns = [
     url(r'^note/$',
         views.MilestoneNoteAction.as_view(),
         name='milestone_note_action'),
+    url(r'^add/$',
+        views.MilestoneCreateAction.as_view(),
+        name='milestone_create_action'),
     ]

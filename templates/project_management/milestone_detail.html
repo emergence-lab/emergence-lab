@@ -4,7 +4,9 @@
 
 {% block header %}
   {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
   {{task_form.media}}
+  {{note_form.media}}
 {% endblock header %}
 
 {% load dashboard_tags %}
@@ -14,7 +16,9 @@
 <nav>
     <ol class="breadcrumb">
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'milestone_list' %}">Milestones</a></li>
+        <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
+        <li><a href="{% url 'pm_project_list' %}">{{milestone.investigation.project.name}}</a></li>
+        <li><a href="{% url 'pm_investigation_detail' slug=milestone.investigation.slug %}">{{milestone.investigation.name}}</a></li>
         <li class='active'>{{milestone.name|truncatewords:4}}</li>
     </ol>
 </nav>
@@ -39,7 +43,7 @@
       <span class="pull-right"><span class="glyphicon glyphicon-time"></span> {{milestone.due_date}}</span>
     </div>
     <div class="panel-body">
-      {{milestone.description}}
+      {{milestone.description|safe}}
     </div>
   </div>
 
@@ -63,7 +67,7 @@
     <div class="tab-pane active" role="tabpanel" id="details">
 
       <div class="list-group">
-        {% for note in object_list reversed %}
+        {% for note in object_list %}
           <div class="list-group-item" href="#">
             <p class="list-group-item-text">{{note.note|convert_to_links}}</p>
             <p class="list-group-item-text"><small>{{note.created}}</small></p>
@@ -195,16 +199,16 @@
                     <div class="col-md-8">
                       <div class="form-group">
                         <!-- <label>Description</label> -->
-                        <textarea name="note" id="note-text" cols="30" rows="3" class="form-control" placeholder="Type note text here..."></textarea>
-                        <input class="form-control hidden" type="textbox" name="user_id" value="{{milestone.user.id}}">
-                        <input class="form-control hidden" type="textbox" name="slug" value="{{milestone.slug}}">
+                        {% bootstrap_field note_form.note %}
+                        <input class="form-control hidden" type="textbox" name="user" id="id_user" value="{{milestone.user.id}}">
+                        <input class="form-control hidden" type="textbox" name="milestone" id="id_milestone" value="{{milestone.id}}">
                       </div>
                     </div>
                     <div class="col-md-4">
                       <div>
                           <ul class="nav nav-tabs">
-                            <li role="presentation" class="active"><a href="#processes-modal" aria-controls="processes-modal" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-exclamation-sign"></span> Processes</a></li>
-                            <li role="presentation"><a href="#literature-modal" aria-controls="literature-modal" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-ok-sign"></span> Literature</a></li>
+                            <li role="presentation" class="active"><a href="#processes-modal" aria-controls="processes-modal" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-stats"></span> Processes</a></li>
+                            <li role="presentation"><a href="#literature-modal" aria-controls="literature-modal" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-book"></span> Literature</a></li>
                           </ul>
                       </div>
                       <div class="tab-content">
@@ -212,7 +216,7 @@
                         <div class="tab-pane active" role="tabpanel" id="processes-modal">
                           <div class="list-group">
                             {% for process in processes %}
-                              <div class="list-group-item text-add" data-toggle="tooltip" data-placement="bottom" data-title="{{process.comment|safe}}" data-append="#{{process.uuid}} ">
+                              <div class="list-group-item text-add" data-toggle="tooltip" data-placement="bottom" data-title="{{process.comment|escape}}" data-html="true" data-append="#{{process.uuid}} ">
                                 <p class="list-group-item-text">
                                   {{process.uuid}}{% if process.legacy_identifier %}({{process.legacy_identifier}}){% endif %}
                                 </p>
@@ -227,7 +231,7 @@
                             {% for update in literature %}
                               <div class="list-group-item text-add" data-toggle="tooltip" data-placement="bottom" data-title="{{update.title}}" data-append="#lit-{{update.id}} ">
                                 <p class="list-group-item-text">
-                                  {{update.id}}: {{update.title|truncatewords:4}}
+                                  {{update.title|truncatewords:4}}
                                 </p>
                               </div>
 
@@ -277,7 +281,8 @@
   <script>
     $(document).ready(function(){
       $(".text-add").click(function(){
-        $('#note-text').append($(this).attr("data-append"));
+        // $('#id_note').append($(this).attr("data-append"));
+        $('#note_hallo_field').append($(this).attr("data-append"));
       });
     });
   </script>
@@ -285,3 +290,13 @@
 
 {% endif %}
 {% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project_management/js/milestone_detail.js' %}"></script>
+    <script type="text/javascript">
+        milestone_detail.enable_rich_text('.hallo', 'form');
+    </script>
+{% endblock scripts %}

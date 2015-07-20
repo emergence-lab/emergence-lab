@@ -69,6 +69,9 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
     def get_redirect_url(self, *args, **kwargs):
         if 'token' not in self.request.session:
             return self.auth.get_login_url()
+        elif 'refer' in self.request.session:
+            refer = self.request.session.get('refer')
+            return reverse(refer['url'], kwargs=refer.get('kwargs', '{}'))
         else:
             return reverse('mendeley_search')
 
@@ -131,6 +134,17 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
 
 
 class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView):
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'milestone' in self.kwargs:
+            self.request.session['refer'] = {'url': 'add_mendeley_object_milestone',
+                                            'kwargs': {'milestone': self.kwargs['milestone'],
+                                                        'external_id': self.kwargs['external_id']}}
+        if 'investigation' in self.kwargs:
+            self.request.session['refer'] = {'url': 'add_mendeley_object_investigation',
+                                            'kwargs': {'investigation': self.kwargs['investigation'],
+                                                        'external_id': self.kwargs['external_id']}}
+        return super(AddMendeleyObjectView, self).dispatch(request, *args, **kwargs)
 
     def perform_action(self, request, *args, **kwargs):
         tmp = Literature.objects.all().filter(external_id=self.kwargs['external_id'])
@@ -215,6 +229,11 @@ class LiteratureDetailView(LoginRequiredMixin, generic.DetailView):
 class MendeleyDetailView(LoginRequiredMixin, MendeleyMixin, generic.TemplateView):
 
     template_name = 'project_management/literature_detail.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.request.session['refer'] = {'url': 'mendeley_detail',
+                                            'kwargs': {'external_id': self.kwargs['external_id']}}
+        return super(MendeleyDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(MendeleyDetailView, self).get_context_data(**kwargs)

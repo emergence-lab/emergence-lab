@@ -60,7 +60,7 @@
             </div>
             <div class="panel-body">
                 <p><span class="glyphicon glyphicon-ok-circle"></span> You follow this project.</p>
-                <p>{{ p.description|safe|truncatewords:50 }}</p>
+                <p>{{ p.description|escape|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigation_set.all %}
@@ -71,16 +71,16 @@
                           <a href="{% url 'investigation_deactivate' project=p.slug slug=i.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down">&emsp;</span></a>
                         </h4>
                         <p class="list-group-item-text">
-                          {{i.description|safe|truncatewords:50}}
+                          {{i.description|escape|truncatewords:50}}
                         </p>
                         <p class="list-group-item-text">
                           <strong>Milestones: &emsp;</strong>
                           {% for m in i.milestone.all %}
                             {% if m.is_active and m.user == request.user %}
-                            <span class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-toggle="tooltip" title="{{m.description|safe|truncatewords:20}}">{{m.name}}</span>
+                            <a class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-html="true" data-toggle="tooltip" title="{{m.description|escape|truncatewords:20}}">{{m.name|truncatewords:4}}</a>
                             {% endif %}
                           {% endfor %}
-                          &emsp;<a href="{% url 'milestone_create' %}"><span data-toggle="tooltip" data-title="Create a milestone" class="glyphicon glyphicon-plus"></span></a>
+                          &emsp;<a href="{% url 'pm_investigation_detail' slug=i.slug %}#milestone-modal" class="btn btn-xs btn-default"><span data-toggle="tooltip" data-title="Create a milestone" class="glyphicon glyphicon-plus"></span></a>
                         </p>
                     </li>
                   {% endif %}
@@ -93,7 +93,7 @@
                           <a href="{% url 'investigation_activate' project=p.slug slug=i.slug %}" data-toggle="tooltip" data-title="Make Active" class="pull-right"><span class="glyphicon glyphicon-thumbs-up">&emsp;</span></a>
                         </h4>
                         <p class="list-group-item-text">
-                          {{i.description|safe|truncatewords:50}}
+                          {{i.description|escape|truncatewords:50}}
                         </p>
                     </li>
                   {% endif %}
@@ -110,13 +110,13 @@
                 <h3 class="panel-title">
                     <a href="{% url 'pm_project_edit' slug=p.slug %}">{{ p }}</a>
                     <a href="{% url 'project_track' slug=p.slug %}" data-toggle="tooltip" data-title="Track" class="pull-right"><span class="glyphicon glyphicon-star-empty"></span></a>
-                    <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down">&emsp;</span></a>
+                    <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down"></span></a>&emsp;
                 </h3>
 
             </div>
             <div class="panel-body">
                 <p><span class="glyphicon glyphicon-ban-circle"></span> You do not follow this project.</p>
-                <p>{{ p.description|safe|truncatewords:50 }}</p>
+                <p>{{ p.description|escape|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigation_set.all %}
@@ -125,7 +125,7 @@
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
                   </h4>
                   <p class="list-group-item-text">
-                    {{i.description|safe|truncatewords:50}}
+                    {{i.description|escape|truncatewords:50}}
                   </p>
                 </li>
                 {% endfor %}
@@ -145,7 +145,7 @@
             </div>
             <div class="panel-body">
                 <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. <a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>
-                <p>{{ p.description|safe|truncatewords:50 }}<p>
+                <p>{{ p.description|escape|truncatewords:50 }}<p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigation_set.all %}
@@ -154,7 +154,7 @@
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
                   </h4>
                   <p class="list-group-item-text">
-                    {{i.description|safe|truncatewords:50}}
+                    {{i.description|escape|truncatewords:50}}
                   </p>
                 </li>
                 {% endfor %}
