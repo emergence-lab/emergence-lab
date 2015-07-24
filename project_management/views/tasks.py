@@ -68,11 +68,10 @@ class TaskReOpenView(LoginRequiredMixin, ActionReloadView):
 class TaskCreateAction(LoginRequiredMixin, generic.View):
 
     def post(self, request, *args, **kwargs):
-        due_date = request.POST.get('due_date')
-        description = request.POST.get('description')
-        slug = request.POST.get('slug')
-        Task.objects.create(description=description,
-                            due_date=due_date,
-                            user=request.user,
-                            milestone=Milestone.objects.get(slug=slug))
-        return HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': slug}))
+        task_form = TaskForm(request.POST)
+        if task_form.is_valid():
+            self.object = task_form.save(commit=False)
+            self.object.user = request.user
+            self.object.save()
+        milestone = Milestone.objects.get(id=request.POST.get('milestone'))
+        return HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': milestone.slug}))

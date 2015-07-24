@@ -38,7 +38,7 @@ class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = MilestoneForm
 
     def get_success_url(self):
-        return reverse('milestone_list')
+        return reverse('milestone_detail', kwargs={'slug': self.object.slug})
 
 
 class MilestoneUpdateView(LoginRequiredMixin, generic.UpdateView):
@@ -49,7 +49,7 @@ class MilestoneUpdateView(LoginRequiredMixin, generic.UpdateView):
     form_class = MilestoneForm
 
     def get_success_url(self):
-        return reverse('milestone_list')
+        return reverse('milestone_detail', kwargs={'slug': self.object.slug})
 
 
 class MilestoneCloseView(LoginRequiredMixin, ActionReloadView):

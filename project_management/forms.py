@@ -55,6 +55,20 @@ class InvestigationForm(forms.ModelForm):
         projects = Project.objects.all().filter(id__in=project_tracking)
         self.fields['project'].queryset = projects
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        reserved_names = [
+            'activate',
+            'deactivate',
+            'add-investigation',
+            'all',
+            'list',
+        ]
+        if name in reserved_names:
+            self.add_error('name',
+                'Investigation name "{}" is reserved, please choose another'.format(name))
+        return name
+
     class Meta:
         model = Investigation
         fields = ('name', 'description', 'project',)
