@@ -10,9 +10,9 @@ from datetime import datetime
 from braces.views import LoginRequiredMixin
 
 from core.views import ActionReloadView
-from core.models import Milestone, MilestoneNote, Investigation
+from core.models import Milestone, MilestoneNote
 
-from project_management.forms import MilestoneForm, TaskForm, MilestoneForm, MilestoneNoteForm
+from project_management.forms import MilestoneForm, TaskForm, MilestoneNoteForm
 
 
 class MilestoneListView(LoginRequiredMixin, generic.ListView):
@@ -109,7 +109,8 @@ class MilestoneCreateAction(LoginRequiredMixin, generic.View):
             milestone_form.save()
         else:
             HttpResponseRedirect(reverse('dashboard'))
-        return HttpResponseRedirect(reverse('pm_investigation_detail', kwargs={'slug': investigation_slug}))
+        return HttpResponseRedirect(reverse('pm_investigation_detail',
+            kwargs={'slug': investigation_slug}))
 
 
 class MilestoneNoteAction(LoginRequiredMixin, generic.View):
@@ -118,17 +119,10 @@ class MilestoneNoteAction(LoginRequiredMixin, generic.View):
         note_form = MilestoneNoteForm(request.POST)
         milestone = Milestone.objects.get(id=request.POST.get('milestone'))
         if note_form.is_valid():
-            print(note_form.cleaned_data)
-            # milestone_slug = note_form.cleaned_data['milestone'].slug
             self.object = note_form.save(commit=False)
             self.object.milestone_id = milestone.id
             self.object.user_id = request.POST.get('user')
             self.object.save()
         else:
             HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': milestone.slug}))
-        # note = request.POST.get('note')
-        # slug = request.POST.get('slug')
-        # MilestoneNote.objects.create(note=note,
-        #                                 user=request.user,
-        #                                 milestone=Milestone.objects.get(slug=slug))
         return HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': milestone.slug}))

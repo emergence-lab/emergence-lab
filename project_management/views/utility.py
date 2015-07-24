@@ -35,5 +35,5 @@ class NewsfeedView(LoginRequiredMixin, generic.TemplateView):
         context = super(NewsfeedView, self).get_context_data(**kwargs)
         stream = model_stream(Process)
         context['process_stream'] = stream[:20]
-        context['my_process_stream'] = [x for x in stream if x.actor==self.request.user][:20]
+        context['my_process_stream'] = [x for x in stream if x.actor == self.request.user][:20]
         return context

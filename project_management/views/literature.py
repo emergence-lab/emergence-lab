@@ -142,8 +142,8 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
                                                         'external_id': self.kwargs['external_id']}}
         if 'investigation' in self.kwargs:
             self.request.session['refer'] = {'url': 'add_mendeley_object_investigation',
-                                            'kwargs': {'investigation': self.kwargs['investigation'],
-                                                        'external_id': self.kwargs['external_id']}}
+                'kwargs': {'investigation': self.kwargs['investigation'],
+                'external_id': self.kwargs['external_id']}}
         return super(AddMendeleyObjectView, self).dispatch(request, *args, **kwargs)
 
     def perform_action(self, request, *args, **kwargs):
