@@ -302,7 +302,7 @@ class TestInvestigationCRUD(TestCase):
         obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_activate', args=(proj.slug, obj.slug))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Investigation.objects.get(id=obj.id)
 
@@ -313,7 +313,7 @@ class TestInvestigationCRUD(TestCase):
         obj = Investigation.objects.filter(is_active=True).first()
         proj = obj.project
         url = reverse('investigation_deactivate', args=(proj.slug, obj.slug))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Investigation.objects.get(id=obj.id)
 

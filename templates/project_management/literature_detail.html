@@ -2,6 +2,18 @@
 
 {% block subtitle %}Literature Detail{% endblock %}
 
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'literature_landing' %}">Literature</a></li>
+        <li class="active">Detail</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
 {% block pm_content %}
 
 <div class="col-md-12">

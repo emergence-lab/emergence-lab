@@ -2,7 +2,16 @@
 
 {% block title %}Literature{% endblock title %}
 
-{% block subtitle %}Literature{% endblock subtitle %}
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="active">Literature</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
 
 {% block pm_content %}
 

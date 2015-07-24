@@ -1,22 +1,54 @@
 {% extends 'project_management/pm_base.html' %}
 
-{% block pm_content %}
+{% block breadcrumb %}
 
-<div class="col-md-8 col-md-offset-1">
-  <ul class="media-list">
-    {% for process in process_stream %}
-    <li class="media">
-      <div class="media-left">
-        <a href="#"><span class="glyphicon glyphicon-user"></span></a>
-      </div>
-      <div class="media-body">
-        <p class="media-text">
-          {{process.actor.full_name}} {{process.verb}} a {{process.action_object.type}} <a href="{% url 'process_detail' process.action_object.uuid %}">({{process.action_object.uuid}})</a>
-          <span class="pull-right">{{process.timestamp|timesince}} ago</span>
-        </p>
-      </div>
-    </li>
-    {% endfor %}
-  </ul>
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="active">Newsfeed</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+<div class="col-md-4 pull-right">
+    <ul class="nav nav-pills nav-stacked">
+      <li role="presentation" class="active"><a href="#full_feed" aria-controls="full_feed" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-stats"></span> All Users Feed</a></li>
+      <li role="presentation"><a href="#me_feed" aria-controls="me_feed" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-user"></span> {{request.user.full_name}}'s Feed</a></li>
+    </ul>
 </div>
+<div class="tab-content">
+
+  <div class="tab-pane active" role="tabpanel" id="full_feed">
+    <div class="col-md-8">
+      <ul class="list-group">
+        {% for process in process_stream %}
+        <li class="list-group-item" style="border: none !important;">
+          <p class="list-group-item-text">
+            <span class="glyphicon glyphicon-user"></span>&emsp; {{process.actor.full_name}} {{process.verb}} a {{process.action_object.type}} <a href="{% url 'process_detail' process.action_object.uuid %}" data-toggle="tooltip" data-title="{{process.action_object.comment|escape|truncatewords:50}}" data-html="true">({{process.action_object.uuid}})</a>
+            &mdash; <span>{{process.timestamp|timesince}} ago</span>
+          </p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="tab-pane" role="tabpanel" id="me_feed">
+    <div class="col-md-8">
+      <ul class="list-group">
+        {% for process in my_process_stream %}
+        <li class="list-group-item" style="border: none !important;">
+          <p class="list-group-item-text">
+            <span class="glyphicon glyphicon-user"></span>&emsp; {{process.actor.full_name}} {{process.verb}} a {{process.action_object.type}} <a href="{% url 'process_detail' process.action_object.uuid %}" data-toggle="tooltip" data-title="{{process.action_object.comment|escape|truncatewords:50}}" data-html="true">({{process.action_object.uuid}})</a>
+            &mdash; <span>{{process.timestamp|timesince}} ago</span>
+          </p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+</div>
+
 {% endblock %}

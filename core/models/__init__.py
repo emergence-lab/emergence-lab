@@ -11,6 +11,8 @@ from .project import (
     Project,
     Investigation,
     Milestone,
+    MilestoneNote,
+    Task,
     ProjectTracking,
 )
 from .user import User

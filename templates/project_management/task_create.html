@@ -12,8 +12,8 @@
 <nav>
     <ol class="breadcrumb">
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'literature_landing' %}">Literature</a></li>
-        <li class="active">Create</li>
+        <li><a href="{% url 'pm_task_list' %}">Tasks</a></li>
+        <li class="active">Create Task</li>
     </ol>
 </nav>
 
@@ -21,7 +21,7 @@
 
 {% block pm_content %}
 
-<h2 class="text-center">New Literature Object</h2>
+<h2 class="text-center">New Task</h2>
 <div class="container-fluid">
   <form action="" method="post">{%csrf_token%}
     <div class="col-md-8 col-md-offset-2">

@@ -3,9 +3,10 @@ from milestones import (MilestoneListView,
                         MilestoneDetailView,
                         MilestoneUpdateView,
                         MilestoneCloseView,
-                        MilestoneReOpenView,)
+                        MilestoneReOpenView,
+                        MilestoneNoteAction,
+                        MilestoneCreateAction,)
 from literature import (MendeleyOAuth,
-                        LiteratureListView,
                         MendeleyLibrarySearchView,
                         LiteratureLandingView,
                         AddMendeleyObjectView,
@@ -21,5 +22,10 @@ from investigations import (InvestigationListView,
                             InvestigationUpdateView,)
 from projects import (ProjectListView,
                         ProjectUpdateView,)
+from tasks import (TaskListView,
+                    TaskCreateView,
+                    TaskCloseView,
+                    TaskReOpenView,
+                    TaskCreateAction,)
 from utility import (LandingPageView,
                         NewsfeedView,)
