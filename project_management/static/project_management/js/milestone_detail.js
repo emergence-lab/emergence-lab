@@ -21,11 +21,10 @@
                 toolbar: 'halloToolbarFixed',
             });
         });
-
     }
 
     exports.enable_rich_text = function(elements_selector, form_selector) {
-        exports.make_rich_text_editable($(elements_selector))
+        exports.make_rich_text_editable($(elements_selector));
 
         // on form submission, copy the text from the hallo.js divs into the
         // actual form fields.

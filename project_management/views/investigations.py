@@ -34,7 +34,11 @@ class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
         context['processes'] = investigation.target_actions.all().order_by('-timestamp')[:20]
         context['milestones'] = Milestone.objects.filter(
             user=self.request.user).order_by('due_date')
-        context['milestone_form'] = MilestoneForm()
+        context['milestone_form'] = MilestoneForm(
+            initial={
+                'user': self.request.user,
+                'investigation': investigation,
+            })
         context['active_milestones'] = context['milestones'].filter(is_active=True)
         context['inactive_milestones'] = context['milestones'].filter(is_active=False)
         return context

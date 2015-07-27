@@ -1,7 +1,0 @@
-{
-    "type": "afm",
-    "is_destructive": false,
-    "name": "AFM",
-    "full_name": "Atomic Force Microscopy",
-    "description": "A very high-resolution scanning probe microscopy technique to characterize surface morphology."
-}

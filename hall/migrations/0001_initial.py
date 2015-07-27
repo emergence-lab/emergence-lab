@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
-import os
-
 from django.db import models, migrations
 
 
-def create_process_type(apps, schema_editor):
-    current_dir = os.path.dirname(__file__)
-    with open(os.path.join(current_dir, 'process_type.json'), 'r') as f:
-        data = json.load(f)
-
+def create_processtype(apps, schema_editor):
     ProcessType = apps.get_model('core', 'ProcessType')
-    ProcessType.objects.create(**data)
+    ProcessType.objects.create(type='hall',
+                               is_destructive=False,
+                               name='Hall',
+                               full_name='Hall Effect Measurement',
+                               description='Measurement for carrier concentration and carrier mobility based on the Hall effect.',
+                               scheduling_type='none')
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0015_processtype'),
+        ('core', '0017_remove_splitprocess'),
     ]
 
     operations = [
@@ -43,5 +41,5 @@ class Migration(migrations.Migration):
             },
             bases=('core.datafile',),
         ),
-        migrations.RunPython(create_process_type),
+        migrations.RunPython(create_processtype),
     ]

@@ -1,31 +1,37 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
-import os
-
 from django.db import models, migrations
 
 
-def create_process_type(apps, schema_editor):
-    current_dir = os.path.dirname(__file__)
-    with open(os.path.join(current_dir, 'process_type.json'), 'r') as f:
-        data = json.load(f)
-
+def create_processtype(apps, schema_editor):
     ProcessType = apps.get_model('core', 'ProcessType')
-    ProcessType.objects.create(**data)
+    ProcessType.objects.create(type='d180-growth',
+                               is_destructive=True,
+                               name='D180',
+                               full_name='D180 MOCVD Growth',
+                               description='An MOCVD growth using the Veeco D180 reactor.',
+                               scheduling_type='simple')
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0015_processtype'),
+        ('core', '0017_remove_splitprocess'),
         ('d180', '0013_migrate_d180growth_data'),
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name='d180growth',
+            name='platter',
+        ),
+        migrations.RemoveField(
+            model_name='d180growth',
+            name='process_ptr',
+        ),
         migrations.DeleteModel(
             name='D180Growth',
         ),
-        migrations.RunPython(create_process_type),
+        migrations.RunPython(create_processtype),
     ]

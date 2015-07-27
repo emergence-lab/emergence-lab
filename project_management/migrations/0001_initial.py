@@ -2,47 +2,33 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import autoslug.fields
 import core.models.fields
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0014_processnode_number'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('core', '0017_remove_splitprocess'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Milestone',
+            name='Literature',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('is_active', models.BooleanField(default=True, verbose_name='active')),
-                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('due_date', models.DateField()),
-                ('name', models.CharField(max_length=45, verbose_name='name')),
-                ('slug', autoslug.fields.AutoSlugField(verbose_name='slug', editable=False)),
-                ('description', core.models.fields.RichTextField(verbose_name='description', blank=True)),
-                ('investigation', models.ForeignKey(related_query_name='milestone', related_name='milestone', to='core.Investigation', null=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='ProgressUpdate',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('is_active', models.BooleanField(default=True, verbose_name='active')),
-                ('status_changed', models.DateTimeField(verbose_name='status changed', null=True, editable=False, blank=True)),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='date modified')),
-                ('description', core.models.fields.RichTextField(verbose_name='description', blank=True)),
-                ('datafile', models.ForeignKey(related_query_name='progress', related_name='progress', to='core.DataFile', null=True)),
-                ('process', models.ForeignKey(related_query_name='progress', related_name='progress', to='core.Process', null=True)),
+                ('title', models.CharField(max_length=500)),
+                ('external_id', models.CharField(max_length=100, blank=True)),
+                ('abstract', core.models.fields.RichTextField(null=True, verbose_name='abstract', blank=True)),
+                ('doi_number', models.CharField(max_length=100, null=True, blank=True)),
+                ('year', models.CharField(max_length=4, null=True, blank=True)),
+                ('journal', models.CharField(max_length=200, null=True, blank=True)),
+                ('investigations', models.ManyToManyField(related_query_name='literature', related_name='literature', null=True, to='core.Investigation')),
+                ('milestones', models.ManyToManyField(related_query_name='literature', related_name='literature', null=True, to='core.Milestone')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,

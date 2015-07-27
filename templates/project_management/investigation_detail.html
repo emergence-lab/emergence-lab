@@ -148,15 +148,7 @@
             <form action="{% url 'milestone_create_action' %}" method="post" role="form">
               {% csrf_token %}
               <div class="modal-body">
-                <div class="form-group">
-                  <!-- <label>Description</label> -->
-                  {% bootstrap_field milestone_form.name %}
-                  {% bootstrap_field milestone_form.due_date %}
-                  {% bootstrap_field milestone_form.description %}
-                  <input class="form-control hidden" type="textbox" name="investigation" id="id_investigation" value="{{investigation.id}}">
-                  <input class="form-control hidden" type="textbox" name="is_active" value="true">
-                  <input class="form-control hidden" type="textbox" name="user" id="id_user" value="{{user.id}}">
-                </div>
+                  {% bootstrap_form milestone_form %}
               </div>
               <footer class="modal-footer">
                   <a class="btn btn-default" data-dismiss="modal">Cancel</a>

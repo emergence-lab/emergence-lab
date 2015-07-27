@@ -37,12 +37,12 @@ class ProcessType(models.Model):
     )
 
     type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
-    name = models.CharField(max_length=100, blank=True)
-    full_name = models.CharField(max_length=255, blank=True)
+    name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=255)
     is_destructive = models.BooleanField(default=True)
     description = models.TextField(blank=True)
     scheduling_type = models.CharField(max_length=10, choices=SCHEDULING_TYPE,
-                                       default='none', blank=True, null=True)
+                                       default='none')
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)
@@ -75,7 +75,7 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
-    type = models.ForeignKey(ProcessType, null=True, default='generic-process')
+    type = models.ForeignKey(ProcessType, default='generic-process')
 
     investigations = models.ManyToManyField(Investigation,
         related_name='processes', related_query_name='process',)

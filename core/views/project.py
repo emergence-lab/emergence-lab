@@ -62,8 +62,14 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
     model = Project
     form_class = CreateProjectForm
 
+    def form_valid(self, form):
+        response = super(ProjectCreateView, self).form_valid(form)
+        ProjectTracking.objects.get_or_create(project=self.object,
+                                              user=self.request.user)
+        return response
+
     def get_success_url(self):
-        return reverse('project_detail_all', kwargs={'slug': self.object.slug})
+        return reverse('pm_project_list')
 
 
 class ProjectUpdateView(LoginRequiredMixin, generic.UpdateView):

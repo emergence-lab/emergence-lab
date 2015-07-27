@@ -7,7 +7,8 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0016_process_investigations'),
+        ('d180', '0013_migrate_d180growth_data'),
+        ('core', '0016_project_management'),
     ]
 
     operations = [

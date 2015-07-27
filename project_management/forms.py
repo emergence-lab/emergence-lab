@@ -10,40 +10,42 @@ from core.models import Investigation, ProjectTracking, Project, Milestone, Task
 
 class MilestoneForm(forms.ModelForm):
 
-    due_date = forms.DateField(widget=DateWidget(
-        attrs={'class': 'datetime'},
-        bootstrap_version=3,
-        usel10n=True,
-        options={'minView': '2',
-                'startView': '2',
-                'todayBtn': 'false',
-                'todayHighlight': 'true',
-                'clear_Btn': 'true',
-                'format': 'yyyy-mm-dd'}
-    ))
-
     class Meta:
         model = Milestone
-        fields = '__all__'
+        fields = ('name', 'due_date', 'description', 'user', 'investigation')
+        widgets = {
+            'investigation': forms.HiddenInput(),
+            'user': forms.HiddenInput(),
+            'due_date': DateWidget(attrs={'class': 'datetime'},
+                                   bootstrap_version=3,
+                                   usel10n=True,
+                                   options={'minView': '2',
+                                            'startView': '2',
+                                            'todayBtn': 'false',
+                                            'todayHighlight': 'true',
+                                            'clear_Btn': 'true',
+                                            'format': 'yyyy-mm-dd'}),
+            'description': forms.Textarea(attrs={'class': 'hallo'}),
+        }
 
 
 class MilestoneSimpleForm(forms.ModelForm):
 
-    due_date = forms.DateField(widget=DateWidget(
-        attrs={'class': 'datetime'},
-        bootstrap_version=3,
-        usel10n=True,
-        options={'minView': '2',
-                'startView': '2',
-                'todayBtn': 'false',
-                'todayHighlight': 'true',
-                'clear_Btn': 'true',
-                'format': 'yyyy-mm-dd'}
-    ))
-
     class Meta:
         model = Milestone
         fields = ('due_date', 'name', 'description',)
+        widgets = {
+            'due_date': DateWidget(attrs={'class': 'datetime'},
+                                   bootstrap_version=3,
+                                   usel10n=True,
+                                   options={'minView': '2',
+                                            'startView': '2',
+                                            'todayBtn': 'false',
+                                            'todayHighlight': 'true',
+                                            'clear_Btn': 'true',
+                                            'format': 'yyyy-mm-dd'}),
+            'description': forms.Textarea(attrs={'class': 'hallo'}),
+        }
 
 
 class InvestigationForm(forms.ModelForm):
@@ -51,8 +53,9 @@ class InvestigationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super(InvestigationForm, self).__init__(*args, **kwargs)
-        project_tracking = [x.project_id for x in ProjectTracking.objects.all().filter(user=user)]
-        projects = Project.objects.all().filter(id__in=project_tracking)
+        project_tracking = (ProjectTracking.objects.filter(user=user)
+                                                   .values_list('project_id', flat=True))
+        projects = Project.objects.filter(id__in=project_tracking)
         self.fields['project'].queryset = projects
 
     def clean_name(self):
@@ -76,27 +79,23 @@ class InvestigationForm(forms.ModelForm):
 
 class TaskForm(forms.ModelForm):
 
-    due_date = forms.DateField(widget=DateWidget(
-        attrs={'class': 'datetime'},
-        bootstrap_version=3,
-        usel10n=True,
-        options={'minView': '2',
-                'startView': '2',
-                'todayBtn': 'false',
-                'todayHighlight': 'true',
-                'clear_Btn': 'true',
-                'format': 'yyyy-mm-dd'}
-    ))
-
     class Meta:
         model = Task
         fields = ('due_date', 'description',)
+        widgets = {
+            'due_date': DateWidget(attrs={'class': 'datetime'},
+                                   bootstrap_version=3,
+                                   usel10n=True,
+                                   options={'minView': '2',
+                                            'startView': '2',
+                                            'todayBtn': 'false',
+                                            'todayHighlight': 'true',
+                                            'clear_Btn': 'true',
+                                            'format': 'yyyy-mm-dd'}),
+        }
 
 
 class MilestoneNoteForm(forms.ModelForm):
-
-    # note = forms.CharField(
-    #     widget=forms.Textarea(attrs={'class': 'hallo'}))
 
     class Meta:
         model = MilestoneNote
