@@ -59,6 +59,6 @@ target/
 # Project-specific
 /static/
 secrets.json
-tunnel.sh
+*.sh
 /media/
 /bower_components/
