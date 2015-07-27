@@ -7,7 +7,6 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0015_processtype'),
         ('d180', '0007_remove_d180growth_user_old'),
     ]
 

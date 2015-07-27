@@ -757,17 +757,17 @@ class TestProcessTypeCRUD(TestCase):
         url = reverse('processtype_edit', args=(processtype.type,))
         data = {}
         response = self.client.post(url, data)
-        before = processtype.description
-        processtype = ProcessType.objects.get(type=processtype.type)
-        self.assertEqual(processtype.description, before)
-        detail_url =  '/process/type/{}/'.format(processtype.type)
-        self.assertRedirects(response, detail_url)
+        self.assertFormError(response, 'form', 'name', 'This field is required.')
 
     def test_processtype_edit_valid_data(self):
         processtype = mommy.make(ProcessType, type='test')
         url = reverse('processtype_edit', args=(processtype.type,))
         data = {
+            'name': processtype.name,
+            'full_name': processtype.full_name,
             'description': 'testing',
+            'is_destructive': processtype.is_destructive,
+            'scheduling_type': processtype.scheduling_type,
         }
         response = self.client.post(url, data)
         processtype = ProcessType.objects.get(type=processtype.type)

@@ -1,7 +1,0 @@
-{
-    "type": "d180-growth",
-    "is_destructive": true,
-    "name": "D180",
-    "full_name": "D180 MOCVD Growth",
-    "description": "An MOCVD growth using the Veeco D180 reactor."
-}

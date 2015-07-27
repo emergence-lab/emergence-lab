@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0005_auto_20150324_1032'),
+        ('core', '0014_processnode_number'),
     ]
 
     operations = [
@@ -19,21 +19,12 @@ class Migration(migrations.Migration):
                 ('rms', models.DecimalField(max_digits=7, decimal_places=3)),
                 ('zrange', models.DecimalField(max_digits=7, decimal_places=3)),
                 ('location', models.CharField(default='c', max_length=45, choices=[('c', 'Center'), ('r', 'Round'), ('f', 'Flat')])),
+                ('image_type', models.CharField(default='Height', max_length=45, choices=[('Raw', 'Raw'), ('Height', 'Height'), ('Amplitude', 'Amplitude'), ('Phase', 'Phase')])),
                 ('size', models.DecimalField(max_digits=7, decimal_places=3)),
             ],
             options={
                 'abstract': False,
             },
             bases=('core.datafile',),
-        ),
-        migrations.CreateModel(
-            name='AFMScan',
-            fields=[
-                ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=('core.process',),
         ),
     ]
