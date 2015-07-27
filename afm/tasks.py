@@ -3,9 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 import logging
 import math
-import os
 
-from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import django_rq
@@ -13,6 +12,7 @@ import nanoscope
 from PIL import Image, ImageDraw, ImageFont
 import six
 
+from afm import utils
 from core.tasks import AsyncDjangoFile
 
 
@@ -21,26 +21,31 @@ logger = logging.getLogger(__name__)
 
 @django_rq.job
 def process_nanoscope_file(raw_file):
-    scan_number = int(os.path.splitext(raw_file.name)[-1][1:])
-    if '_' in raw_file.name:
-        location = os.path.splitext(raw_file.name)[0].split('_')[-1]
-        if location not in 'rRcCfFeE':
-            location = 'c'
-    else:
-        location = 'c'
+    scan_number = utils.extract_scan_number(raw_file.name)
+    location = utils.extract_scan_location(raw_file.name)
     logger.debug(
         'Extracted scan_number={}, location={}'.format(scan_number, location))
+
+    # read & parse file
     raw = six.BytesIO(raw_file.read())
     raw.mode = 'b'
     scan = nanoscope.read(raw, encoding='cp1252')
     logger.debug('Read in file {}'.format(raw_file.name))
 
     processed_files = [
-        AsyncDjangoFile(raw_file,
-                        dict(image_type='Raw', state='raw',
-                             rms=0.0, zrange=0.0,
-                             size=0.0, scan_number=scan_number,
-                             content_type='application/octet-stream'))]
+        AsyncDjangoFile(
+            raw_file,
+            {
+                'image_type': 'Raw',
+                'state': 'raw',
+                'rms': 0.0,
+                'zrange': 0.0,
+                'size': 0.0,
+                'scan_number': scan_number,
+                'location': location,
+                'content_type': 'application/octet-stream'
+            })]
+    scan_size = 0.0
     for img in scan:
         img.process()
         logger.debug('Processed {} scan'.format(img.type))
@@ -48,10 +53,18 @@ def process_nanoscope_file(raw_file):
         logger.debug('Created image file for {} scan'.format(img.type))
         scan_size = math.sqrt(img.scan_area)
         processed_files.append(
-            AsyncDjangoFile(processed_image,
-                            dict(image_type=img.type, state='extracted',
-                                 rms=img.rms, zrange=img.zrange,
-                                 size=scan_size, scan_number=scan_number)))
+            AsyncDjangoFile(
+                processed_image,
+                {
+                    'image_type': img.type,
+                    'state': 'extracted',
+                    'rms': img.rms,
+                    'zrange': img.zrange,
+                    'size': scan_size,
+                    'scan_number': scan_number,
+                    'location': location,
+                    'content_type': processed_image.content_type
+                }))
     processed_files[0].kwargs['size'] = scan_size
     return processed_files
 
@@ -70,13 +83,10 @@ def _create_scan_png(scan, filename, scan_number):
     processed_image.paste(image,
                           (20, 20, image.size[0] + 20, image.size[1] + 20))
 
-    calibri = ImageFont.truetype(
-        os.path.join(settings.STATIC_ROOT, 'afm', 'fonts', 'calibrib.ttf'),
-        20)
+    calibri = ImageFont.truetype(finders.find('afm/fonts/calibrib.ttf'), 20)
     draw = ImageDraw.Draw(processed_image)
 
-    scale_image = Image.open(
-        os.path.join(settings.STATIC_ROOT, 'afm', 'img', 'scale_12.png'))
+    scale_image = Image.open(finders.find('afm/img/scale_12.png'))
     processed_image.paste(scale_image,
                          (28 + image.size[0],
                           30,

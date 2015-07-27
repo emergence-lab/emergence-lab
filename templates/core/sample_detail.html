@@ -96,7 +96,7 @@
                 <h3>This sample hasn't had any processes run on it.</h3>
                 <p>Get started by running a new or existing process.</p>
                 <div class="top-spacer-sm">
-                    <a href="#" class="btn btn-primary right-spacer-xs">
+                    <a href="{% url 'process_autocreate' uuid=sample.uuid %}" class="btn btn-primary right-spacer-xs">
                         {% bootstrap_icon 'plus' %}
                         Run Process
                     </a>
@@ -109,7 +109,7 @@
                     {% recursetree sample.nodes %}
                             {% if not node.is_root_node %}
                                 <li>
-                                    {{node.process.name}}
+                                    {{node.process.type.name}}
                                     (<a href="{% url 'process_detail' uuid=node.process.uuid %}"
                                         data-toggle="tooltip"
                                         data-html="true"

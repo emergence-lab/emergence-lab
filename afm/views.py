@@ -3,10 +3,9 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
 
-from afm.forms import AutoCreateAFMForm
-from afm.models import AFMFile, AFMScan
+from afm.models import AFMFile
 from afm.tasks import process_nanoscope_file
-from core.views import CreateUploadProcessView, UploadFileView
+from core.views import RunProcessView, UploadFileView
 
 
 class AFMFileUpload(UploadFileView):
@@ -19,12 +18,11 @@ class AFMFileUpload(UploadFileView):
     }
 
 
-class AutocreateAFMView(CreateUploadProcessView):
+class AutocreateAFMView(RunProcessView):
     """
     View for creation of new afm data.
     """
-    model = AFMScan
-    form_class = AutoCreateAFMForm
+    process_type = 'afm'
 
     def get_success_url(self):
         return reverse('afm_upload', args=(self.object.uuid,))

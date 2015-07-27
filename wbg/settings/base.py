@@ -80,6 +80,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     # administration
     'grappelli',
     'django.contrib.admin',
@@ -95,6 +96,7 @@ INSTALLED_APPS = (
     'storages',
     'django_ace',
     'django_rq',
+    'crispy_forms',
     # local apps
     'core',
     'dashboard',
@@ -102,6 +104,7 @@ INSTALLED_APPS = (
     'd180',
     'afm',
     'hall',
+    'project_management',
     'simulations',
     'schedule_queue',
     'sem',
@@ -181,6 +184,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, os.pardir, 'static')
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, os.pardir, 'bower_components'),
+)
 
 
 # RESTful API
@@ -267,15 +277,20 @@ LOGGING = {
         },
     },
     'loggers': {
-        'core.views.process': {
-            'handlers': ['file'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
         'django': {
             'handlers': ['file'],
             'propogate': True,
             'level': 'WARNING',
+        },
+        'rq.worker': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
+        },
+        'core.views.process': {
+            'handlers': ['file'],
+            'propogate': True,
+            'level': 'DEBUG',
         },
         'd180.views': {
             'handlers': ['file'],
@@ -312,3 +327,17 @@ EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS', [])
 # Feedback
 
 ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK', False)
+
+
+# Crispy Forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+
+# Mendeley
+
+ENABLE_MENDELEY = get_secret('ENABLE_MENDELEY', False)
+MENDELEY_ID = get_secret('MENDELEY_ID', '')
+MENDELEY_SECRET = get_secret('MENDELEY_SECRET', '')
+MENDELEY_REDIRECT = get_secret('MENDELEY_REDIRECT', '')
+MENDELEY_SSL_VERIFY = get_secret('MENDELEY_SSL_VERIFY', False)

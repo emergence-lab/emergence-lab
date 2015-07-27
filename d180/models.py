@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+from collections import OrderedDict
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from core.models import ActiveStateMixin, Process, Investigation
+from core.models import ActiveStateMixin, Process
 
 
 @python_2_unicode_compatible
@@ -25,19 +27,12 @@ class Platter(ActiveStateMixin, models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
-class D180Growth(Process):
+class D180GrowthInfo(models.Model):
     """
     Stores information related to a growth on the d180 including tagging for
     material and device properties.
     """
-    name = 'D180 Growth'
-    slug = 'd180-growth'
-    is_destructive = True
-
-    # general info
-    investigations = models.ManyToManyField(Investigation,
-        related_name='growths', related_query_name='growth',)
+    process = models.OneToOneField(Process, related_name='info')
     platter = models.ForeignKey(Platter,
                                 limit_choices_to={'is_active': True})
 
@@ -65,12 +60,39 @@ class D180Growth(Process):
     has_p = models.BooleanField(default=False)
     has_u = models.BooleanField(default=False)
 
-    class Meta:
-        verbose_name = _('d180 growth')
-        verbose_name_plural = _('d180 growths')
+    @property
+    def material(self):
+        print('material')
+        materials = OrderedDict([
+            (self.has_gan, 'GaN'),
+            (self.has_aln, 'AlN'),
+            (self.has_inn, 'InN'),
+            (self.has_algan, 'AlGaN'),
+            (self.has_ingan, 'InGaN'),
+            (self.other_material, self.other_material),
+        ])
+        return ', '.join([v for k, v in materials.items() if k])
 
-    def __str__(self):
-        return self.uuid
+    @property
+    def doping(self):
+        dopings = OrderedDict([
+            (self.has_n, 'n-type'),
+            (self.has_p, 'p-type'),
+            (self.has_u, 'unintentional'),
+        ])
+        return ', '.join(v for k, v in dopings.items() if k)
+
+    @property
+    def growth_features(self):
+        features = OrderedDict([
+            (self.is_template, 'is a template'),
+            (self.is_buffer, 'is a buffer'),
+            (self.has_pulsed, 'has pulsed layer(s)'),
+            (self.has_superlattice, 'has superlattice layers'),
+            (self.has_mqw, 'has multi-quantum well layers'),
+            (self.has_graded, 'has graded composition layer(s)'),
+        ])
+        return ', '.join(v for k, v in features.items() if k)
 
 
 @python_2_unicode_compatible
@@ -79,9 +101,9 @@ class D180Readings(models.Model):
     Stores readings (i.e. temperature) from a d180 growth.
     """
     # growth and layer info
-    growth = models.ForeignKey(D180Growth, related_name='readings')
+    process = models.ForeignKey(Process, related_name='readings')
     layer = models.IntegerField()
-    layer_desc = models.CharField(max_length=45, blank=True)
+    description = models.CharField(max_length=100, blank=True)
 
     # readings
     pyro_out = models.DecimalField(max_digits=7, decimal_places=2)
@@ -132,7 +154,7 @@ class D180Readings(models.Model):
         verbose_name_plural = _('readings')
 
     def __str__(self):
-        return self.growth.__str__()
+        return self.process.__str__()
 
 
 @python_2_unicode_compatible
@@ -140,7 +162,7 @@ class D180RecipeLayer(models.Model):
     """
     Stores layers used in the recipes for a d180 growth.
     """
-    growth = models.ForeignKey(D180Growth)
+    process = models.ForeignKey(Process, related_name='recipe')
 
     layer_num = models.IntegerField()
     loop_num = models.IntegerField()
@@ -200,7 +222,7 @@ class D180RecipeLayer(models.Model):
         verbose_name_plural = _('layers')
 
     def __str__(self):
-        return self.growth.__str__()
+        return self.process.__str__()
 
 
 @python_2_unicode_compatible

@@ -12,11 +12,9 @@ from django.views.generic import DetailView
 from braces.views import LoginRequiredMixin
 from redis import StrictRedis
 
-from core.models import User, Project, Investigation
+from core.models import User, Project, Investigation, ProcessType
 from core.streams import project_stream, investigation_stream
 from core.views import ActionReloadView
-from d180.models import D180Growth
-from schedule_queue.models import Reservation, tools
 from users.redis_config import ActionItem
 
 
@@ -30,15 +28,8 @@ class DashboardMixin(object):
                                 .values_list('projects__id', flat=True))
         kwargs['active_projects'] = Project.active_objects.filter(id__in=projects)
         kwargs['inactive_projects'] = Project.inactive_objects.filter(id__in=projects)
-        reservation_list = []
-        for i in tools.get_tool_list():
-            tmp_res = (Reservation.objects.filter(is_active=True, tool=i)
-                                          .order_by('priority_field').first())
-            if tmp_res and tmp_res.user == self.request.user:
-                tmp_res.url = tools.get_tool_info(i).get('process_start_url',
-                                                         None)
-                reservation_list.append(tmp_res)
-        kwargs['reservations'] = reservation_list
+
+        kwargs['reservations'] = []
         r = StrictRedis(settings.REDIS_HOST,
                         settings.REDIS_PORT,
                         settings.REDIS_DB)
@@ -59,9 +50,8 @@ class Dashboard(LoginRequiredMixin, DashboardMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
-        context['growths'] = (D180Growth.objects.filter(user=self.object)
-                                                .order_by('-uuid_full')[:25])
-        context['tools'] = tools.get_tool_list()
+        context['growths'] = []
+        context['tools'] = ProcessType.objects.values_list('name', flat=True)
         return context
 
     def get_object(self, queryset=None):

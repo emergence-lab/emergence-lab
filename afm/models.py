@@ -3,16 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 
-from core.models import DataFile, Process
-
-
-class AFMScan(Process):
-    """
-    Stores afm characterization information.
-    """
-    name = 'AFM Scan'
-    slug = 'afm'
-    is_destructive = False
+from core.models import DataFile
 
 
 class AFMFile(DataFile):

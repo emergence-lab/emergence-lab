@@ -1,0 +1,29 @@
+doc-warnings: yes
+
+test-warnings: no
+
+strictness: veryhigh
+
+uses:
+    - django
+
+autodetect: yes
+
+requirements:
+    - requirements/development.txt
+    - requirements/production.txt
+    - requirements/testing.txt
+
+ignore-paths:
+    - docs
+    - __init__\.py
+
+pep8:
+    full: true
+    options:
+        max-line-length: 100
+    disable:
+        - E123
+        - E127
+        - E128
+        - E133

@@ -21,11 +21,10 @@
                 toolbar: 'halloToolbarFixed',
             });
         });
-        
     }
 
     exports.enable_rich_text = function(elements_selector, form_selector) {
-        exports.make_rich_text_editable($(elements_selector))
+        exports.make_rich_text_editable($(elements_selector));
 
         // on form submission, copy the text from the hallo.js divs into the
         // actual form fields.
@@ -70,6 +69,17 @@
                 $(advance_selector)
                     .html('Next Step <span class="glyphicon glyphicon-chevron-right"></span>')
             }
+        });
+    }
+
+    exports.set_up_sample_radio = function(new_sample_button, existing_sample_button, new_sample_form, existing_sample_form) {
+        $(new_sample_button).click(function() {
+            $(existing_sample_form).children('.form-group').removeClass('hidden');
+            $(new_sample_form).children('.form-group').addClass('hidden');
+        });
+        $(existing_sample_button).click(function() {
+            $(new_sample_form).children('.form-group').removeClass('hidden');
+            $(existing_sample_form).children('.form-group').addClass('hidden');
         });
     }
 

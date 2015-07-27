@@ -113,6 +113,7 @@ class ExportSampleDetail(PrintTemplate):
 
     def get_context_data(self, **kwargs):
         context = super(ExportSampleDetail, self).get_context_data(**kwargs)
-        sample = Sample.objects.get(id=Sample.strip_uuid(self.kwargs.get('uuid', None)))
+
+        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid', None))
         context['sample'] = sample
         return context

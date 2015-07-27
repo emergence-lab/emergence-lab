@@ -1,0 +1,43 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block title %}Investigations{% endblock title %}
+
+{% block pm_content %}
+
+<div class="container-fluid">
+</div>
+<div class="col-md-12">
+  <div>
+    <a class="btn btn-success" href="{% url 'pm_investigation_create' %}"><span class="glyphicon glyphicon-plus"></span> New Investigation</a>
+    <h4 class="pull-right">
+      This page lists investigations associated with the projects you track.
+    </h4>
+  </div>
+  <div class="spacer-xs"></div>
+  <div class="list-group">
+    {% for investigation in object_list %}
+    <a href="{% url 'pm_investigation_detail' investigation.slug %}" class="list-group-item">
+      <h4 class="list-group-item-heading">
+        {{ investigation.name }}
+      </h4>
+      <p class="list-group-item-text">
+        {{ investigation.target_actions.all|length }} Progress Updates
+        &emsp; &emsp;
+        {{ investigation.literature.all|length }} Papers Read
+        <div class="well">
+          {{ investigation.description|truncatewords:50 }}
+        </div>
+        {% for milestone in investigation.milestone.all %}
+        {% if milestone.user == request.user %}
+          <span class="label label-primary" href="{% url 'milestone_detail' milestone.id %}">{{milestone.name}}</span>
+        {% endif %}
+        {% endfor %}
+      </p>
+    </a>
+
+
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

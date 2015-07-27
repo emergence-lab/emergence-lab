@@ -11,7 +11,7 @@ from model_mommy import mommy
 
 from .helpers import test_resolution_template
 from core.models import (Investigation, Process, Project, ProjectTracking,
-                         Sample, Substrate, ProcessTemplate)
+                         Sample, Substrate, ProcessTemplate, ProcessType)
 
 
 class TestHomepageAbout(TestCase):
@@ -165,7 +165,7 @@ class TestProjectCRUD(TestCase):
     def test_project_activate(self):
         obj = Project.objects.filter(is_active=False).first()
         url = reverse('project_activate', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Project.objects.get(id=obj.id)
 
@@ -175,7 +175,7 @@ class TestProjectCRUD(TestCase):
     def test_project_deactivate(self):
         obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_deactivate', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Project.objects.get(id=obj.id)
 
@@ -185,7 +185,7 @@ class TestProjectCRUD(TestCase):
     def test_project_track(self):
         obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_track', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 
@@ -197,7 +197,7 @@ class TestProjectCRUD(TestCase):
         obj = Project.objects.filter(is_active=True).first()
         tracking = ProjectTracking.objects.create(user=self.user, project=obj)
         url = reverse('project_untrack', args=(obj.slug,))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         self.assertRedirects(response, list_url)
 
@@ -211,7 +211,7 @@ class TestProjectCRUD(TestCase):
         response = self.client.post(url, data)
         obj = Project.objects.get(**data)
         self.assertEqual(obj.slug, 'project-3')
-        detail_url = reverse('project_detail_all', args=(obj.slug,))
+        detail_url = reverse('pm_project_list')
         self.assertRedirects(response, detail_url)
 
     def test_project_create_empty_data(self):
@@ -302,7 +302,7 @@ class TestInvestigationCRUD(TestCase):
         obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_activate', args=(proj.slug, obj.slug))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Investigation.objects.get(id=obj.id)
 
@@ -313,7 +313,7 @@ class TestInvestigationCRUD(TestCase):
         obj = Investigation.objects.filter(is_active=True).first()
         proj = obj.project
         url = reverse('investigation_deactivate', args=(proj.slug, obj.slug))
-        list_url = reverse('project_list')
+        list_url = reverse('pm_project_list')
         response = self.client.get(url)
         obj = Investigation.objects.get(id=obj.id)
 
@@ -383,18 +383,15 @@ class TestSampleCRUD(TestCase):
             url='/samples/{}/'.format(sample.uuid),
             url_name='sample_detail',
             template_file='core/sample_detail.html',
-            response_code=200)
+            response_code=200,
+            valid_lookup=sample.uuid,
+            invalid_lookup='s1000')
 
     def test_sample_detail_content(self):
         sample = Sample.objects.create(mommy.make(Substrate))
         url = reverse('sample_detail', args=(sample.uuid,))
         response = self.client.get(url)
         self.assertContains(response, sample.uuid)
-
-    def test_sample_detail_invalid(self):
-        url = reverse('sample_detail', args=('s1000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
 
     def test_sample_create_resolution_template(self):
         test_resolution_template(self,
@@ -431,12 +428,9 @@ class TestSampleCRUD(TestCase):
             url='/samples/{}/edit/'.format(sample.uuid),
             url_name='sample_edit',
             template_file='core/sample_edit.html',
-            response_code=200)
-
-    def test_sample_edit_invalid(self):
-        url = reverse('sample_edit', args=('s1000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup=sample.uuid,
+            invalid_lookup='s1000')
 
     def test_sample_edit_valid_data(self):
         sample = Sample.objects.create(mommy.make(Substrate))
@@ -475,12 +469,9 @@ class TestProcessCRUD(TestCase):
             url='/process/{}/'.format(process.uuid),
             url_name='process_detail',
             template_file='core/process_detail.html',
-            response_code=200)
-
-    def test_process_detail_invalid(self):
-        url = reverse('process_detail', args=('p0000000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup=process.uuid,
+            invalid_lookup='p0000000')
 
     def test_process_detail_content(self):
         process = mommy.make(Process)
@@ -497,12 +488,9 @@ class TestProcessCRUD(TestCase):
             url='/process/{}/edit/'.format(process.uuid),
             url_name='process_edit',
             template_file='core/process_edit.html',
-            response_code=200)
-
-    def test_process_edit_invalid(self):
-        url = reverse('process_edit', args=('p0000000',))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+            response_code=200,
+            valid_lookup=process.uuid,
+            invalid_lookup='p0000000')
 
     def test_process_edit_empty_data(self):
         process = mommy.make(Process)
@@ -548,6 +536,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
             'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',
@@ -568,7 +557,9 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': samples[0].uuid,
+            'sample-1-existing_or_new': 'existing-sample',
             'sample-1-sample_uuid': samples[1].uuid,
             'sample-INITIAL_FORMS': '2',
             'sample-MAX_NUM_FORMS': '',
@@ -591,6 +582,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
             'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',
@@ -608,15 +600,68 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}{}'.format(sample.uuid, piece),
             'sample-INITIAL_FORMS': '1',
             'sample-MAX_NUM_FORMS': '',
             'sample-TOTAL_FORMS': '1'
         }
         response = self.client.post(url, data)
-        nodes = sample.get_nodes_for_process_type(Process)
+        nodes = sample.get_nodes_for_process_type('generic-process')
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].piece, piece)
+
+    def test_process_autocreate_resolution_template(self):
+        sample = Sample.objects.create(mommy.make(Substrate))
+        test_resolution_template(self,
+            url='/process/autocreate/{}/'.format(sample.uuid),
+            url_name='process_autocreate',
+            template_file='core/process_create.html',
+            response_code=200,
+            valid_lookup=sample.uuid,
+            invalid_lookup='s1000')
+
+    def test_autocreate_empty_data(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'pieces', 'This field is required.')
+
+    def test_process_autocreate_invalid_pieces(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'pieces': ['b'],
+            'type': 'generic-process',
+        }
+        response = self.client.post(url, data)
+
+        msg = 'Select a valid choice. b is not one of the available choices.'
+        self.assertFormError(response, 'form', 'pieces', msg)
+
+    def test_process_autocreate_invalid_type(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'pieces': ['a'],
+            'type': 'nonexistant',
+        }
+        response = self.client.post(url, data)
+
+        msg = 'Select a valid choice. That choice is not one of the available choices.'
+        self.assertFormError(response, 'form', 'type', msg)
+
+    def test_process_autocreate_valid_data(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'pieces': ['a'],
+            'type': 'generic-process',
+        }
+        response = self.client.post(url, data)
+        process = Process.objects.last()
+        self.assertRedirects(response, reverse('process_detail', args=[process.uuid]))
 
 
 class TestProcessTemplateCRUD(TestCase):
@@ -639,7 +684,7 @@ class TestProcessTemplateCRUD(TestCase):
         process = mommy.make(Process)
         template = ProcessTemplate.objects.create(process=process,
                                                   user=self.user)
-        url = '/process/templates/edit/{}/'.format(template.id)
+        url = '/process/templates/{}/edit/'.format(template.id)
         data = {
             'name': 'test',
             'comment': 'test_comment'
@@ -654,8 +699,107 @@ class TestProcessTemplateCRUD(TestCase):
         process = mommy.make(Process)
         template = ProcessTemplate.objects.create(process=process,
                                                   user=self.user)
-        url = '/process/templates/remove/{}/'.format(template.id)
+        url = '/process/templates/{}/remove/'.format(template.id)
         response = self.client.post(url, args=(template.id,), follow=True)
         with self.assertRaises(ProcessTemplate.DoesNotExist):
             ProcessTemplate.objects.get(id=template.id)
         self.assertEqual(response.status_code, 200)
+
+
+class TestProcessTypeCRUD(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
+        self.client.login(username='username1', password='')
+
+    def test_processtype_list_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/type/',
+            url_name='processtype_list',
+            template_file='core/processtype_list.html',
+            response_code=200)
+
+    def test_processtype_list_content(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = reverse('processtype_list')
+        response = self.client.get(url)
+        self.assertContains(response, processtype.full_name)
+
+    def test_processtype_detail_resolution_template(self):
+        processtype = mommy.make(ProcessType, type='test')
+        test_resolution_template(self,
+            url='/process/type/{}/'.format(processtype.type),
+            url_name='processtype_detail',
+            template_file='core/processtype_detail.html',
+            response_code=200,
+            valid_lookup='test',
+            invalid_lookup='invalid')
+
+    def test_processtype_detail_content(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = reverse('processtype_detail', args=(processtype.type,))
+        response = self.client.get(url)
+        self.assertContains(response, processtype.full_name)
+
+    def test_processtype_edit_resolution_template(self):
+        processtype = mommy.make(ProcessType, type='test')
+        test_resolution_template(self,
+            url='/process/type/{}/edit/'.format(processtype.type),
+            url_name='processtype_edit',
+            template_file='core/processtype_edit.html',
+            response_code=200,
+            valid_lookup='test',
+            invalid_lookup='invalid')
+
+    def test_processtype_edit_empty_data(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = reverse('processtype_edit', args=(processtype.type,))
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'name', 'This field is required.')
+
+    def test_processtype_edit_valid_data(self):
+        processtype = mommy.make(ProcessType, type='test')
+        url = reverse('processtype_edit', args=(processtype.type,))
+        data = {
+            'name': processtype.name,
+            'full_name': processtype.full_name,
+            'description': 'testing',
+            'is_destructive': processtype.is_destructive,
+            'scheduling_type': processtype.scheduling_type,
+        }
+        response = self.client.post(url, data)
+        processtype = ProcessType.objects.get(type=processtype.type)
+        self.assertEqual(processtype.description, data['description'])
+        detail_url =  '/process/type/{}/'.format(processtype.type)
+        self.assertRedirects(response, detail_url)
+
+    def test_processtype_create_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/type/create/',
+            url_name='processtype_create',
+            template_file='core/processtype_create.html',
+            response_code=200)
+
+    def test_processtype_create_empty_data(self):
+        url = reverse('processtype_create')
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'type',
+                             'This field is required.')
+
+    def test_processtype_create_valid_data(self):
+        url = reverse('processtype_create')
+        data = {
+            'type': 'test',
+            'name': 'Test',
+            'full_name': 'Test Process',
+            'description': 'testing',
+            'is_destructive': True,
+            'scheduling_type': 'none',
+        }
+        response = self.client.post(url, data)
+        processtype = ProcessType.objects.last()
+        self.assertRedirects(response, reverse('processtype_detail',
+                                               args=(processtype.type,)))

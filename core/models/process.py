@@ -6,13 +6,15 @@ import os
 from django.core.files.storage import default_storage as labshare
 from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
+from actstream import action
 import polymorphic
 
 from core.models.mixins import TimestampMixin, UUIDMixin
-from core.models import fields
-from core.polymorphic import get_subclasses
+from core.models import fields, Investigation, Milestone
 
 
 def get_file_path(instance, filename):
@@ -22,37 +24,68 @@ def get_file_path(instance, filename):
     return os.path.join('processes', instance.process.uuid_full.hex, filename)
 
 
-class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
+@python_2_unicode_compatible
+class ProcessType(models.Model):
     """
-    Base class for all processes. A process represents anything done to a
-    sample which results in data (numerical or visual) or alters the properties
-    of the sample.
+    Holds information about types of processes.
+    """
+    SCHEDULING_TYPE = (
+        ('none', 'None'),
+        ('simple', 'Simple'),
+        ('full', 'Full'),
+        ('external', 'External')
+    )
 
-    name: The human readable name for the process
-    slug: The computer-consumed identifier to tell which type of process the
-          instance is. Used to help identify which fields are availiable.
-    is_destructive: Boolean that identifies whether the process is destructive,
-                    meaning that the sample is altered in some way and that
-                    repeating past processes may give different results.
+    type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
+    name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=255)
+    is_destructive = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+    scheduling_type = models.CharField(max_length=10, choices=SCHEDULING_TYPE,
+                                       default='none')
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self.__class__.__name__, self.type)
+
+    def __str__(self):
+        return self.full_name
+
+
+class ProcessTypeManager(models.Manager):
+    """
+    Manager to filter on the ``type`` field.
+    """
+    def __init__(self, process_type):
+        super(ProcessTypeManager, self).__init__()
+        self.process_type = process_type
+
+    def get_queryset(self):
+        return (super(ProcessTypeManager, self)
+                    .get_queryset().filter(type_id=self.process_type))
+
+
+class Process(UUIDMixin, TimestampMixin, models.Model):
+    """
+    A process represents anything done to a sample which results in data
+    (numerical or visual) or alters the properties of the sample.
     """
     prefix = 'p'
-
-    name = 'Generic Process'
-    slug = 'generic-process'
-    is_destructive = True
 
     comment = fields.RichTextField(blank=True)
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
+    type = models.ForeignKey(ProcessType, default='generic-process')
 
-    @staticmethod
-    def get_process_class(slug):
-        classes = get_subclasses(Process) + [Process]
-        try:
-            return next(p for p in classes if p.slug == slug)
-        except StopIteration:
-            raise ValueError('Process slug {} not valid'.format(slug))
+    investigations = models.ManyToManyField(Investigation,
+        related_name='processes', related_query_name='process',)
+
+    milestones = models.ManyToManyField(Milestone,
+        related_name='processes', related_query_name='milestone',)
+
+    objects = models.Manager()
+    generic = ProcessTypeManager(process_type='generic-process')
+    split = ProcessTypeManager(process_type='split-process')
 
     @property
     def samples(self):
@@ -69,15 +102,6 @@ class Process(polymorphic.PolymorphicModel, UUIDMixin, TimestampMixin):
     @property
     def nodes(self):
         return self.processnode_set.all()
-
-
-class SplitProcess(Process):
-    """
-    Process representing splitting a sample into multiple parts or pieces.
-    """
-    name = 'Split Sample'
-    slug = 'split-process'
-    is_destructive = False
 
 
 class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
@@ -140,9 +164,18 @@ class ProcessTemplate(TimestampMixin, models.Model):
     Model for templating existing process details for later reference
     """
     process = models.ForeignKey(Process,
-                                related_name='process',
-                                related_query_name='process')
+                                related_name='templates',
+                                related_query_name='templates')
     name = models.CharField(max_length=50, blank=True)
     comment = fields.RichTextField(blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                          limit_choices_to={'is_active': True})
+
+
+@receiver(models.signals.m2m_changed, sender=Process.investigations.through)
+def process_actstream(sender, instance=None, created=False, **kwargs):
+    for investigation in instance.investigations.all():
+        action.send(instance.user,
+                    verb='created',
+                    action_object=instance,
+                    target=investigation)

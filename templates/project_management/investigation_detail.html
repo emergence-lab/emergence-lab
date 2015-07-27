@@ -1,0 +1,179 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block subtitle %}{{investigation.name}}{% endblock %}
+
+{% load bootstrap3 %}
+
+{% block header %}
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
+  {{milestone_form.media}}
+{% endblock header %}
+
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
+        <li><a href="{% url 'pm_project_list' %}">{{investigation.project.name}}</a></li>
+        <li class="active">{{investigation.name}}</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      Description
+      <a class="pull-right" href="{% url 'pm_investigation_edit' investigation.slug %}"><span class="glyphicon glyphicon-edit"></span></a>
+    </div>
+    <div class="panel-body">
+      {{investigation.description|escape}}
+    </div>
+  </div>
+</div>
+
+<div>
+    <ul class="nav nav-tabs">
+      {% if milestones %}
+      <li role="presentation" class="active"><a href="#milestones" aria-controls="milestones" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-time"></span> Milestones</a></li>
+      {% endif %}
+      <li role="presentation" {% if not milestones %}class="active"{%endif%}><a href="#processes" aria-controls="processes" data-toggle="pill" role="tab"><span class="glyphicon
+       glyphicon-stats"></span> Processes</a></li>
+       <li role="presentation"><a href="#literature" aria-controls="literature" data-toggle="pill" role="tab"><span class="glyphicon
+        glyphicon-book"></span> Literature</a></li>
+      <li role="presentation" class="pull-right"><a data-toggle="modal" data-target="#milestone-modal"><span class="glyphicon glyphicon-plus"></span> Milestone</a></li>
+    </ul>
+</div>
+
+<div class="spacer-xs"></div>
+
+<div class="tab-content">
+
+  <div class="tab-pane {% if milestones %}active{%endif%}" role="tabpanel" id="milestones">
+    <div class="col-md-2 pull-right">
+        <ul class="nav nav-pills nav-stacked">
+          <li role="presentation" class="active"><a href="#active_milestones" aria-controls="active_milestones" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-exclamation-sign"></span> Open</a></li>
+          <li role="presentation"><a href="#inactive_milestones" aria-controls="inactive_milestones" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-ok-sign"></span> Closed</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+      <div class="tab-content">
+        <div class="tab-pane active" role="tabpanel" id="active_milestones">
+          <div>
+            <div class="list-group">
+              {% for milestone in active_milestones %}
+                  <div class="list-group-item" href="#">
+                    <h4 class="list-group-item-heading">
+                      <a href="{% url 'milestone_detail' slug=milestone.slug %}">{{milestone.name}}</a>
+                      <span class="pull-right">Due: {{milestone.due_date}}</span>
+                    </h4>
+                    <p class="list-group-item-text">
+                      {{milestone.description|safe|truncatewords:50}}
+                    </p>
+                  </div>
+
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" role="tabpanel" id="inactive_milestones">
+          <div>
+            <div class="list-group">
+              {% for milestone in inactive_milestones %}
+                  <div class="list-group-item" href="#">
+                    <h4 class="list-group-item-heading">
+                      <a href="{% url 'milestone_detail' slug=milestone.slug %}">{{milestone.name}}</a>
+                      <span class="pull-right">Due: {{milestone.due_date}}</span>
+                    </h4>
+                    <p class="list-group-item-text">
+                      {{milestone.description|escape|truncatewords:50}}
+                    </p>
+                  </div>
+
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tab-pane {% if not milestones %}active{%endif%}" role="tabpanel" id="processes">
+    <div class="list-group">
+      {% for update in processes %}
+        <div class="list-group-item">
+          <h4 class="list-group-item-heading">{{update.action_object.type}} <a data-toggle="tooltip" title="{{update.action_object.comment|safe}}" href="{% url 'process_detail' update.action_object.uuid %}">({{update.action_object.uuid}}{% if update.action_object.legacy_identifier %}, {{update.action_object.legacy_identifier}}{%endif%})</a></h4>
+          <p class="list-group-item-text">
+            {{update.timestamp}}
+
+          </p>
+        </div>
+
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="tab-pane" role="tabpanel" id="literature">
+    <div class="list-group">
+      {% for update in literature reversed %}
+        <a class="list-group-item" href="{% url 'literature_detail_redirector' update.id %}">
+          <h4 class="list-group-item-heading">{{update.title}}</h4>
+          <p class="list-group-item-text">
+            {{update.created}}
+          </p>
+          <p class="list-group-item-text">
+            {{update.doi}}
+          </p>
+        </a>
+
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<section id="milestone-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <header class="modal-header">
+                <button class="close" type="button" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title">New Milestone</h3>
+            </header>
+            <form action="{% url 'milestone_create_action' %}" method="post" role="form">
+              {% csrf_token %}
+              <div class="modal-body">
+                  {% bootstrap_form milestone_form %}
+              </div>
+              <footer class="modal-footer">
+                  <a class="btn btn-default" data-dismiss="modal">Cancel</a>
+                  <button class="btn btn-primary" type="submit">Submit</button>
+              </footer>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project_management/js/milestone_detail.js' %}"></script>
+    <script type="text/javascript">
+        milestone_detail.enable_rich_text('.hallo', 'form');
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+          if(window.location.href.indexOf('#milestone-modal') != -1) {
+            $('#milestone-modal').modal('show');
+          }
+        });
+    </script>
+{% endblock scripts %}

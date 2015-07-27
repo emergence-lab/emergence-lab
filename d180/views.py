@@ -5,21 +5,21 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.views import generic
 from django.shortcuts import get_object_or_404
 
 from braces.views import LoginRequiredMixin
 
-from d180.models import D180Growth, D180Source, D180Readings, Platter
-from d180.forms import (CommentsForm, SourcesForm, WizardBasicInfoForm,
-                        WizardGrowthInfoForm, WizardFullForm,
+from d180.models import D180Source, D180Readings, Platter
+from d180.forms import (CommentsForm, SourcesForm,
+                        WizardBasicProcessForm, WizardGrowthInfoForm, WizardFullProcessForm,
                         WizardPrerunChecklistForm, WizardPostrunChecklistForm,
                         D180ReadingsFormSet, ReservationCloseForm,
                         D180ReadingsForm)
 from core.views import ActionReloadView, ActiveListView
 from core.forms import SampleFormSet
-from core.models import Sample, Process, ProcessTemplate
+from core.models import Process, ProcessTemplate, ProcessType
 from schedule_queue.models import Reservation
 
 
@@ -92,7 +92,8 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             previous_source = None
 
         try:
-            previous_growth = D180Growth.objects.latest('created')
+            previous_growth = (Process.objects.filter(type_id='d180-growth')
+                                              .latest('created'))
             growth_number = 'g{}'.format(
                 str(int(previous_growth.legacy_identifier[1:]) + 1).zfill(4))
         except ObjectDoesNotExist:
@@ -101,17 +102,19 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
             growth_number = 'g1000'
 
         return {
-            'info_form': WizardBasicInfoForm(
+            'info_form': WizardBasicProcessForm(
                 initial={
                     'user': self.request.user,
-                    'legacy_identifier': growth_number
+                    'legacy_identifier': growth_number,
+                    'type': ProcessType.objects.get(type='d180-growth'),
                 },
-                prefix='growth'),
+                user=self.request.user,
+                prefix='process'),
             'growth_form': WizardGrowthInfoForm(prefix='growth'),
             'checklist_form': WizardPrerunChecklistForm(prefix='checklist'),
             'source_form': SourcesForm(instance=previous_source,
                                        prefix='source'),
-            'comment_form': CommentsForm(prefix='growth'),
+            'comment_form': CommentsForm(prefix='process'),
             'sample_formset': SampleFormSet(prefix='sample'),
             'reservation_form': ReservationCloseForm(prefix='reservation'),
         }
@@ -119,24 +122,28 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
     def get(self, request, *args, **kwargs):
         self.object = None
         reservation = Reservation.get_latest(user=self.request.user,
-                                             tool_name='d180')
+                                             process_type='d180-growth')
         return self.render_to_response(self.get_context_data(
             reservation=reservation, **self.build_forms()))
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        growth_form = WizardFullForm(request.POST, prefix='growth')
+        process_form = WizardFullProcessForm(request.POST, prefix='process')
+        growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')
         checklist_form = WizardPrerunChecklistForm(request.POST,
                                                    prefix='checklist')
         source_form = SourcesForm(request.POST, prefix='source')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
         reservation_form = ReservationCloseForm(request.POST, prefix='reservation')
 
-        if all([growth_form.is_valid(), source_form.is_valid(),
-                checklist_form.is_valid(), sample_formset.is_valid(),
-                reservation_form.is_valid()]):
+        if all([process_form.is_valid(), growth_info_form.is_valid(),
+                source_form.is_valid(), checklist_form.is_valid(),
+                sample_formset.is_valid(), reservation_form.is_valid()]):
             logger.debug('Creating new growth')
-            self.object = growth_form.save()
+            self.object = process_form.save()
+            info = growth_info_form.save(commit=False)
+            info.process = self.object
+            info.save()
             logger.debug('Created process {} ({}) for {} samples'.format(
                 self.object.uuid_full, self.object.legacy_identifier, len(sample_formset)))
             source_form.save()
@@ -146,17 +153,18 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 piece = s.cleaned_data['piece']
                 sample.run_process(self.object, piece, n + 1)
             reservation = Reservation.get_latest(user=self.request.user,
-                                                 tool_name='d180')
+                                                 process_type=self.object.type)
             if reservation and not reservation_form.cleaned_data['hold_open']:
                 reservation.deactivate()
 
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
-            basic_info_form = WizardBasicInfoForm(request.POST, prefix='growth')
+            process_form = WizardBasicProcessForm(self.request.user, request.POST,
+                                                    prefix='process')
             growth_info_form = WizardGrowthInfoForm(request.POST, prefix='growth')
-            comment_form = CommentsForm(request.POST, prefix='growth')
+            comment_form = CommentsForm(request.POST, prefix='process')
             return self.render_to_response(self.get_context_data(
-                info_form=basic_info_form,
+                info_form=process_form,
                 growth_form=growth_info_form,
                 checklist_form=checklist_form,
                 source_form=source_form,
@@ -164,14 +172,14 @@ class WizardStartView(LoginRequiredMixin, generic.TemplateView):
                 sample_formset=sample_formset,
                 reservation_form=reservation_form,
                 reservation=Reservation.get_latest(user=self.request.user,
-                                                   tool_name='d180')))
+                                                   process_type='d180-growth')))
 
 
 class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'd180/create_growth_readings.html'
 
     def get_object(self):
-        return D180Growth.objects.latest('created')
+        return Process.objects.filter(type_id='d180-growth').latest('created')
 
     def build_forms(self, **kwargs):
         comment_form = CommentsForm(prefix='comment',
@@ -192,7 +200,8 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super(WizardReadingsView, self).get_context_data(**kwargs)
         context_data['growth'] = self.object
-        context_data['samples'] = Sample.objects.by_process(self.object.uuid_full)
+        nodes = self.object.nodes.order_by('number')
+        context_data['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         return context_data
 
     def post(self, request, *args, **kwargs):
@@ -208,7 +217,7 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
                 self.object.save()
             for reading_form in readings_formset:
                 if reading_form.has_changed():
-                    reading_form.save(growth=self.object)
+                    reading_form.save(process=self.object)
             return HttpResponseRedirect(reverse('create_growth_d180_readings'))
         else:
             return self.render_to_response(self.get_context_data(
@@ -221,7 +230,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'd180/create_growth_postrun.html'
 
     def get_object(self):
-        return D180Growth.objects.latest('created')
+        return Process.objects.filter(type_id='d180-growth').latest('created')
 
     def build_forms(self):
         try:
@@ -242,7 +251,8 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super(WizardPostrunView, self).get_context_data(**kwargs)
         context_data['growth'] = self.object
-        context_data['samples'] = Sample.objects.by_process(self.object.uuid_full)
+        nodes = self.object.nodes.order_by('number')
+        context_data['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         return context_data
 
     def get(self, request, *args, **kwargs):
@@ -273,7 +283,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
 class WizardCancelView(LoginRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
-        growth = D180Growth.objects.latest('created')
+        growth = Process.objects.filter(type_id='d180-growth').latest('created')
 
         # remove readings
         growth.readings.all().delete()
@@ -290,25 +300,24 @@ class WizardCancelView(LoginRequiredMixin, ActionReloadView):
         return reverse('dashboard')
 
 
-class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
-    model = D180Growth
+class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
+    model = D180Readings
     template_name = 'd180/readings_detail.html'
-    context_object_name = 'growth'
+    context_object_name = 'readings'
 
-    def get_object(self):
+    def get_queryset(self):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
-        return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
+        try:
+            self.process = Process.objects.get(uuid_full__startswith=uuid)
+        except Process.DoesNotExist:
+            raise Http404('Process {} does not exist'.format(self.kwargs['uuid']))
+        return self.model.objects.filter(process=self.process).order_by('layer')
 
     def get_context_data(self, **kwargs):
         context = super(ReadingsDetailView, self).get_context_data(**kwargs)
-        context['growth'] = self.object
+        context['process'] = self.process
 
-        # turn list organized by column into a list organized by row
-        #  and add labels to first column
-        readings_list = D180Readings.objects.filter(
-            growth=self.object).order_by('layer').values_list()
-        if not readings_list:
-            return context
+        readings_list = self.object_list.values_list()
 
         def molar_flow(temp, flow, press, a, b):
             if press <= 0:
@@ -362,18 +371,18 @@ class ReadingsDetailView(LoginRequiredMixin, generic.DetailView):
 class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
                          generic.TemplateView):
     context_object_name = 'growth'
-    queryset = D180Growth.objects.all()
+    queryset = Process.objects.filter(type_id='d180-growth')
     template_name = 'd180/update_readings.html'
 
     def get_object(self):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
-        return get_object_or_404(D180Growth, uuid_full__startswith=uuid)
+        return get_object_or_404(Process, uuid_full__startswith=uuid)
 
     def get_context_data(self, **kwargs):
-        self.object = None
         context = super(UpdateReadingsView, self).get_context_data(**kwargs)
-        context["growth"] = self.get_object()
-        allreadings = D180Readings.objects.filter(growth=self.get_object()).order_by('layer')
+        self.object = self.get_object()
+        context["growth"] = self.object
+        allreadings = D180Readings.objects.filter(process=self.object).order_by('layer')
         context["readings"] = allreadings
         formlist = []
         numberofreadings = 0
@@ -382,7 +391,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
             rform = D180ReadingsForm(instance=D180Readings(),
                                      prefix=('reading' + str(numberofreadings)),
                                   initial={'growth': reading.growth,
-                'layer': reading.layer, 'layer_desc': reading.layer_desc,
+                'layer': reading.layer, 'description': reading.description,
                 'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in,
                 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
                 'tc_in': reading.tc_in, 'motor_rpm': reading.motor_rpm,
@@ -413,14 +422,14 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
         return context
 
     def post(self, request, **kwargs):
-        numberofreadings = len(D180Readings.objects.filter(growth=self.get_object()))
+        numberofreadings = len(D180Readings.objects.filter(process=self.get_object()))
         print (numberofreadings)
         for x in range(0, numberofreadings):
             rform = D180ReadingsForm(request.POST, prefix=('reading' + str(x + 1)))
             if rform.is_valid():
                 newgrowth = self.get_object()
                 newlayer = rform.cleaned_data['layer']
-                newlayer_desc = rform.cleaned_data['layer_desc']
+                newlayer_desc = rform.cleaned_data['description']
                 newpyro_out = rform.cleaned_data['pyro_out']
                 newpyro_in = rform.cleaned_data['pyro_in']
                 newecp_temp = rform.cleaned_data['ecp_temp']
@@ -463,9 +472,9 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
                 newsilane_dilution = rform.cleaned_data['silane_dilution']
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
-                thisreading = D180Readings.objects.filter(growth=newgrowth, layer=newlayer)
+                thisreading = D180Readings.objects.filter(process=newgrowth, layer=newlayer)
                 thisreading.update(growth=newgrowth, layer=newlayer,
-                                   layer_desc=newlayer_desc, pyro_out=newpyro_out,
+                                   description=newlayer_desc, pyro_out=newpyro_out,
                                    pyro_in=newpyro_in, ecp_temp=newecp_temp,
                                    tc_out=newtc_out, tc_in=newtc_in, motor_rpm=newmotor_rpm,
                                    gc_pressure=newgc_pressure, gc_position=newgc_position,
@@ -499,7 +508,7 @@ class TemplateWizardStartView(WizardStartView):
         if 'id' in self.kwargs:
             comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
         elif 'uuid' in self.kwargs:
-            comment = D180Growth.objects.get(uuid_full__startswith=Process.strip_uuid(
+            comment = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
                 self.kwargs.get('uuid', None))).comment
         output = super(TemplateWizardStartView, self).build_forms()
         output['comment_form'] = CommentsForm(initial={'comment': comment}, prefix='growth')

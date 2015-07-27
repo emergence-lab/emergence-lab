@@ -4,17 +4,27 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 
+def create_processtype(apps, schema_editor):
+    ProcessType = apps.get_model('core', 'ProcessType')
+    ProcessType.objects.create(type='hall',
+                               is_destructive=False,
+                               name='Hall',
+                               full_name='Hall Effect Measurement',
+                               description='Measurement for carrier concentration and carrier mobility based on the Hall effect.',
+                               scheduling_type='none')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0001_initial'),
+        ('core', '0017_remove_splitprocess'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Hall',
+            name='HallData',
             fields=[
-                ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
+                ('datafile_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.DataFile')),
                 ('temperature', models.DecimalField(default=300.0, max_digits=7, decimal_places=2, blank=True)),
                 ('symmetry_factor', models.DecimalField(default=1.0, max_digits=7, decimal_places=2, blank=True)),
                 ('sheet_coefficient', models.FloatField(null=True, blank=True)),
@@ -29,6 +39,7 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            bases=('core.process',),
+            bases=('core.datafile',),
         ),
+        migrations.RunPython(create_processtype),
     ]

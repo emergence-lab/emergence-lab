@@ -5,8 +5,7 @@ import django_filters as filters
 from django_filters.views import FilterView
 from datetimewidget.widgets import DateTimeWidget
 
-from core.models import User, Project, Investigation
-from .models import D180Growth
+from core.models import User, Project, Investigation, Process
 
 
 # TODO: don't hardcode names as <model>__<field>, get name from FilterSet class
@@ -94,11 +93,8 @@ class D180GrowthFilter(filters.FilterSet):
         super(D180GrowthFilter, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = D180Growth
-        fields = ['uuid_full', 'created', 'user', 'project', 'investigations',
-                  'platter', 'has_n', 'has_p', 'has_u', 'has_gan', 'has_algan',
-                  'has_aln', 'is_template', 'is_buffer', 'has_pulsed',
-                  'has_graded', 'has_superlattice', 'has_mqw', ]
+        model = Process
+        fields = ['uuid_full', 'created', 'user', 'project', 'investigations']
         relational_fields = {
             'afm': ['rms', 'zrange', 'size'],
             'hall': ['sheet_concentration', 'sheet_resistance', 'mobility',

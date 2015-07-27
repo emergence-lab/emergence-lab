@@ -6,7 +6,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
@@ -16,8 +16,7 @@ from braces.views import LoginRequiredMixin
 from core.forms import (DropzoneForm, ProcessCreateForm,
                         EditProcessTemplateForm, SampleFormSet,
                         WizardBasicInfoForm)
-from core.models import Process, Sample, DataFile, ProcessTemplate
-from core.polymorphic import get_subclasses
+from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType
 from core.tasks import process_file, save_files
 from core.views import ActionReloadView
 
@@ -43,13 +42,11 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
-        context['samples'] = set(node.get_sample() for node in
-                                 self.object.processnode_set.get_queryset())
+        nodes = self.object.nodes.order_by('number')
+        context['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         context['datafiles'] = {k: list(g)
                                 for k, g in groupby(self.object.datafiles.all(),
                                              lambda x: type(x))}
-        if type(self.object).name == 'D180 Growth':
-            context['readings'] = True
         return context
 
 
@@ -67,7 +64,7 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['process_list'] = get_subclasses(Process) + [Process]
+        context['process_list'] = ProcessType.objects.all()
         context['user_list'] = get_user_model().objects.all().filter(is_active=True)
         context['slug'] = self.kwargs.get('slug', 'all')
         context['username'] = self.kwargs.get('username', 'all')
@@ -80,7 +77,7 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
         if username != 'all':
             queryset = queryset.filter(user__username=username)
         if slug != 'all':
-            queryset = [i for i in queryset if i.slug == slug]
+            queryset = queryset.filter(type_id=slug)
         return queryset
 
 
@@ -109,7 +106,10 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
     template_name = 'core/process_create.html'
 
     def get_form(self, form_class):
-        sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        try:
+            sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        except Sample.DoesNotExist as e:
+            raise Http404(e)
         return form_class(pieces=sample.pieces, **self.get_form_kwargs())
 
     def form_valid(self, form):
@@ -129,6 +129,12 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
 class RunProcessView(CreateUploadProcessView):
     model = Process
     form_class = ProcessCreateForm
+    process_type = 'generic-process'
+
+    def get_initial(self):
+        initial = super(RunProcessView, self).get_initial()
+        initial['type'] = self.process_type
+        return initial
 
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):
@@ -146,7 +152,11 @@ class UploadFileView(LoginRequiredMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(UploadFileView, self).get_context_data(**kwargs)
-        context['process'] = self.kwargs['uuid']
+        uuid = Process.strip_uuid(self.kwargs.get('uuid'))
+        process = Process.objects.get(uuid_full__startswith=uuid)
+        context['process'] = process
+        nodes = process.nodes.order_by('number')
+        context['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
         return context
 
     def form_valid(self, form):
@@ -179,12 +189,12 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
         queryset = super(ProcessTemplateListView, self).get_queryset()
         queryset = queryset.filter(user=self.request.user).order_by('-created')
         if slug != 'all':
-            queryset = [i for i in queryset if i.process.slug == slug]
+            queryset = queryset.filter(type_id=slug)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
-        context['process_list'] = get_subclasses(Process) + [Process]
+        context['process_list'] = ProcessType.objects.all()
         context['slug'] = self.kwargs.get('slug', 'all')
         return context
 
@@ -248,6 +258,7 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
                 initial={
                     'user': self.request.user,
                 },
+                user=self.request.user,
                 prefix='process'),
             'sample_formset': SampleFormSet(prefix='sample'),
         }
@@ -258,7 +269,7 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        info_form = WizardBasicInfoForm(request.POST, prefix='process')
+        info_form = WizardBasicInfoForm(self.request.user, request.POST, prefix='process')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
 
         if sample_formset.is_valid():
@@ -274,7 +285,8 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
             return HttpResponseRedirect(reverse('process_detail',
                                                 kwargs={'uuid': self.object.uuid}))
         else:
-            basic_info_form = WizardBasicInfoForm(request.POST, prefix='process')
+            basic_info_form = WizardBasicInfoForm(self.request.user, request.POST,
+                                                    prefix='process')
             return self.render_to_response(self.get_context_data(
                 info_form=basic_info_form,
                 sample_formset=sample_formset))
@@ -292,3 +304,43 @@ class TemplateProcessWizardView(ProcessWizardView):
         output['info_form'] = WizardBasicInfoForm(initial={'user': self.request.user,
                                                            'comment': comment}, prefix='process')
         return output
+
+
+class ProcessTypeListView(LoginRequiredMixin, generic.ListView):
+    model = ProcessType
+    template_name = 'core/processtype_list.html'
+    context_object_name = 'processtypes'
+
+
+class ProcessTypeDetailView(LoginRequiredMixin, generic.DetailView):
+    model = ProcessType
+    template_name = 'core/processtype_detail.html'
+    context_object_name = 'processtype'
+    slug_field = 'type'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTypeDetailView, self).get_context_data(**kwargs)
+        context['recent_processes'] = (Process.objects.filter(type_id=self.object.type)
+                                                      .order_by('-created')[:10])
+        return context
+
+
+class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = ProcessType
+    template_name = 'core/processtype_edit.html'
+    context_object_name = 'processtype'
+    slug_field = 'type'
+    fields = ('name', 'full_name', 'description', 'scheduling_type',)
+
+    def get_success_url(self):
+        return reverse('processtype_detail', args=(self.object.type,))
+
+
+class ProcessTypeCreateView(LoginRequiredMixin, generic.CreateView):
+    model = ProcessType
+    template_name = 'core/processtype_create.html'
+    fields = ('type', 'name', 'full_name', 'description',
+              'is_destructive', 'scheduling_type')
+
+    def get_success_url(self):
+        return reverse('processtype_detail', args=(self.object.type,))

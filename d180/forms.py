@@ -4,22 +4,32 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import D180Growth, D180Readings, D180Source
 from core.forms import ChecklistForm
+from core.models import Process, Milestone
+from d180.models import D180Readings, D180Source, D180GrowthInfo
 
 
-class WizardBasicInfoForm(forms.ModelForm):
+class WizardBasicProcessForm(forms.ModelForm):
+
+    def __init__(self, user, *args, **kwargs):
+        super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
+        self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
+        self.fields['milestones'].required = False
 
     class Meta:
-        model = D180Growth
-        fields = ('user', 'investigations', 'platter', 'legacy_identifier',)
+        model = Process
+        fields = ('user', 'investigations', 'legacy_identifier', 'type', 'milestones')
+        widgets = {
+            'type': forms.HiddenInput(),
+        }
 
 
 class WizardGrowthInfoForm(forms.ModelForm):
 
     class Meta:
-        model = D180Growth
-        fields = ('has_gan', 'has_aln', 'has_inn', 'has_algan',
+        model = D180GrowthInfo
+        fields = ('platter',
+                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
                   'has_ingan', 'other_material', 'orientation',
                   'is_template', 'is_buffer', 'has_pulsed',
                   'has_superlattice', 'has_mqw', 'has_graded',
@@ -60,31 +70,16 @@ class WizardGrowthInfoForm(forms.ModelForm):
         return cleaned_data
 
 
-class WizardFullForm(forms.ModelForm):
+class WizardFullProcessForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(WizardFullProcessForm, self).__init__(*args, **kwargs)
+        self.fields['milestones'].required = False
 
     class Meta:
-        model = D180Growth
-        fields = ('user', 'investigations', 'platter', 'legacy_identifier',
-                  'comment',
-                  'has_gan', 'has_aln', 'has_inn', 'has_algan',
-                  'has_ingan', 'other_material', 'orientation',
-                  'is_template', 'is_buffer', 'has_pulsed',
-                  'has_superlattice', 'has_mqw', 'has_graded',
-                  'has_n', 'has_p', 'has_u',)
-
-    def clean(self):
-        cleaned_data = super(WizardFullForm, self).clean()
-        material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
-        materials = [field for field in material_fields if cleaned_data[field]]
-        if not materials:
-            raise forms.ValidationError('At least one material must be specified')
-
-        doping_fields = ['has_n', 'has_p', 'has_u']
-        doping = [field for field in doping_fields if cleaned_data[field]]
-        if not doping:
-            raise forms.ValidationError('At least one doping type must be specified')
-
-        return cleaned_data
+        model = Process
+        fields = ('user', 'investigations', 'comment', 'legacy_identifier', 'type',
+                    'milestones')
 
 
 class WizardPrerunChecklistForm(ChecklistForm):
@@ -129,7 +124,7 @@ class D180ReadingsForm(forms.ModelForm):
 
     class Meta:
         model = D180Readings
-        fields = ('layer', 'layer_desc',
+        fields = ('layer', 'description',
                   'pyro_out', 'pyro_in', 'ecp_temp', 'tc_out', 'tc_in',
                   'motor_rpm', 'gc_pressure', 'gc_position', 'voltage_in',
                   'voltage_out', 'current_in', 'current_out', 'top_vp_flow',
@@ -145,7 +140,7 @@ class D180ReadingsForm(forms.ModelForm):
                   'silane_pressure',)
         labels = {
             'layer': _('Layer number'),
-            'layer_desc': _('Layer description'),
+            'description': _('Layer description'),
             'pyro_out': _('Outer pyro [°C]'),
             'pyro_in': _('Inner pyro [°C]'),
             'ecp_temp': _('ECP temperature [°C]'),
@@ -190,9 +185,9 @@ class D180ReadingsForm(forms.ModelForm):
             'silane_pressure': _('Silane pressure [torr]'),
         }
 
-    def save(self, growth, commit=True):
+    def save(self, process, commit=True):
         self.instance = super(D180ReadingsForm, self).save(commit=False)
-        self.instance.growth = growth
+        self.instance.process = process
         if commit:
             self.instance.save()
 

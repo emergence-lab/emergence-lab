@@ -1,16 +1,13 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load crispy_forms_tags %}
 {% load wysiwyg %}
 
 {% block title %}Start Growth{% endblock title %}
 
 {% block header %}
     {% load staticfiles %}
-    <script src="{% static 'growths/js/jquery-ui.js' %}"></script>
-    <script src="{% static 'growths/js/rangy-core.js' %}"></script>
-    <script src="{% static 'growths/js/hallo.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'growths/css/jquery-ui.css' %}">
-    <link rel="stylesheet" href="{% static 'core/css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
 {% endblock header %}
 
 
@@ -109,19 +106,15 @@
                     {# Sample Tabs #}
                     <div class="tab-content">
                         <div class="tab-pane fade in empty-form" id="{{sample_formset.empty_form.prefix}}">
-                            <div class="row">
-                                <div class="col-xs-5">
-                                    {% bootstrap_form sample_formset.empty_form %}
-                                </div>
+                            <div class="form-horizontal">
+                                {% crispy sample_formset.empty_form %}
                             </div>
                         </div>
 
                         {% for sample_form in sample_formset %}
                             <div class="tab-pane fade in{% if forloop.first %} active{% endif %}" id="{{sample_form.prefix}}">
-                                <div class="row">
-                                    <div class="col-xs-5">
-                                        {% bootstrap_form sample_form %}
-                                    </div>
+                                <div class="form-horizontal">
+                                    {% crispy sample_form %}
                                 </div>
                             </div>
                         {% endfor %}
@@ -220,7 +213,7 @@
                                     <div class="panel-body">
                                         <strong>Tool:</strong> {{ reservation.tool.upper }} <br>
                                         <strong>Operator:</strong> {{ reservation.user.full_name }} <br>
-                                        <strong>Run Time:</strong> {{ reservation.growth_length_in_hours }} hours
+                                        <strong>Run Time:</strong> {{ reservation.growth_length }} hours
                                         {% if reservation.comment %}
                                             <br><strong>Comment:</strong> {{ reservation.comment }}
                                         {% endif %}
@@ -244,7 +237,10 @@
 {% endblock content %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{% static 'growths/js/django-formset.js' %}"></script>
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
+    <script src="{% static 'jquery.django-formset/dist/django-formset.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/process_wizard.js' %}"></script>
     <script type="text/javascript" src="{% static 'growths/js/create_growth.js' %}"></script>
 {% endblock scripts %}

@@ -1,0 +1,80 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block title %}Tasks{% endblock title %}
+
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="active">Tasks</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+
+<div class="container-fluid">
+  <div class="col-md-12">
+    <div>
+        <ul class="nav nav-tabs">
+          <li role="presentation" class="active"><a href="#open" aria-controls="open" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-exclamation-sign"></span> Open</a></li>
+          <li role="presentation"><a href="#closed" aria-controls="closed" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-ok-sign"></span> Closed</a></li>
+          <h4 class="pull-right">This page lists tasks you've created for your milestones.</h4>
+        </ul>
+    </div>
+    <div class="spacer-xs"></div>
+
+    <div class="tab-content">
+      <div class="tab-pane active" role="tabpanel" id="open">
+        <div class="list-group">
+          {% for task in object_list %}
+            <div href="#" class="list-group-item {% if task.due_date < today.date %}list-group-item-warning{%endif%}">
+              <h4 class="list-group-item-heading">
+                <a href="{% url 'task_close' pk=task.id slug=task.milestone.slug %}" data-toggle="tooltip" data-title="Mark complete"><span class="glyphicon glyphicon-ok"></span></a> {{task.description}}
+                <span class="pull-right">Due: {{task.due_date}}</span>
+              </h4>
+              <p class="list-group-item-text">
+                <span class="label label-default">{{task.milestone.investigation}}/{{task.milestone}}</span>
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+        {% if is_paginated %}
+        <nav>
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li><a href="?page={{ page_obj.previous_page_number }}">{% if not page_obj.has_previous %}<span aria-hidden="true">{% endif %}&laquo; Previous</span><span class="sr-only">Previous</span></a></li>
+            {% endif %}
+            {% for page in paginator.page_range %}
+                <li {% if page_obj.number == forloop.counter %}class="active"{% endif %}><a href="?page={{forloop.counter}}">{{forloop.counter}}</a></li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}">{% if not page_obj.has_next %}<span aria-hidden="true">{% endif %}Next &raquo;</span><span class="sr-only">Next</span></a></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+      <div class="tab-pane" role="tabpanel" id="closed">
+        <div class="list-group">
+          {% for task in inactive_tasks|slice:":10" %}
+            <div href="#" class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="{% url 'task_open' pk=task.id slug=task.milestone.slug %}" data-toggle="tooltip" data-title="Re-Open"><span class="glyphicon glyphicon-repeat"></span></a> {{task.description}}
+                <span class="pull-right">Due: {{task.due_date}}</span>
+              </h4>
+              <p>
+                <span class="label label-default">{{task.milestone.investigation}}/{{task.milestone}}</span>
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
