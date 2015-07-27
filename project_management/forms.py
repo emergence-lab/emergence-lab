@@ -53,7 +53,8 @@ class InvestigationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super(InvestigationForm, self).__init__(*args, **kwargs)
-        project_tracking = ProjectTracking.objects.filter(user=user).values_list('project_id', flat=True)
+        project_tracking = (ProjectTracking.objects.filter(user=user)
+                                                   .values_list('project_id', flat=True))
         projects = Project.objects.filter(id__in=project_tracking)
         self.fields['project'].queryset = projects
 

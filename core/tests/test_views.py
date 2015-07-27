@@ -211,7 +211,7 @@ class TestProjectCRUD(TestCase):
         response = self.client.post(url, data)
         obj = Project.objects.get(**data)
         self.assertEqual(obj.slug, 'project-3')
-        detail_url = reverse('project_detail_all', args=(obj.slug,))
+        detail_url = reverse('pm_project_list')
         self.assertRedirects(response, detail_url)
 
     def test_project_create_empty_data(self):
