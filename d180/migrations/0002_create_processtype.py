@@ -7,20 +7,18 @@ from django.db import models, migrations
 def create_process_type(apps, schema_editor):
     ProcessType = apps.get_model('core', 'ProcessType')
     ProcessType.objects.get_or_create(
-        type='afm',
-        is_destructive=False,
-        name='AFM',
-        full_name='Atomic Force Microscopy',
-        description='A very high-resolution scanning probe microscopy technique '
-                    'to characterize surface morphology.',
-        scheduling_type='none')
-
+        type='d180-growth',
+        is_destructive=True,
+        name='D180',
+        full_name='D180 MOCVD Growth',
+        description='An MOCVD growth using the Veeco D180 reactor.',
+        scheduling_type='simple')
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('afm', '0001_initial'),
+        ('d180', '0001_initial'),
     ]
 
     operations = [
