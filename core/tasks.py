@@ -55,14 +55,14 @@ def _save_sample_files(process, file_object):
     process-specific folder.
 
     Create sample-specific directory structure:
-      samples/<sample.uuid>/<process.slug>/<process.uuid_full.hex>/
+      samples/<sample.uuid>/<process.type_id>/<process.uuid_full.hex>/
     and create a hard link to the file in the process-specific
     directory structure:
       processes/<process.uuid_full.hex>/
     """
     for sample in process.samples:
         sample_dir = os.path.abspath(os.path.join(
-            settings.MEDIA_ROOT, 'samples', sample.uuid, process.slug))
+            settings.MEDIA_ROOT, 'samples', sample.uuid, process.type_id))
         target_dir = os.path.join(sample_dir, process.uuid_full.hex)
         try:
             os.makedirs(target_dir)
