@@ -7,12 +7,12 @@ from django.db import models, migrations
 def create_process_type(apps, schema_editor):
     ProcessType = apps.get_model('core', 'ProcessType')
     ProcessType.objects.get_or_create(
-        type='afm',
+        type='hall',
         is_destructive=False,
-        name='AFM',
-        full_name='Atomic Force Microscopy',
-        description='A very high-resolution scanning probe microscopy technique '
-                    'to characterize surface morphology.',
+        name='Hall',
+        full_name='Hall Effect Measurement',
+        description='Measurement for carrier concentration and carrier mobility '
+                    'based on the Hall effect.',
         scheduling_type='none')
 
 
@@ -20,7 +20,7 @@ def create_process_type(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('afm', '0001_initial'),
+        ('hall', '0001_initial'),
     ]
 
     operations = [

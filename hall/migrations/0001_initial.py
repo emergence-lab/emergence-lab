@@ -4,20 +4,10 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 
-def create_processtype(apps, schema_editor):
-    ProcessType = apps.get_model('core', 'ProcessType')
-    ProcessType.objects.create(type='hall',
-                               is_destructive=False,
-                               name='Hall',
-                               full_name='Hall Effect Measurement',
-                               description='Measurement for carrier concentration and carrier mobility based on the Hall effect.',
-                               scheduling_type='none')
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0017_remove_splitprocess'),
+        ('core', '0001_initial'),
     ]
 
     operations = [
@@ -41,5 +31,4 @@ class Migration(migrations.Migration):
             },
             bases=('core.datafile',),
         ),
-        migrations.RunPython(create_processtype),
     ]

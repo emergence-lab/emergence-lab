@@ -26,14 +26,14 @@ class D180GrowthDetailAPI(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-class D180GrowthFetchLatestAPI(generics.ListCreateAPIView):
+class D180GrowthFetchLatestAPI(generics.RetrieveAPIView):
     """
     Returns latest growth.
     """
     serializer_class = D180GrowthSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get_queryset(self):
+    def get_object(self):
         return (Process.objects.filter(type_id='d180-growth')
                                .order_by('-created')
                                .first())

@@ -126,12 +126,12 @@
                         {% bootstrap_icon 'upload' %}
                         Upload File
                     </a>
-                    {% if process.slug == 'afm' %}
+                    {% if process.type_id == 'afm' %}
                         <a href="{% url 'afm_upload' uuid=process.uuid %}" class="btn btn-primary">
                             {% bootstrap_icon 'upload' %}
                             Upload AFM Scan
                         </a>
-                    {% elif process.slug == 'sem' %}
+                    {% elif process.type_id == 'sem' %}
                         <a href="{% url 'sem_upload' uuid=process.uuid %}" class="btn btn-primary">
                             {% bootstrap_icon 'upload' %}
                             Upload SEM Image

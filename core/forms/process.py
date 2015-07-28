@@ -65,6 +65,7 @@ class WizardBasicInfoForm(forms.ModelForm):
         self.helper.field_class = 'col-md-10'
         self.helper.layout = layout.Layout(
             layout.Field('user'),
+            layout.Field('type'),
             layout.Field('comment', css_class='hallo'),
             layout.Field('investigations'),
             layout.Field('milestones'),
@@ -72,9 +73,11 @@ class WizardBasicInfoForm(forms.ModelForm):
 
     class Meta:
         model = Process
-        fields = ('user', 'comment', 'investigations', 'milestones')
+        fields = ('user', 'type', 'comment', 'investigations', 'milestones')
         labels = {
             'comment': 'Process Comments',
+            'type': 'Process Type',
             'user': 'User',
             'investigations': 'Associated Investigations',
+            'milestones': 'Associated Milestones',
         }

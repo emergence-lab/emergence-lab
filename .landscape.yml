@@ -16,7 +16,9 @@ requirements:
 
 ignore-paths:
     - docs
-    - __init__\.py
+
+ignore-patterns:
+    - (^|/)__init__\.py(/|$)
 
 pep8:
     full: true
@@ -27,3 +29,12 @@ pep8:
         - E127
         - E128
         - E133
+
+pylint:
+    disable:  # disable several warnings due to use of Django class-based views
+        - W0232  # class has no __init__ method
+        - W1202  # use % in logging functions
+        - R0903  # too few public methods
+        - R0901  # too many ancestors
+    options:
+        max-line-length: 100
