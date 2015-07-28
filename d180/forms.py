@@ -11,10 +11,11 @@ from d180.models import D180Readings, D180Source, D180GrowthInfo
 
 class WizardBasicProcessForm(forms.ModelForm):
 
+    milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
+
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
         self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
-        self.fields['milestones'].required = False
 
     class Meta:
         model = Process
