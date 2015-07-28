@@ -7,7 +7,8 @@ from django import forms
 
 from crispy_forms import helper, layout
 
-from core.models import DataFile, Process, ProcessTemplate, Milestone
+from core.models import (DataFile, Process, ProcessTemplate, Milestone,
+                         ProjectTracking, Investigation)
 
 
 class DropzoneForm(forms.ModelForm):
@@ -56,6 +57,9 @@ class WizardBasicInfoForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
         self.fields['investigations'].required = False
+        projs = (ProjectTracking.objects.filter(user=user)
+                                        .values_list('project_id', flat=True))
+        self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
         self.fields['milestones'].required = False
         self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
         self.helper = helper.FormHelper()
@@ -78,6 +82,6 @@ class WizardBasicInfoForm(forms.ModelForm):
             'comment': 'Process Comments',
             'type': 'Process Type',
             'user': 'User',
-            'investigations': 'Associated Investigations',
-            'milestones': 'Associated Milestones',
+            'investigations': 'Investigation(s)',
+            'milestones': 'Milestone(s)',
         }
