@@ -533,9 +533,11 @@ class TestProcessCRUD(TestCase):
     def test_process_wizard_valid_data(self):
         url = '/process/create/'
         sample = Sample.objects.create(mommy.make(Substrate))
+        processtype = mommy.make(ProcessType, type='test')
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
             'sample-INITIAL_FORMS': '1',
@@ -554,9 +556,11 @@ class TestProcessCRUD(TestCase):
             Sample.objects.create(substrate=mommy.make(Substrate)),
             Sample.objects.create(substrate=mommy.make(Substrate)),
         ]
+        processtype = mommy.make(ProcessType, type='test')
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': samples[0].uuid,
             'sample-1-existing_or_new': 'existing-sample',
@@ -579,9 +583,11 @@ class TestProcessCRUD(TestCase):
         url = '/process/create/'
         sample = Sample.objects.create(mommy.make(Substrate))
         sample.split(self.user, 2)
+        processtype = mommy.make(ProcessType, type='test')
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}'.format(sample.uuid),
             'sample-INITIAL_FORMS': '1',
@@ -597,9 +603,11 @@ class TestProcessCRUD(TestCase):
         sample = Sample.objects.create(mommy.make(Substrate))
         sample.split(self.user, 2)
         piece = 'b'
+        processtype = mommy.make(ProcessType, type='test')
         data = {
             'process-comment': 'testing',
             'process-user': self.user.id,
+            'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
             'sample-0-sample_uuid': '{}{}'.format(sample.uuid, piece),
             'sample-INITIAL_FORMS': '1',
@@ -607,7 +615,7 @@ class TestProcessCRUD(TestCase):
             'sample-TOTAL_FORMS': '1'
         }
         response = self.client.post(url, data)
-        nodes = sample.get_nodes_for_process_type('generic-process')
+        nodes = sample.get_nodes_for_process_type(processtype.type)
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].piece, piece)
 
