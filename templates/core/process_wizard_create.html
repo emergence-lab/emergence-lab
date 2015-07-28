@@ -8,6 +8,8 @@
 {% block header %}
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
+    <link rel="stylesheet" href="{% static 'select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'select2-bootstrap-theme/dist/select2-bootstrap.min.css' %}">
 {% endblock header %}
 
 
@@ -145,9 +147,23 @@
 
 {% block scripts %}
     <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'select2/dist/js/select2.min.js' %}"></script>
     <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
     <script src="{% static 'hallo/dist/hallo.js' %}"></script>
     <script src="{% static 'jquery.django-formset/dist/django-formset.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/process_wizard.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/create_process.js' %}"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('select').select2({theme: 'bootstrap'});
+            $('#id_process-investigations').select2({
+                placeholder: 'Select associated investigation(s)',
+                theme: 'bootstrap'
+            });
+            $('#id_process-milestones').select2({
+                placeholder: 'Select associated milestone(s)',
+                theme: 'bootstrap'
+            });
+        });
+    </script>
 {% endblock scripts %}

@@ -15,6 +15,8 @@
     "dropzone": "~3.7.4",
     "font-awesome": "^4.2",
     "rangy": "~1.2.3",
-    "jquery.django-formset": "git+https://github.com/mbertheau/jquery.django-formset#039c24d2"
+    "jquery.django-formset": "git+https://github.com/mbertheau/jquery.django-formset#039c24d2",
+    "select2": "~4.0.0",
+    "select2-bootstrap-theme": "https://github.com/select2/select2-bootstrap-theme.git#~0.1.0-beta.4"
   }
 }
