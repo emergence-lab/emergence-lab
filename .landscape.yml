@@ -33,3 +33,5 @@ pep8:
 pylint:
     disable:
         - W1202
+    options:
+        max-line-length: 100
