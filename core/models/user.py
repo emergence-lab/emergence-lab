@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.core import validators
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.authtoken.models import Token
@@ -38,6 +39,7 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
+@python_2_unicode_compatible
 class User(ActiveStateMixin, auth.AbstractBaseUser):
     """
     A custom user model that stores the name in a more portable way. Also
@@ -82,6 +84,9 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    def __str__(self):
+        return self.get_full_name()
 
     def get_full_name(self):
         return self.full_name
