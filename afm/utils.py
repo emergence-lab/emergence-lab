@@ -21,10 +21,10 @@ def extract_scan_location(filename, default_location='c'):
     Where 'c' will be the extracted location and '-' or '_' can be used as the
     separating character.
     """
-    if re.search('[\-_]', filename) is None:
+    if re.search(r'[\-_]', filename) is None:
         return default_location
 
-    location = re.split('[\-_]', os.path.splitext(filename)[0])[-1]
+    location = re.split(r'[\-_]', os.path.splitext(filename)[0])[-1]
 
     if len(location) != 1 or location not in 'rRcCfFeE':
         return default_location

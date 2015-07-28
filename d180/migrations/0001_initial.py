@@ -2,21 +2,19 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('core', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='D180Growth',
+            name='D180GrowthInfo',
             fields=[
-                ('process_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='core.Process')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('has_gan', models.BooleanField(default=False)),
                 ('has_aln', models.BooleanField(default=False)),
                 ('has_inn', models.BooleanField(default=False)),
@@ -33,20 +31,17 @@ class Migration(migrations.Migration):
                 ('has_n', models.BooleanField(default=False)),
                 ('has_p', models.BooleanField(default=False)),
                 ('has_u', models.BooleanField(default=False)),
-                ('investigations', models.ManyToManyField(related_query_name='growth', related_name='growths', to='core.Investigation')),
             ],
             options={
-                'verbose_name': 'd180 growth',
-                'verbose_name_plural': 'd180 growths',
             },
-            bases=('core.process',),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='D180Readings',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('layer', models.IntegerField()),
-                ('layer_desc', models.CharField(max_length=45, blank=True)),
+                ('description', models.CharField(max_length=100, blank=True)),
                 ('pyro_out', models.DecimalField(max_digits=7, decimal_places=2)),
                 ('pyro_in', models.DecimalField(max_digits=7, decimal_places=2)),
                 ('ecp_temp', models.DecimalField(max_digits=7, decimal_places=2)),
@@ -89,7 +84,7 @@ class Migration(migrations.Migration):
                 ('silane_dilution', models.DecimalField(max_digits=7, decimal_places=2)),
                 ('silane_mix', models.DecimalField(max_digits=7, decimal_places=2)),
                 ('silane_pressure', models.DecimalField(max_digits=7, decimal_places=2)),
-                ('growth', models.ForeignKey(to='d180.D180Growth')),
+                ('process', models.ForeignKey(related_name='readings', to='core.Process')),
             ],
             options={
                 'verbose_name': 'reading',
@@ -152,7 +147,7 @@ class Migration(migrations.Migration):
                 ('alk_push_inner', models.IntegerField()),
                 ('alk_push_middle', models.IntegerField()),
                 ('alk_push_outer', models.IntegerField()),
-                ('growth', models.ForeignKey(to='d180.D180Growth')),
+                ('process', models.ForeignKey(related_name='recipe', to='core.Process')),
             ],
             options={
                 'verbose_name': 'layer',
@@ -198,15 +193,15 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AddField(
-            model_name='d180growth',
+            model_name='d180growthinfo',
             name='platter',
             field=models.ForeignKey(to='d180.Platter'),
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='d180growth',
-            name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            model_name='d180growthinfo',
+            name='process',
+            field=models.OneToOneField(related_name='info', to='core.Process'),
             preserve_default=True,
         ),
     ]
