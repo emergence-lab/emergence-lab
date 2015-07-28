@@ -166,3 +166,16 @@ class TestReservationCRUD(TestCase):
             template_file='schedule_queue/reservation_list.html')
 
 
+    def test_reservation_landing_count_open_only(self):
+        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
+            mommy.make(Reservation, tool=process_type, user=self.user),
+        ]
+        url = reverse('reservation_landing')
+        response = self.client.get(url)
+        open_reservations = next(ptype.open_reservations
+                                 for ptype
+                                 in response.context['object_list']
+                                 if ptype.type == process_type.type)
+        self.assertEqual(open_reservations, 1)
