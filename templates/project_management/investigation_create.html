@@ -4,6 +4,7 @@
 
 {% block header %}
   {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
   {{form.media}}
 {% endblock header %}
 
@@ -32,3 +33,13 @@
 </div>
 
 {% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project_management/js/hallo_helper.js' %}"></script>
+    <script type="text/javascript">
+        hallo_helper.enable_rich_text('.hallo', 'form');
+    </script>
+{% endblock scripts %}

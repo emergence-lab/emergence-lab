@@ -32,7 +32,7 @@
       <a class="pull-right" href="{% url 'pm_investigation_edit' investigation.slug %}"><span class="glyphicon glyphicon-edit"></span></a>
     </div>
     <div class="panel-body">
-      {{investigation.description|escape}}
+      {{investigation.description|safe}}
     </div>
   </div>
 </div>
@@ -91,7 +91,7 @@
                       <span class="pull-right">Due: {{milestone.due_date}}</span>
                     </h4>
                     <p class="list-group-item-text">
-                      {{milestone.description|escape|truncatewords:50}}
+                      {{milestone.description|safe|truncatewords:50}}
                     </p>
                   </div>
 
@@ -165,9 +165,9 @@
     <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
     <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
     <script src="{% static 'hallo/dist/hallo.js' %}"></script>
-    <script type="text/javascript" src="{% static 'project_management/js/milestone_detail.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project_management/js/hallo_helper.js' %}"></script>
     <script type="text/javascript">
-        milestone_detail.enable_rich_text('.hallo', 'form');
+        hallo_helper.enable_rich_text('.hallo', 'form');
     </script>
     <script type="text/javascript">
         $(document).ready(function() {

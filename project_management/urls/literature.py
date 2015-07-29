@@ -36,4 +36,7 @@ urlpatterns = [
     url(r'^detail/external/(?P<external_id>[0-9a-f\w-]{36,})$',
         views.MendeleyDetailView.as_view(),
         name="mendeley_detail"),
+    url(r'^error$',
+        views.MendeleySearchErrorView.as_view(),
+        name="mendeley_error"),
     ]

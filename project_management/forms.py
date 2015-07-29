@@ -75,6 +75,9 @@ class InvestigationForm(forms.ModelForm):
     class Meta:
         model = Investigation
         fields = ('name', 'description', 'project',)
+        widgets = {
+            'description': forms.Textarea(attrs={'class': 'hallo'}),
+        }
 
 
 class TaskForm(forms.ModelForm):
@@ -100,3 +103,6 @@ class MilestoneNoteForm(forms.ModelForm):
     class Meta:
         model = MilestoneNote
         fields = ('note',)
+        widgets = {
+            'note': forms.Textarea(attrs={'class': 'hallo'}),
+        }
