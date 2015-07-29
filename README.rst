@@ -16,9 +16,10 @@ Emergence Lab
 
 Web-based application written in Django with the following goals:
 
-    #) Improve tracking of experimental samples and data, both process and characteriztion data
-    #) Allow data-driven experimentation by allowing programmable access to data via an embedded iPython notebook
-    #) Have a clean, consistent user interface to encourage best-practices for use
+#) Improve tracking and discoverability of experimental samples and data, both process and characterization data
+#) Allow data-driven experimentation by allowing programmable access to data via an embedded iPython notebook
+#) Provide project management functionality to help organize experiments and samples
+#) Have a clean, consistent user interface to encourage best-practices for use
 
 Development Setup
 =================
