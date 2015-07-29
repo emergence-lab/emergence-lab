@@ -91,7 +91,7 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
                 sleep(1)
                 literature = self.session.documents.search(query).list()
             except MendeleyApiException:
-                return HttpResponseRedirect(reverse('mendeley_error')+'?query={}'.format(query))
+                return HttpResponseRedirect(reverse('mendeley_error') + '?query={}'.format(query))
         projects = [x.project for x in ProjectTracking.objects.all().filter(
             user=self.request.user)]
         context['literature'] = pagination_helper(page, literature.count, literature)
