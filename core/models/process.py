@@ -9,9 +9,10 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 
-from mptt import models as mptt
 from actstream import action
+from mptt import models as mptt
 import polymorphic
+from simple_history import models as simple_history
 
 from core.models.mixins import TimestampMixin, UUIDMixin
 from core.models import fields, Investigation, Milestone
@@ -79,9 +80,10 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
 
     investigations = models.ManyToManyField(Investigation,
         related_name='processes', related_query_name='process',)
-
     milestones = models.ManyToManyField(Milestone,
         related_name='processes', related_query_name='milestone',)
+
+    history = simple_history.HistoricalRecords()
 
     objects = models.Manager()
     generic = ProcessTypeManager(process_type='generic-process')
