@@ -46,20 +46,26 @@ def _filter_process_comment(queryset, value):
 
 class SampleFilterSet(django_filters.FilterSet):
     D180_TAGS_CHOICES = [
-        ('has_gan', 'Has GaN'),
-        ('has_aln', 'Has AlN'),
-        ('has_inn', 'Has InN'),
-        ('has_algan', 'Has AlGaN'),
-        ('has_ingan', 'Has InGaN'),
-        ('has_u', 'Has Undoped Material'),
-        ('has_n', 'Has N-type Material'),
-        ('has_p', 'Has P-type Material'),
-        ('is_template', 'Is Template'),
-        ('is_buffer', 'Is Buffer'),
-        ('has_pulsed', 'Has Pulsed Layer(s)'),
-        ('has_graded', 'Has Graded Layer(s)'),
-        ('has_superlattice', 'Has Superlattice Layers'),
-        ('has_mqw', 'Has MQW Layers'),
+        ('Material', (
+            ('has_gan', 'Has GaN'),
+            ('has_aln', 'Has AlN'),
+            ('has_inn', 'Has InN'),
+            ('has_algan', 'Has AlGaN'),
+            ('has_ingan', 'Has InGaN'),
+        )),
+        ('Doping', (
+            ('has_u', 'Has Undoped Material'),
+            ('has_n', 'Has N-type Material'),
+            ('has_p', 'Has P-type Material'),
+        )),
+        ('Growth Features', (
+            ('is_template', 'Is Template'),
+            ('is_buffer', 'Is Buffer'),
+            ('has_pulsed', 'Has Pulsed Layer(s)'),
+            ('has_graded', 'Has Graded Layer(s)'),
+            ('has_superlattice', 'Has Superlattice Layers'),
+            ('has_mqw', 'Has MQW Layers'),
+        )),
     ]
 
     created = django_filters.DateFilter(
@@ -86,7 +92,7 @@ class SampleFilterSet(django_filters.FilterSet):
                      'format': 'yyyy-mm-dd'}))
     d180_tags = django_filters.MultipleChoiceFilter(
         choices=D180_TAGS_CHOICES,
-        widget=forms.CheckboxSelectMultiple(),
+        widget=forms.SelectMultiple(),
         label='D180 Tags',
         action=_filter_d180_growth_tags
         )
