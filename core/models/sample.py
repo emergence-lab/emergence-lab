@@ -9,6 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
 import polymorphic
+from simple_history import models as simple_history
 
 from .mixins import AutoUUIDMixin, TimestampMixin
 from .process import Process, ProcessNode, ProcessType
@@ -130,6 +131,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
 
     objects = SampleManager.from_queryset(SampleQuerySet)()
+
+    history = simple_history.HistoricalRecords()
 
     @classmethod
     def strip_uuid(cls, uuid):

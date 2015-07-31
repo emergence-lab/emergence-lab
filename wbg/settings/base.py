@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     'django_ace',
     'django_rq',
     'crispy_forms',
+    'simple_history',
     # local apps
     'core',
     'dashboard',
@@ -122,6 +123,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 )
 
 
