@@ -58,7 +58,7 @@ class SampleQuerySet(models.query.QuerySet):
             raise Sample.DoesNotExist
         return self.get(pk=uuid)
 
-    def filter_process(self, **kwargs):
+    def filter_process(self, *args, **kwargs):
         """
         Generic filtering on processes run on the sample. Keyword arguments
         should be formatted as if it was filtering on the Process model.
@@ -71,7 +71,7 @@ class SampleQuerySet(models.query.QuerySet):
 
         kwargs = {'process__{}'.format(k): v for k, v in kwargs.items()}
 
-        trees = (ProcessNode.objects.filter(**kwargs)
+        trees = (ProcessNode.objects.filter(*args, **kwargs)
                                     .order_by('tree_id')
                                     .values_list('tree_id', flat=True)
                                     .distinct())
