@@ -27,12 +27,16 @@ class AutoCreateForm(forms.ModelForm):
 
         super(AutoCreateForm, self).__init__(*args, **kwargs)
 
+        self.fields['investigations'].required = False
+        self.fields['milestones'].required = False
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
+        if len(pieces) == 1:
+            self.fields['pieces'].initial = pieces[0]
 
     class Meta:
         model = Process
-        fields = ('comment', 'type')
+        fields = ('comment', 'type', 'investigations', 'milestones')
 
 
 ProcessCreateForm = AutoCreateForm
