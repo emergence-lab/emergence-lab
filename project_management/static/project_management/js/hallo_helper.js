@@ -36,4 +36,4 @@
         });
     }
 
-})(this.milestone_detail = {});
+})(this.hallo_helper = {});

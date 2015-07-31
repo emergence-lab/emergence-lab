@@ -90,8 +90,8 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
             try:
                 sleep(1)
                 literature = self.session.documents.search(query).list()
-            except:
-                raise
+            except MendeleyApiException:
+                return HttpResponseRedirect(reverse('mendeley_error') + '?query={}'.format(query))
         projects = [x.project for x in ProjectTracking.objects.all().filter(
             user=self.request.user)]
         context['literature'] = pagination_helper(page, literature.count, literature)
@@ -99,6 +99,16 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
             user=self.request.user).filter(is_active=True)
         context['investigations'] = Investigation.objects.all().filter(
             is_active=True).filter(project__in=projects)
+        return context
+
+
+class MendeleySearchErrorView(LoginRequiredMixin, generic.TemplateView):
+
+    template_name = 'project_management/mendeley_error.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MendeleySearchErrorView, self).get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('query', None)
         return context
 
 

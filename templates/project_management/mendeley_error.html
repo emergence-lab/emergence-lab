@@ -1,0 +1,24 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'literature_landing' %}">Literature</a></li>
+        <li class="active">Mendeley Error</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+
+<div class="col-md-12">
+  <div class="alert alert-info">
+    <h3>Uh oh! The Mendeley API had an error.</h3>
+    <p>Your search query will probably work if you <a href="{% url 'mendeley_search' %}?query={{query}}" class="alert-link">retry</a>, otherwise you can return to the <a href="{% url 'mendeley_search' %}" class="alert-link">search page</a>.</p>
+  </div>
+</div>
+
+{% endblock %}

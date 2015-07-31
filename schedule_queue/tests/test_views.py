@@ -144,7 +144,7 @@ class TestReservationCRUD(TestCase):
         self.assertFalse(res_act_field, msg=None)
 
     def test_list_view(self):
-        process_type = mommy.make(ProcessType, type='test-process')
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user),
             mommy.make(Reservation, tool=process_type, user=self.user),
@@ -155,7 +155,7 @@ class TestReservationCRUD(TestCase):
                          len(Reservation.objects.all().filter(tool=process_type)))
 
     def test_reservation_list_resolution_template(self):
-        process_type = mommy.make(ProcessType, type='test-process')
+        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user),
             mommy.make(Reservation, tool=process_type, user=self.user),
@@ -165,4 +165,37 @@ class TestReservationCRUD(TestCase):
             url_name='reservation_list',
             template_file='schedule_queue/reservation_list.html')
 
+    def test_reservation_landing_resolution_template(self):
+        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
+            mommy.make(Reservation, tool=process_type, user=self.user),
+        ]
+        test_resolution_template(self,
+            url='/scheduling/',
+            url_name='reservation_landing',
+            template_file='schedule_queue/reservation_landing.html')
 
+    def test_reservation_landing_content(self):
+        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
+            mommy.make(Reservation, tool=process_type, user=self.user),
+        ]
+        url = reverse('reservation_landing')
+        response = self.client.get(url)
+        self.assertContains(response, process_type.name)
+
+    def test_reservation_landing_count_open_only(self):
+        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        reservations = [
+            mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
+            mommy.make(Reservation, tool=process_type, user=self.user),
+        ]
+        url = reverse('reservation_landing')
+        response = self.client.get(url)
+        open_reservations = next(ptype.open_reservations
+                                 for ptype
+                                 in response.context['object_list']
+                                 if ptype.type == process_type.type)
+        self.assertEqual(open_reservations, 1)

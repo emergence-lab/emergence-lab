@@ -62,37 +62,36 @@ class D180GrowthInfo(models.Model):
 
     @property
     def material(self):
-        print('material')
         materials = OrderedDict([
-            (self.has_gan, 'GaN'),
-            (self.has_aln, 'AlN'),
-            (self.has_inn, 'InN'),
-            (self.has_algan, 'AlGaN'),
-            (self.has_ingan, 'InGaN'),
+            ('GaN', self.has_gan, ),
+            ('AlN', self.has_aln),
+            ('InN', self.has_inn),
+            ('AlGaN', self.has_algan),
+            ('InGaN', self.has_ingan),
             (self.other_material, self.other_material),
         ])
-        return ', '.join([v for k, v in materials.items() if k])
+        return ', '.join([k for k, v in materials.items() if v])
 
     @property
     def doping(self):
         dopings = OrderedDict([
-            (self.has_n, 'n-type'),
-            (self.has_p, 'p-type'),
-            (self.has_u, 'unintentional'),
+            ('n-type', self.has_n),
+            ('p-type', self.has_p),
+            ('unintentional', self.has_u),
         ])
-        return ', '.join(v for k, v in dopings.items() if k)
+        return ', '.join([k for k, v in dopings.items() if v])
 
     @property
     def growth_features(self):
         features = OrderedDict([
-            (self.is_template, 'is a template'),
-            (self.is_buffer, 'is a buffer'),
-            (self.has_pulsed, 'has pulsed layer(s)'),
-            (self.has_superlattice, 'has superlattice layers'),
-            (self.has_mqw, 'has multi-quantum well layers'),
-            (self.has_graded, 'has graded composition layer(s)'),
+            ('is a template', self.is_template),
+            ('is a buffer', self.is_buffer),
+            ('has pulsed layer(s)', self.has_pulsed),
+            ('has superlattice layers', self.has_superlattice),
+            ('has multi-quantum well layers', self.has_mqw),
+            ('has graded composition layer(s)', self.has_graded),
         ])
-        return ', '.join(v for k, v in features.items() if k)
+        return ', '.join([k for k, v in features.items() if v])
 
 
 @python_2_unicode_compatible

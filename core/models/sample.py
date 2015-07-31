@@ -9,6 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
 import polymorphic
+from simple_history import models as simple_history
 
 from .mixins import AutoUUIDMixin, TimestampMixin
 from .process import Process, ProcessNode, ProcessType
@@ -58,7 +59,7 @@ class SampleQuerySet(models.query.QuerySet):
             raise Sample.DoesNotExist
         return self.get(pk=uuid)
 
-    def filter_process(self, **kwargs):
+    def filter_process(self, *args, **kwargs):
         """
         Generic filtering on processes run on the sample. Keyword arguments
         should be formatted as if it was filtering on the Process model.
@@ -71,7 +72,7 @@ class SampleQuerySet(models.query.QuerySet):
 
         kwargs = {'process__{}'.format(k): v for k, v in kwargs.items()}
 
-        trees = (ProcessNode.objects.filter(**kwargs)
+        trees = (ProcessNode.objects.filter(*args, **kwargs)
                                     .order_by('tree_id')
                                     .values_list('tree_id', flat=True)
                                     .distinct())
@@ -130,6 +131,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
 
     objects = SampleManager.from_queryset(SampleQuerySet)()
+
+    history = simple_history.HistoricalRecords()
 
     @classmethod
     def strip_uuid(cls, uuid):

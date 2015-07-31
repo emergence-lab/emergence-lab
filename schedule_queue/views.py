@@ -18,8 +18,10 @@ from d180.models import Platter
 
 class ReservationLanding(LoginRequiredMixin, generic.ListView):
     model = Reservation
-    queryset = (ProcessType.objects.filter(scheduling_type='simple')
-                                   .annotate(open_reservations=Count('reservation')))
+    queryset = (ProcessType.objects
+                           .filter(scheduling_type='simple')
+                           .filter(reservation__is_active=True)
+                           .annotate(open_reservations=Count('reservation')))
     template_name = 'schedule_queue/reservation_landing.html'
 
 

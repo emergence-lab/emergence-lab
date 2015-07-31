@@ -6,6 +6,8 @@
 {% block header %}
     {% load staticfiles %}
     {{filter.form.media}}
+    <link rel="stylesheet" href="{% static 'select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'select2-bootstrap-theme/dist/select2-bootstrap.min.css' %}">
 {% endblock header %}
 
 {% block content %}
@@ -71,3 +73,20 @@
 </main>
 
 {% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'select2/dist/js/select2.min.js' %}"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('select').select2({theme: 'bootstrap'});
+            $('#id_process_type').select2({
+                placeholder: 'Select process type(s)',
+                theme: 'bootstrap'
+            });
+            $('#id_d180_tags').select2({
+                placeholder: 'Select D180 growth feature(s)',
+                theme: 'bootstrap'
+            });
+        });
+    </script>
+{% endblock scripts %}
