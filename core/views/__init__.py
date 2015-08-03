@@ -49,7 +49,6 @@ from .process import (
     ProcessListView,
     ProcessUpdateView,
     RunProcessView,
-    CreateUploadProcessView,
     UploadFileView,
     ProcessTemplateListView,
     AddProcessTemplateView,
