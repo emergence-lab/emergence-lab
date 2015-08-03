@@ -20,12 +20,12 @@ class DropzoneForm(forms.ModelForm):
         fields = ('content_type',)
 
 
-class AutoCreateForm(forms.ModelForm):
+class ProcessCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
 
-        super(AutoCreateForm, self).__init__(*args, **kwargs)
+        super(ProcessCreateForm, self).__init__(*args, **kwargs)
 
         self.fields['investigations'].required = False
         self.fields['milestones'].required = False
@@ -37,9 +37,6 @@ class AutoCreateForm(forms.ModelForm):
     class Meta:
         model = Process
         fields = ('comment', 'type', 'investigations', 'milestones')
-
-
-ProcessCreateForm = AutoCreateForm
 
 
 class EditProcessTemplateForm(forms.ModelForm):
