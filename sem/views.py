@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 from django.core.urlresolvers import reverse
 
 from core.views import RunProcessView, UploadFileView
-from sem.models import SEMScan
 from sem.tasks import process_sem_file
 
 
@@ -22,7 +21,6 @@ class SEMFileUpload(UploadFileView):
     """
     Add files to an existing sem process
     """
-    model = SEMScan
     rq_config = {
         'process': process_sem_file,
     }
