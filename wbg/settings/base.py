@@ -131,12 +131,12 @@ MIDDLEWARE_CLASSES = (
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': get_secret('DATABASE_NAME', 'db'),
         'USER': get_secret('DATABASE_USER', 'user'),
         'PASSWORD': get_secret('DATABASE_PASSWORD', ''),
         'HOST': get_secret('DATABASE_HOST', 'localhost'),
-        'PORT': get_secret('DATABASE_PORT', 3306),
+        'PORT': get_secret('DATABASE_PORT', 5432),
     }
 }
 
