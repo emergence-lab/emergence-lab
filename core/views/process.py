@@ -21,7 +21,7 @@ from core.tasks import process_file, save_files
 from core.views import ActionReloadView
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('emergence.process')
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
