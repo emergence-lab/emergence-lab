@@ -1,4 +1,5 @@
 Django>=1.8,<1.9
+git+https://github.com/rbarrois/python-ldap@py3
 django-auth-ldap==1.2.7
 django-filter==0.11.0
 django-datetime-widget==0.9.3
@@ -19,7 +20,7 @@ html2text==2015.11.4
 django-grappelli>=2.7,<2.8
 django-mptt==0.7.4
 git+https://github.com/wbg-optronix-lab/aws-support@0.11.0#egg=aws_support
-django-storages==1.1.8
+django-storages-redux==1.2.3
 django-ace==1.0.2
 django-polymorphic==0.7.1
 django-uuidfield==0.5.0
