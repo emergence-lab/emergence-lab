@@ -24,13 +24,13 @@ class TestSampleManager(TestCase):
     def test_get_by_uuid_nonexistant(self):
         with self.assertRaises(ObjectDoesNotExist):
             Sample.objects.get_by_uuid('s0000')
-        
+
     def test_get_by_uuid_short(self):
         substrate = mommy.make('core.Substrate')
         sample = Sample.objects.create(substrate=substrate)
         result = Sample.objects.get_by_uuid(sample.uuid)
         self.assertEqual(sample.uuid, result.uuid)
-    
+
     def test_get_by_uuid_long(self):
         substrate = mommy.make('core.Substrate')
         sample = Sample.objects.create(substrate=substrate)
@@ -133,6 +133,7 @@ class TestSampleManager(TestCase):
         qs = Sample.objects.by_process_types(['generic-process', 'split-process'], combine_and=False)
         self.assertQuerysetEqual(
             qs, map(repr, samples[0:3]), ordered=False)
+
 
 class TestSample(TestCase):
 

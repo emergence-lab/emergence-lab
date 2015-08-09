@@ -26,8 +26,8 @@ class Migration(migrations.Migration):
                 ('doi_number', models.CharField(max_length=100, null=True, blank=True)),
                 ('year', models.CharField(max_length=4, null=True, blank=True)),
                 ('journal', models.CharField(max_length=200, null=True, blank=True)),
-                ('investigations', models.ManyToManyField(related_query_name='literature', related_name='literature', null=True, to='core.Investigation')),
-                ('milestones', models.ManyToManyField(related_query_name='literature', related_name='literature', null=True, to='core.Milestone')),
+                ('investigations', models.ManyToManyField(related_query_name='literature', related_name='literature', to='core.Investigation')),
+                ('milestones', models.ManyToManyField(related_query_name='literature', related_name='literature', to='core.Milestone')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={

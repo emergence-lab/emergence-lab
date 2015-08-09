@@ -36,12 +36,9 @@ class SampleManager(models.Manager):
         Creates a sample with a default 'root' processnode which makes it easy
         to refer to the root node.
         """
-        process_tree = ProcessNode(process=None, piece='a')
+        process_tree = ProcessNode.objects.create(process=None, piece='a')
         sample = self.model(substrate=substrate, comment=comment,
                             process_tree=process_tree)
-        sample.save()
-        process_tree.save()
-        sample.process_tree = process_tree
         sample.save()
 
         return sample
