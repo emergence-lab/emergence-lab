@@ -113,6 +113,7 @@ class MendeleySearchErrorView(LoginRequiredMixin, generic.TemplateView):
 
 
 class LiteratureRedirectorView(LoginRequiredMixin, generic.RedirectView):
+    permanent = True
 
     def get_redirect_url(self, *args, **kwargs):
         if settings.ENABLE_MENDELEY:

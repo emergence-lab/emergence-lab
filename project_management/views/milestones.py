@@ -34,7 +34,6 @@ class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
 
     model = Milestone
     template_name = 'project_management/milestone_create.html'
-    fields = '__all__'
     form_class = MilestoneForm
 
     def get_success_url(self):
@@ -45,7 +44,6 @@ class MilestoneUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     model = Milestone
     template_name = 'project_management/milestone_update.html'
-    fields = '__all__'
     form_class = MilestoneForm
 
     def get_success_url(self):
