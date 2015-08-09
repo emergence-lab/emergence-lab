@@ -6,4 +6,4 @@ pep8
 flake8
 pep8-naming
 tox
-model_mommy==1.2.2
+model_mommy==1.2.5
