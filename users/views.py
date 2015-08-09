@@ -93,6 +93,6 @@ class _GetGitLabToken(LoginRequiredMixin, FormView):
             g.gitlab_id = tmp['id']
             r.set('users:{0}:git.credential'.format(self.request.user.id), pickle.dumps(g))
         except Exception as e:
-            print e
+            print(e)
         return HttpResponseRedirect(reverse('users_profile',
                                             kwargs={'username': str(self.request.user)}))
