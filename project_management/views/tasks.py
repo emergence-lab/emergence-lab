@@ -36,7 +36,6 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
 
     model = Task
     template_name = 'project_management/task_create.html'
-    fields = '__all__'
     form_class = TaskForm
 
     def get_success_url(self):

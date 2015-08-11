@@ -23,7 +23,7 @@ from core.models import Process, ProcessTemplate, ProcessType
 from schedule_queue.models import Reservation
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('emergence.process.d180')
 
 
 class PlatterListView(LoginRequiredMixin, ActiveListView):

@@ -10,7 +10,7 @@ import os
 import django_rq
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('emergence')
 
 
 AsyncDjangoFile = namedtuple('AsyncDjangoFile', ['data', 'kwargs'])

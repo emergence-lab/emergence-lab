@@ -16,7 +16,7 @@ from afm import utils
 from core.tasks import AsyncDjangoFile
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('emergence.process.afm')
 
 
 @django_rq.job

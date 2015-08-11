@@ -21,18 +21,7 @@ class Literature(TimestampMixin, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     investigations = models.ManyToManyField(Investigation,
                                         related_name='literature',
-                                        related_query_name='literature',
-                                        null=True)
+                                        related_query_name='literature')
     milestones = models.ManyToManyField(Milestone,
                                         related_name='literature',
-                                        related_query_name='literature',
-                                        null=True)
-
-
-#
-# class Keyword(models.Model):
-#     name = models.CharField(max_length=45)
-#     article = models.ManyToManyField(Literature,
-#                                     related_name='keyword',
-#                                     related_query_name='keyword',
-#                                     null=True)
+                                        related_query_name='literature')

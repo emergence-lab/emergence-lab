@@ -21,7 +21,7 @@ from core.tasks import process_file, save_files
 from core.views import ActionReloadView
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('emergence.process')
 
 
 class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
@@ -102,8 +102,16 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
         return reverse('process_detail', args=(self.object.uuid,))
 
 
-class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
+class RunProcessView(LoginRequiredMixin, generic.CreateView):
+    model = Process
     template_name = 'core/process_create.html'
+    form_class = ProcessCreateForm
+    process_type = 'generic-process'
+
+    def get_initial(self):
+        initial = super(RunProcessView, self).get_initial()
+        initial['type'] = self.process_type
+        return initial
 
     def get_form(self, form_class):
         try:
@@ -124,17 +132,6 @@ class CreateUploadProcessView(LoginRequiredMixin, generic.CreateView):
 
     def get_success_url(self):
         return reverse('process_detail', args=(self.object.uuid,))
-
-
-class RunProcessView(CreateUploadProcessView):
-    model = Process
-    form_class = ProcessCreateForm
-    process_type = 'generic-process'
-
-    def get_initial(self):
-        initial = super(RunProcessView, self).get_initial()
-        initial['type'] = self.process_type
-        return initial
 
 
 class UploadFileView(LoginRequiredMixin, generic.CreateView):

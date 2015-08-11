@@ -131,12 +131,12 @@ MIDDLEWARE_CLASSES = (
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': get_secret('DATABASE_NAME', 'db'),
         'USER': get_secret('DATABASE_USER', 'user'),
         'PASSWORD': get_secret('DATABASE_PASSWORD', ''),
         'HOST': get_secret('DATABASE_HOST', 'localhost'),
-        'PORT': get_secret('DATABASE_PORT', 3306),
+        'PORT': get_secret('DATABASE_PORT', 5432),
     }
 }
 
@@ -263,7 +263,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(filename)s:%(lineno)s] %(message)s',
             'datefmt': '%Y-%m-%d %H-%M-%S',
         },
         'simple': {
@@ -274,7 +274,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+            'filename': os.path.join(BASE_DIR, os.pardir, 'debug.log'),
             'formatter': 'verbose',
         },
     },
@@ -287,24 +287,9 @@ LOGGING = {
         'rq.worker': {
             'handlers': ['file'],
             'propogate': True,
-            'level': 'DEBUG',
+            'level': 'WARNING',
         },
-        'core.views.process': {
-            'handlers': ['file'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'd180.views': {
-            'handlers': ['file'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'afm.tasks': {
-            'handlers': ['file'],
-            'propogate': True,
-            'level': 'DEBUG',
-        },
-        'core.tasks': {
+        'emergence': {
             'handlers': ['file'],
             'propogate': True,
             'level': 'DEBUG',

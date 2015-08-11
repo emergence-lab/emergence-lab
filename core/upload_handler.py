@@ -12,7 +12,7 @@ from django.core.files.uploadhandler import FileUploadHandler
 from django.core.files.uploadedfile import UploadedFile
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('emergence')
 
 
 class RQTemporaryUploadedFile(UploadedFile):

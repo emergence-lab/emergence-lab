@@ -15,7 +15,6 @@ from .sample import (
 )
 from .utility import ChecklistForm
 from .process import (
-    AutoCreateForm,
     DropzoneForm,
     ProcessCreateForm,
     EditProcessTemplateForm,
