@@ -120,6 +120,11 @@ class RunProcessView(LoginRequiredMixin, generic.CreateView):
             raise Http404(e)
         return form_class(pieces=sample.pieces, **self.get_form_kwargs())
 
+    def get_form_kwargs(self):
+        kwargs = super(RunProcessView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.user = self.request.user

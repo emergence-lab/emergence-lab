@@ -24,11 +24,11 @@ class ProcessCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
-
+        user = kwargs.pop('user', None)
         super(ProcessCreateForm, self).__init__(*args, **kwargs)
-
         self.fields['investigations'].required = False
         self.fields['milestones'].required = False
+        self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
         if len(pieces) == 1:
