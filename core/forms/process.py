@@ -22,6 +22,8 @@ class DropzoneForm(forms.ModelForm):
 
 class ProcessCreateForm(forms.ModelForm):
 
+    milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
+
     def __init__(self, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
         user = kwargs.pop('user', None)
@@ -30,7 +32,6 @@ class ProcessCreateForm(forms.ModelForm):
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
         self.fields['investigations'].required = False
-        self.fields['milestones'].required = False
         self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
