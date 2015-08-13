@@ -213,7 +213,7 @@
                                         <h3 class="panel-title"><span class="glyphicon glyphicon-bookmark pull-right"></span>Reservation</h3>
                                     </div>
                                     <div class="panel-body">
-                                        <strong>Tool:</strong> {{ reservation.tool.upper }} <br>
+                                        <strong>Tool:</strong> {{ reservation.tool }} <br>
                                         <strong>Operator:</strong> {{ reservation.user.full_name }} <br>
                                         <strong>Run Time:</strong> {{ reservation.growth_length }} hours
                                         {% if reservation.comment %}
