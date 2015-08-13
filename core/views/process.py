@@ -123,6 +123,7 @@ class RunProcessView(LoginRequiredMixin, generic.CreateView):
     def get_form_kwargs(self):
         kwargs = super(RunProcessView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
+        kwargs['process_type'] = self.process_type
         return kwargs
 
     def form_valid(self, form):
