@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.views import generic
 
@@ -64,8 +65,9 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         response = super(ProjectCreateView, self).form_valid(form)
-        ProjectTracking.objects.get_or_create(project=self.object,
-                                              user=self.request.user)
+        p = ProjectTracking.objects.get_or_create(project=self.object,
+                                            user=self.request.user)
+        self.request.user.groups.add(p[0].project.owner_group)
         return response
 
     def get_success_url(self):

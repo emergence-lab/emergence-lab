@@ -3,6 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
+from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -22,6 +24,12 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
+    owner_group = models.ForeignKey(Group, verbose_name=_('owner_group'),
+                                    related_name='+', blank=True, null=True)
+    member_group = models.ForeignKey(Group, verbose_name=_('member_group'),
+                                    related_name='+', blank=True, null=True)
+    viewer_group = models.ForeignKey(Group, verbose_name=_('viewer_group'),
+                                    related_name='+', blank=True, null=True)
 
     class Meta:
         verbose_name = _('project')
@@ -108,3 +116,15 @@ class ProjectTracking(models.Model):
     project = models.ForeignKey(Project)
     user = models.ForeignKey(User)
     is_owner = models.BooleanField(default=False)
+
+
+@receiver(models.signals.post_save, sender=Project)
+def create_project_groups(sender, instance=None, created=False, **kwargs):
+    if created:
+        owner = Group.objects.create(name='rbac_project_owner_{}'.format(instance.slug))
+        member = Group.objects.create(name='rbac_project_member_{}'.format(instance.slug))
+        viewer = Group.objects.create(name='rbac_project_viewer_{}'.format(instance.slug))
+        instance.owner_group = owner
+        instance.member_group = member
+        instance.viewer_group = viewer
+        instance.save()
