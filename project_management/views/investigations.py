@@ -6,9 +6,23 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.views import ActiveListView
+from core.views import ActiveListView, AccessControlMixin
 from core.models import Investigation, Milestone, ProjectTracking
 from project_management.forms import InvestigationForm, MilestoneForm
+
+
+class InvestigationAccessControlMixin(AccessControlMixin):
+    """
+    Implements AccessControlMixin for Investigation as kwarg to view.
+    """
+
+    membership = None
+
+    def get_group_required(self):
+        self.investigation = Investigation.objects.get(slug=self.kwargs.get('slug'))
+        instance = self.investigation.project
+        return super(InvestigationAccessControlMixin, self).get_group_required(
+            self.membership, instance)
 
 
 class InvestigationListView(LoginRequiredMixin, ActiveListView):
@@ -22,10 +36,12 @@ class InvestigationListView(LoginRequiredMixin, ActiveListView):
         return queryset.filter(project__in=projects)
 
 
-class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
+class InvestigationDetailView(InvestigationAccessControlMixin, generic.DetailView):
 
     template_name = 'project_management/investigation_detail.html'
     model = Investigation
+
+    membership = 'viewer'
 
     def get_context_data(self, **kwargs):
         context = super(InvestigationDetailView, self).get_context_data(**kwargs)
@@ -60,11 +76,13 @@ class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
         return reverse('pm_investigation_detail', kwargs={'slug': self.object.slug})
 
 
-class InvestigationUpdateView(LoginRequiredMixin, generic.UpdateView):
+class InvestigationUpdateView(InvestigationAccessControlMixin, generic.UpdateView):
 
     model = Investigation
     template_name = 'project_management/investigation_create.html'
     form_class = InvestigationForm
+
+    membership = 'owner'
 
     def get_form_kwargs(self):
         kwargs = super(InvestigationUpdateView, self).get_form_kwargs()

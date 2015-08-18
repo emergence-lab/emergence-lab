@@ -35,6 +35,21 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
         verbose_name = _('project')
         verbose_name_plural = _('projects')
 
+    def is_owner(self, user):
+        if self.owner_group and user in self.owner_group.custom_users.all():
+            return True
+
+    def is_member(self, user):
+        if (self.owner_group and self.member_group) and user in (
+            self.owner_group.custom_users.all() or self.member_group.custom_users.all()):
+            return True
+
+    def is_viewer(self, user):
+        if (self.owner_group and self.member_group and self.viewer_group) and user in (
+            self.owner_group.custom_users.all() or self.member_group.custom_users.all() or
+            self.viewer_group.custom_users.all()):
+            return True
+
     def __str__(self):
         return self.name
 
@@ -53,6 +68,15 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     class Meta:
         verbose_name = _('investigation')
         verbose_name_plural = _('investigations')
+
+    def is_owner(self, user):
+        return self.project.is_owner(user)
+
+    def is_member(self, user):
+        return self.project.is_member(user)
+
+    def is_viewer(self, user):
+        return self.project.is_viewer(user)
 
     def __str__(self):
         return self.name
@@ -77,6 +101,15 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
     class Meta:
         verbose_name = _('milestone')
         verbose_name_plural = _('milestones')
+
+    def is_owner(self, user):
+        return self.investigation.project.is_owner(user)
+
+    def is_member(self, user):
+        return self.investigation.project.is_member(user)
+
+    def is_viewer(self, user):
+        return self.investigation.project.is_viewer(user)
 
     def __str__(self):
         return self.name

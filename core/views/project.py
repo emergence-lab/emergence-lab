@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.views import generic
 
