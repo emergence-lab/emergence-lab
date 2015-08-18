@@ -57,8 +57,10 @@
                 <div class="clearfix">
                   <div class="btn-group pull-right" role="group" aria-label="...">
                         <a href="{% url 'project_untrack' slug=p.slug %}" data-toggle="tooltip" data-title="Untrack" ><span class="glyphicon glyphicon-star invert-link inline-button-spacer"></span></a>
+                        {% if user in p.owner_group.custom_users.all %}
                         <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down invert-link inline-button-spacer"></span></a>
                         <a href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit invert-link inline-button-spacer"></span></a>
+                        {% endif %}
                   </div>
                 </div>
             </div>
@@ -121,8 +123,10 @@
                 <div class="clearfix">
                   <div class="btn-group pull-right" role="group" aria-label="...">
                     <a href="{% url 'project_track' slug=p.slug %}" data-toggle="tooltip" data-title="Track"><span class="glyphicon glyphicon-star-empty inline-button-spacer"></span></a>
+                    {% if user in p.owner_group.custom_users.all %}
                     <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
                     <a href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
+                    {% endif %}
                   </div>
                 </div>
             </div>
@@ -155,7 +159,7 @@
                 </h3>
             </div>
             <div class="panel-body">
-                <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. <a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>
+                <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. {% if user in p.owner_group.custom_users.all %}<a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>{% endif %}
                 <p>{{ p.description|safe|truncatewords:50 }}<p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
