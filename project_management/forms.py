@@ -108,3 +108,13 @@ class MilestoneNoteForm(forms.ModelForm):
         widgets = {
             'note': forms.Textarea(attrs={'class': 'hallo'}),
         }
+
+
+class ProjectForm(forms.ModelForm):
+
+    class Meta:
+        model = Project
+        fields = ('name', 'description',)
+        widgets = {
+            'description': forms.Textarea(attrs={'class': 'hallo'}),
+        }
