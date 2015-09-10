@@ -1,5 +1,10 @@
 {% extends 'project_management/pm_base.html' %}
 
+{% block scripts %}
+  {% load staticfiles %}
+  <script src="{% static 'project_management/js/project_list.js' %}"></script>
+{% endblock %}
+
 {% block breadcrumb %}
 
 <nav>
@@ -49,13 +54,14 @@
     <div class="tab-content">
       <div class="tab-pane active" role="tabpanel" id="my_projects">
         {% for p in my_active_projects %}
-        <div class="panel panel-primary">
+        <div class="panel panel-primary" id="project_panel_{{p.id}}">
             <div class="panel-heading">
                 <h3 class="panel-title pull-left">
-                    {{ p }}
+                    <a href="{% url 'pm_project_detail' slug=p.slug %}">{{ p }}</a>
                 </h3>
                 <div class="clearfix">
                   <div class="btn-group pull-right" role="group" aria-label="...">
+                        <a href="#" data-toggle="tooltip" data-title="Expand" ><span id="expand_proj_{{p.id}}" class="glyphicon glyphicon-option-horizontal invert-link inline-button-spacer"></span></a>
                         <a href="{% url 'project_untrack' slug=p.slug %}" data-toggle="tooltip" data-title="Untrack" ><span class="glyphicon glyphicon-star invert-link inline-button-spacer"></span></a>
                         {% if user in p.owner_group.custom_users.all %}
                         <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down invert-link inline-button-spacer"></span></a>
@@ -64,7 +70,7 @@
                   </div>
                 </div>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" id="project_panel_body_{{p.id}}">
                 <p><span class="glyphicon glyphicon-ok-circle"></span> You follow this project.</p>
                 <p>{{ p.description|safe|truncatewords:50 }}</p>
             </div>
@@ -84,7 +90,7 @@
                         <p class="list-group-item-text">
                           <strong>Milestones: &emsp;</strong>
                           {% for m in i.milestone.all %}
-                            {% if m.is_active and m.user == request.user %}
+                            {% if m.is_active %}
                             <a class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-html="true" data-toggle="tooltip" title="{{m.description|escape|truncatewords:20}}">{{m.name|truncatewords:4}}</a>
                             {% endif %}
                           {% endfor %}
@@ -118,10 +124,11 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title pull-left">
-                    {{ p }}
+                    <a href="{% url 'pm_project_detail' slug=p.slug %}">{{ p }}</a>
                 </h3>
                 <div class="clearfix">
                   <div class="btn-group pull-right" role="group" aria-label="...">
+                    <a href="#" data-toggle="tooltip" data-title="Expand" ><span id="expand_proj_{{p.id}}" class="glyphicon glyphicon-option-horizontal invert-link inline-button-spacer"></span></a>
                     <a href="{% url 'project_track' slug=p.slug %}" data-toggle="tooltip" data-title="Track"><span class="glyphicon glyphicon-star-empty inline-button-spacer"></span></a>
                     {% if user in p.owner_group.custom_users.all %}
                     <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
@@ -130,7 +137,7 @@
                   </div>
                 </div>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" id="project_panel_body_{{p.id}}">
                 <p><span class="glyphicon glyphicon-ban-circle"></span> You do not follow this project.</p>
                 <p>{{ p.description|safe|truncatewords:50 }}</p>
             </div>
@@ -155,14 +162,14 @@
         <div class="panel panel-danger">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    {{ p }}
+                    <a href="{% url 'pm_project_detail' slug=p.slug %}">{{ p }}</a>
                 </h3>
             </div>
             <div class="panel-body">
                 <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. {% if user in p.owner_group.custom_users.all %}<a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>{% endif %}
                 <p>{{ p.description|safe|truncatewords:50 }}<p>
             </div>
-            <ul id="invest_list_{{p.id}}" class="list-group">
+            <ul id="_invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigation_set.all %}
                 <li class="list-group-item">
                   <h4 class="list-group-item-heading">
