@@ -22,11 +22,14 @@ from investigations import (InvestigationListView,
                             InvestigationCreateView,
                             InvestigationUpdateView,)
 from projects import (ProjectListView,
-                        ProjectUpdateView,)
+                      ProjectUpdateView,
+                      ProjectDetailView,
+                      AddUserToProjectGroupView,
+                      RemoveUserFromProjectGroup,)
 from tasks import (TaskListView,
-                    TaskCreateView,
-                    TaskCloseView,
-                    TaskReOpenView,
-                    TaskCreateAction,)
+                   TaskCreateView,
+                   TaskCloseView,
+                   TaskReOpenView,
+                   TaskCreateAction,)
 from utility import (LandingPageView,
-                        NewsfeedView,)
+                     NewsfeedView,)

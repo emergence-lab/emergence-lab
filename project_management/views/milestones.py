@@ -125,9 +125,10 @@ class MilestoneCreateAction(LoginRequiredMixin, generic.View):
 
     def post(self, request, *args, **kwargs):
         milestone_form = MilestoneForm(request.POST)
-        investigation = milestone_form.cleaned_data['investigation']
-        if milestone_form.is_valid() and investigation.is_owner(self.request.user):
-            milestone_form.save()
+        if milestone_form.is_valid():
+            investigation = milestone_form.cleaned_data['investigation']
+            if investigation.is_owner(self.request.user):
+                milestone_form.save()
         else:
             HttpResponseRedirect(reverse('dashboard'))
         return HttpResponseRedirect(reverse('pm_investigation_detail',

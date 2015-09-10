@@ -5,8 +5,8 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from core.views import NeverCacheMixin, AccessControlMixin
-from core.models import ProjectTracking, Project
+from core.views import NeverCacheMixin, AccessControlMixin, ActionReloadView
+from core.models import ProjectTracking, Project, User
 
 
 class ProjectAccessControlMixin(AccessControlMixin):
@@ -47,3 +47,43 @@ class ProjectUpdateView(ProjectAccessControlMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('pm_project_list')
+
+
+class ProjectDetailView(ProjectAccessControlMixin, generic.DetailView):
+
+    model = Project
+    template_name = 'project_management/project_detail.html'
+
+    membership = 'viewer'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectDetailView, self).get_context_data(**kwargs)
+        context['users'] = User.objects.all()
+        return context
+
+
+class AddUserToProjectGroupView(ProjectAccessControlMixin, ActionReloadView):
+
+    membership = 'owner'
+
+    def perform_action(self, request, *args, **kwargs):
+        self.project = Project.objects.get(slug=kwargs.pop('slug'))
+        user = User.objects.get(username=kwargs.pop('username'))
+        attribute = kwargs.pop('attribute')
+        self.project.add_user(user, attribute)
+
+    def get_redirect_url(self, **kwargs):
+        return reverse('pm_project_detail', kwargs={'slug': self.project.slug})
+
+
+class RemoveUserFromProjectGroup(ProjectAccessControlMixin, ActionReloadView):
+
+    membership = 'owner'
+
+    def perform_action(self, request, *args, **kwargs):
+        self.project = Project.objects.get(slug=kwargs.pop('slug'))
+        user = User.objects.get(username=kwargs.pop('username'))
+        self.project.remove_user(user)
+
+    def get_redirect_url(self, **kwargs):
+        return reverse('pm_project_detail', kwargs={'slug': self.project.slug})

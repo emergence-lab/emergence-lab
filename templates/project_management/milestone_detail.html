@@ -27,8 +27,6 @@
 
 {% block pm_content %}
 
-{% if milestone.user == request.user %}
-
 <div class="col-md-12">
 
   <div class="panel {% if milestone.is_active and milestone.due_date < today.date %}panel-warning{%else%}panel-info{%endif%}">
@@ -288,7 +286,6 @@
   </script>
 
 
-{% endif %}
 {% endblock %}
 
 {% block scripts %}
