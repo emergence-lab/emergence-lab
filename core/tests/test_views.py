@@ -241,11 +241,13 @@ class TestProjectCRUD(TestCase):
 class TestInvestigationCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
         project2 = mommy.make(Project, name='project 2', slug='project-2',
                               is_active=False)
+        user.groups.add(project1.owner_group)
+        user.groups.add(project2.owner_group)
 
         mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)

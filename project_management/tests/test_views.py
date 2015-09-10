@@ -56,6 +56,7 @@ class TestProjectCRUD(TestCase):
             is_active=True)
         self.user = get_user_model().objects.create_user('username1',
                                                          password='')
+        self.user.groups.add(project.owner_group)
         self.client.login(username='username1', password='')
 
     def test_project_list_resolution_template(self):
@@ -87,11 +88,13 @@ class TestProjectCRUD(TestCase):
 class TestInvestigationCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
         project2 = mommy.make(Project, name='project 2', slug='project-2',
                               is_active=False)
+        user.groups.add(project1.owner_group)
+        user.groups.add(project2.owner_group)
         mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         mommy.make(Investigation, name='investigation 2',
@@ -176,11 +179,13 @@ class TestInvestigationCRUD(TestCase):
 class TestMilestoneCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
         project2 = mommy.make(Project, name='project 2', slug='project-2',
                               is_active=False)
+        user.groups.add(project1.owner_group)
+        user.groups.add(project2.owner_group)
         investigation1 = mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         mommy.make(Milestone, name='milestone 1', slug='milestone-1',
@@ -265,9 +270,10 @@ class TestMilestoneCRUD(TestCase):
 class TestTaskCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
+        user.groups.add(project1.owner_group)
         investigation1 = mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         milestone1 = mommy.make(Milestone, name='milestone 1', slug='milestone-1',
@@ -310,9 +316,10 @@ class TestTaskCRUD(TestCase):
 class TestNoteCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
+        user.groups.add(project1.owner_group)
         investigation1 = mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         milestone1 = mommy.make(Milestone, name='milestone 1', slug='milestone-1',
