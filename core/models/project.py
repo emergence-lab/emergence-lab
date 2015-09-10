@@ -41,14 +41,39 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
 
     def is_member(self, user):
         if (self.owner_group and self.member_group) and user in (
-            self.owner_group.custom_users.all() or self.member_group.custom_users.all()):
+                self.owner_group.custom_users.all() or self.member_group.custom_users.all()):
             return True
 
     def is_viewer(self, user):
         if (self.owner_group and self.member_group and self.viewer_group) and user in (
-            self.owner_group.custom_users.all() or self.member_group.custom_users.all() or
-            self.viewer_group.custom_users.all()):
+                self.owner_group.custom_users.all() or self.member_group.custom_users.all() or
+                self.viewer_group.custom_users.all()):
             return True
+
+    def get_membership(self, user):
+        if self.is_owner(user):
+            return 'owner'
+        elif self.is_member(user):
+            return 'member'
+        elif self.is_viewer(user):
+            return 'viewer'
+        else:
+            return None
+
+    def remove_user(self, user):
+        self.owner_group.custom_users.remove(user)
+        self.member_group.custom_users.remove(user)
+        self.viewer_group.custom_users.remove(user)
+
+    def add_user(self, user, attribute):
+        if self.get_membership(user) and attribute in ['owner', 'member', 'viewer']:
+            self.remove_user(user)
+        if attribute == 'owner':
+            user.groups.add(self.owner_group)
+        if attribute == 'member':
+            user.groups.add(self.member_group)
+        if attribute == 'viewer':
+            user.groups.add(self.viewer_group)
 
     def __str__(self):
         return self.name
@@ -77,6 +102,9 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
 
     def is_viewer(self, user):
         return self.project.is_viewer(user)
+
+    def get_membership(self, user):
+        return self.project.get_membership(user)
 
     def __str__(self):
         return self.name
@@ -110,6 +138,9 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
 
     def is_viewer(self, user):
         return self.investigation.project.is_viewer(user)
+
+    def get_membership(self, user):
+        return self.investigation.project.get_membership(user)
 
     def __str__(self):
         return self.name
