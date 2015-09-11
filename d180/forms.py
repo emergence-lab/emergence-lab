@@ -5,7 +5,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from core.forms import ChecklistForm
-from core.models import Process, Milestone, ProjectTracking, Investigation
+from core.models import Process, Milestone, Investigation, Project
 from d180.models import D180Readings, D180Source, D180GrowthInfo
 
 
@@ -15,10 +15,12 @@ class WizardBasicProcessForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
-        self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
+        milestones = [x.id for x in Milestone.objects.filter(is_active=True) if x.is_member(user)]
+        projs = [x.id for x in Project.objects.filter(is_active=True) if x.is_member(user)]
+        self.fields['milestones'].queryset = Milestone.objects.filter(id__in=milestones)
         self.fields['investigations'].required = False
-        projs = (ProjectTracking.objects.filter(user=user)
-                                        .values_list('project_id', flat=True))
+        # projs = (ProjectTracking.objects.filter(user=user)
+        #                                 .values_list('project_id', flat=True))
         self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
 
     class Meta:

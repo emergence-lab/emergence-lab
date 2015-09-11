@@ -8,7 +8,7 @@ from django import forms
 from crispy_forms import helper, layout
 
 from core.models import (DataFile, Process, ProcessTemplate, Milestone,
-                         ProjectTracking, Investigation)
+                         Investigation, Project)
 
 
 class DropzoneForm(forms.ModelForm):
@@ -24,15 +24,17 @@ class ProcessCreateForm(forms.ModelForm):
 
     milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
-        user = kwargs.pop('user', None)
         process_type = kwargs.pop('process_type', None)
         super(ProcessCreateForm, self).__init__(*args, **kwargs)
+        milestones = [x.id for x in Milestone.objects.filter(is_active=True) if x.is_member(user)]
+        projs = [x.id for x in Project.objects.filter(is_active=True) if x.is_member(user)]
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
         self.fields['investigations'].required = False
-        self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
+        self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
+        self.fields['milestones'].queryset = Milestone.objects.filter(id__in=milestones)
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
         if len(pieces) == 1:
@@ -62,11 +64,13 @@ class WizardBasicInfoForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
         self.fields['investigations'].required = False
-        projs = (ProjectTracking.objects.filter(user=user)
-                                        .values_list('project_id', flat=True))
+        milestones = [x.id for x in Milestone.objects.filter(is_active=True) if x.is_member(user)]
+        projs = [x.id for x in Project.objects.filter(is_active=True) if x.is_member(user)]
+        # projs = (ProjectTracking.objects.filter(user=user)
+        #                                 .values_list('project_id', flat=True))
         self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
         self.fields['milestones'].required = False
-        self.fields['milestones'].queryset = Milestone.objects.filter(user=user)
+        self.fields['milestones'].queryset = Milestone.objects.filter(id__in=milestones)
         self.helper = helper.FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True
