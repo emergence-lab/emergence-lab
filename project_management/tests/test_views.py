@@ -84,6 +84,36 @@ class TestProjectCRUD(TestCase):
         list_url = reverse('pm_project_list')
         self.assertRedirects(response, list_url)
 
+    def test_project_detail_content(self):
+        obj = Project.objects.filter(is_active=True).first()
+        url = reverse('pm_project_detail', kwargs={'slug': obj.slug})
+        response = self.client.get(url)
+        self.assertContains(response, obj.name)
+        self.assertContains(response, Investigation.objects.first().name)
+
+    def test_project_add_user(self):
+        obj = Project.objects.filter(is_active=True).first()
+        username = get_user_model().objects.create_user(username='username2',
+                                                        password='')
+        url = reverse('pm_project_group_add', kwargs={'slug': obj.slug,
+                                                      'username': username.username,
+                                                      'attribute': 'viewer'})
+        response = self.client.get(url)
+        self.assertEqual(obj.get_membership(username), 'viewer')
+        self.assertRedirects(response, reverse('pm_project_detail', kwargs={'slug': obj.slug}))
+
+    def test_project_remove_user(self):
+        obj = Project.objects.filter(is_active=True).first()
+        username = get_user_model().objects.create_user(username='username2',
+                                                        password='')
+        url = reverse('pm_project_group_remove', kwargs={'slug': obj.slug,
+                                                         'username': username.username,})
+        obj.add_user(username, 'viewer')
+        self.assertEqual(obj.get_membership(username), 'viewer')
+        response = self.client.get(url)
+        self.assertIsNone(obj.get_membership(username))
+        self.assertRedirects(response, reverse('pm_project_detail', kwargs={'slug': obj.slug}))
+
 
 class TestInvestigationCRUD(TestCase):
 

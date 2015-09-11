@@ -36,19 +36,16 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
         verbose_name_plural = _('projects')
 
     def is_owner(self, user):
-        if self.owner_group and user in self.owner_group.custom_users.all():
-            return True
+        groups = [self.owner_group]
+        return bool(set(groups) & set(user.groups.all()))
 
     def is_member(self, user):
-        if (self.owner_group and self.member_group) and user in (
-                self.owner_group.custom_users.all() or self.member_group.custom_users.all()):
-            return True
+        groups = [self.owner_group, self.member_group]
+        return bool(set(groups) & set(user.groups.all()))
 
     def is_viewer(self, user):
-        if (self.owner_group and self.member_group and self.viewer_group) and user in (
-                self.owner_group.custom_users.all() or self.member_group.custom_users.all() or
-                self.viewer_group.custom_users.all()):
-            return True
+        groups = [self.owner_group, self.member_group, self.viewer_group]
+        return bool(set(groups) & set(user.groups.all()))
 
     def get_membership(self, user):
         if self.is_owner(user):
@@ -66,14 +63,15 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
         self.viewer_group.custom_users.remove(user)
 
     def add_user(self, user, attribute):
-        if self.get_membership(user) and attribute in ['owner', 'member', 'viewer']:
+        if self.get_membership(user):
             self.remove_user(user)
-        if attribute == 'owner':
-            user.groups.add(self.owner_group)
-        if attribute == 'member':
-            user.groups.add(self.member_group)
-        if attribute == 'viewer':
-            user.groups.add(self.viewer_group)
+        if attribute in ['owner', 'member', 'viewer']:
+            if attribute == 'owner':
+                user.groups.add(self.owner_group)
+            if attribute == 'member':
+                user.groups.add(self.member_group)
+            if attribute == 'viewer':
+                user.groups.add(self.viewer_group)
 
     def __str__(self):
         return self.name
