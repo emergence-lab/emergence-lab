@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample, Process
+from core.models import Sample, Process, Project
 
 
 class TestSampleManager(TestCase):
@@ -494,3 +494,30 @@ class TestProcess(TestCase):
         process = Process.objects.create(comment='test', user=self.user)
         nodes = [s.run_process(process) for s in samples]
         self.assertListEqual(list(process.nodes), nodes)
+
+
+class TestProject(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('default', password='')
+        self.project = Project.objects.create(name='Test Project')
+
+    def test_add_user(self):
+        self.project.add_user(self.user, 'owner')
+        self.assertEquals(self.project.get_membership(self.user), 'owner')
+        self.assertTrue(self.project.is_viewer(self.user))
+        self.assertIn(self.project.owner_group, self.user.groups.all())
+
+    def test_remove_user(self):
+        self.project.add_user(self.user, 'owner')
+        self.assertEquals(self.project.get_membership(self.user), 'owner')
+        self.project.remove_user(self.user)
+        self.assertFalse(self.project.get_membership(self.user))
+
+    def test_membership_inheritance(self):
+        self.project.add_user(self.user, 'owner')
+        self.assertTrue(self.project.is_member(self.user))
+
+    def test_membership_heirarchy(self):
+        self.project.add_user(self.user, 'viewer')
+        self.assertFalse(self.project.is_owner(self.user))
