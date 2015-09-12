@@ -64,8 +64,8 @@
                         <a href="#" data-toggle="tooltip" data-title="Expand" ><span id="expand_proj_{{p.id}}" class="glyphicon glyphicon-option-horizontal invert-link inline-button-spacer"></span></a>
                         <a href="{% url 'project_untrack' slug=p.slug %}" data-toggle="tooltip" data-title="Untrack" ><span class="glyphicon glyphicon-star invert-link inline-button-spacer"></span></a>
                         {% if user in p.owner_group.custom_users.all %}
-                        <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down invert-link inline-button-spacer"></span></a>
-                        <a href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit invert-link inline-button-spacer"></span></a>
+                        <a id="project_deactivate_{{p.id}}" href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down invert-link inline-button-spacer"></span></a>
+                        <a id="project_edit_{{p.id}}" href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit invert-link inline-button-spacer"></span></a>
                         {% endif %}
                   </div>
                 </div>
@@ -131,8 +131,8 @@
                     <a href="#" data-toggle="tooltip" data-title="Expand" ><span id="expand_proj_{{p.id}}" class="glyphicon glyphicon-option-horizontal invert-link inline-button-spacer"></span></a>
                     <a href="{% url 'project_track' slug=p.slug %}" data-toggle="tooltip" data-title="Track"><span class="glyphicon glyphicon-star-empty inline-button-spacer"></span></a>
                     {% if user in p.owner_group.custom_users.all %}
-                    <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
-                    <a href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
+                    <a id="project_deactivate_{{p.id}}" href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
+                    <a id="project_edit_{{p.id}}" href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
                     {% endif %}
                   </div>
                 </div>
