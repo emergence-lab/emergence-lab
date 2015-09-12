@@ -20,13 +20,10 @@ class MilestoneAccessControlMixin(AccessControlMixin):
     Implements AccessControlMixin for Milestone as kwarg to view.
     """
 
-    membership = None
-
     def get_group_required(self):
         self.milestone = Milestone.objects.get(slug=self.kwargs.get('slug'))
-        instance = self.milestone.investigation.project
         return super(MilestoneAccessControlMixin, self).get_group_required(
-            self.membership, instance)
+            self.membership, self.milestone)
 
 
 class MilestoneListView(LoginRequiredMixin, generic.ListView):

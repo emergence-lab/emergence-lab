@@ -14,13 +14,10 @@ class ProjectAccessControlMixin(AccessControlMixin):
     Implements AccessControlMixin for Project as kwarg to view.
     """
 
-    membership = None
-
     def get_group_required(self):
         self.project = Project.objects.get(slug=self.kwargs.get('slug'))
-        instance = self.project
         return super(ProjectAccessControlMixin, self).get_group_required(
-            self.membership, instance)
+            self.membership, self.project)
 
 
 class ProjectListView(LoginRequiredMixin, NeverCacheMixin, generic.TemplateView):

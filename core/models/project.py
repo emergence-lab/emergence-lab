@@ -10,13 +10,13 @@ from django.utils.translation import ugettext_lazy as _
 
 import autoslug
 
-from .mixins import ActiveStateMixin, TimestampMixin
+from .mixins import ActiveStateMixin, TimestampMixin, AccessControlShortcutMixin
 from .user import User
 from . import fields
 
 
 @python_2_unicode_compatible
-class Project(ActiveStateMixin, TimestampMixin, models.Model):
+class Project(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on a project, which is a higher level organizational
     tool.
@@ -35,50 +35,50 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
         verbose_name = _('project')
         verbose_name_plural = _('projects')
 
-    def is_owner(self, user):
-        groups = [self.owner_group]
-        return bool(set(groups) & set(user.groups.all()))
-
-    def is_member(self, user):
-        groups = [self.owner_group, self.member_group]
-        return bool(set(groups) & set(user.groups.all()))
-
-    def is_viewer(self, user):
-        groups = [self.owner_group, self.member_group, self.viewer_group]
-        return bool(set(groups) & set(user.groups.all()))
-
-    def get_membership(self, user):
-        if self.is_owner(user):
-            return 'owner'
-        elif self.is_member(user):
-            return 'member'
-        elif self.is_viewer(user):
-            return 'viewer'
-        else:
-            return None
-
-    def remove_user(self, user):
-        self.owner_group.custom_users.remove(user)
-        self.member_group.custom_users.remove(user)
-        self.viewer_group.custom_users.remove(user)
-
-    def add_user(self, user, attribute):
-        if self.get_membership(user):
-            self.remove_user(user)
-        if attribute in ['owner', 'member', 'viewer']:
-            if attribute == 'owner':
-                user.groups.add(self.owner_group)
-            if attribute == 'member':
-                user.groups.add(self.member_group)
-            if attribute == 'viewer':
-                user.groups.add(self.viewer_group)
+    # def is_owner(self, user):
+    #     groups = [self.owner_group]
+    #     return bool(set(groups) & set(user.groups.all()))
+    #
+    # def is_member(self, user):
+    #     groups = [self.owner_group, self.member_group]
+    #     return bool(set(groups) & set(user.groups.all()))
+    #
+    # def is_viewer(self, user):
+    #     groups = [self.owner_group, self.member_group, self.viewer_group]
+    #     return bool(set(groups) & set(user.groups.all()))
+    #
+    # def get_membership(self, user):
+    #     if self.is_owner(user):
+    #         return 'owner'
+    #     elif self.is_member(user):
+    #         return 'member'
+    #     elif self.is_viewer(user):
+    #         return 'viewer'
+    #     else:
+    #         return None
+    #
+    # def remove_user(self, user):
+    #     self.owner_group.custom_users.remove(user)
+    #     self.member_group.custom_users.remove(user)
+    #     self.viewer_group.custom_users.remove(user)
+    #
+    # def add_user(self, user, attribute):
+    #     if self.get_membership(user):
+    #         self.remove_user(user)
+    #     if attribute in ['owner', 'member', 'viewer']:
+    #         if attribute == 'owner':
+    #             user.groups.add(self.owner_group)
+    #         if attribute == 'member':
+    #             user.groups.add(self.member_group)
+    #         if attribute == 'viewer':
+    #             user.groups.add(self.viewer_group)
 
     def __str__(self):
         return self.name
 
 
 @python_2_unicode_compatible
-class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
+class Investigation(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on an individual investigation related to one or more
     projects.
@@ -92,24 +92,36 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
         verbose_name = _('investigation')
         verbose_name_plural = _('investigations')
 
-    def is_owner(self, user):
-        return self.project.is_owner(user)
+    # def is_owner(self, user):
+    #     return self.project.is_owner(user)
+    #
+    # def is_member(self, user):
+    #     return self.project.is_member(user)
+    #
+    # def is_viewer(self, user):
+    #     return self.project.is_viewer(user)
+    #
+    # def get_membership(self, user):
+    #     return self.project.get_membership(user)
 
-    def is_member(self, user):
-        return self.project.is_member(user)
+    @property
+    def owner_group(self):
+        return self.project.owner_group
 
-    def is_viewer(self, user):
-        return self.project.is_viewer(user)
+    @property
+    def member_group(self):
+        return self.project.member_group
 
-    def get_membership(self, user):
-        return self.project.get_membership(user)
+    @property
+    def viewer_group(self):
+        return self.project.viewer_group
 
     def __str__(self):
         return self.name
 
 
 @python_2_unicode_compatible
-class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
+class Milestone(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information related to short-term project goals.
     """
@@ -128,23 +140,35 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
         verbose_name = _('milestone')
         verbose_name_plural = _('milestones')
 
-    def is_owner(self, user):
-        return self.investigation.project.is_owner(user)
+    # def is_owner(self, user):
+    #     return self.investigation.project.is_owner(user)
+    #
+    # def is_member(self, user):
+    #     return self.investigation.project.is_member(user)
+    #
+    # def is_viewer(self, user):
+    #     return self.investigation.project.is_viewer(user)
+    #
+    # def get_membership(self, user):
+    #     return self.investigation.project.get_membership(user)
 
-    def is_member(self, user):
-        return self.investigation.project.is_member(user)
+    @property
+    def owner_group(self):
+        return self.investigation.owner_group
 
-    def is_viewer(self, user):
-        return self.investigation.project.is_viewer(user)
+    @property
+    def member_group(self):
+        return self.investigation.member_group
 
-    def get_membership(self, user):
-        return self.investigation.project.get_membership(user)
+    @property
+    def viewer_group(self):
+        return self.investigation.viewer_group
 
     def __str__(self):
         return self.name
 
 
-class MilestoneNote(TimestampMixin, models.Model):
+class MilestoneNote(AccessControlShortcutMixin, TimestampMixin, models.Model):
     """
     Stores a note attached to a milestone object
     """
@@ -156,8 +180,32 @@ class MilestoneNote(TimestampMixin, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
 
+    # def is_owner(self, user):
+    #     return self.milestone.is_owner(user)
+    #
+    # def is_member(self, user):
+    #     return self.milestone.is_member(user)
+    #
+    # def is_viewer(self, user):
+    #     return self.milestone.is_viewer(user)
+    #
+    # def get_membership(self, user):
+    #     return self.milestone.get_membership(user)
 
-class Task(ActiveStateMixin, TimestampMixin, models.Model):
+    @property
+    def owner_group(self):
+        return self.milestone.owner_group
+
+    @property
+    def member_group(self):
+        return self.milestone.member_group
+
+    @property
+    def viewer_group(self):
+        return self.milestone.viewer_group
+
+
+class Task(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores a task with potential relation to a milestone.
     """
@@ -169,6 +217,30 @@ class Task(ActiveStateMixin, TimestampMixin, models.Model):
                                 null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
+
+    # def is_owner(self, user):
+    #     return self.milestone.is_owner(user)
+    #
+    # def is_member(self, user):
+    #     return self.milestone.is_member(user)
+    #
+    # def is_viewer(self, user):
+    #     return self.milestone.is_viewer(user)
+    #
+    # def get_membership(self, user):
+    #     return self.milestone.get_membership(user)
+
+    @property
+    def owner_group(self):
+        return self.milestone.owner_group
+
+    @property
+    def member_group(self):
+        return self.milestone.member_group
+
+    @property
+    def viewer_group(self):
+        return self.milestone.viewer_group
 
 
 class ProjectTracking(models.Model):

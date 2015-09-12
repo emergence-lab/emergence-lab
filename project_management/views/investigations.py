@@ -16,13 +16,10 @@ class InvestigationAccessControlMixin(AccessControlMixin):
     Implements AccessControlMixin for Investigation as kwarg to view.
     """
 
-    membership = None
-
     def get_group_required(self):
         self.investigation = Investigation.objects.get(slug=self.kwargs.get('slug'))
-        instance = self.investigation.project
         return super(InvestigationAccessControlMixin, self).get_group_required(
-            self.membership, instance)
+            self.membership, self.investigation)
 
 
 class InvestigationListView(LoginRequiredMixin, ActiveListView):
