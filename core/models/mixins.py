@@ -128,6 +128,7 @@ class UUIDMixin(models.Model):
             return uuid[len(cls.prefix):]
         return uuid
 
+
 class AccessControlShortcutMixin(object):
     """
     Mixin to add access control methods to model classes
