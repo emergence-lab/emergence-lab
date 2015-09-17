@@ -16,7 +16,7 @@
     <ol class="breadcrumb">
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
-        <li><a href="{% url 'pm_project_list' %}">{{investigation.project.name}}</a></li>
+        <li><a href="{% url 'pm_project_detail' slug=investigation.project.slug %}">{{investigation.project.name}}</a></li>
         <li class="active">{{investigation.name}}</li>
     </ol>
 </nav>
@@ -28,8 +28,17 @@
 <div class="col-md-12">
   <div class="panel panel-info">
     <div class="panel-heading">
-      Description
-      <a class="pull-right" href="{% url 'pm_investigation_edit' investigation.slug %}"><span class="glyphicon glyphicon-edit"></span></a>
+      <h4 class="panel-title pull-left">Description</h4>
+      <div class="clearfix">
+        <div class="btn-group pull-right" role="group" aria-label="...">
+          {% if investigation.is_active %}
+          <a href="{% url 'investigation_deactivate' slug=investigation.slug project=investigation.project.slug %}"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
+          {% else %}
+          <a href="{% url 'investigation_activate' slug=investigation.slug project=investigation.project.slug %}"><span class="glyphicon glyphicon-thumbs-up inline-button-spacer"></span></a>
+          {%endif%}
+          <a href="{% url 'pm_investigation_edit' investigation.slug %}"><span class="glyphicon glyphicon-edit"></span></a>
+        </div>
+      </div>
     </div>
     <div class="panel-body">
       {{investigation.description|safe}}
@@ -46,7 +55,7 @@
        glyphicon-stats"></span> Processes</a></li>
        <li role="presentation"><a href="#literature" aria-controls="literature" data-toggle="pill" role="tab"><span class="glyphicon
         glyphicon-book"></span> Literature</a></li>
-      <li role="presentation" class="pull-right"><a data-toggle="modal" data-target="#milestone-modal"><span class="glyphicon glyphicon-plus"></span> Milestone</a></li>
+      <li role="presentation" class="pull-right"><a href="{% url 'milestone_create' investigation.slug %}"><span class="glyphicon glyphicon-plus"></span> Milestone</a></li>
     </ul>
 </div>
 
@@ -137,27 +146,6 @@
   </div>
 
 </div>
-
-<section id="milestone-modal" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <header class="modal-header">
-                <button class="close" type="button" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">New Milestone</h3>
-            </header>
-            <form action="{% url 'milestone_create_action' %}" method="post" role="form">
-              {% csrf_token %}
-              <div class="modal-body">
-                  {% bootstrap_form milestone_form %}
-              </div>
-              <footer class="modal-footer">
-                  <a class="btn btn-default" data-dismiss="modal">Cancel</a>
-                  <button class="btn btn-primary" type="submit">Submit</button>
-              </footer>
-            </form>
-        </div>
-    </div>
-</section>
 
 {% endblock %}
 
