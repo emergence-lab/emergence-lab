@@ -35,44 +35,6 @@ class Project(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mode
         verbose_name = _('project')
         verbose_name_plural = _('projects')
 
-    # def is_owner(self, user):
-    #     groups = [self.owner_group]
-    #     return bool(set(groups) & set(user.groups.all()))
-    #
-    # def is_member(self, user):
-    #     groups = [self.owner_group, self.member_group]
-    #     return bool(set(groups) & set(user.groups.all()))
-    #
-    # def is_viewer(self, user):
-    #     groups = [self.owner_group, self.member_group, self.viewer_group]
-    #     return bool(set(groups) & set(user.groups.all()))
-    #
-    # def get_membership(self, user):
-    #     if self.is_owner(user):
-    #         return 'owner'
-    #     elif self.is_member(user):
-    #         return 'member'
-    #     elif self.is_viewer(user):
-    #         return 'viewer'
-    #     else:
-    #         return None
-    #
-    # def remove_user(self, user):
-    #     self.owner_group.custom_users.remove(user)
-    #     self.member_group.custom_users.remove(user)
-    #     self.viewer_group.custom_users.remove(user)
-    #
-    # def add_user(self, user, attribute):
-    #     if self.get_membership(user):
-    #         self.remove_user(user)
-    #     if attribute in ['owner', 'member', 'viewer']:
-    #         if attribute == 'owner':
-    #             user.groups.add(self.owner_group)
-    #         if attribute == 'member':
-    #             user.groups.add(self.member_group)
-    #         if attribute == 'viewer':
-    #             user.groups.add(self.viewer_group)
-
     def __str__(self):
         return self.name
 
@@ -91,18 +53,6 @@ class Investigation(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin
     class Meta:
         verbose_name = _('investigation')
         verbose_name_plural = _('investigations')
-
-    # def is_owner(self, user):
-    #     return self.project.is_owner(user)
-    #
-    # def is_member(self, user):
-    #     return self.project.is_member(user)
-    #
-    # def is_viewer(self, user):
-    #     return self.project.is_viewer(user)
-    #
-    # def get_membership(self, user):
-    #     return self.project.get_membership(user)
 
     @property
     def owner_group(self):
@@ -140,18 +90,6 @@ class Milestone(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mo
         verbose_name = _('milestone')
         verbose_name_plural = _('milestones')
 
-    # def is_owner(self, user):
-    #     return self.investigation.project.is_owner(user)
-    #
-    # def is_member(self, user):
-    #     return self.investigation.project.is_member(user)
-    #
-    # def is_viewer(self, user):
-    #     return self.investigation.project.is_viewer(user)
-    #
-    # def get_membership(self, user):
-    #     return self.investigation.project.get_membership(user)
-
     @property
     def owner_group(self):
         return self.investigation.owner_group
@@ -180,18 +118,6 @@ class MilestoneNote(AccessControlShortcutMixin, TimestampMixin, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
 
-    # def is_owner(self, user):
-    #     return self.milestone.is_owner(user)
-    #
-    # def is_member(self, user):
-    #     return self.milestone.is_member(user)
-    #
-    # def is_viewer(self, user):
-    #     return self.milestone.is_viewer(user)
-    #
-    # def get_membership(self, user):
-    #     return self.milestone.get_membership(user)
-
     @property
     def owner_group(self):
         return self.milestone.owner_group
@@ -217,18 +143,6 @@ class Task(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.
                                 null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
-
-    # def is_owner(self, user):
-    #     return self.milestone.is_owner(user)
-    #
-    # def is_member(self, user):
-    #     return self.milestone.is_member(user)
-    #
-    # def is_viewer(self, user):
-    #     return self.milestone.is_viewer(user)
-    #
-    # def get_membership(self, user):
-    #     return self.milestone.get_membership(user)
 
     @property
     def owner_group(self):
