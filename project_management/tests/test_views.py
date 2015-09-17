@@ -81,7 +81,7 @@ class TestProjectCRUD(TestCase):
         response = self.client.post(url, data)
         obj = Project.objects.get(id=obj.id)
         self.assertEqual(obj.description, data['description'])
-        list_url = reverse('pm_project_list')
+        list_url = reverse('pm_project_detail', args=(obj.slug,))
         self.assertRedirects(response, list_url)
 
     def test_project_detail_content(self):
@@ -154,7 +154,8 @@ class TestInvestigationCRUD(TestCase):
         self.assertContains(response, obj.name)
 
     def test_investigation_create_resolution_template(self):
-        url = '/dashboard/investigations/create'
+        proj = Project.objects.get(slug='project-1')
+        url = '/dashboard/investigations/create/{}'.format(proj.slug)
         match = resolve(url)
         self.assertEqual(match.url_name, 'pm_investigation_create')
         response = self.client.get(url)
@@ -167,12 +168,12 @@ class TestInvestigationCRUD(TestCase):
         match = resolve(url)
         self.assertEqual(match.url_name, 'pm_investigation_edit')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'project_management/investigation_create.html')
+        self.assertTemplateUsed(response, 'project_management/investigation_edit.html')
         self.assertEqual(response.status_code, 200)
 
     def test_investigation_create_valid_data(self):
         proj = Project.objects.get(slug='project-1')
-        url = reverse('pm_investigation_create')
+        url = reverse('pm_investigation_create', kwargs={'project': proj.slug})
         data = {'name': 'investigation 3', 'project': proj.id}
         response = self.client.post(url, data)
         obj = Investigation.objects.get(**data)
@@ -182,13 +183,15 @@ class TestInvestigationCRUD(TestCase):
         self.assertRedirects(response, detail_url)
 
     def test_investigation_create_empty_data(self):
-        url = reverse('pm_investigation_create')
+        proj = Project.objects.get(slug='project-1')
+        url = reverse('pm_investigation_create', args=(proj.slug,))
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',
             'This field is required.')
 
     def test_project_create_reserved_name(self):
-        url = reverse('pm_investigation_create')
+        proj = Project.objects.get(slug='project-1')
+        url = reverse('pm_investigation_create', args=(proj.slug,))
         data = {'name': 'activate'}
         response = self.client.post(url, data)
         self.assertFormError(response, 'form', 'name',
@@ -245,7 +248,8 @@ class TestMilestoneCRUD(TestCase):
         self.assertContains(response, obj.name)
 
     def test_milestone_create_resolution_template(self):
-        url = '/dashboard/milestones/create/'
+        investigation = Investigation.objects.get(slug='investigation-1')
+        url = '/dashboard/milestones/create/{}'.format(investigation.slug)
         match = resolve(url)
         self.assertEqual(match.url_name, 'milestone_create')
         response = self.client.get(url)
@@ -263,7 +267,7 @@ class TestMilestoneCRUD(TestCase):
 
     def test_milestone_create_valid_data(self):
         investigation = Investigation.objects.get(slug='investigation-1')
-        url = reverse('milestone_create')
+        url = reverse('milestone_create', args=(investigation.slug,))
         due_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
         data = {'name': 'Milestone 3', 'investigation': investigation.id,
             'user': get_user_model().objects.first().id, 'due_date': due_date}
@@ -276,7 +280,8 @@ class TestMilestoneCRUD(TestCase):
         self.assertRedirects(response, detail_url)
 
     def test_milestone_create_empty_data(self):
-        url = reverse('milestone_create')
+        investigation = Investigation.objects.get(slug='investigation-1')
+        url = reverse('milestone_create', args=(investigation.slug,))
         response = self.client.post(url, {})
         self.assertFormError(response, 'form', 'name',
             'This field is required.')

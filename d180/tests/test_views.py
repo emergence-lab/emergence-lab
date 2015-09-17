@@ -26,14 +26,14 @@ class TestPlatterCRUD(TestCase):
         self.assertTemplateUsed(response, 'd180/platter_list.html')
         self.assertEqual(response.status_code, 200)
 
-    def test_project_list_content(self):
+    def test_platter_list_content(self):
         platters = [
             mommy.make(Platter),
             mommy.make(Platter),
             mommy.make(Platter),
             mommy.make(Platter),
         ]
-        url = reverse('project_list')
+        url = reverse('platter_list')
         response = self.client.get(url)
         for platter in platters:
             self.assertContains(response, platter.serial)
