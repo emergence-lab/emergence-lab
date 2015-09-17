@@ -5,7 +5,7 @@ from django import forms
 
 from datetimewidget.widgets import DateWidget
 
-from core.models import Investigation, ProjectTracking, Project, Milestone, Task, MilestoneNote
+from core.models import Investigation, Project, Milestone, Task, MilestoneNote
 
 
 class MilestoneForm(forms.ModelForm):
@@ -50,15 +50,17 @@ class MilestoneSimpleForm(forms.ModelForm):
 
 class InvestigationForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')
-        super(InvestigationForm, self).__init__(*args, **kwargs)
-        projects_tracked = [x.project for x in ProjectTracking.objects.filter(user=user)]
-        projects_owned = [x.id for x in projects_tracked if x.is_owner(user)]
-        # project_tracking = (ProjectTracking.objects.filter(user=user)
-        #                                            .values_list('project_id', flat=True))
-        projects = Project.objects.filter(id__in=projects_owned)
-        self.fields['project'].queryset = projects
+    # def __init__(self, *args, **kwargs):
+    #     # user = kwargs.pop('user')
+    #     super(InvestigationForm, self).__init__(*args, **kwargs)
+    #     user = self.initial['user']
+    #     projects_tracked = [x.project.id for x in ProjectTracking.objects.filter(user=user)
+    #                         if x.project.is_owner(user)]
+    #     # projects_owned = [x.id for x in projects_tracked if x.is_owner(user)]
+    #     # project_tracking = (ProjectTracking.objects.filter(user=user)
+    #     #                                            .values_list('project_id', flat=True))
+    #     projects = Project.objects.filter(id__in=projects_tracked)
+    #     self.fields['project'].queryset = projects
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -79,6 +81,7 @@ class InvestigationForm(forms.ModelForm):
         fields = ('name', 'description', 'project',)
         widgets = {
             'description': forms.Textarea(attrs={'class': 'hallo'}),
+            'project': forms.HiddenInput(),
         }
 
 
