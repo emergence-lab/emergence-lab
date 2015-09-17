@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 from django.core.urlresolvers import reverse
 from django.views import generic
 
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, StaffuserRequiredMixin, UserPassesTestMixin
 
 from core.views import NeverCacheMixin, AccessControlMixin, ActionReloadView
 from core.models import ProjectTracking, Project, User
@@ -62,12 +62,13 @@ class ProjectDetailView(ProjectAccessControlMixin, generic.DetailView):
         return context
 
 
-class AddUserToProjectGroupView(ProjectAccessControlMixin, ActionReloadView):
+class AddUserToProjectGroupView(UserPassesTestMixin, ActionReloadView):
 
-    membership = 'owner'
+    def test_func(self, user):
+        self.project = Project.objects.get(slug=self.kwargs.get('slug'))
+        return (self.project.is_owner(user) or user.is_staff)
 
     def perform_action(self, request, *args, **kwargs):
-        self.project = Project.objects.get(slug=kwargs.pop('slug'))
         user = User.objects.get(username=kwargs.pop('username'))
         attribute = kwargs.pop('attribute')
         self.project.add_user(user, attribute)
@@ -76,14 +77,26 @@ class AddUserToProjectGroupView(ProjectAccessControlMixin, ActionReloadView):
         return reverse('pm_project_detail', kwargs={'slug': self.project.slug})
 
 
-class RemoveUserFromProjectGroup(ProjectAccessControlMixin, ActionReloadView):
+class RemoveUserFromProjectGroup(UserPassesTestMixin, ActionReloadView):
 
-    membership = 'owner'
+    def test_func(self, user):
+        self.project = Project.objects.get(slug=self.kwargs.get('slug'))
+        return (self.project.is_owner(user) or user.is_staff)
 
     def perform_action(self, request, *args, **kwargs):
-        self.project = Project.objects.get(slug=kwargs.pop('slug'))
         user = User.objects.get(username=kwargs.pop('username'))
         self.project.remove_user(user)
 
     def get_redirect_url(self, **kwargs):
         return reverse('pm_project_detail', kwargs={'slug': self.project.slug})
+
+
+class ProjectGroupAdminView(StaffuserRequiredMixin, generic.TemplateView):
+
+    template_name = 'project_management/project_admin.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectGroupAdminView, self).get_context_data(**kwargs)
+        context['users'] = User.objects.all()
+        context['projects'] = Project.objects.all()
+        return context

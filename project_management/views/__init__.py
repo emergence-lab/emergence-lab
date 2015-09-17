@@ -25,7 +25,8 @@ from projects import (ProjectListView,
                       ProjectUpdateView,
                       ProjectDetailView,
                       AddUserToProjectGroupView,
-                      RemoveUserFromProjectGroup,)
+                      RemoveUserFromProjectGroup,
+                      ProjectGroupAdminView,)
 from tasks import (TaskListView,
                    TaskCreateView,
                    TaskCloseView,

@@ -30,6 +30,9 @@
             {# <li><a href="{% url 'pm_investigation_create' %}">Investigation</a></li>#}
           </ul>
         </li>
+        {% if user.is_staff %}
+        <li role="presentation"><a href="{% url 'pm_project_admin' %}" role="tab"><span class="glyphicon glyphicon-cog"></span> Administration</a></li> 
+        {% endif %}
         <h4 class="pull-right">This page lists the projects that you track.</h4>
       </ul>
   </div>

@@ -18,4 +18,6 @@ urlpatterns = [
     url(r'^group_remove/(?P<slug>[\w-]+)/(?P<username>[\w-]+)/$',
         views.RemoveUserFromProjectGroup.as_view(),
         name='pm_project_group_remove'),
+    url(r'^admin$', views.ProjectGroupAdminView.as_view(),
+        name='pm_project_admin'),
 ]
