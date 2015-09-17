@@ -41,8 +41,6 @@ urlpatterns = [
         name='operator_deactivate'),
 
     url(r'^projects/', include('core.urls.project')),
-    url(r'^investigations/$',
-        core.views.InvestigationListView.as_view(), name='investigation_list'),
 
 
     # sample/process urls
