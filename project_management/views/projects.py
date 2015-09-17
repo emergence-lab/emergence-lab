@@ -7,6 +7,7 @@ from braces.views import LoginRequiredMixin
 
 from core.views import NeverCacheMixin, AccessControlMixin, ActionReloadView
 from core.models import ProjectTracking, Project, User
+from core.forms import CreateProjectForm
 
 
 class ProjectAccessControlMixin(AccessControlMixin):
@@ -38,24 +39,26 @@ class ProjectUpdateView(ProjectAccessControlMixin, generic.UpdateView):
 
     model = Project
     template_name = 'project_management/project_edit.html'
-    fields = '__all__'
+    form_class = CreateProjectForm
 
     membership = 'owner'
 
     def get_success_url(self):
-        return reverse('pm_project_list')
+        return reverse('pm_project_detail', args=(self.object.slug,))
 
 
 class ProjectDetailView(ProjectAccessControlMixin, generic.DetailView):
 
-    model = Project
     template_name = 'project_management/project_detail.html'
+    model = Project
 
     membership = 'viewer'
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         context['users'] = User.objects.all()
+        context['investigation_list'] = sorted(self.project.investigation_set.all(),
+                                               key=lambda x: x.is_active, reverse=True)
         return context
 
 

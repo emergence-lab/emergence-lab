@@ -10,7 +10,7 @@ from datetime import datetime
 from braces.views import LoginRequiredMixin
 
 from core.views import ActionReloadView, AccessControlMixin
-from core.models import Milestone, MilestoneNote
+from core.models import Milestone, MilestoneNote, Investigation
 
 from project_management.forms import MilestoneForm, TaskForm, MilestoneNoteForm
 
@@ -47,6 +47,24 @@ class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'project_management/milestone_create.html'
     form_class = MilestoneForm
 
+    def get_initial(self):
+        self.investigation = Investigation.objects.get(slug=self.kwargs.get('investigation'))
+        initial = super(MilestoneCreateView, self).get_initial()
+        initial['investigation'] = self.investigation
+        initial['user'] = self.request.user
+        return initial
+
+    def post(self, request, *args, **kwargs):
+        self.investigation = Investigation.objects.get(slug=kwargs.get('investigation'))
+        if self.investigation.is_owner(self.request.user):
+            return super(MilestoneCreateView, self).post(request, *args, **kwargs)
+        else:
+            self.object = None
+            form = self.get_form()
+            form.add_error('investigation',
+                'You do not have permission to create a milestone for this investigation.')
+            return self.form_invalid(form)
+
     def get_success_url(self):
         return reverse('milestone_detail', kwargs={'slug': self.object.slug})
 
@@ -68,12 +86,12 @@ class MilestoneCloseView(MilestoneAccessControlMixin, ActionReloadView):
     membership = 'owner'
 
     def perform_action(self, request, *args, **kwargs):
-        slug = kwargs.pop('slug')
-        milestone = Milestone.objects.get(slug=slug)
+        self.slug = kwargs.pop('slug')
+        milestone = Milestone.objects.get(slug=self.slug)
         milestone.deactivate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('milestone_list')
+        return reverse('milestone_detail', kwargs={'slug': self.slug})
 
 
 class MilestoneReOpenView(MilestoneAccessControlMixin, ActionReloadView):
@@ -81,12 +99,12 @@ class MilestoneReOpenView(MilestoneAccessControlMixin, ActionReloadView):
     membership = 'owner'
 
     def perform_action(self, request, *args, **kwargs):
-        slug = kwargs.pop('slug')
-        milestone = Milestone.objects.get(slug=slug)
+        self.slug = kwargs.pop('slug')
+        milestone = Milestone.objects.get(slug=self.slug)
         milestone.activate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('milestone_list')
+        return reverse('milestone_detail', kwargs={'slug': self.slug})
 
 
 class MilestoneDetailView(MilestoneAccessControlMixin, generic.ListView):
@@ -113,23 +131,7 @@ class MilestoneDetailView(MilestoneAccessControlMixin, generic.ListView):
         context['inactive_tasks'] = tasks.filter(is_active=False)[:20]
         context['note_form'] = MilestoneNoteForm()
         context['task_form'] = TaskForm()
-        context['rbac_owner'] = self.milestone.is_owner(self.request.user)
-        context['rbac_member'] = self.milestone.is_member(self.request.user)
         return context
-
-
-class MilestoneCreateAction(LoginRequiredMixin, generic.View):
-
-    def post(self, request, *args, **kwargs):
-        milestone_form = MilestoneForm(request.POST)
-        if milestone_form.is_valid():
-            investigation = milestone_form.cleaned_data['investigation']
-            if investigation.is_owner(self.request.user):
-                milestone_form.save()
-        else:
-            HttpResponseRedirect(reverse('dashboard'))
-        return HttpResponseRedirect(reverse('pm_investigation_detail',
-            kwargs={'slug': investigation.slug}))
 
 
 class MilestoneNoteAction(LoginRequiredMixin, generic.View):
