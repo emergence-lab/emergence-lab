@@ -48,7 +48,9 @@ class Investigation(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin
     name = models.CharField(_('name'), max_length=45)
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
-    project = models.ForeignKey(Project, verbose_name=_('project'))
+    project = models.ForeignKey(Project, verbose_name=_('project'),
+                                related_name='investigations',
+                                related_query_name='investigation')
 
     class Meta:
         verbose_name = _('investigation')
@@ -80,7 +82,7 @@ class Milestone(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mo
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
     investigation = models.ForeignKey(Investigation,
-                                related_name='milestone',
+                                related_name='milestones',
                                 related_query_name='milestone',
                                 null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,

@@ -57,7 +57,7 @@ class ProjectDetailView(ProjectAccessControlMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         context['users'] = User.objects.all()
-        context['investigation_list'] = sorted(self.project.investigation_set.all(),
+        context['investigation_list'] = sorted(self.project.investigations.all(),
                                                key=lambda x: x.is_active, reverse=True)
         return context
 

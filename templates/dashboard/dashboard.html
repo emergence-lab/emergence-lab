@@ -110,7 +110,7 @@
                     {{ p.description|safe|truncatewords:50 }}
                 </div>
                 <ul id="invest_list_{{p.id}}" class="list-group">
-                    {% for i in p.investigation_set.all %}
+                    {% for i in p.investigations.all %}
                     <li class="list-group-item">
                         <a href="{% url 'investigation_detail_dashboard' project=p.slug slug=i.slug%}"> {{ i }}</a>
                     </li>

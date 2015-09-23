@@ -78,7 +78,7 @@
                 <p>{{ p.description|safe|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                   {% if i.is_active %}
                     <li class="list-group-item">
                         <h4 class="list-group-item-heading">
@@ -102,7 +102,7 @@
                     </li>
                   {% endif %}
                 {% endfor %}
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                   {% if not i.is_active %}
                     <li class="list-group-item list-group-item-danger">
                         <h4 class="list-group-item-heading">
@@ -145,7 +145,7 @@
                 <p>{{ p.description|safe|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                 <li class="list-group-item">
                   <h4 class="list-group-item-heading">
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
@@ -173,7 +173,7 @@
                 <p>{{ p.description|safe|truncatewords:50 }}<p>
             </div>
             <ul id="_invest_list_{{p.id}}" class="list-group">
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                 <li class="list-group-item">
                   <h4 class="list-group-item-heading">
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
