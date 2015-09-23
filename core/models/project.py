@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 import autoslug
 
 from .mixins import ActiveStateMixin, TimestampMixin, AccessControlShortcutMixin
-from .user import User
 from . import fields
 
 
@@ -37,6 +36,10 @@ class Project(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mode
 
     def __str__(self):
         return self.name
+
+    def milestones(self):
+        investigation_ids = self.investigations.values_list('id', flat=True)
+        return Milestone.objects.filter(investigation_id__in=investigation_ids)
 
 
 @python_2_unicode_compatible
@@ -164,7 +167,7 @@ class ProjectTracking(models.Model):
     Stores ownership and tracking information for projects.
     """
     project = models.ForeignKey(Project)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey('User')
     is_owner = models.BooleanField(default=False)
 
 

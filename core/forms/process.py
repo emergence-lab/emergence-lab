@@ -7,8 +7,7 @@ from django import forms
 
 from crispy_forms import helper, layout
 
-from core.models import (DataFile, Process, ProcessTemplate, Milestone,
-                         Investigation, Project)
+from core.models import DataFile, Process, ProcessTemplate
 
 
 class DropzoneForm(forms.ModelForm):
@@ -28,13 +27,11 @@ class ProcessCreateForm(forms.ModelForm):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
         process_type = kwargs.pop('process_type', None)
         super(ProcessCreateForm, self).__init__(*args, **kwargs)
-        milestones = [x.id for x in Milestone.objects.filter(is_active=True) if x.is_member(user)]
-        projs = [x.id for x in Project.objects.filter(is_active=True) if x.is_member(user)]
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
         self.fields['investigations'].required = False
-        self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
-        self.fields['milestones'].queryset = Milestone.objects.filter(id__in=milestones)
+        self.fields['investigations'].queryset = user.get_investigations('member')
+        self.fields['milestones'].queryset = user.get_milestones('member')
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
         if len(pieces) == 1:
@@ -64,13 +61,9 @@ class WizardBasicInfoForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
         self.fields['investigations'].required = False
-        milestones = [x.id for x in Milestone.objects.filter(is_active=True) if x.is_member(user)]
-        projs = [x.id for x in Project.objects.filter(is_active=True) if x.is_member(user)]
-        # projs = (ProjectTracking.objects.filter(user=user)
-        #                                 .values_list('project_id', flat=True))
-        self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
+        self.fields['investigations'].queryset = user.get_investigations('member')
         self.fields['milestones'].required = False
-        self.fields['milestones'].queryset = Milestone.objects.filter(id__in=milestones)
+        self.fields['milestones'].queryset = user.get_milestones('member')
         self.helper = helper.FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True

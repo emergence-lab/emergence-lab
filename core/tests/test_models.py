@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample, Process, Project
+from core.models import Sample, Process, Project, Investigation, Milestone
 
 
 class TestSampleManager(TestCase):
@@ -521,3 +521,130 @@ class TestProject(TestCase):
     def test_membership_heirarchy(self):
         self.project.add_user(self.user, 'viewer')
         self.assertFalse(self.project.is_owner(self.user))
+
+
+class TestUser(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('default', password='')
+
+    def test_get_projects_none_exist(self):
+        """Test that an empty queryset is returned if no projects exist."""
+        self.assertFalse(self.user.get_projects('viewer').exists())
+
+    def test_get_projects_none_with_permission(self):
+        """
+        Test that an empty queryset is returned if no projects exist with
+        the proper permissions for the specified user.
+        """
+        project = mommy.make(Project)
+        self.assertFalse(self.user.get_projects('viewer').exists())
+        user2 = get_user_model().objects.create_user('alternative', password='')
+        project.add_user(user2, 'owner')
+        self.assertFalse(self.user.get_projects('viewer').exists())
+
+    def test_get_projects_permission(self):
+        """Test that the permissions filtering works."""
+        project = mommy.make(Project)
+        project2 = Project.objects.create(name='project2')
+        # Viewer
+        project.add_user(self.user, 'viewer')
+        self.assertFalse(self.user.get_projects('owner').exists())
+        self.assertFalse(self.user.get_projects('member').exists())
+        self.assertTrue(self.user.get_projects('viewer').exists())
+        # Member
+        project.add_user(self.user, 'member')
+        self.assertFalse(self.user.get_projects('owner').exists())
+        self.assertTrue(self.user.get_projects('member').exists())
+        self.assertTrue(self.user.get_projects('viewer').exists())
+        # Owner
+        project.add_user(self.user, 'owner')
+        self.assertTrue(self.user.get_projects('owner').exists())
+        self.assertTrue(self.user.get_projects('member').exists())
+        self.assertTrue(self.user.get_projects('viewer').exists())
+
+    def test_get_investigations_none_exist(self):
+        """Test that an empty queryset is returned if no investigations exist."""
+        self.assertFalse(self.user.get_investigations('viewer').exists())
+
+    def test_get_investigations_none_with_permission(self):
+        """
+        Test that an empty queryset is returned if no investigations exist with
+        the proper permissions for the specified user.
+        """
+        project = mommy.make(Project)
+        investigation = mommy.make(Investigation, project=project)
+        self.assertFalse(self.user.get_investigations('viewer').exists())
+        user2 = get_user_model().objects.create_user('alternative', password='')
+        investigation.add_user(user2, 'owner')
+        self.assertFalse(self.user.get_investigations('viewer').exists())
+
+    def test_get_investigations_permission(self):
+        """Test that the permissions filtering works."""
+        project = mommy.make(Project)
+        investigation = mommy.make(Investigation, project=project)
+        alt_investigation = mommy.make(Investigation, project=project)
+        project2 = Project.objects.create(name='project2')
+        mommy.make(Investigation, project=project2)
+        # Viewer
+        investigation.add_user(self.user, 'viewer')
+        self.assertFalse(self.user.get_investigations('owner').exists())
+        self.assertFalse(self.user.get_investigations('member').exists())
+        self.assertTrue(self.user.get_investigations('viewer').exists())
+        self.assertQuerysetEqual(self.user.get_investigations('viewer').order_by('id'),
+                                 [repr(investigation), repr(alt_investigation)])
+        # Member
+        investigation.add_user(self.user, 'member')
+        self.assertFalse(self.user.get_investigations('owner').exists())
+        self.assertTrue(self.user.get_investigations('member').exists())
+        self.assertTrue(self.user.get_investigations('viewer').exists())
+        # Owner
+        investigation.add_user(self.user, 'owner')
+        self.assertTrue(self.user.get_investigations('owner').exists())
+        self.assertTrue(self.user.get_investigations('member').exists())
+        self.assertTrue(self.user.get_investigations('viewer').exists())
+
+
+    def test_get_milestones_none_exist(self):
+        """Test that an empty queryset is returned if no milestones exist."""
+        self.assertFalse(self.user.get_milestones('viewer').exists())
+
+    def test_get_milestones_none_with_permission(self):
+        """
+        Test that an empty queryset is returned if no milestones exist with
+        the proper permissions for the specified user.
+        """
+        project = mommy.make(Project)
+        investigation = mommy.make(Investigation, project=project)
+        milestone = mommy.make(Milestone, investigation=investigation)
+        self.assertFalse(self.user.get_milestones('viewer').exists())
+        user2 = get_user_model().objects.create_user('alternative', password='')
+        milestone.add_user(user2, 'owner')
+        self.assertFalse(self.user.get_milestones('viewer').exists())
+
+    def test_get_milestones_permission(self):
+        """Test that the permissions filtering works."""
+        project = mommy.make(Project)
+        investigation = mommy.make(Investigation, project=project)
+        milestone = mommy.make(Milestone, investigation=investigation)
+        alt_milestone = mommy.make(Milestone, investigation=investigation)
+        project2 = Project.objects.create(name='project2')
+        investigation2 = mommy.make(Investigation, project=project2)
+        mommy.make(Milestone, investigation=investigation2)
+        # Viewer
+        milestone.add_user(self.user, 'viewer')
+        self.assertFalse(self.user.get_milestones('owner').exists())
+        self.assertFalse(self.user.get_milestones('member').exists())
+        self.assertTrue(self.user.get_milestones('viewer').exists())
+        self.assertQuerysetEqual(self.user.get_milestones('viewer').order_by('id'),
+                                 [repr(milestone), repr(alt_milestone)])
+        # Member
+        milestone.add_user(self.user, 'member')
+        self.assertFalse(self.user.get_milestones('owner').exists())
+        self.assertTrue(self.user.get_milestones('member').exists())
+        self.assertTrue(self.user.get_milestones('viewer').exists())
+        # Owner
+        milestone.add_user(self.user, 'owner')
+        self.assertTrue(self.user.get_milestones('owner').exists())
+        self.assertTrue(self.user.get_milestones('member').exists())
+        self.assertTrue(self.user.get_milestones('viewer').exists())
