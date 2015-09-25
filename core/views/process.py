@@ -118,7 +118,13 @@ class RunProcessView(LoginRequiredMixin, generic.CreateView):
             sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
         except Sample.DoesNotExist as e:
             raise Http404(e)
-        return form_class(pieces=sample.pieces, **self.get_form_kwargs())
+        return form_class(pieces=sample.pieces, user=self.request.user, **self.get_form_kwargs())
+
+    def get_form_kwargs(self):
+        kwargs = super(RunProcessView, self).get_form_kwargs()
+        # kwargs['user'] = self.request.user
+        kwargs['process_type'] = self.process_type
+        return kwargs
 
     def form_valid(self, form):
         self.object = form.save(commit=False)

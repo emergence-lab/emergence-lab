@@ -5,8 +5,8 @@ from .base import *
 
 # Debugging
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 
 # Authentication
@@ -28,6 +28,7 @@ DATABASES = {
 # Password hashing
 
 PASSWORD_MANAGER = ('django.contrib.auth.hashers.MD5PasswordHasher',)
+PASSWORD_HASHER = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 
 
 # Model Mommy
@@ -48,3 +49,11 @@ INSTALLED_APPS += (
 )
 
 REDIS_DB = 1
+
+# Logging
+
+logging.disable(logging.critical)
+
+# File storages
+
+DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'

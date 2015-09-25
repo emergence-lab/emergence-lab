@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^list/$',
         views.MilestoneListView.as_view(),
         name='milestone_list'),
-    url(r'^create/$',
+    url(r'^create/(?P<investigation>[\w-]+)$',
         views.MilestoneCreateView.as_view(),
         name='milestone_create'),
     url(r'^detail/(?P<slug>[\w-]+)$',
@@ -27,7 +27,4 @@ urlpatterns = [
     url(r'^note/$',
         views.MilestoneNoteAction.as_view(),
         name='milestone_note_action'),
-    url(r'^add/$',
-        views.MilestoneCreateAction.as_view(),
-        name='milestone_create_action'),
     ]

@@ -127,3 +127,47 @@ class UUIDMixin(models.Model):
         elif len(uuid) == len(cls.prefix) + cls.short_length:
             return uuid[len(cls.prefix):]
         return uuid
+
+
+class AccessControlShortcutMixin(object):
+    """
+    Mixin to add access control methods to model classes
+    """
+
+    def is_owner(self, user):
+        groups = [self.owner_group]
+        return bool(set(groups) & set(user.groups.all()))
+
+    def is_member(self, user):
+        groups = [self.owner_group, self.member_group]
+        return bool(set(groups) & set(user.groups.all()))
+
+    def is_viewer(self, user):
+        groups = [self.owner_group, self.member_group, self.viewer_group]
+        return bool(set(groups) & set(user.groups.all()))
+
+    def get_membership(self, user):
+        if self.is_owner(user):
+            return 'owner'
+        elif self.is_member(user):
+            return 'member'
+        elif self.is_viewer(user):
+            return 'viewer'
+        else:
+            return None
+
+    def remove_user(self, user):
+        self.owner_group.custom_users.remove(user)
+        self.member_group.custom_users.remove(user)
+        self.viewer_group.custom_users.remove(user)
+
+    def add_user(self, user, attribute):
+        if self.get_membership(user):
+            self.remove_user(user)
+        if attribute in ['owner', 'member', 'viewer']:
+            if attribute == 'owner':
+                user.groups.add(self.owner_group)
+            if attribute == 'member':
+                user.groups.add(self.member_group)
+            if attribute == 'viewer':
+                user.groups.add(self.viewer_group)

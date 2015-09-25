@@ -7,3 +7,4 @@ flake8
 pep8-naming
 tox
 model_mommy==1.2.5
+django-inmemorystorage

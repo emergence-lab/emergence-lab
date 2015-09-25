@@ -11,9 +11,12 @@
 
 <nav>
     <ol class="breadcrumb">
-        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'milestone_list' %}">Milestones</a></li>
-        <li class="active">Update Milestone</li>
+      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
+      <li><a href="{% url 'pm_project_detail' slug=milestone.investigation.project.slug  %}">{{milestone.investigation.project.name}}</a></li>
+      <li><a href="{% url 'pm_investigation_detail' slug=milestone.investigation.slug %}">{{milestone.investigation.name}}</a></li>
+      <li><a href="{% url 'milestone_detail' slug=milestone.slug %}">{{milestone.name|truncatewords:4}}</a></li>
+      <li class='active'>Edit Milestone</li>
     </ol>
 </nav>
 

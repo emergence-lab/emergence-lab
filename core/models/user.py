@@ -13,6 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 
 from .mixins import ActiveStateMixin
+from .project import Project, Milestone, Investigation, ProjectTracking
 
 
 def _user_get_all_permissions(user, obj):
@@ -71,7 +72,7 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         related_name='custom_users', related_query_name='custom_user')
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    projects = models.ManyToManyField('Project', through='ProjectTracking',
+    projects = models.ManyToManyField(Project, through=ProjectTracking,
         verbose_name=_('tracked projects'), blank=True,
         help_text=_('Projects this user is tracking'),
         related_name='users', related_query_name='user')
@@ -99,6 +100,51 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def get_projects(self, permission):
+        """
+        Returns a queryset of projects that the user has the specified
+        permissions on.
+
+        :param permission: Should be one of 'owner', 'member', or 'viewer'
+                           depending on the desired permission desired.
+        """
+        group_ids = self.groups.values_list('id', flat=True)
+        if permission == 'owner':
+            permission_filters = models.Q(owner_group_id__in=group_ids)
+        elif permission == 'member':
+            permission_filters = (models.Q(owner_group_id__in=group_ids) |
+                                  models.Q(member_group_id__in=group_ids))
+        elif permission == 'viewer':
+            permission_filters = (models.Q(owner_group_id__in=group_ids) |
+                                  models.Q(member_group_id__in=group_ids) |
+                                  models.Q(viewer_group_id__in=group_ids))
+        else:
+            raise ValueError('Permission {} is not valid. Should be one of '
+                             'owner, member, or viewer'.format(permission))
+        return Project.objects.filter(permission_filters)
+
+    def get_investigations(self, permission):
+        """
+        Returns a queryset of investigations that the user has the specified
+        permissions on.
+
+        :param permission: Should be one of 'owner', 'member', or 'viewer'
+                           depending on the desired permission desired.
+        """
+        project_ids = self.get_projects(permission).values_list('id', flat=True)
+        return Investigation.objects.filter(project_id__in=project_ids)
+
+    def get_milestones(self, permission):
+        """
+        Returns a queryset of milestones that the user has the specified
+        permissions on.
+
+        :param permission: Should be one of 'owner', 'member', or 'viewer'
+                           depending on the desired permission desired.
+        """
+        investigation_ids = self.get_investigations(permission).values_list('id', flat=True)
+        return Milestone.objects.filter(investigation_id__in=investigation_ids)
 
     def get_group_permissions(self, obj=None):
         """

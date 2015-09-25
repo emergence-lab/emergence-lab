@@ -110,38 +110,40 @@ class TestUserCRUD(TestCase):
 class TestProjectCRUD(TestCase):
 
     def setUp(self):
-        mommy.make(Project, name='project 1', slug='project-1', is_active=True)
-        mommy.make(Project, name='project 2', slug='project-2', is_active=False)
+        proj1 = mommy.make(Project, name='project 1', slug='project-1', is_active=True)
+        proj2 = mommy.make(Project, name='project 2', slug='project-2', is_active=False)
         self.user = get_user_model().objects.create_user('username1',
                                                          password='')
+        proj1.add_user(self.user, 'owner')
+        proj2.add_user(self.user, 'owner')
         self.client.login(username='username1', password='')
 
     def test_project_list_resolution_template(self):
-        url = '/projects/'
+        url = '/dashboard/projects/'
         match = resolve(url)
-        self.assertEqual(match.url_name, 'project_list')
+        self.assertEqual(match.url_name, 'pm_project_list')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/project_list.html')
+        self.assertTemplateUsed(response, 'project_management/project_list.html')
         self.assertEqual(response.status_code, 200)
 
     def test_project_list_content(self):
-        url = reverse('project_list')
+        url = reverse('pm_project_list')
         response = self.client.get(url)
         for project in Project.objects.all():
             self.assertContains(response, project.name)
 
     def test_project_detail_resolution_template(self):
         obj = Project.objects.filter(is_active=True).first()
-        url = '/projects/{0}/'.format(obj.slug)
+        url = '/dashboard/projects/detail/{0}'.format(obj.slug)
         match = resolve(url)
-        self.assertEqual(match.url_name, 'project_detail_all')
+        self.assertEqual(match.url_name, 'pm_project_detail')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/project_detail.html')
+        self.assertTemplateUsed(response, 'project_management/project_detail.html')
         self.assertEqual(response.status_code, 200)
 
     def test_project_detail_content(self):
         obj = Project.objects.filter(is_active=True).first()
-        url = reverse('project_detail_all', args=(obj.slug,))
+        url = reverse('pm_project_detail', args=(obj.slug,))
         response = self.client.get(url)
         self.assertContains(response, obj.name)
 
@@ -155,31 +157,31 @@ class TestProjectCRUD(TestCase):
 
     def test_project_update_resolution_template(self):
         obj = Project.objects.filter(is_active=True).first()
-        url = '/projects/{0}/edit/'.format(obj.slug)
+        url = '/dashboard/projects/edit/{0}'.format(obj.slug)
         match = resolve(url)
-        self.assertEqual(match.url_name, 'project_update')
+        self.assertEqual(match.url_name, 'pm_project_edit')
         response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/project_update.html')
+        self.assertTemplateUsed(response, 'project_management/project_edit.html')
         self.assertEqual(response.status_code, 200)
 
     def test_project_activate(self):
         obj = Project.objects.filter(is_active=False).first()
         url = reverse('project_activate', args=(obj.slug,))
-        list_url = reverse('pm_project_list')
+        redirect_url = reverse('pm_project_detail', args=(obj.slug,))
         response = self.client.get(url)
         obj = Project.objects.get(id=obj.id)
 
-        self.assertRedirects(response, list_url)
+        self.assertRedirects(response, redirect_url)
         self.assertTrue(obj.is_active)
 
     def test_project_deactivate(self):
         obj = Project.objects.filter(is_active=True).first()
         url = reverse('project_deactivate', args=(obj.slug,))
-        list_url = reverse('pm_project_list')
+        redirect_url = reverse('pm_project_detail', args=(obj.slug,))
         response = self.client.get(url)
         obj = Project.objects.get(id=obj.id)
 
-        self.assertRedirects(response, list_url)
+        self.assertRedirects(response, redirect_url)
         self.assertFalse(obj.is_active)
 
     def test_project_track(self):
@@ -229,23 +231,25 @@ class TestProjectCRUD(TestCase):
 
     def test_project_update_valid_data(self):
         obj = Project.objects.filter(is_active=True).first()
-        url = reverse('project_update', args=(obj.slug,))
-        data = {'description': 'test description'}
+        url = reverse('pm_project_edit', args=(obj.slug,))
+        data = {'name': obj.name, 'description': 'test description'}
         response = self.client.post(url, data)
         obj = Project.objects.get(id=obj.id)
         self.assertEqual(obj.description, data['description'])
-        detail_url = reverse('project_detail_all', args=(obj.slug,))
+        detail_url = reverse('pm_project_detail', args=(obj.slug,))
         self.assertRedirects(response, detail_url)
 
 
 class TestInvestigationCRUD(TestCase):
 
     def setUp(self):
-        get_user_model().objects.create_user('username1', password='')
+        user = get_user_model().objects.create_user('username1', password='')
         project1 = mommy.make(Project, name='project 1', slug='project-1',
                               is_active=True)
         project2 = mommy.make(Project, name='project 2', slug='project-2',
                               is_active=False)
+        user.groups.add(project1.owner_group)
+        user.groups.add(project2.owner_group)
 
         mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
@@ -254,108 +258,32 @@ class TestInvestigationCRUD(TestCase):
         self.client.login(username='username1', password='')
 
     def test_project_list_investigation_content(self):
-        url = reverse('project_list')
+        url = reverse('pm_project_list')
         response = self.client.get(url)
         for investigation in Investigation.objects.all():
-            if investigation.project.is_active:
-                self.assertContains(response, investigation.name)
-            else:
-                self.assertNotContains(response, investigation.name)
-
-    def test_investigation_detail_resolution_template(self):
-        obj = Investigation.objects.filter(is_active=False).first()
-        proj = obj.project
-        url = '/projects/{0}/{1}/'.format(proj.slug, obj.slug)
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'investigation_detail_all')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/investigation_detail.html')
-        self.assertEqual(response.status_code, 200)
-
-    def test_investigation_detail_content(self):
-        obj = Investigation.objects.filter(is_active=False).first()
-        proj = obj.project
-        url = reverse('investigation_detail_all', args=(proj.slug, obj.slug))
-        response = self.client.get(url)
-        self.assertContains(response, obj.name)
-
-    def test_investigation_create_resolution_template(self):
-        proj = Project.objects.filter(is_active=True).first()
-        url = '/projects/{0}/add-investigation/'.format(proj.slug)
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'investigation_create')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/investigation_create.html')
-        self.assertEqual(response.status_code, 200)
-
-    def test_investigation_update_resolution_template(self):
-        obj = Investigation.objects.filter(is_active=False).first()
-        proj = obj.project
-        url = '/projects/{0}/{1}/edit/'.format(proj.slug, obj.slug)
-        match = resolve(url)
-        self.assertEqual(match.url_name, 'investigation_update')
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'core/investigation_update.html')
-        self.assertEqual(response.status_code, 200)
+            self.assertContains(response, investigation.name)
 
     def test_investigation_activate(self):
         obj = Investigation.objects.filter(is_active=False).first()
         proj = obj.project
         url = reverse('investigation_activate', args=(proj.slug, obj.slug))
-        list_url = reverse('pm_project_list')
+        redirect_url = reverse('pm_investigation_detail', args=(obj.slug,))
         response = self.client.get(url)
         obj = Investigation.objects.get(id=obj.id)
 
-        self.assertRedirects(response, list_url)
+        self.assertRedirects(response, redirect_url)
         self.assertTrue(obj.is_active)
 
     def test_investigation_deactivate(self):
         obj = Investigation.objects.filter(is_active=True).first()
         proj = obj.project
         url = reverse('investigation_deactivate', args=(proj.slug, obj.slug))
-        list_url = reverse('pm_project_list')
+        redirect_url = reverse('pm_investigation_detail', args=(obj.slug,))
         response = self.client.get(url)
         obj = Investigation.objects.get(id=obj.id)
 
-        self.assertRedirects(response, list_url)
+        self.assertRedirects(response, redirect_url)
         self.assertFalse(obj.is_active)
-
-    def test_investigation_create_valid_data(self):
-        proj = Project.objects.filter(is_active=True).first()
-        url = reverse('investigation_create', args=(proj.slug,))
-        data = {'name': 'investigation 3'}
-        response = self.client.post(url, data)
-        obj = Investigation.objects.get(**data)
-        self.assertEqual(obj.slug, 'investigation-3')
-        detail_url = reverse('investigation_detail_all',
-                         args=(proj.slug, obj.slug,))
-        self.assertRedirects(response, detail_url)
-
-    def test_investigation_create_empty_data(self):
-        proj = Project.objects.filter(is_active=True).first()
-        url = reverse('investigation_create', args=(proj.slug,))
-        response = self.client.post(url, {})
-        self.assertFormError(response, 'form', 'name',
-            'This field is required.')
-
-    def test_project_create_reserved_name(self):
-        proj = Project.objects.filter(is_active=True).first()
-        url = reverse('investigation_create', args=(proj.slug,))
-        data = {'name': 'activate'}
-        response = self.client.post(url, data)
-        self.assertFormError(response, 'form', 'name',
-            'Investigation name "activate" is reserved, please choose another')
-
-    def test_investigation_update_valid_data(self):
-        obj = Investigation.objects.filter(is_active=False).first()
-        proj = obj.project
-        url = reverse('investigation_update', args=(proj.slug, obj.slug))
-        data = {'description': 'test description'}
-        response = self.client.post(url, data)
-        obj = Investigation.objects.get(id=obj.id)
-        self.assertEqual(obj.description, data['description'])
-        detail_url = reverse('investigation_detail_all', args=(proj.slug, obj.slug,))
-        self.assertRedirects(response, detail_url)
 
 
 class TestSampleCRUD(TestCase):

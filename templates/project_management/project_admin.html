@@ -1,0 +1,67 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
+        <li class="active">Project Administration</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+
+<div class="container">
+
+  <h2>Project User Administration</h2>
+  <p>Use this page to administratively add users to projects.</p>
+  <div class="spacer-xs"></div>
+
+  <ul class="list-group">
+    {% for project in projects %}
+    <li class="list-group-item">
+      <h4 class="pull-left"><a href="{% url 'pm_project_detail' slug=project.slug}">{{project.name}}</a></h4>
+      <div class="clearfix">
+        <a class="btn btn-default pull-right" href="#{{project.id}}_user-modal" data-toggle="modal" data-target="#{{project.id}}_user-modal">Add Users</a>
+      </div>
+
+
+    </li>
+    {% endfor %}
+  </ul>
+
+</div>
+
+{% for project in projects %}
+<section id="{{project.id}}_user-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <header class="modal-header">
+                <button class="close" type="button" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title">Add User</h3>
+            </header>
+            <div class="modal-body">
+              <ul class="list-group">
+                {% for item in users %}
+                <li class="list-group-item">
+                  {{item.full_name}}
+                  <span class="pull-right">Add to:
+                    <a {% if not item in project.owner_group.custom_users.all %}href="{% url 'pm_project_group_add' slug=project.slug username=item.username attribute='owner' %}" class="label label-info" {% else %} class="label label-default" {% endif %}>Owners</a>
+                    <a {% if not item in project.member_group.custom_users.all %}href="{% url 'pm_project_group_add' slug=project.slug username=item.username attribute='member' %}" class="label label-info" {% else %} class="label label-default" {% endif %}>Members</a>
+                    <a {% if not item in project.viewer_group.custom_users.all %}href="{% url 'pm_project_group_add' slug=project.slug username=item.username attribute='viewer' %}" class="label label-info" {% else %} class="label label-default" {% endif %}>Viewers</a> </span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <footer class="modal-footer">
+                <a class="btn btn-default" data-dismiss="modal">Close</a>
+            </footer>
+        </div>
+    </div>
+</section>
+{% endfor %}
+
+{% endblock %}

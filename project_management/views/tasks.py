@@ -9,9 +9,20 @@ from datetime import datetime
 
 from braces.views import LoginRequiredMixin
 
-from core.views import ActionReloadView
+from core.views import ActionReloadView, AccessControlMixin
 from core.models import Task, Milestone
 from project_management.forms import TaskForm
+
+
+class TaskAccessControlMixin(AccessControlMixin):
+    """
+    Implements AccessControlMixin for Milestone as kwarg to view.
+    """
+
+    def get_group_required(self):
+        self.task = Task.objects.get(slug=self.kwargs.get('pk'))
+        return super(TaskAccessControlMixin, self).get_group_required(
+            self.membership, self.task)
 
 
 class TaskListView(LoginRequiredMixin, generic.ListView):
@@ -28,8 +39,9 @@ class TaskListView(LoginRequiredMixin, generic.ListView):
         return context
 
     def get_queryset(self):
-        queryset = super(TaskListView, self).get_queryset().filter(user=self.request.user)
-        return queryset.filter(is_active=True).order_by("due_date")
+        queryset = (super(TaskListView, self).get_queryset()
+                                             .filter(is_active=True).order_by("due_date"))
+        return [x for x in queryset if x.is_viewer(self.request.user)]
 
 
 class TaskCreateView(LoginRequiredMixin, generic.CreateView):
@@ -42,7 +54,9 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
         return reverse('pm_task_list')
 
 
-class TaskCloseView(LoginRequiredMixin, ActionReloadView):
+class TaskCloseView(TaskAccessControlMixin, ActionReloadView):
+
+    membership = 'member'
 
     def perform_action(self, request, *args, **kwargs):
         task = Task.objects.get(id=kwargs.pop('pk'))
@@ -53,7 +67,9 @@ class TaskCloseView(LoginRequiredMixin, ActionReloadView):
         return reverse('milestone_detail', kwargs={'slug': kwargs.pop('slug')})
 
 
-class TaskReOpenView(LoginRequiredMixin, ActionReloadView):
+class TaskReOpenView(TaskAccessControlMixin, ActionReloadView):
+
+    membership = 'member'
 
     def perform_action(self, request, *args, **kwargs):
         task = Task.objects.get(id=kwargs.pop('pk'))
@@ -68,9 +84,9 @@ class TaskCreateAction(LoginRequiredMixin, generic.View):
 
     def post(self, request, *args, **kwargs):
         task_form = TaskForm(request.POST)
-        if task_form.is_valid():
+        milestone = Milestone.objects.get(id=request.POST.get('milestone'))
+        if task_form.is_valid() and milestone.is_member(self.request.user):
             self.object = task_form.save(commit=False)
             self.object.user = request.user
             self.object.save()
-        milestone = Milestone.objects.get(id=request.POST.get('milestone'))
         return HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': milestone.slug}))

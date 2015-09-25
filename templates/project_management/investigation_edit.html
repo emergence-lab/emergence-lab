@@ -1,0 +1,47 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% load bootstrap3 %}
+
+{% block header %}
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
+  {{form.media}}
+{% endblock header %}
+
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
+        <li><a href="{% url 'pm_project_detail' slug=investigation.project.slug %}">{{investigation.project.name}}</a></li>
+        <li><a href="{% url 'pm_investigation_detail' slug=investigation.slug %}">{{investigation.name}}</a></li>
+        <li class="active">Edit Investigation</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+
+<h2 class="text-center">Edit Investigation</h2>
+<div class="container-fluid">
+  <form action="" method="post">{%csrf_token%}
+    <div class="col-md-8 col-md-offset-2">
+      {% bootstrap_form form %}
+      <button type="submit" class="btn btn-success" value="Create">Submit</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project_management/js/hallo_helper.js' %}"></script>
+    <script type="text/javascript">
+        hallo_helper.enable_rich_text('.hallo', 'form');
+    </script>
+{% endblock scripts %}

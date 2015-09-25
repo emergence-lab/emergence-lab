@@ -1,0 +1,180 @@
+{% extends 'project_management/pm_base.html' %}
+
+{% load bootstrap3 %}
+
+{% block header %}
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
+{% endblock header %}
+
+{% block breadcrumb %}
+
+<nav>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'pm_project_list' %}">Projects</a></li>
+        <li class="active">{{project.name}}</li>
+    </ol>
+</nav>
+
+{% endblock breadcrumb %}
+
+{% block pm_content %}
+
+<div>
+    <ul class="nav nav-tabs">
+       <li role="presentation" class="active"><a href="#detail" aria-controls="detail" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-info-sign"></span> Detail</a></li>
+       <li role="presentation"><a href="#investigations" aria-controls="investigations" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-pushpin"></span> Investigations</a></li>
+       {% if user in project.owner_group.custom_users.all %}
+       <li role="presentation"><a href="#groups" aria-controls="groups" data-toggle="pill" role="tab"><span class="glyphicon glyphicon-user"></span> Membership</a></li>
+       <li role="presentation" class="pull-right"><a href="{% url 'pm_investigation_create' project.slug %}" role="tab"><span class="glyphicon glyphicon-plus"></span> Investigation</a></li>
+       {% endif %}
+    </ul>
+</div>
+
+<div class="spacer-xs"></div>
+
+<div class="tab-content">
+
+  <div class="tab-pane active" role="tabpanel" id="detail">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title pull-left">{{project.name}}</h3>
+        <div class="clearfix">
+          <div class="btn-group pull-right" role="group" aria-label="...">
+              <a href="{% url 'project_untrack' slug=project.slug %}" data-toggle="tooltip" data-title="Untrack" ><span class="glyphicon glyphicon-star inline-button-spacer"></span></a>
+              {% if user in project.owner_group.custom_users.all %}
+              <a href="{% url 'project_deactivate' slug=project.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
+              <a href="{% url 'pm_project_edit' slug=project.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">{{project.description}}</div>
+    </div>
+  </div>
+
+  <div class="tab-pane" role="tabpanel" id="groups">
+
+    <div class="col-md-4">
+      <h4>
+        Owners
+        <a data-toggle="modal" data-target="#user-modal" class="pull-right" rel="tooltip" data-title="Add user to group"><span class="glyphicon glyphicon-plus"></span></a>
+      </h4>
+      <ul class="list-group">
+        {% for item in project.owner_group.custom_users.all %}
+        <li class="list-group-item">
+          {{item.full_name}}
+          {% if not user == item %}
+          <a class="pull-right" href="{% url 'pm_project_group_remove' slug=project.slug username=item.username %}"><span class="glyphicon glyphicon-remove"></span></a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-4">
+      <h4>
+        Members
+        <a data-toggle="modal" data-target="#user-modal" class="pull-right" rel="tooltip" data-title="Add user to group"><span class="glyphicon glyphicon-plus"></span></a>
+      </h4>
+      <ul class="list-group">
+        {% for item in project.member_group.custom_users.all %}
+        <li class="list-group-item">
+          {{item.full_name}}
+          {% if not user == item %}
+          <a class="pull-right" href="{% url 'pm_project_group_remove' slug=project.slug username=item.username %}"><span class="glyphicon glyphicon-remove"></span></a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-4">
+      <h4>
+        Viewers
+        <a data-toggle="modal" data-target="#user-modal" class="pull-right" rel="tooltip" data-title="Add user to group"><span class="glyphicon glyphicon-plus"></span></a>
+      </h4>
+      <ul class="list-group">
+        {% for item in project.viewer_group.custom_users.all %}
+        <li class="list-group-item">
+          {{item.full_name}}
+          {% if not user == item %}
+          <a class="pull-right" href="{% url 'pm_project_group_remove' slug=project.slug username=item.username %}"><span class="glyphicon glyphicon-remove"></span></a>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-pane" role="tabpanel" id="investigations">
+    {% for investigation in investigation_list %}
+    <div class="panel {% if investigation.is_active %}panel-default{%else%}panel-danger{%endif%}">
+      <div class="panel-heading">
+        <h4 class="panel-title pull-left"><a href="{% url 'pm_investigation_detail' investigation.slug %}">{{investigation.name}}</a></h4>
+        <div class="clearfix">
+          <div class="btn-group pull-right" role="group" aria-label="...">
+              {% if user in project.owner_group.custom_users.all %}
+                {% if investigation.is_active %}
+                <a href="{% url 'investigation_deactivate' project=project.slug slug=investigation.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
+                {% else %}
+                <a href="{% url 'investigation_activate' project=project.slug slug=investigation.slug %}" data-toggle="tooltip" data-title="Make Active" ><span class="glyphicon glyphicon-thumbs-up inline-button-spacer"></span></a>
+                {% endif %}
+                <a href="{% url 'pm_investigation_edit' slug=investigation.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        {{investigation.description}}
+      </div>
+      <ul class="list-group">
+        {% for milestone in investigation.milestone.all reversed %}
+        <li class="list-group-item"><a href="{% url 'milestone_detail' slug=milestone.slug %}">{% if milestone.is_active %}{{milestone}}{%else%}<strike>{{milestone}}</strike>{%endif%}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {% endfor %}
+  </div>
+
+</div>
+
+<section id="user-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <header class="modal-header">
+                <button class="close" type="button" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title">Add User</h3>
+            </header>
+            <div class="modal-body">
+              <ul class="list-group">
+                {% for item in users %}
+                <li class="list-group-item">
+                  {{item.full_name}}
+                  <span class="pull-right">Add to:
+                    <a {% if not item in project.owner_group.custom_users.all %}href="{% url 'pm_project_group_add' slug=project.slug username=item.username attribute='owner' %}" class="label label-info" {% else %} class="label label-default" {% endif %}>Owners</a>
+                    <a {% if not item in project.member_group.custom_users.all %}href="{% url 'pm_project_group_add' slug=project.slug username=item.username attribute='member' %}" class="label label-info" {% else %} class="label label-default" {% endif %}>Members</a>
+                    <a {% if not item in project.viewer_group.custom_users.all %}href="{% url 'pm_project_group_add' slug=project.slug username=item.username attribute='viewer' %}" class="label label-info" {% else %} class="label label-default" {% endif %}>Viewers</a> </span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <footer class="modal-footer">
+                <a class="btn btn-default" data-dismiss="modal">Close</a>
+            </footer>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+<script src="{% static 'rangy/rangy-core.min.js' %}"></script>
+<script src="{% static 'hallo/dist/hallo.js' %}"></script>
+<script type="text/javascript" src="{% static 'project_management/js/hallo_helper.js' %}"></script>
+<script type="text/javascript">
+    hallo_helper.enable_rich_text('.hallo', 'form');
+</script>
+{% endblock %}

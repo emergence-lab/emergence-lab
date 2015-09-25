@@ -7,51 +7,10 @@ from django.views import generic
 
 from braces.views import LoginRequiredMixin
 
-from .utility import ActiveListView, ActionReloadView
-from core.models import Investigation, Project, ProjectTracking, User
-from core.forms import (CreateInvestigationForm, CreateProjectForm,
-                        TrackProjectForm,)
-from core.streams import project_stream, investigation_stream
-
-
-class ProjectListView(LoginRequiredMixin, ActiveListView):
-    """
-    View to list all projects and provide actions.
-    """
-    template_name = "core/project_list.html"
-    model = Project
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectListView, self).get_context_data(**kwargs)
-        context['tracking'] = (ProjectTracking.objects
-            .filter(user=self.request.user)
-            .values_list('project_id', flat=True))
-        return context
-
-
-class ProjectDetailView(LoginRequiredMixin, generic.DetailView):
-    """
-    View for details of a project.
-    """
-    template_name = 'core/project_detail.html'
-    model = Project
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectDetailView, self).get_context_data(**kwargs)
-        username = self.kwargs.get('username')
-        if username is not None:
-            userid = User.objects.filter(username=username).values('id')
-            context['tracking'] = (ProjectTracking.objects
-                .filter(user_id=userid, project=self.object)
-                .exists())
-        else:
-            context['tracking'] = (ProjectTracking.objects
-                .filter(user=self.request.user, project=self.object)
-                .exists())
-        context['growths'] = []
-        context['entries'] = []
-        context['stream'] = project_stream(self.object)
-        return context
+from .utility import ActionReloadView
+from core.models import Investigation, Project, ProjectTracking
+from core.forms import CreateProjectForm, TrackProjectForm
+from .mixins import AccessControlMixin
 
 
 class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
@@ -64,24 +23,13 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         response = super(ProjectCreateView, self).form_valid(form)
-        ProjectTracking.objects.get_or_create(project=self.object,
-                                              user=self.request.user)
+        p = ProjectTracking.objects.get_or_create(project=self.object,
+                                            user=self.request.user)
+        self.request.user.groups.add(p[0].project.owner_group)
         return response
 
     def get_success_url(self):
         return reverse('pm_project_list')
-
-
-class ProjectUpdateView(LoginRequiredMixin, generic.UpdateView):
-    """
-    View for editing information about a project.
-    """
-    template_name = 'core/project_update.html'
-    model = Project
-    fields = ('description',)
-
-    def get_success_url(self):
-        return reverse('project_detail_all', kwargs={'slug': self.object.slug})
 
 
 class TrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
@@ -118,119 +66,80 @@ class UntrackProjectRedirectView(LoginRequiredMixin, ActionReloadView):
         return reverse('pm_project_list')
 
 
-class ActivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
+class ActivateProjectRedirectView(AccessControlMixin, ActionReloadView):
     """
     Sets the specified project to active.
     """
 
+    membership = 'owner'
+
+    def get_group_required(self):
+        self.project = Project.objects.get(slug=self.kwargs.get('slug'))
+        return super(ActivateProjectRedirectView, self).get_group_required(
+            self.membership, self.project)
+
     def perform_action(self, request, *args, **kwargs):
-        slug = kwargs.pop('slug')
-        project = Project.objects.get(slug=slug)
-        project.activate()
+        self.project.activate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('pm_project_list')
+        return reverse('pm_project_detail', args=(self.project.slug,))
 
 
-class DeactivateProjectRedirectView(LoginRequiredMixin, ActionReloadView):
+class DeactivateProjectRedirectView(AccessControlMixin, ActionReloadView):
     """
     Sets the specified project to inactive.
     """
 
+    membership = 'owner'
+
+    def get_group_required(self):
+        self.project = Project.objects.get(slug=self.kwargs.get('slug'))
+        return super(DeactivateProjectRedirectView, self).get_group_required(
+            self.membership, self.project)
+
     def perform_action(self, request, *args, **kwargs):
-        slug = kwargs.pop('slug')
-        project = Project.objects.get(slug=slug)
-        project.deactivate()
+        self.project.deactivate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('pm_project_list')
+        return reverse('pm_project_detail', args=(self.project.slug,))
 
 
-class InvestigationDetailView(LoginRequiredMixin, generic.DetailView):
-    """
-    View for details of an investigation.
-    """
-    template_name = 'core/investigation_detail.html'
-    model = Investigation
-
-    def get_context_data(self, **kwargs):
-        context = super(InvestigationDetailView, self).get_context_data(**kwargs)
-        context['stream'] = investigation_stream(self.object)
-        context['project'] = self.object.project
-        context['growths'] = []
-        context['entries'] = []
-        return context
-
-
-class InvestigationCreateView(LoginRequiredMixin, generic.CreateView):
-    """
-    View for creating an investigation.
-    """
-    template_name = 'core/investigation_create.html'
-    model = Investigation
-    form_class = CreateInvestigationForm
-
-    def dispatch(self, request, *args, **kwargs):
-        self.initial = {'project': Project.objects.get(slug=kwargs.pop('slug'))}
-        return super(InvestigationCreateView, self).dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.instance.project = self.initial['project']
-        self.object = form.save()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
-                                                           'slug': self.object.slug})
-
-
-class InvestigationUpdateView(LoginRequiredMixin, generic.UpdateView):
-    """
-    View for editing information about a project.
-    """
-    template_name = 'core/investigation_update.html'
-    model = Investigation
-    fields = ('description',)
-
-    def get_success_url(self):
-        return reverse('investigation_detail_all', kwargs={'project': self.object.project.slug,
-                                                           'slug': self.object.slug})
-
-
-class InvestigationListView(LoginRequiredMixin, ActiveListView):
-    """
-    View to list all projects and provide actions.
-    """
-    template_name = "core/investigation_list.html"
-    model = Investigation
-
-
-class ActivateInvestigationRedirectView(LoginRequiredMixin, ActionReloadView):
+class ActivateInvestigationRedirectView(AccessControlMixin, ActionReloadView):
     """
     Sets the specified investigation to active.
     """
 
+    membership = 'owner'
+
+    def get_group_required(self):
+        self.investigation = Investigation.objects.get(slug=self.kwargs.get('slug'))
+        return super(ActivateInvestigationRedirectView, self).get_group_required(
+            self.membership, self.investigation)
+
     def perform_action(self, request, *args, **kwargs):
-        slug = kwargs.pop('slug')
-        investigation = Investigation.objects.get(slug=slug)
-        investigation.activate()
+        self.investigation.activate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('pm_project_list')
+        return reverse('pm_investigation_detail', args=(self.investigation.slug,))
 
 
-class DeactivateInvestigationRedirectView(LoginRequiredMixin, ActionReloadView):
+class DeactivateInvestigationRedirectView(AccessControlMixin, ActionReloadView):
     """
     Sets the specified investigation to inactive.
     """
 
+    membership = 'owner'
+
+    def get_group_required(self):
+        self.investigation = Investigation.objects.get(slug=self.kwargs.get('slug'))
+        return super(DeactivateInvestigationRedirectView, self).get_group_required(
+            self.membership, self.investigation)
+
     def perform_action(self, request, *args, **kwargs):
-        slug = kwargs.pop('slug')
-        investigation = Investigation.objects.get(slug=slug)
-        investigation.deactivate()
+        self.investigation.deactivate()
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('pm_project_list')
+        return reverse('pm_investigation_detail', args=(self.investigation.slug,))
 
 
 class TrackProjectView(LoginRequiredMixin, generic.CreateView):

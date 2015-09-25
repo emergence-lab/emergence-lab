@@ -75,7 +75,7 @@
                     <p>{{project.description|safe}}</p>
                 </div>
                 <div class="col-md-6 hidden-xs hidden-sm">
-                    {% if not project.investigation_set.all %}
+                    {% if not project.investigations.all %}
                         <div class="alert alert-info">
                             <h3>This project doesn't have any investigations</h3>
                             <p>Get started by creating a new one.</p>
@@ -95,7 +95,7 @@
                 <h1 class="page-header">Investigations</h1>
             </header>
             <ul class="list-group">
-                {% for i in project.investigation_set.all %}
+                {% for i in project.investigations.all %}
                     <li class="list-group-item">
                         <a href="{% url 'investigation_detail_dashboard' project=project.slug slug=i.slug %}">{{i}}</a>
                     </li>

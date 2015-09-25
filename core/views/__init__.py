@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+from .mixins import (
+    AccessControlMixin,
+)
 from .utility import (
     AboutView,
     ActiveListView,
@@ -21,18 +24,18 @@ from .project import (
     ActivateProjectRedirectView,
     DeactivateProjectRedirectView,
     ProjectCreateView,
-    ProjectDetailView,
-    ProjectListView,
-    ProjectUpdateView,
+    # ProjectDetailView,
+    # ProjectListView,
+    # ProjectUpdateView,
     TrackProjectRedirectView,
     TrackProjectView,
     UntrackProjectRedirectView,
     ActivateInvestigationRedirectView,
     DeactivateInvestigationRedirectView,
-    InvestigationCreateView,
-    InvestigationDetailView,
-    InvestigationListView,
-    InvestigationUpdateView,
+    # InvestigationCreateView,
+    # InvestigationDetailView,
+    # InvestigationListView,
+    # InvestigationUpdateView,
 )
 from .sample import (
     SampleDetailView,
