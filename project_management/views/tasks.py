@@ -39,9 +39,7 @@ class TaskListView(LoginRequiredMixin, generic.ListView):
         return context
 
     def get_queryset(self):
-        queryset = (super(TaskListView, self).get_queryset()
-                                             .filter(is_active=True).order_by("due_date"))
-        return [x for x in queryset if x.is_viewer(self.request.user)]
+        return self.request.user.get_tasks('viewer', followed=True)
 
 
 class TaskCreateView(LoginRequiredMixin, generic.CreateView):

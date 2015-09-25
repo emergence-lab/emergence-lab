@@ -28,9 +28,7 @@ class InvestigationListView(LoginRequiredMixin, ActiveListView):
     model = Investigation
 
     def get_queryset(self):
-        queryset = super(InvestigationListView, self).get_queryset()
-        projects = [x.project for x in ProjectTracking.objects.all().filter(user=self.request.user)]
-        return queryset.filter(project__in=projects)
+        return self.get_investigations('viewer', followed=True)
 
 
 class InvestigationDetailView(InvestigationAccessControlMixin, generic.DetailView):
