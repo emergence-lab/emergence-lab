@@ -6,7 +6,7 @@ from django.views import generic
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin, UserPassesTestMixin
 
 from core.views import NeverCacheMixin, AccessControlMixin, ActionReloadView
-from core.models import ProjectTracking, Project, User
+from core.models import Project, User
 from core.forms import CreateProjectForm
 
 
@@ -27,11 +27,12 @@ class ProjectListView(LoginRequiredMixin, NeverCacheMixin, generic.TemplateView)
 
     def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
-        projects_tracked = [x.project_id for x in ProjectTracking.objects.filter(
-            user=self.request.user) if x.project.is_viewer(self.request.user)]
-        context['my_active_projects'] = Project.active_objects.filter(id__in=projects_tracked)
-        context['active_projects'] = Project.active_objects.exclude(id__in=projects_tracked)
-        context['inactive_projects'] = Project.inactive_objects.all()
+        context['my_active_projects'] = (self.request.user.get_projects('viewer', followed=True)
+                                         .filter(is_active=True))
+        context['active_projects'] = (self.request.user.get_projects('viewer', followed=False)
+                                      .filter(is_active=True))
+        context['inactive_projects'] = (self.request.user.get_projects('viewer')
+                                        .exclude(is_active=True))
         return context
 
 

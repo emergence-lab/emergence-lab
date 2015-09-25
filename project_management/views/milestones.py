@@ -37,8 +37,7 @@ class MilestoneListView(LoginRequiredMixin, generic.ListView):
         return context
 
     def get_queryset(self):
-        queryset = super(MilestoneListView, self).get_queryset()
-        return [x for x in queryset if x.is_viewer(self.request.user)]
+        return self.request.user.get_milestones('viewer', followed=True)
 
 
 class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
