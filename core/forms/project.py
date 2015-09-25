@@ -31,6 +31,12 @@ class CreateProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name', 'description',)
+        widgets = {
+            'description': forms.Textarea(attrs={'class': 'hallo'}),
+            'owner_group': forms.HiddenInput(),
+            'member_group': forms.HiddenInput(),
+            'viewer_group': forms.HiddenInput(),
+        }
 
     def clean_name(self):
         name = self.cleaned_data['name']

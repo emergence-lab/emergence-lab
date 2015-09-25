@@ -1,5 +1,10 @@
 {% extends 'project_management/pm_base.html' %}
 
+{% block scripts %}
+  {% load staticfiles %}
+  <script src="{% static 'project_management/js/project_list.js' %}"></script>
+{% endblock %}
+
 {% block breadcrumb %}
 
 <nav>
@@ -22,9 +27,12 @@
           <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-plus"></span> New <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="{% url 'project_create' %}">Project</a></li>
-            <li><a href="{% url 'pm_investigation_create' %}">Investigation</a></li>
+            {# <li><a href="{% url 'pm_investigation_create' %}">Investigation</a></li>#}
           </ul>
         </li>
+        {% if user.is_staff %}
+        <li role="presentation"><a href="{% url 'pm_project_admin' %}" role="tab"><span class="glyphicon glyphicon-cog"></span> Administration</a></li> 
+        {% endif %}
         <h4 class="pull-right">This page lists the projects that you track.</h4>
       </ul>
   </div>
@@ -49,30 +57,35 @@
     <div class="tab-content">
       <div class="tab-pane active" role="tabpanel" id="my_projects">
         {% for p in my_active_projects %}
-        <div class="panel panel-primary">
+        <div class="panel panel-primary" id="project_panel_{{p.id}}">
             <div class="panel-heading">
                 <h3 class="panel-title pull-left">
-                    {{ p }}
+                    <a href="{% url 'pm_project_detail' slug=p.slug %}">{{ p }}</a>
                 </h3>
                 <div class="clearfix">
                   <div class="btn-group pull-right" role="group" aria-label="...">
+                        <a href="#" data-toggle="tooltip" data-title="Expand" ><span id="expand_proj_{{p.id}}" class="glyphicon glyphicon-option-horizontal invert-link inline-button-spacer"></span></a>
                         <a href="{% url 'project_untrack' slug=p.slug %}" data-toggle="tooltip" data-title="Untrack" ><span class="glyphicon glyphicon-star invert-link inline-button-spacer"></span></a>
-                        <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down invert-link inline-button-spacer"></span></a>
-                        <a href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit invert-link inline-button-spacer"></span></a>
+                        {% if user in p.owner_group.custom_users.all %}
+                        <a id="project_deactivate_{{p.id}}" href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive" ><span class="glyphicon glyphicon-thumbs-down invert-link inline-button-spacer"></span></a>
+                        <a id="project_edit_{{p.id}}" href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit invert-link inline-button-spacer"></span></a>
+                        {% endif %}
                   </div>
                 </div>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" id="project_panel_body_{{p.id}}">
                 <p><span class="glyphicon glyphicon-ok-circle"></span> You follow this project.</p>
                 <p>{{ p.description|safe|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                   {% if i.is_active %}
                     <li class="list-group-item">
                         <h4 class="list-group-item-heading">
                           <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
+                          {% if user in p.owner_group.custom_users.all %}
                           <a href="{% url 'investigation_deactivate' project=p.slug slug=i.slug %}" data-toggle="tooltip" data-title="Make Inactive" class="pull-right"><span class="glyphicon glyphicon-thumbs-down">&emsp;</span></a>
+                          {% endif %}
                         </h4>
                         <p class="list-group-item-text">
                           {{i.description|safe|truncatewords:50}}
@@ -80,21 +93,23 @@
                         <p class="list-group-item-text">
                           <strong>Milestones: &emsp;</strong>
                           {% for m in i.milestone.all %}
-                            {% if m.is_active and m.user == request.user %}
+                            {% if m.is_active %}
                             <a class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-html="true" data-toggle="tooltip" title="{{m.description|escape|truncatewords:20}}">{{m.name|truncatewords:4}}</a>
                             {% endif %}
                           {% endfor %}
-                          &emsp;<a href="{% url 'pm_investigation_detail' slug=i.slug %}#milestone-modal" class="btn btn-xs btn-default"><span data-toggle="tooltip" data-title="Create a milestone" class="glyphicon glyphicon-plus"></span></a>
+                          &emsp;{% if user in p.owner_group.custom_users.all %}<a href="{% url 'pm_investigation_detail' slug=i.slug %}#milestone-modal" class="btn btn-xs btn-default"><span data-toggle="tooltip" data-title="Create a milestone" class="glyphicon glyphicon-plus"></span></a>{% endif %}
                         </p>
                     </li>
                   {% endif %}
                 {% endfor %}
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                   {% if not i.is_active %}
                     <li class="list-group-item list-group-item-danger">
                         <h4 class="list-group-item-heading">
                           <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> <del>{{ i }}</del></a>
+                          {% if user in p.owner_group.custom_users.all %}
                           <a href="{% url 'investigation_activate' project=p.slug slug=i.slug %}" data-toggle="tooltip" data-title="Make Active" class="pull-right"><span class="glyphicon glyphicon-thumbs-up">&emsp;</span></a>
+                          {%endif%}
                         </h4>
                         <p class="list-group-item-text">
                           {{i.description|safe|truncatewords:50}}
@@ -112,22 +127,25 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title pull-left">
-                    {{ p }}
+                    <a href="{% url 'pm_project_detail' slug=p.slug %}">{{ p }}</a>
                 </h3>
                 <div class="clearfix">
                   <div class="btn-group pull-right" role="group" aria-label="...">
+                    <a href="#" data-toggle="tooltip" data-title="Expand" ><span id="expand_proj_{{p.id}}" class="glyphicon glyphicon-option-horizontal invert-link inline-button-spacer"></span></a>
                     <a href="{% url 'project_track' slug=p.slug %}" data-toggle="tooltip" data-title="Track"><span class="glyphicon glyphicon-star-empty inline-button-spacer"></span></a>
-                    <a href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
-                    <a href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
+                    {% if user in p.owner_group.custom_users.all %}
+                    <a id="project_deactivate_{{p.id}}" href="{% url 'project_deactivate' slug=p.slug %}" data-toggle="tooltip" data-title="Make Inactive"><span class="glyphicon glyphicon-thumbs-down inline-button-spacer"></span></a>
+                    <a id="project_edit_{{p.id}}" href="{% url 'pm_project_edit' slug=p.slug %}" data-toggle="tooltip" data-title="Edit"><span class="glyphicon glyphicon-edit inline-button-spacer"></span></a>
+                    {% endif %}
                   </div>
                 </div>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" id="project_panel_body_{{p.id}}">
                 <p><span class="glyphicon glyphicon-ban-circle"></span> You do not follow this project.</p>
                 <p>{{ p.description|safe|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
-                {% for i in p.investigation_set.all %}
+                {% for i in p.investigations.all %}
                 <li class="list-group-item">
                   <h4 class="list-group-item-heading">
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
@@ -147,15 +165,15 @@
         <div class="panel panel-danger">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    {{ p }}
+                    <a href="{% url 'pm_project_detail' slug=p.slug %}">{{ p }}</a>
                 </h3>
             </div>
             <div class="panel-body">
-                <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. <a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>
+                <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. {% if user in p.owner_group.custom_users.all %}<a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>{% endif %}
                 <p>{{ p.description|safe|truncatewords:50 }}<p>
             </div>
-            <ul id="invest_list_{{p.id}}" class="list-group">
-                {% for i in p.investigation_set.all %}
+            <ul id="_invest_list_{{p.id}}" class="list-group">
+                {% for i in p.investigations.all %}
                 <li class="list-group-item">
                   <h4 class="list-group-item-heading">
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>

@@ -3,18 +3,19 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
+from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 import autoslug
 
-from .mixins import ActiveStateMixin, TimestampMixin
-from .user import User
+from .mixins import ActiveStateMixin, TimestampMixin, AccessControlShortcutMixin
 from . import fields
 
 
 @python_2_unicode_compatible
-class Project(ActiveStateMixin, TimestampMixin, models.Model):
+class Project(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on a project, which is a higher level organizational
     tool.
@@ -22,6 +23,12 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
+    owner_group = models.ForeignKey(Group, verbose_name=_('owner_group'),
+                                    related_name='+', blank=True, null=True)
+    member_group = models.ForeignKey(Group, verbose_name=_('member_group'),
+                                    related_name='+', blank=True, null=True)
+    viewer_group = models.ForeignKey(Group, verbose_name=_('viewer_group'),
+                                    related_name='+', blank=True, null=True)
 
     class Meta:
         verbose_name = _('project')
@@ -30,9 +37,13 @@ class Project(ActiveStateMixin, TimestampMixin, models.Model):
     def __str__(self):
         return self.name
 
+    def milestones(self):
+        investigation_ids = self.investigations.values_list('id', flat=True)
+        return Milestone.objects.filter(investigation_id__in=investigation_ids)
+
 
 @python_2_unicode_compatible
-class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
+class Investigation(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information on an individual investigation related to one or more
     projects.
@@ -40,18 +51,32 @@ class Investigation(ActiveStateMixin, TimestampMixin, models.Model):
     name = models.CharField(_('name'), max_length=45)
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
-    project = models.ForeignKey(Project, verbose_name=_('project'))
+    project = models.ForeignKey(Project, verbose_name=_('project'),
+                                related_name='investigations',
+                                related_query_name='investigation')
 
     class Meta:
         verbose_name = _('investigation')
         verbose_name_plural = _('investigations')
+
+    @property
+    def owner_group(self):
+        return self.project.owner_group
+
+    @property
+    def member_group(self):
+        return self.project.member_group
+
+    @property
+    def viewer_group(self):
+        return self.project.viewer_group
 
     def __str__(self):
         return self.name
 
 
 @python_2_unicode_compatible
-class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
+class Milestone(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores information related to short-term project goals.
     """
@@ -60,7 +85,7 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
     investigation = models.ForeignKey(Investigation,
-                                related_name='milestone',
+                                related_name='milestones',
                                 related_query_name='milestone',
                                 null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -70,11 +95,23 @@ class Milestone(ActiveStateMixin, TimestampMixin, models.Model):
         verbose_name = _('milestone')
         verbose_name_plural = _('milestones')
 
+    @property
+    def owner_group(self):
+        return self.investigation.owner_group
+
+    @property
+    def member_group(self):
+        return self.investigation.member_group
+
+    @property
+    def viewer_group(self):
+        return self.investigation.viewer_group
+
     def __str__(self):
         return self.name
 
 
-class MilestoneNote(TimestampMixin, models.Model):
+class MilestoneNote(AccessControlShortcutMixin, TimestampMixin, models.Model):
     """
     Stores a note attached to a milestone object
     """
@@ -86,8 +123,20 @@ class MilestoneNote(TimestampMixin, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
 
+    @property
+    def owner_group(self):
+        return self.milestone.owner_group
 
-class Task(ActiveStateMixin, TimestampMixin, models.Model):
+    @property
+    def member_group(self):
+        return self.milestone.member_group
+
+    @property
+    def viewer_group(self):
+        return self.milestone.viewer_group
+
+
+class Task(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.Model):
     """
     Stores a task with potential relation to a milestone.
     """
@@ -100,11 +149,35 @@ class Task(ActiveStateMixin, TimestampMixin, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 limit_choices_to={'is_active': True})
 
+    @property
+    def owner_group(self):
+        return self.milestone.owner_group
+
+    @property
+    def member_group(self):
+        return self.milestone.member_group
+
+    @property
+    def viewer_group(self):
+        return self.milestone.viewer_group
+
 
 class ProjectTracking(models.Model):
     """
     Stores ownership and tracking information for projects.
     """
     project = models.ForeignKey(Project)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey('User')
     is_owner = models.BooleanField(default=False)
+
+
+@receiver(models.signals.post_save, sender=Project)
+def create_project_groups(sender, instance=None, created=False, **kwargs):
+    if created:
+        owner = Group.objects.create(name='rbac_project_owner_{}'.format(instance.slug))
+        member = Group.objects.create(name='rbac_project_member_{}'.format(instance.slug))
+        viewer = Group.objects.create(name='rbac_project_viewer_{}'.format(instance.slug))
+        instance.owner_group = owner
+        instance.member_group = member
+        instance.viewer_group = viewer
+        instance.save()
