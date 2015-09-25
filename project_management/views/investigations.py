@@ -7,7 +7,7 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 
 from core.views import ActiveListView, AccessControlMixin
-from core.models import Investigation, Milestone, ProjectTracking, Project
+from core.models import Investigation, Milestone, Project
 from project_management.forms import InvestigationForm, MilestoneForm
 
 

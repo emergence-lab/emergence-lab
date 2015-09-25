@@ -57,6 +57,9 @@ class TestProjectCRUD(TestCase):
         self.user = get_user_model().objects.create_user('username1',
                                                          password='')
         self.user.groups.add(project.owner_group)
+        ProjectTracking.objects.get_or_create(project=project,
+                                              user=self.user,
+                                              defaults={'is_owner': False})
         self.client.login(username='username1', password='')
 
     def test_project_list_resolution_template(self):
@@ -70,7 +73,7 @@ class TestProjectCRUD(TestCase):
     def test_project_list_content(self):
         url = reverse('pm_project_list')
         response = self.client.get(url)
-        for project in Project.objects.all():
+        for project in self.user.get_projects('viewer', followed=True):
             self.assertContains(response, project.name)
         self.assertContains(response, Investigation.objects.first().name)
 
