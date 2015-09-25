@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 
 from .mixins import ActiveStateMixin
-from .project import Project, Milestone, Investigation, ProjectTracking
+from .project import Project, Milestone, Investigation, ProjectTracking, Task
 
 
 def _user_get_all_permissions(user, obj):
@@ -101,7 +101,7 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
-    def get_projects(self, permission):
+    def get_projects(self, permission, followed=None):
         """
         Returns a queryset of projects that the user has the specified
         permissions on.
@@ -122,9 +122,15 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         else:
             raise ValueError('Permission {} is not valid. Should be one of '
                              'owner, member, or viewer'.format(permission))
-        return Project.objects.filter(permission_filters)
+        if followed is None:
+            return Project.objects.filter(permission_filters)
+        elif followed is True:
+            return self.projects.filter(permission_filters)
+        else:
+            return (Project.objects.filter(permission_filters)
+                    .exclude(id__in=self.projects.values_list('id', flat=True)))
 
-    def get_investigations(self, permission):
+    def get_investigations(self, permission, followed=False):
         """
         Returns a queryset of investigations that the user has the specified
         permissions on.
@@ -132,10 +138,11 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         :param permission: Should be one of 'owner', 'member', or 'viewer'
                            depending on the desired permission desired.
         """
-        project_ids = self.get_projects(permission).values_list('id', flat=True)
+        project_ids = self.get_projects(permission,
+                                        followed).values_list('id', flat=True)
         return Investigation.objects.filter(project_id__in=project_ids)
 
-    def get_milestones(self, permission):
+    def get_milestones(self, permission, followed=False):
         """
         Returns a queryset of milestones that the user has the specified
         permissions on.
@@ -143,8 +150,21 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         :param permission: Should be one of 'owner', 'member', or 'viewer'
                            depending on the desired permission desired.
         """
-        investigation_ids = self.get_investigations(permission).values_list('id', flat=True)
+        investigation_ids = self.get_investigations(permission,
+                                                    followed).values_list('id', flat=True)
         return Milestone.objects.filter(investigation_id__in=investigation_ids)
+
+    def get_tasks(self, permission, followed=False):
+        """
+        Returns a queryset of milestones that the user has the specified
+        permissions on.
+
+        :param permission: Should be one of 'owner', 'member', or 'viewer'
+                           depending on the desired permission desired.
+        """
+        milestone_ids = self.get_milestones(permission,
+                                            followed).values_list('id', flat=True)
+        return Task.objects.filter(milestone_id__in=milestone_ids)
 
     def get_group_permissions(self, obj=None):
         """
