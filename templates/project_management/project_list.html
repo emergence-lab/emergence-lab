@@ -92,7 +92,7 @@
                         </p>
                         <p class="list-group-item-text">
                           <strong>Milestones: &emsp;</strong>
-                          {% for m in i.milestone.all %}
+                          {% for m in i.milestones.all %}
                             {% if m.is_active %}
                             <a class="label label-default" href="{% url 'milestone_detail' m.slug %}" data-html="true" data-toggle="tooltip" title="{{m.description|escape|truncatewords:20}}">{{m.name|truncatewords:4}}</a>
                             {% endif %}
