@@ -130,7 +130,7 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
             return (Project.objects.filter(permission_filters)
                     .exclude(id__in=self.projects.values_list('id', flat=True)))
 
-    def get_investigations(self, permission, followed=False):
+    def get_investigations(self, permission, followed=None):
         """
         Returns a queryset of investigations that the user has the specified
         permissions on.
@@ -142,7 +142,7 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
                                         followed).values_list('id', flat=True)
         return Investigation.objects.filter(project_id__in=project_ids)
 
-    def get_milestones(self, permission, followed=False):
+    def get_milestones(self, permission, followed=None):
         """
         Returns a queryset of milestones that the user has the specified
         permissions on.
@@ -154,7 +154,7 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
                                                     followed).values_list('id', flat=True)
         return Milestone.objects.filter(investigation_id__in=investigation_ids)
 
-    def get_tasks(self, permission, followed=False):
+    def get_tasks(self, permission, followed=None):
         """
         Returns a queryset of milestones that the user has the specified
         permissions on.
