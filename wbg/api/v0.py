@@ -15,4 +15,6 @@ urlpatterns = [
     url(r'^sem/', include('sem.urls.api')),
     url(r'^messaging/', include('messaging.urls.api')),
     url(r'^d180/', include('d180.urls.api')),
+    url(r'^project_management/', include('project_management.urls.api')),
+
 ]
