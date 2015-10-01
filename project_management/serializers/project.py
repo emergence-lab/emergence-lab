@@ -22,7 +22,7 @@ class MilestoneSerializer(AccessControlModelSerializer):
 
 class InvestigationSerializer(AccessControlModelSerializer):
 
-    milestones = MilestoneSerializer(many=True)
+    milestones = MilestoneSerializer(many=True, read_only=True)
 
     class Meta:
         model = Investigation
@@ -32,7 +32,7 @@ class InvestigationSerializer(AccessControlModelSerializer):
 
 class ProjectSerializer(AccessControlModelSerializer):
 
-    investigations = InvestigationSerializer(many=True)
+    investigations = InvestigationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
