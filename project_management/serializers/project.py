@@ -16,18 +16,19 @@ class MilestoneSerializer(AccessControlModelSerializer):
 
     class Meta:
         model = Milestone
-        fields = ('name', 'slug', 'owner_group', 'member_group',
-                  'viewer_group', 'description',)
+        fields = ('name', 'slug', 'description', 'investigation', 'is_active', 'due_date',
+                  'owner_group', 'member_group', 'viewer_group',)
 
 
 class InvestigationSerializer(AccessControlModelSerializer):
 
     milestones = MilestoneSerializer(many=True, read_only=True)
+    project = serializers.StringRelatedField()
 
     class Meta:
         model = Investigation
-        fields = ('name', 'slug', 'description', 'owner_group', 'member_group',
-                  'viewer_group', 'milestones',)
+        fields = ('name', 'slug', 'description', 'project', 'is_active', 'owner_group',
+                  'member_group', 'viewer_group', 'milestones',)
 
 
 class ProjectSerializer(AccessControlModelSerializer):
@@ -36,5 +37,5 @@ class ProjectSerializer(AccessControlModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('name', 'slug', 'description', 'owner_group', 'member_group',
-                  'viewer_group', 'investigations',)
+        fields = ('name', 'slug', 'description', 'is_active', 'owner_group',
+                  'member_group', 'viewer_group', 'investigations',)

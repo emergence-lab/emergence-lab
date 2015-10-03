@@ -8,7 +8,9 @@ import project_management.api
 
 urlpatterns = [
     url(r'^$', project_management.api.ProjectListAPIView.as_view()),
+    url(r'^all$', project_management.api.ProjectListAllAPIView.as_view()),
     url(r'^detail/(?P<slug>[\w-]+)$', project_management.api.ProjectRetrieveAPIView.as_view()),
     url(r'^edit/(?P<slug>[\w-]+)$', project_management.api.ProjectUpdateAPIView.as_view()),
-    # url(r'^detail/(?P<pk>[0-9a-f\-])$', project_management.api.ProjectRetrieveAPIView.as_view()),
+    url(r'^untrack/(?P<slug>[\w-]+)$', project_management.api.ProjectUntrackAPIView.as_view()),
+    url(r'^track/(?P<slug>[\w-]+)$', project_management.api.ProjectTrackAPIView.as_view()),
 ]
