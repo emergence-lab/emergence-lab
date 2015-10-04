@@ -88,8 +88,6 @@ class Milestone(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mo
                                 related_name='milestones',
                                 related_query_name='milestone',
                                 null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                limit_choices_to={'is_active': True})
 
     class Meta:
         verbose_name = _('milestone')
@@ -120,8 +118,6 @@ class MilestoneNote(AccessControlShortcutMixin, TimestampMixin, models.Model):
                                 related_name='note',
                                 related_query_name='note',
                                 null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                limit_choices_to={'is_active': True})
 
     @property
     def owner_group(self):

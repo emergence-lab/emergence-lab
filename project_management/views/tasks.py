@@ -82,7 +82,7 @@ class TaskCreateAction(LoginRequiredMixin, generic.View):
 
     def post(self, request, *args, **kwargs):
         task_form = TaskForm(request.POST)
-        milestone = Milestone.objects.get(id=request.POST.get('milestone'))
+        milestone = Milestone.objects.get(slug=request.POST.get('slug'))
         if task_form.is_valid() and milestone.is_member(self.request.user):
             self.object = task_form.save(commit=False)
             self.object.user = request.user

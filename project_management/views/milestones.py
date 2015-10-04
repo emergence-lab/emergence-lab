@@ -50,7 +50,6 @@ class MilestoneCreateView(LoginRequiredMixin, generic.CreateView):
         self.investigation = Investigation.objects.get(slug=self.kwargs.get('investigation'))
         initial = super(MilestoneCreateView, self).get_initial()
         initial['investigation'] = self.investigation
-        initial['user'] = self.request.user
         return initial
 
     def post(self, request, *args, **kwargs):
@@ -141,7 +140,6 @@ class MilestoneNoteAction(LoginRequiredMixin, generic.View):
         if note_form.is_valid() and milestone.is_member(self.request.user):
             self.object = note_form.save(commit=False)
             self.object.milestone_id = milestone.id
-            self.object.user_id = request.POST.get('user')
             self.object.save()
         else:
             HttpResponseRedirect(reverse('milestone_detail', kwargs={'slug': milestone.slug}))
