@@ -14,6 +14,12 @@ class AccessControlModelSerializer(serializers.ModelSerializer):
 
 class MilestoneSerializer(AccessControlModelSerializer):
 
+    def validate_investigation(self, value):
+        if not value.is_owner(self.context['request'].user):
+            return serializers.ValidationError('Not authorized for this investigation.')
+        else:
+            return value
+
     class Meta:
         model = Milestone
         fields = ('name', 'slug', 'description', 'investigation', 'is_active', 'due_date',
@@ -23,7 +29,12 @@ class MilestoneSerializer(AccessControlModelSerializer):
 class InvestigationSerializer(AccessControlModelSerializer):
 
     milestones = MilestoneSerializer(many=True, read_only=True)
-    project = serializers.StringRelatedField()
+
+    def validate_project(self, value):
+        if not value.is_owner(self.context['request'].user):
+            return serializers.ValidationError('Not authorized for this investigation.')
+        else:
+            return value
 
     class Meta:
         model = Investigation
