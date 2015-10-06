@@ -151,6 +151,19 @@ class TestInvestigationAPI(TestCase):
         for investigation, result in zip(investigations, results):
             self.assertEqual(result['slug'], investigation.slug)
 
+    def test_bad_create_view(self):
+        """
+        Test unauthorized creation of an investigation using the API errors to 403 Forbidden.
+        """
+        project = mommy.make(Project, name='project 1', slug='project-1', is_active=True)
+        url = '/api/v0/project_management/investigation/'
+        data = {'name': 'investigation 1',
+                'description': 'Test description',
+                'project': project.id}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(project.is_owner(self.user))
+
     def test_retrieve_view_get(self):
         """
         Test retrieval of an investigation.
@@ -271,6 +284,22 @@ class TestMilestoneAPI(TestCase):
         self.assertEqual(milestone.description, data['description'])
         self.assertEqual(results.get('description'), data['description'])
         self.assertTrue(milestone in self.user.get_milestones('viewer'))
+
+    def test_bad_create_view(self):
+        """
+        Test unauthorized creation of a milestone using the API errors to 403 Forbidden.
+        """
+        project = mommy.make(Project, name='project 1', slug='project-1', is_active=True)
+        investigation = mommy.make(Investigation, name='investigation 1', slug='investigation-1',
+                                   project=project, is_active=True)
+        url = '/api/v0/project_management/milestone/'
+        data = {'name': 'milestone 1',
+                'description': 'Test description',
+                'investigation': investigation.id,
+                'due_date': str(datetime.date.today())}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(project.is_owner(self.user))
 
     def test_update_view(self):
         """
