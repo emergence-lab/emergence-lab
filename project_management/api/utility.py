@@ -45,7 +45,7 @@ class IsOwnerPermission(permissions.BasePermission):
 class HasInvestigationCreatePermission(permissions.BasePermission):
 
     def has_relation_permission(self, request, view):
-        project = get_object_or_404(Project, id=request.data['project'][0])
+        project = get_object_or_404(Project, id=request.data['project'])
         if project.is_owner(request.user):
             return True
 
@@ -53,6 +53,6 @@ class HasInvestigationCreatePermission(permissions.BasePermission):
 class HasMilestoneCreatePermission(permissions.BasePermission):
 
     def has_relation_permission(self, request, view):
-        investigation = get_object_or_404(Investigation, id=request.data['investigation'][0])
-        if project.is_owner(request.user):
+        investigation = get_object_or_404(Investigation, id=request.data['investigation'])
+        if investigation.is_owner(request.user):
             return True
