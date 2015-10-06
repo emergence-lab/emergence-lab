@@ -49,5 +49,5 @@ class InvestigationProcessListAPIView(generics.ListAPIView):
     serializer_class = ProcessSerializer
 
     def get_queryset(self, *args, **kwargs):
-        filter_set = Q(investigations__in=self.request.user.get_investigations('viewer'))
-        return Process.objects.filter(filter_set)
+        filter_set = self.request.user.get_investigations('viewer')
+        return Process.objects.filter(investigation__in=filter_set)

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.db.models import Q
-
 from rest_framework import generics, permissions
 
 from project_management.serializers import MilestoneSerializer
@@ -48,5 +46,5 @@ class MilestoneProcessListAPIView(generics.ListAPIView):
     serializer_class = ProcessSerializer
 
     def get_queryset(self, *args, **kwargs):
-        filter_set = Q(Milestones__in=self.request.user.get_milestones('viewer'))
-        return Process.objects.filter(filter_set)
+        filter_set = self.request.user.get_milestones('viewer')
+        return Process.objects.filter(milestones__in=filter_set)
