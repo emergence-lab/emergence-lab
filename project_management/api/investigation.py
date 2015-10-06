@@ -3,18 +3,20 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db.models import Q
 
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 
 from project_management.serializers import InvestigationSerializer
-from .utility import IsViewerPermission, IsOwnerPermission
+from .utility import (IsViewerPermission, IsOwnerPermission,
+                      HasInvestigationCreatePermission, CreatePermissionMixin,)
 
 from core.models import Process
 from core.serializers import ProcessSerializer
 
 
-class InvestigationListAPIView(generics.ListCreateAPIView):
+class InvestigationListAPIView(CreatePermissionMixin, generics.ListCreateAPIView):
 
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (HasInvestigationCreatePermission, permissions.IsAuthenticated,)
     serializer_class = InvestigationSerializer
 
     def get_queryset(self, *args, **kwargs):

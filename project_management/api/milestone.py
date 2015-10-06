@@ -6,15 +6,16 @@ from django.db.models import Q
 from rest_framework import generics, permissions
 
 from project_management.serializers import MilestoneSerializer
-from .utility import IsViewerPermission, IsOwnerPermission
+from .utility import (IsViewerPermission, IsOwnerPermission,
+                      HasMilestoneCreatePermission, CreatePermissionMixin)
 
 from core.models import Process
 from core.serializers import ProcessSerializer
 
 
-class MilestoneListAPIView(generics.ListCreateAPIView):
+class MilestoneListAPIView(CreatePermissionMixin, generics.ListCreateAPIView):
 
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (HasMilestoneCreatePermission, permissions.IsAuthenticated,)
     serializer_class = MilestoneSerializer
 
     def get_queryset(self, *args, **kwargs):
