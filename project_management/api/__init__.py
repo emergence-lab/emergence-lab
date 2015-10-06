@@ -11,8 +11,8 @@ from investigation import (InvestigationListAPIView,
                            InvestigationProcessListAPIView,)
 
 from milestone import (MilestoneListAPIView,
-                           MilestoneRetrieveAPIView,
-                           MilestoneUpdateAPIView,
-                           MilestoneProcessListAPIView,)
+                       MilestoneRetrieveAPIView,
+                       MilestoneUpdateAPIView,
+                       MilestoneProcessListAPIView,)
 
 from utility import (IsViewerPermission,)
