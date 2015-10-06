@@ -19,7 +19,6 @@ class CreatePermissionMixin(object):
                 )
 
     def create(self, request, *args, **kwargs):
-        import pdb; pdb.set_trace()
         self.check_relation_permissions(request)
         return super(CreatePermissionMixin, self).create(request, *args, **kwargs)
 
