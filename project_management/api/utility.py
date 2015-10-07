@@ -8,6 +8,9 @@ from core.models import Project, Investigation
 
 
 class CreatePermissionMixin(object):
+    """
+    Mixin to check against custom permission class.
+    """
 
     def check_relation_permissions(self, request):
         for permission in self.get_permissions():
@@ -24,6 +27,9 @@ class CreatePermissionMixin(object):
 
 
 class IsViewerPermission(permissions.BasePermission):
+    """
+    Checks if the user is a viewer and that the method is read-only.
+    """
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
@@ -31,18 +37,27 @@ class IsViewerPermission(permissions.BasePermission):
 
 
 class IsMemberPermission(permissions.BasePermission):
+    """
+    Checks if the user is a member and that the method is read-only.
+    """
 
     def has_object_permission(self, request, view, obj):
         return obj.is_member(request.user)
 
 
 class IsOwnerPermission(permissions.BasePermission):
+    """
+    Checks if the user is an owner and that the method is read-only.
+    """
 
     def has_object_permission(self, request, view, obj):
         return obj.is_owner(request.user)
 
 
 class HasInvestigationCreatePermission(permissions.BasePermission):
+    """
+    Checks if the user is an owner of the project for a created investigation.
+    """
 
     def has_relation_permission(self, request, view):
         project = get_object_or_404(Project, id=request.data['project'])
@@ -51,6 +66,9 @@ class HasInvestigationCreatePermission(permissions.BasePermission):
 
 
 class HasMilestoneCreatePermission(permissions.BasePermission):
+    """
+    Checks if the user is an owner of the investigation for a created milestone.
+    """
 
     def has_relation_permission(self, request, view):
         investigation = get_object_or_404(Investigation, id=request.data['investigation'])
