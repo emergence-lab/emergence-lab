@@ -22,7 +22,7 @@ class InvestigationListAPIView(CreatePermissionMixin, generics.ListCreateAPIView
 
 class InvestigationRetrieveAPIView(generics.RetrieveAPIView):
 
-    permission_classes = (IsViewerPermission,)
+    permission_classes = (IsViewerPermission, permissions.IsAuthenticated,)
     serializer_class = InvestigationSerializer
     lookup_field = 'slug'
 

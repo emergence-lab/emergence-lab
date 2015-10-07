@@ -22,7 +22,7 @@ class MilestoneListAPIView(CreatePermissionMixin, generics.ListCreateAPIView):
 
 class MilestoneRetrieveAPIView(generics.RetrieveAPIView):
 
-    permission_classes = (IsViewerPermission,)
+    permission_classes = (IsViewerPermission, permissions.IsAuthenticated,)
     serializer_class = MilestoneSerializer
     lookup_field = 'slug'
 

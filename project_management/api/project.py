@@ -38,7 +38,7 @@ class ProjectListAPIView(generics.ListCreateAPIView):
 
 class ProjectRetrieveAPIView(generics.RetrieveAPIView):
 
-    permission_classes = (IsViewerPermission,)
+    permission_classes = (IsViewerPermission, permissions.IsAuthenticated,)
     serializer_class = ProjectSerializer
     lookup_field = 'slug'
 
