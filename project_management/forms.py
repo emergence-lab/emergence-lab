@@ -12,10 +12,9 @@ class MilestoneForm(forms.ModelForm):
 
     class Meta:
         model = Milestone
-        fields = ('name', 'due_date', 'description', 'user', 'investigation')
+        fields = ('name', 'due_date', 'description', 'investigation')
         widgets = {
             'investigation': forms.HiddenInput(),
-            'user': forms.HiddenInput(),
             'due_date': DateWidget(attrs={'class': 'datetime'},
                                    bootstrap_version=3,
                                    usel10n=True,
@@ -49,18 +48,6 @@ class MilestoneSimpleForm(forms.ModelForm):
 
 
 class InvestigationForm(forms.ModelForm):
-
-    # def __init__(self, *args, **kwargs):
-    #     # user = kwargs.pop('user')
-    #     super(InvestigationForm, self).__init__(*args, **kwargs)
-    #     user = self.initial['user']
-    #     projects_tracked = [x.project.id for x in ProjectTracking.objects.filter(user=user)
-    #                         if x.project.is_owner(user)]
-    #     # projects_owned = [x.id for x in projects_tracked if x.is_owner(user)]
-    #     # project_tracking = (ProjectTracking.objects.filter(user=user)
-    #     #                                            .values_list('project_id', flat=True))
-    #     projects = Project.objects.filter(id__in=projects_tracked)
-    #     self.fields['project'].queryset = projects
 
     def clean_name(self):
         name = self.cleaned_data['name']

@@ -7,7 +7,7 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 
 from core.views import ActiveListView, AccessControlMixin
-from core.models import Investigation, Milestone, Project
+from core.models import Investigation, Project
 from project_management.forms import InvestigationForm, MilestoneForm
 
 
@@ -43,9 +43,12 @@ class InvestigationDetailView(InvestigationAccessControlMixin, generic.DetailVie
         investigation = context['investigation']
         context['literature'] = investigation.literature.all()[:20]
         context['processes'] = investigation.target_actions.all().order_by('-timestamp')[:20]
-        context['milestones'] = (Milestone.objects.filter(user=self.request.user)
-                                                  .filter(investigation=self.object)
-                                                  .order_by('due_date'))
+        context['milestones'] = (self.request.user.get_milestones('viewer', followed=True)
+                                                 .filter(investigation=self.object)
+                                                 .order_by('due_date'))
+        # context['milestones'] = (Milestone.objects.filter(user=self.request.user)
+        #                                           .filter(investigation=self.object)
+        #                                           .order_by('due_date'))
         context['milestone_form'] = MilestoneForm(
             initial={
                 'investigation': investigation,

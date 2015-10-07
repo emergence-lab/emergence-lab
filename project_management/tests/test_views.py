@@ -225,7 +225,7 @@ class TestMilestoneCRUD(TestCase):
         investigation1 = mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         mommy.make(Milestone, name='milestone 1', slug='milestone-1',
-            is_active=True, investigation=investigation1, user=get_user_model().objects.first())
+            is_active=True, investigation=investigation1,)
         self.client.login(username='username1', password='')
         ProjectTracking.objects.create(user=get_user_model().objects.first(), project=project1)
 
@@ -272,10 +272,8 @@ class TestMilestoneCRUD(TestCase):
         investigation = Investigation.objects.get(slug='investigation-1')
         url = reverse('milestone_create', args=(investigation.slug,))
         due_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
-        data = {'name': 'Milestone 3', 'investigation': investigation.id,
-            'user': get_user_model().objects.first().id, 'due_date': due_date}
+        data = {'name': 'Milestone 3', 'investigation': investigation.id, 'due_date': due_date}
         response = self.client.post(url, data)
-        # print([(x.name, x.errors) for x in response.context['form']])
         obj = Milestone.objects.get(**data)
         self.assertEqual(obj.slug, 'milestone-3')
         detail_url = reverse('milestone_detail',
@@ -295,8 +293,7 @@ class TestMilestoneCRUD(TestCase):
         url = reverse('milestone_edit', kwargs={'slug': obj.slug})
         due_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
         data = {'name': obj.name, 'description': 'test description',
-           'investigation': investigation.id, 'user': get_user_model().objects.first().id,
-           'due_date': due_date}
+           'investigation': investigation.id, 'due_date': due_date}
         response = self.client.post(url, data)
         # print([(x.name, x.errors) for x in response.context['form']])
         obj = Milestone.objects.get(id=obj.id)
@@ -315,9 +312,9 @@ class TestTaskCRUD(TestCase):
         investigation1 = mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         milestone1 = mommy.make(Milestone, name='milestone 1', slug='milestone-1',
-            is_active=True, investigation=investigation1, user=get_user_model().objects.first())
+            is_active=True, investigation=investigation1,)
         mommy.make(Task, description='task 1', is_active=True,
-            milestone=milestone1, user=get_user_model().objects.first())
+            milestone=milestone1,)
         self.client.login(username='username1', password='')
         ProjectTracking.objects.create(user=get_user_model().objects.first(), project=project1)
 
@@ -341,8 +338,8 @@ class TestTaskCRUD(TestCase):
         due_date = datetime.strftime(datetime.now(), '%Y-%m-%d')
         data = {'description': 'description',
             # 'slug': milestone.slug,
-            'milestone': milestone.id,
-            'user': get_user_model().objects.first().id,
+            'slug': milestone.slug,
+            # 'user': get_user_model().objects.first().id,
             'due_date': due_date}
         response = self.client.post(url, data)
         obj = Task.objects.get(description='description')
@@ -361,9 +358,8 @@ class TestNoteCRUD(TestCase):
         investigation1 = mommy.make(Investigation, name='investigation 1',
                    slug='investigation-1', is_active=True, project=project1)
         milestone1 = mommy.make(Milestone, name='milestone 1', slug='milestone-1',
-            is_active=True, investigation=investigation1, user=get_user_model().objects.first())
-        mommy.make(MilestoneNote, note='note-test', milestone=milestone1,
-            user=get_user_model().objects.first())
+            is_active=True, investigation=investigation1,)
+        mommy.make(MilestoneNote, note='note-test', milestone=milestone1,)
         self.client.login(username='username1', password='')
         ProjectTracking.objects.create(user=get_user_model().objects.first(), project=project1)
 
@@ -380,7 +376,8 @@ class TestNoteCRUD(TestCase):
         data = {'note': 'note',
             # 'slug': milestone.slug,
             'milestone': milestone.id,
-            'user': get_user_model().objects.first().id}
+            # 'user': get_user_model().objects.first().id
+            }
         response = self.client.post(url, data)
         obj = MilestoneNote.objects.get(note='note')
         self.assertEqual(obj.note, 'note')
