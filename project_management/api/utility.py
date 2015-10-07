@@ -10,6 +10,7 @@ from core.models import Project, Investigation
 class CreatePermissionMixin(object):
     """
     Mixin to check against custom permission class.
+    Checks that the foreign key relation of the to-be-created object has the proper permission.
     """
 
     def check_relation_permissions(self, request):
@@ -38,7 +39,7 @@ class IsViewerPermission(permissions.BasePermission):
 
 class IsMemberPermission(permissions.BasePermission):
     """
-    Checks if the user is a member and that the method is read-only.
+    Checks if the user is a member.
     """
 
     def has_object_permission(self, request, view, obj):
@@ -47,7 +48,7 @@ class IsMemberPermission(permissions.BasePermission):
 
 class IsOwnerPermission(permissions.BasePermission):
     """
-    Checks if the user is an owner and that the method is read-only.
+    Checks if the user is an owner.
     """
 
     def has_object_permission(self, request, view, obj):
