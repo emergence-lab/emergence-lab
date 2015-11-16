@@ -26,4 +26,5 @@ from .process import (
     DataFile,
     ProcessTemplate,
     ProcessType,
+    ProcessCategory,
 )
