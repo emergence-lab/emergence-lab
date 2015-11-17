@@ -11,7 +11,8 @@ from model_mommy import mommy
 
 from .helpers import test_resolution_template
 from core.models import (Investigation, Process, Project, ProjectTracking,
-                         Sample, Substrate, ProcessTemplate, ProcessType)
+                         Sample, Substrate, ProcessTemplate, ProcessType,
+                         ProcessCategory)
 
 
 class TestHomepageAbout(TestCase):
@@ -696,13 +697,15 @@ class TestProcessTypeCRUD(TestCase):
         self.assertFormError(response, 'form', 'name', 'This field is required.')
 
     def test_processtype_edit_valid_data(self):
-        processtype = mommy.make(ProcessType, type='test')
+        processcategory = mommy.make(ProcessCategory)
+        processtype = mommy.make(ProcessType, type='test', category=processcategory)
         url = reverse('processtype_edit', args=(processtype.type,))
         data = {
             'name': processtype.name,
             'full_name': processtype.full_name,
             'description': 'testing',
             'is_destructive': processtype.is_destructive,
+            'category': processtype.category_id,
             'scheduling_type': processtype.scheduling_type,
         }
         response = self.client.post(url, data)
@@ -726,6 +729,7 @@ class TestProcessTypeCRUD(TestCase):
                              'This field is required.')
 
     def test_processtype_create_valid_data(self):
+        processcategory = mommy.make(ProcessCategory)
         url = reverse('processtype_create')
         data = {
             'type': 'test',
@@ -733,9 +737,35 @@ class TestProcessTypeCRUD(TestCase):
             'full_name': 'Test Process',
             'description': 'testing',
             'is_destructive': True,
+            'category': processcategory.slug,
             'scheduling_type': 'none',
         }
         response = self.client.post(url, data)
         processtype = ProcessType.objects.last()
         self.assertRedirects(response, reverse('processtype_detail',
                                                args=(processtype.type,)))
+
+    def test_processcategory_create_resolution_template(self):
+        test_resolution_template(self,
+            url='/process/type/category/create/',
+            url_name='processcategory_create',
+            template_file='core/processtype_create.html',
+            response_code=200)
+
+    def test_processcategory_create_empty_data(self):
+        url = reverse('processcategory_create')
+        data = {}
+        response = self.client.post(url, data)
+        self.assertFormError(response, 'form', 'slug',
+                             'This field is required.')
+
+    def test_processcategory_create_valid_data(self):
+        url = reverse('processcategory_create')
+        data = {
+            'slug': 'test',
+            'name': 'Test',
+            'description': 'testing',
+        }
+        response = self.client.post(url, data)
+        processcategory = ProcessCategory.objects.last()
+        self.assertRedirects(response, reverse('processtype_list'))
