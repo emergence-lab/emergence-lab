@@ -6,6 +6,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import generic
@@ -16,7 +17,7 @@ from braces.views import LoginRequiredMixin
 from core.forms import (DropzoneForm, ProcessCreateForm,
                         EditProcessTemplateForm, SampleFormSet,
                         WizardBasicInfoForm)
-from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType
+from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType, ProcessCategory
 from core.tasks import process_file, save_files
 from core.views import ActionReloadView
 
@@ -313,6 +314,14 @@ class ProcessTypeListView(LoginRequiredMixin, generic.ListView):
     model = ProcessType
     template_name = 'core/processtype_list.html'
     context_object_name = 'processtypes'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTypeListView, self).get_context_data(**kwargs)
+        context['process_categories'] = (ProcessCategory.objects
+                                                        .order_by('slug')
+                                                        .prefetch_related('processtypes')
+                                                        .annotate(number=Count('processtype')))
+        return context
 
 
 class ProcessTypeDetailView(LoginRequiredMixin, generic.DetailView):

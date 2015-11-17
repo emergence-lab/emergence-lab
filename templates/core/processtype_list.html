@@ -26,15 +26,39 @@
         </h1>
     </header>
 
-    <div>
-        <div class="list-group">
-            {% for processtype in processtypes %}
-                <a class="list-group-item" href="{% url 'processtype_detail' processtype.type %}"
-                   data-toggle="tooltip" data-placement="left" title="{{processtype.description}}">
-                    {{processtype.full_name}}
-                </a>
-            {% endfor %}
-        </div>
+    <div class="panel-group" id="categories">
+        {% for category in process_categories %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        {% if category.number == 0 %}
+                            {{category.name}}
+                            <span class="badge">{{category.number}}</span>
+                        {% else %}
+                            <a data-toggle="collapse" data-parent="#categories" href="#{{category.slug}}">
+                                {{category.name}}
+                            </a>
+                            <span class="badge">
+                                {{category.number}}
+                            </span>
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="panel-collapse collapse{% if forloop.first %} in{% endif %}" id="{{category.slug}}">
+                    <div class="list-group">
+                        {% for processtype in category.processtypes.all %}
+                            <a class="list-group-item"
+                               href="{% url 'processtype_detail' processtype.type %}"
+                               data-toggle="tooltip"
+                               data-placement="left"
+                               title="{{processtype.description}}">
+                                    {{processtype.full_name}}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 
 </main>
