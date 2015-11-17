@@ -356,3 +356,12 @@ class ProcessTypeCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))
+
+
+class ProcessCategoryCreateView(LoginRequiredMixin, generic.CreateView):
+    model = ProcessCategory
+    template_name = 'core/processtype_create.html'
+    fields = ('slug', 'name', 'description')
+
+    def get_success_url(self):
+        return reverse('processtype_list')
