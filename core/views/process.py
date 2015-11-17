@@ -333,7 +333,7 @@ class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'core/processtype_edit.html'
     context_object_name = 'processtype'
     slug_field = 'type'
-    fields = ('name', 'full_name', 'description', 'scheduling_type',)
+    fields = ('name', 'full_name', 'description', 'category', 'scheduling_type',)
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))
@@ -343,7 +343,7 @@ class ProcessTypeCreateView(LoginRequiredMixin, generic.CreateView):
     model = ProcessType
     template_name = 'core/processtype_create.html'
     fields = ('type', 'name', 'full_name', 'description',
-              'is_destructive', 'scheduling_type')
+              'is_destructive', 'category', 'scheduling_type')
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))
