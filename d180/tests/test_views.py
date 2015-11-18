@@ -546,18 +546,23 @@ class TestD180Wizard(TestCase):
             'sample-0-substrate_comment': 'test',
         }
         response = self.client.post(url, data)
-        # print(response.context['info_form'].errors)
-        # print(dict(response.context['comment_form'].errors))
-        # print(dict(response.context['growth_form'].errors))
-        # print(dict(response.context['checklist_form'].errors))
         self.assertRedirects(response, reverse('create_growth_d180_readings'))
         reservation = type(reservation).objects.get(id=reservation.id)
         self.assertFalse(reservation.is_active)
 
+    def test_start_template_uuid(self):
+        """Test creating a growth from a template by id."""
+        process = mommy.make(Process, type_id='d180-growth', comment='testing')
+        mommy.make(D180GrowthInfo, process=process)
+        url = reverse('create_growth_d180_start_template', args=(process.uuid,))
+        response = self.client.get(url)
+        self.assertEqual(response.context['comment_form'].initial['comment'], process.comment)
+        for attr, value in response.context['growth_form'].initial.items():
+            self.assertEqual(value, getattr(process.info, attr))
+
+
     def test_readings_empty_data(self):
-        """
-        Test a post where no data is sent.
-        """
+        """Test a post where no data is sent."""
         process = mommy.make(Process, type_id='d180-growth')
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
@@ -568,9 +573,7 @@ class TestD180Wizard(TestCase):
             'ManagementForm data is missing or has been tampered with')
 
     def test_readings_management_only(self):
-        """
-        Test a post where only managementform data is passed.
-        """
+        """Test a post where only managementform data is passed."""
         process = mommy.make(Process, type_id='d180-growth')
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')

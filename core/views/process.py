@@ -309,8 +309,10 @@ class TemplateProcessWizardView(ProcessWizardView):
             comment = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
                 self.kwargs.get('uuid', None))).comment
         output = super(TemplateProcessWizardView, self).build_forms()
-        output['info_form'] = WizardBasicInfoForm(initial={'user': self.request.user,
-                                                           'comment': comment}, prefix='process')
+        output['info_form'] = WizardBasicInfoForm(self.request.user,
+                                                  initial={'user': self.request.user,
+                                                           'comment': comment},
+                                                  prefix='process')
         return output
 
 
