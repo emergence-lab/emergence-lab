@@ -43,6 +43,10 @@ urlpatterns = [
     url(r'^type/(?P<slug>[\w-]+)/edit/$',
         core.views.ProcessTypeUpdateView.as_view(), name='processtype_edit'),
 
+    # process category
+    url(r'^type/category/create/',
+        core.views.ProcessCategoryCreateView.as_view(), name='processcategory_create'),
+
     # process detail/edit
     url(r'^(?P<uuid>p[0-9a-f\-]{7,})/$', core.views.ProcessDetailView.as_view(),
         name='process_detail'),

@@ -6,6 +6,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import generic
@@ -16,7 +17,7 @@ from braces.views import LoginRequiredMixin
 from core.forms import (DropzoneForm, ProcessCreateForm,
                         EditProcessTemplateForm, SampleFormSet,
                         WizardBasicInfoForm)
-from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType
+from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType, ProcessCategory
 from core.tasks import process_file, save_files
 from core.views import ActionReloadView
 
@@ -65,6 +66,10 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
         context['process_list'] = ProcessType.objects.all()
+        context['process_categories'] = (ProcessCategory.objects
+                                                        .order_by('slug')
+                                                        .prefetch_related('processtypes')
+                                                        .annotate(number=Count('processtype')))
         context['user_list'] = get_user_model().objects.all().filter(is_active=True)
         context['slug'] = self.kwargs.get('slug', 'all')
         context['username'] = self.kwargs.get('username', 'all')
@@ -314,6 +319,14 @@ class ProcessTypeListView(LoginRequiredMixin, generic.ListView):
     template_name = 'core/processtype_list.html'
     context_object_name = 'processtypes'
 
+    def get_context_data(self, **kwargs):
+        context = super(ProcessTypeListView, self).get_context_data(**kwargs)
+        context['process_categories'] = (ProcessCategory.objects
+                                                        .order_by('slug')
+                                                        .prefetch_related('processtypes')
+                                                        .annotate(number=Count('processtype')))
+        return context
+
 
 class ProcessTypeDetailView(LoginRequiredMixin, generic.DetailView):
     model = ProcessType
@@ -333,7 +346,7 @@ class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'core/processtype_edit.html'
     context_object_name = 'processtype'
     slug_field = 'type'
-    fields = ('name', 'full_name', 'description', 'scheduling_type',)
+    fields = ('name', 'full_name', 'description', 'category', 'scheduling_type',)
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))
@@ -343,7 +356,16 @@ class ProcessTypeCreateView(LoginRequiredMixin, generic.CreateView):
     model = ProcessType
     template_name = 'core/processtype_create.html'
     fields = ('type', 'name', 'full_name', 'description',
-              'is_destructive', 'scheduling_type')
+              'is_destructive', 'category', 'scheduling_type')
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))
+
+
+class ProcessCategoryCreateView(LoginRequiredMixin, generic.CreateView):
+    model = ProcessCategory
+    template_name = 'core/processtype_create.html'
+    fields = ('slug', 'name', 'description')
+
+    def get_success_url(self):
+        return reverse('processtype_list')

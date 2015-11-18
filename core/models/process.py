@@ -26,6 +26,24 @@ def get_file_path(instance, filename):
 
 
 @python_2_unicode_compatible
+class ProcessCategory(models.Model):
+    """Holds information about the category of process types."""
+
+    slug = models.SlugField(primary_key=True, max_length=100, default='uncategorized')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self.__class__.__name__, self.slug)
+
+    def __str__(self):
+        return self.name
+
+    def processtype_slugs(self):
+        return self.processtypes.values_list('type', flat=True)
+
+
+@python_2_unicode_compatible
 class ProcessType(models.Model):
     """
     Holds information about types of processes.
@@ -44,6 +62,9 @@ class ProcessType(models.Model):
     description = models.TextField(blank=True)
     scheduling_type = models.CharField(max_length=10, choices=SCHEDULING_TYPE,
                                        default='none')
+    category = models.ForeignKey(ProcessCategory, default='uncategorized',
+                                 related_name='processtypes',
+                                 related_query_name='processtype')
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)
