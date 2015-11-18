@@ -31,8 +31,8 @@ class TestProcessAPI(TestCase):
         response = self.client.get('/api/v0/process/')
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
-        self.assertEqual(results.get('count'), len(processes))
-        for process, result in zip(processes, results.get('results')):
+        self.assertEqual(len(results), len(processes))
+        for process, result in zip(processes, results):
             self.assertEqual(result.get('uuid_full'), process.uuid_full.hex)
 
     def test_retrieve_view_get_full_uuid(self):
@@ -115,8 +115,8 @@ class TestSampleAPI(TestCase):
         response = self.client.get('/api/v0/sample/')
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
-        self.assertEqual(results.get('count'), len(samples))
-        for sample, result in zip(samples, results.get('results')):
+        self.assertEqual(len(results), len(samples))
+        for sample, result in zip(samples, results):
             self.assertEqual(result.get('uuid'), sample.uuid)
 
     def test_retrieve_view_get(self):
@@ -206,7 +206,7 @@ class TestUserAPI(TestCase):
         response = self.client.get('/api/v0/users/')
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content)
-        self.assertEqual(results.get('count'), 1)
-        user = results.get('results')[0]
+        self.assertEqual(len(results), 1)
+        user = results[0]
         self.assertIsNotNone(user)
         self.assertEqual(user.get('username'), 'username1')
