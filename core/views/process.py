@@ -197,12 +197,16 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
         queryset = super(ProcessTemplateListView, self).get_queryset()
         queryset = queryset.filter(user=self.request.user).order_by('-created')
         if slug != 'all':
-            queryset = queryset.filter(type_id=slug)
+            queryset = queryset.filter(process__type_id=slug)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
         context['process_list'] = ProcessType.objects.all()
+        context['process_categories'] = (ProcessCategory.objects
+                                                        .order_by('slug')
+                                                        .prefetch_related('processtypes')
+                                                        .annotate(number=Count('processtype')))
         context['slug'] = self.kwargs.get('slug', 'all')
         return context
 
