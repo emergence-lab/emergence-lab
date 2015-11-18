@@ -66,6 +66,10 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
         context['process_list'] = ProcessType.objects.all()
+        context['process_categories'] = (ProcessCategory.objects
+                                                        .order_by('slug')
+                                                        .prefetch_related('processtypes')
+                                                        .annotate(number=Count('processtype')))
         context['user_list'] = get_user_model().objects.all().filter(is_active=True)
         context['slug'] = self.kwargs.get('slug', 'all')
         context['username'] = self.kwargs.get('username', 'all')

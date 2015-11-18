@@ -39,6 +39,9 @@ class ProcessCategory(models.Model):
     def __str__(self):
         return self.name
 
+    def processtype_slugs(self):
+        return self.processtypes.values_list('type', flat=True)
+
 
 @python_2_unicode_compatible
 class ProcessType(models.Model):

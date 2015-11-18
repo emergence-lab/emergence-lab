@@ -44,21 +44,67 @@
 
     </section>
 
-    <section class="col-md-2">
-        Filter by type:
-        <p></p>
-        <ul class="nav nav-pills nav-stacked">
-            <li role="presentation" {% if slug == 'all' %}class="active"{%endif%}><a href="{% url 'process_list' slug='all' username='all' %}">All</a></li>
-        {% for process_type in process_list %}
-            <li role="presentation" {% if slug == process_type.type %}class="active"{% endif %}><a href="{% url 'process_list' slug=process_type.type username=username %}">{{process_type.name}}</a></li>
-        {% endfor %}
-        </ul>
-        <p></p>
+    <section class="col-md-3">
+        <p>Filter by type:</p>
+
+        <div class="panel-group bottom-spacer-lg" id="categories">
+            <div class="panel">
+                <a class="panel-link" href="{% url 'process_list' slug='all' username='all' %}"
+                   data-toggle="tooltip" data-placement="right" title="Show all process types">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                All
+                            </h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% for category in process_categories %}
+                {% if category.number != 0 %}
+                    <div class="panel panel-default panel-clickable">
+                        <div class="panel-heading" data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}">
+                            <span data-toggle="tooltip" data-placement="right" title="{{category.description}}">
+                            <h4 class="panel-title">
+                                {{category.name}}
+                                <span class="badge pull-right">{{category.number}}</span>
+                            </h4>
+                            </span>
+                        </div>
+                        <div class="panel-collapse collapse{% if slug in category.processtype_slugs %} in{% endif %}" id="{{category.slug}}">
+                            <div class="list-group">
+                                {% for process_type in category.processtypes.all %}
+                                    <a class="list-group-item{% if slug == process_type.type %} active{% endif %}"
+                                       href="{% url 'process_list' slug=process_type.type username=username %}"
+                                       data-toggle="tooltip"
+                                       data-placement="right"
+                                       title="{{process_type.description}}">
+                                            {{process_type.full_name}}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
 
     </section>
 
-    <section class="col-md-10">
+    <section class="col-md-9">
         <ul class="list-group">
+            {% if not object_list %}
+                <div class="alert alert-info top-spacer-md">
+                    <h3>No processes of this type have been run.</h3>
+                    <p>Get started by creating a new process.</p>
+                    <div class="top-spacer-sm">
+                        <a href="{% url 'process_create' %}" class="btn btn-primary right-spacer-xs">
+                            {% bootstrap_icon 'plus' %}
+                            Create Process
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
             {% for process in object_list %}
                 <li class="list-group-item">
                     <h4 class="list-group-item-heading">
