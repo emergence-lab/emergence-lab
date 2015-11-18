@@ -32,20 +32,11 @@
 
     <div class="panel-group" id="categories">
         {% for category in process_categories %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
+            <div class="panel panel-default{% if category.number != 0 %} panel-link{% endif %}">
+                <div class="panel-heading"{% if category.number != 0 %} data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}"{% endif %}>
                     <h4 class="panel-title">
-                        {% if category.number == 0 %}
-                            {{category.name}}
-                            <span class="badge">{{category.number}}</span>
-                        {% else %}
-                            <a data-toggle="collapse" data-parent="#categories" href="#{{category.slug}}">
-                                {{category.name}}
-                            </a>
-                            <span class="badge">
-                                {{category.number}}
-                            </span>
-                        {% endif %}
+                        {{category.name}}
+                        <span class="badge">{{category.number}}</span>
                     </h4>
                 </div>
                 <div class="panel-collapse collapse{% if forloop.first %} in{% endif %}" id="{{category.slug}}">

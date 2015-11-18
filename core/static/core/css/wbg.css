@@ -173,3 +173,7 @@ a.list-group-item.active-parent:focus {
   padding-left: 4px;
   padding-right: 4px;
 }
+
+.panel-link {
+  cursor: pointer;
+}
