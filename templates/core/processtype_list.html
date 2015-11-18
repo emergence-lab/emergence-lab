@@ -30,30 +30,34 @@
         </h1>
     </header>
 
-    <div class="panel-group" id="categories">
-        {% for category in process_categories %}
-            <div class="panel panel-default{% if category.number != 0 %} panel-link{% endif %}">
-                <div class="panel-heading"{% if category.number != 0 %} data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}"{% endif %}>
-                    <h4 class="panel-title">
-                        {{category.name}}
-                        <span class="badge">{{category.number}}</span>
-                    </h4>
-                </div>
-                <div class="panel-collapse collapse{% if forloop.first %} in{% endif %}" id="{{category.slug}}">
-                    <div class="list-group">
-                        {% for processtype in category.processtypes.all %}
-                            <a class="list-group-item"
-                               href="{% url 'processtype_detail' processtype.type %}"
-                               data-toggle="tooltip"
-                               data-placement="left"
-                               title="{{processtype.description}}">
-                                    {{processtype.full_name}}
-                            </a>
-                        {% endfor %}
+    <div class="col-md-10">
+        <div class="panel-group" id="categories">
+            {% for category in process_categories %}
+                <div class="panel panel-default{% if category.number != 0 %} panel-link{% endif %}">
+                    <div class="panel-heading"{% if category.number != 0 %} data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}"{% endif %}>
+                        <span data-toggle="tooltip" data-placement="right" title="{{category.description}}">
+                            <h4 class="panel-title">
+                                {{category.name}}
+                                <span class="badge">{{category.number}}</span>
+                            </h4>
+                        </span>
+                    </div>
+                    <div class="panel-collapse collapse{% if forloop.first %} in{% endif %}" id="{{category.slug}}">
+                        <div class="list-group">
+                            {% for process_type in category.processtypes.all %}
+                                <a class="list-group-item"
+                                   href="{% url 'processtype_detail' process_type.type %}"
+                                   data-toggle="tooltip"
+                                   data-placement="right"
+                                   title="{{process_type.description}}">
+                                        {{process_type.full_name}}
+                                </a>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
 </main>
