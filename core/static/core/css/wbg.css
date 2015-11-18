@@ -183,3 +183,7 @@ a.list-group-item.active-parent:focus {
 .panel-link:focus {
   text-decoration: none;
 }
+
+.tooltip-inner {
+  min-width: 150px;
+}
