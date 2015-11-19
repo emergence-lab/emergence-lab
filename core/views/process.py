@@ -70,7 +70,8 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
                                                         .order_by('slug')
                                                         .prefetch_related('processtypes')
                                                         .annotate(number=Count('processtype')))
-        context['user_list'] = get_user_model().objects.all().filter(is_active=True)
+        context['active_users'] = get_user_model().active_objects.exclude(id=self.request.user.id)
+        context['inactive_users'] = get_user_model().inactive_objects.order_by('-status_changed')
         context['slug'] = self.kwargs.get('slug', 'all')
         context['username'] = self.kwargs.get('username', 'all')
         return context

@@ -32,19 +32,33 @@
             </div>
         </h1>
         <ul class="nav nav-tabs">
-            <li role="presentation" {% if username == 'all' %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username='all' %}">All Users</a></li>
-            {% for user_obj in user_list %}
-                <li role="presentation"{% if username == user_obj.username %} class="active" {%endif%}><a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.full_name}}</a></li>
+            <li role="presentation" {% if username == 'all' %} class="active" {%endif%}>
+                <a href="{% url 'process_list' slug=slug username='all' %}">All Users</a>
+            </li>
+            <li role="presentation" {% if username == user.username %} class="active" {%endif%}>
+                <a href="{% url 'process_list' slug=slug username=user.username %}">{{user.full_name}}</a>
+            </li>
+            {% for user_obj in active_users %}
+                <li role="presentation"{% if username == user_obj.username %} class="active" {%endif%}>
+                    <a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.full_name}}</a>
+                </li>
             {% endfor %}
+            <li class="dropdown pull-right">
+                <a class="dropdown-toggle" data-toggle="dropdown">
+                    Inactive Users <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    {% for user_obj in inactive_users %}
+                        <li{% if username == user_obj.username %} class="active" {%endif%}>
+                            <a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.username}}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
         </ul>
-        <p></p>
     </header>
 
-    <section>
-
-    </section>
-
-    <section class="col-md-3">
+    <section class="col-md-3 top-spacer-sm">
         <p>Filter by type:</p>
 
         <div class="panel-group bottom-spacer-lg" id="categories">
@@ -91,18 +105,22 @@
 
     </section>
 
-    <section class="col-md-9">
+    <section class="col-md-9 top-spacer-sm">
         <ul class="list-group">
             {% if not object_list %}
                 <div class="alert alert-info top-spacer-md">
-                    <h3>No processes of this type have been run.</h3>
-                    <p>Get started by creating a new process.</p>
-                    <div class="top-spacer-sm">
-                        <a href="{% url 'process_create' %}" class="btn btn-primary right-spacer-xs">
-                            {% bootstrap_icon 'plus' %}
-                            Create Process
-                        </a>
-                    </div>
+                    {% if username == user.username %}
+                        <h3>No processes of this type have been run.</h3>
+                        <p>Get started by creating a new process.</p>
+                        <div class="top-spacer-sm">
+                            <a href="{% url 'process_create' %}" class="btn btn-primary right-spacer-xs">
+                                {% bootstrap_icon 'plus' %}
+                                Create Process
+                            </a>
+                        </div>
+                    {% else %}
+                        <h3>This user has not created any processes of this type.</h3>
+                    {% endif %}
                 </div>
             {% endif %}
             {% for process in object_list %}

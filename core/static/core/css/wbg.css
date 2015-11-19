@@ -185,5 +185,5 @@ a.list-group-item.active-parent:focus {
 }
 
 .tooltip-inner {
-  min-width: 150px;
+  min-width: 100px;
 }
