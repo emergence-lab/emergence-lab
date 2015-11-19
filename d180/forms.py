@@ -5,13 +5,11 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from core.forms import ChecklistForm
-from core.models import Process, Milestone, Investigation, Project
+from core.models import Process
 from d180.models import D180Readings, D180Source, D180GrowthInfo
 
 
 class WizardBasicProcessForm(forms.ModelForm):
-
-    milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)

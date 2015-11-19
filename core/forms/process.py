@@ -21,8 +21,6 @@ class DropzoneForm(forms.ModelForm):
 
 class ProcessCreateForm(forms.ModelForm):
 
-    milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
-
     def __init__(self, user, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
         process_type = kwargs.pop('process_type', None)
