@@ -21,17 +21,22 @@ class DropzoneForm(forms.ModelForm):
 
 class ProcessCreateForm(forms.ModelForm):
 
-    milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
-
     def __init__(self, user, *args, **kwargs):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
         process_type = kwargs.pop('process_type', None)
         super(ProcessCreateForm, self).__init__(*args, **kwargs)
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
+        self.fields['milestones'].required = False
+        self.fields['milestones'].choices = [
+            ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
+            for i in user.get_investigations('member') if i.milestones.exists()
+        ]
         self.fields['investigations'].required = False
-        self.fields['investigations'].queryset = user.get_investigations('member')
-        self.fields['milestones'].queryset = user.get_milestones('member')
+        self.fields['investigations'].choices = [
+            (p.name, [(i.id, i.name) for i in p.investigations.all()])
+            for p in user.get_projects('member') if p.investigations.exists()
+        ]
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
         if len(pieces) == 1:
@@ -60,10 +65,16 @@ class WizardBasicInfoForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
-        self.fields['investigations'].required = False
-        self.fields['investigations'].queryset = user.get_investigations('member')
         self.fields['milestones'].required = False
-        self.fields['milestones'].queryset = user.get_milestones('member')
+        self.fields['milestones'].choices = [
+            ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
+            for i in user.get_investigations('member') if i.milestones.exists()
+        ]
+        self.fields['investigations'].required = False
+        self.fields['investigations'].choices = [
+            (p.name, [(i.id, i.name) for i in p.investigations.all()])
+            for p in user.get_projects('member') if p.investigations.exists()
+        ]
         self.helper = helper.FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True

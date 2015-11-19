@@ -32,7 +32,7 @@
         <div class="col-md-10">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <strong>{% if processtemplate.name%}{{ processtemplate.name }}{%else%}Unnamed Template{%endif%}</strong>
+                    <strong>{% if processtemplate.name%}{{ processtemplate.name }}{%else%}Unnamed Template{%endif%}</strong> ({{processtemplate.process.type.name}})
                     <span class="pull-right">Based on <a href="{% url 'process_detail' processtemplate.process.uuid %}">{{processtemplate.process.uuid}}{%if processtemplate.process.legacy_identifier%} ({{processtemplate.process.legacy_identifier}}){%endif%}</a></span>
                 </div>
                 <div class="panel-body">

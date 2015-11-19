@@ -18,6 +18,7 @@
         <h1 class="page-header">
             {{processtype.full_name}} <small>{{processtype.name}}</small>
             <div class="pull-right">
+                <small>{{processtype.category.name}}</small>
                 <a href="{% url 'processtype_edit' processtype.type %}" class="btn btn-warning">
                     {% bootstrap_icon 'edit' %}
                     Edit

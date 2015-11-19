@@ -507,9 +507,14 @@ class TemplateWizardStartView(WizardStartView):
     def build_forms(self):
         if 'id' in self.kwargs:
             comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
+            process = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).process
         elif 'uuid' in self.kwargs:
-            comment = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
-                self.kwargs.get('uuid', None))).comment
+            process = Process.objects.get(
+                uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None)))
+            comment = process.comment
         output = super(TemplateWizardStartView, self).build_forms()
-        output['comment_form'] = CommentsForm(initial={'comment': comment}, prefix='growth')
+        output['comment_form'] = CommentsForm(initial={'comment': comment}, prefix='process')
+        growth_info = {attr: getattr(process.info, attr)
+                       for attr in WizardGrowthInfoForm.Meta.fields}
+        output['growth_form'] = WizardGrowthInfoForm(initial=growth_info, prefix='growth')
         return output

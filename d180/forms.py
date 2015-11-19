@@ -5,27 +5,28 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from core.forms import ChecklistForm
-from core.models import Process, Milestone, Investigation, Project
+from core.models import Process
 from d180.models import D180Readings, D180Source, D180GrowthInfo
 
 
 class WizardBasicProcessForm(forms.ModelForm):
 
-    milestones = forms.ModelMultipleChoiceField(queryset=None, required=False)
-
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
-        milestones = [x.id for x in Milestone.objects.filter(is_active=True) if x.is_member(user)]
-        projs = [x.id for x in Project.objects.filter(is_active=True) if x.is_member(user)]
-        self.fields['milestones'].queryset = Milestone.objects.filter(id__in=milestones)
+        self.fields['milestones'].required = False
+        self.fields['milestones'].choices = [
+            ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
+            for i in user.get_investigations('member') if i.milestones.exists()
+        ]
         self.fields['investigations'].required = False
-        # projs = (ProjectTracking.objects.filter(user=user)
-        #                                 .values_list('project_id', flat=True))
-        self.fields['investigations'].queryset = Investigation.objects.filter(project_id__in=projs)
+        self.fields['investigations'].choices = [
+            (p.name, [(i.id, i.name) for i in p.investigations.all()])
+            for p in user.get_projects('member') if p.investigations.exists()
+        ]
 
     class Meta:
         model = Process
-        fields = ('user', 'investigations', 'legacy_identifier', 'type', 'milestones')
+        fields = ('user', 'type', 'legacy_identifier', 'investigations', 'milestones')
         widgets = {
             'type': forms.HiddenInput(),
         }
