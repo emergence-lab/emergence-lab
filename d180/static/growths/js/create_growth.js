@@ -57,4 +57,35 @@ $(function () {
     formset.addForm();
   });
 
+  $('a[data-action=copy-form]').click(function(event) {
+    form = formset.addForm();
+
+    // copy data to new form
+    last_form = form.prev();
+    existing_sample = last_form.field('existing_or_new').prop('checked');
+    if(existing_sample) {
+      // copy radio button state
+      form.field('existing_or_new').first().click();
+      form.field('existing_or_new').last().prop('checked', false);
+      // copy normal fields
+      form.field('sample_uuid').val(last_form.field('sample_uuid').val());
+    }
+    else {
+      // copy radio button state
+      form.field('existing_or_new').first().prop('checked', false);
+      form.field('existing_or_new').last().click();
+      // copy normal fields
+      form_fields = ['substrate_source', 'substrate_serial'];
+      form_fields.forEach(function(value) {
+        form.field(value).val(last_form.field(value).val());
+      });
+      // copy rich text fields
+      rich_fields = ['sample_comment', 'substrate_comment'];
+      rich_fields.forEach(function(value) {
+        form.field(value).prev().html(last_form.field(value).prev().html());
+      });
+    }
+
+  });
+
 });
