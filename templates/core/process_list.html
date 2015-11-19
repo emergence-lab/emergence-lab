@@ -50,7 +50,7 @@
                 <ul class="dropdown-menu">
                     {% for user_obj in inactive_users %}
                         <li{% if username == user_obj.username %} class="active" {%endif%}>
-                            <a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.username}}</a>
+                            <a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.full_name}}</a>
                         </li>
                     {% endfor %}
                 </ul>
