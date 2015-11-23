@@ -53,6 +53,15 @@ if _get_secret('PRODUCTION_MODE') == 'production':
                                   _get_secret('PRODUCTION_MODE')))
 
     application = get_wsgi_application()
+elif _get_secret('PRODUCTION_MODE') == 'docker':
+    sys.path.append('/opt/django')
+    sys.path.append('/opt/django/wbg')
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wbg.settings.base')
+
+    import django.core.handlers.wsgi
+
+    application = django.core.handlers.wsgi.WSGIHandler()
 else:
     sys.path.append('/var/wsgi')
     sys.path.append('/var/wsgi/wbg')

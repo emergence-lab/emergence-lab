@@ -11,6 +11,13 @@ TEMPLATE_DEBUG = False
 ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS', [])
 
 
+# Authentication
+
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+)
+
+
 # Media Files
 
 MEDIA_URL = '{}/media/'.format(SUB_SITE)

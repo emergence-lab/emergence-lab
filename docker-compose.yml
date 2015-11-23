@@ -1,26 +1,18 @@
 db:
   image: postgres
+  ports:
+      - "5432:5432"
 redis:
   image: redis
   ports:
-      - "6379"
-openldap:
-  image: osixia/openldap:1.0.7
-  ports:
-    - "389:389"
-  environment:
-    - LDAP_ORGANISATION=myorg
-    - LDAP_DOMAIN=myorg.com
-    - LDAP_ADMIN_PASSWORD=password
-    - LDAP_TLS=false
+      - "6379:6379"
 web:
   build: .
-  command: python /opt/django/manage.py runserver 0.0.0.0:8000 --settings=wbg.settings.docker
-  # volumes:
-  #   - /path/to/emergence:/opt/django
+  command: python /opt/django/manage.py runserver 0.0.0.0:8000 --insecure --settings=wbg.settings.docker
+  volumes:
+    - .:/opt/django
   ports:
     - "8000:8000"
   links:
     - db
     - redis
-    - openldap

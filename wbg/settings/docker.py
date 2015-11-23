@@ -1,43 +1,30 @@
-import logging
-
 from .base import *
-
 
 # Debugging
 
 DEBUG = True
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = False
 
 
-# Installed Apps
+# Misc Settings
 
-INSTALLED_APPS += (
-    'debug_toolbar',
-    'nplusone.ext.django',
-)
+ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS', [])
 
 
 # Authentication
 
-AUTH_LDAP_SERVER_URI = 'ldap://openldap:389'
-
-
-# Middleware
-
-MIDDLEWARE_CLASSES += (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'nplusone.ext.django.NPlusOneMiddleware',
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 
-# Logging
+# Static Files
 
-NPLUSONE_LOGGER = logging.getLogger('nplusone')
-NPLUSONE_LOG_LEVEL = logging.WARN
+STATIC_ROOT = '/opt/django/static/'
 
 
 # Media Files
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
-SENDFILE_BACKEND = 'sendfile.backends.development'
+MEDIA_URL = '{}/media/'.format(SUB_SITE)
+MEDIA_ROOT = get_secret('MEDIA_ROOT', os.path.join(BASE_DIR, os.pardir, 'media'))
+SENDFILE_BACKEND = 'sendfile.backends.xsendfile'

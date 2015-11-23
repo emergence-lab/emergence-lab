@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+from .user import (
+    CreateUserForm,
+    EditUserForm
+)
+
 from .project import (
     CreateInvestigationForm,
     CreateProjectForm,
