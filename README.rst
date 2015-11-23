@@ -21,9 +21,11 @@ Web-based application written in Django with the following goals:
 #) Provide project management functionality to help organize experiments and samples
 #) Have a clean, consistent user interface to encourage best-practices for use
 
-# Installation Instructions
+Installation Instructions
+=========================
 
-## Docker
+Docker
+------
 
 The easiest way to get Emergence Lab up and running is to build a Docker container.
 
@@ -57,17 +59,18 @@ Get your docker machine IP address:
 
 Then fire up your web browser and go to ```<IP Address>:8000``` and login with the username and password you created. Enjoy!
 
-#### Shutting down the container
+**Shutting down the container**
 
 To shut down Emergence, run ```docker-compose stop```.
 
-### Additional Development Options
+**Additional Development Options**
 
 To facilitate development, you can change the ```DEBUG``` and ```TEMPLATE_DEBUG``` settings in ```wbg/settings/docker.py``` to ```True```, and edit ```docker-compose.yml```, line 13 with the path to your git repository.
 
-## Manual Install
+Manual Install
+--------------
 
-### Install Dependencies
+**Install Dependencies**
 
 .. code::
 

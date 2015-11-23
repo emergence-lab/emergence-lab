@@ -21,6 +21,7 @@ class ProjectTrackingInline(admin.TabularInline):
     model = core.models.ProjectTracking
     extra = 1
 
+
 class UserAdmin(admin.ModelAdmin):
     form = CreateUserForm
 

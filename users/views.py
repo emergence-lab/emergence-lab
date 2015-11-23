@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.shortcuts import HttpResponseRedirect, get_object_or_404
 from django.views.generic import (TemplateView, FormView, UpdateView,
-                                  CreateView, ListView, CreateView)
+                                  CreateView, ListView)
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from redis import StrictRedis
