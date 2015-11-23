@@ -31,11 +31,12 @@ class ProcessCreateForm(forms.ModelForm):
             self.fields['type'].queryset = ProcessType.objects.exclude(creation_type='custom')
 
         self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
-            ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
+            ('{} - {}'.format(i.project.name, i.name), [
+                (m.id, m.name) for m in i.milestones.order_by('project')])
             for i in user.get_investigations('member') if i.milestones.exists()
         ])
         self.fields['investigations'] = forms.MultipleChoiceField(required=False, choices=[
-            (p.name, [(i.id, i.name) for i in p.investigations.all()])
+            (p.name, [(i.id, i.name) for i in p.investigations.order_by('project')])
             for p in user.get_projects('member') if p.investigations.exists()
         ])
         self.fields['pieces'] = forms.MultipleChoiceField(
