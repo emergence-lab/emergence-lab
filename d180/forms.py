@@ -103,7 +103,7 @@ class WizardPrerunChecklistForm(ChecklistForm):
         'Close gate valve, front viewport and shutter',
         'Turn on power supplies, set the motor to Auto, and pressure control to Remote',
         'Verify the system is in IDLE',
-        'Start the Run and k-space',
+        'Set up k-space settings and start run',
     ]
 
 
