@@ -9,6 +9,7 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
             <li><a href="{% url 'processtype_list' %}">Process Types</a></li>
             <li class='active'>{{processtype.name}}</li>
         </ol>
