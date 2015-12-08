@@ -187,3 +187,10 @@ a.list-group-item.active-parent:focus {
 .tooltip-inner {
   min-width: 100px;
 }
+
+.jumbotron-link,
+.jumbotron-link:hover,
+.jumbotron-link:focus {
+  text-decoration: none;
+  color: black;
+}
