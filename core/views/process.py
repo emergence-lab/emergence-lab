@@ -65,11 +65,13 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['process_list'] = ProcessType.objects.all()
-        context['process_categories'] = (ProcessCategory.objects
-                                                        .order_by('slug')
-                                                        .prefetch_related('processtypes')
-                                                        .annotate(number=Count('processtype')))
+        process_categories = list(ProcessCategory.objects
+                                                 .order_by('slug')
+                                                 .prefetch_related('processtypes')
+                                                 .annotate(number=Count('processtype__process')))
+        for category in process_categories:
+            category.annotated = category.processtypes.annotate(number=Count('process'))
+        context['process_categories'] = process_categories
         context['active_users'] = get_user_model().active_objects.exclude(id=self.request.user.id)
         context['inactive_users'] = get_user_model().inactive_objects.order_by('-status_changed')
         context['slug'] = self.kwargs.get('slug', 'all')
@@ -203,11 +205,13 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessTemplateListView, self).get_context_data(**kwargs)
-        context['process_list'] = ProcessType.objects.all()
-        context['process_categories'] = (ProcessCategory.objects
-                                                        .order_by('slug')
-                                                        .prefetch_related('processtypes')
-                                                        .annotate(number=Count('processtype')))
+        process_categories = list(ProcessCategory.objects
+                                                 .order_by('slug')
+                                                 .prefetch_related('processtypes')
+                                                 .annotate(number=Count('processtype__process__templates')))
+        for category in process_categories:
+            category.annotated = category.processtypes.annotate(number=Count('process__templates'))
+        context['process_categories'] = process_categories
         context['slug'] = self.kwargs.get('slug', 'all')
         return context
 

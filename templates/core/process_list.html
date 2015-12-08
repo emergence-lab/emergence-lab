@@ -87,13 +87,18 @@
                         </div>
                         <div class="panel-collapse collapse{% if slug in category.processtype_slugs %} in{% endif %}" id="{{category.slug}}">
                             <div class="list-group">
-                                {% for process_type in category.processtypes.all %}
+                                {% for process_type in category.annotated %}
                                     <a class="list-group-item{% if slug == process_type.type %} active{% endif %}"
                                        href="{% url 'process_list' slug=process_type.type username=username %}"
                                        data-toggle="tooltip"
                                        data-placement="right"
                                        title="{{process_type.description}}">
-                                            {{process_type.full_name}}
+                                            {{process_type.name}}
+                                            {% if process_type.number %}
+                                                <span class="badge pull-right">
+                                                    {{process_type.number}}
+                                                </span>
+                                            {% endif %}
                                     </a>
                                 {% endfor %}
                             </div>
