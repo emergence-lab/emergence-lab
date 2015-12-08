@@ -52,10 +52,10 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
 
 
 class ProcessListRedirectView(LoginRequiredMixin, generic.RedirectView):
-    permanent = True
+    permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse('process_list', args=('all', 'all'))
+        return reverse('process_list', args=('all', self.request.user.username))
 
 
 class ProcessListView(LoginRequiredMixin, generic.ListView):
