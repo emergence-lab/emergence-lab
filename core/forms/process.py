@@ -98,3 +98,21 @@ class WizardBasicInfoForm(forms.ModelForm):
             'investigations': 'Investigation(s)',
             'milestones': 'Milestone(s)',
         }
+
+
+class ProcessTypeForm(forms.ModelForm):
+
+    type = forms.RegexField(
+        regex='[a-z\-]+', label='Unique Identifier',
+        widget=forms.TextInput(attrs={'placeholder': 'Use lowercase letters and hyphens only'}))
+
+    class Meta:
+        model = ProcessType
+        fields = ('type', 'name', 'full_name', 'description', 'category',
+                  'is_destructive', 'scheduling_type', 'creation_type')
+        labels = {
+            'name': 'Short Name or Abbreviation',
+            'full_name': 'Full Name',
+            'is_destructive': 'Does this process type alter the sample properties?',
+            'creation_type': 'Does this process need custom handling for creation?'
+        }

@@ -16,7 +16,7 @@ from braces.views import LoginRequiredMixin
 
 from core.forms import (DropzoneForm, ProcessCreateForm,
                         EditProcessTemplateForm, SampleFormSet,
-                        WizardBasicInfoForm)
+                        WizardBasicInfoForm, ProcessTypeForm)
 from core.models import Process, Sample, DataFile, ProcessTemplate, ProcessType, ProcessCategory
 from core.tasks import process_file, save_files
 from core.views import ActionReloadView
@@ -363,9 +363,7 @@ class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
 class ProcessTypeCreateView(LoginRequiredMixin, generic.CreateView):
     model = ProcessType
     template_name = 'core/processtype_create.html'
-    fields = ('type', 'name', 'full_name', 'description',
-              'is_destructive', 'category', 'scheduling_type',
-              'creation_type')
+    form_class = ProcessTypeForm
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))

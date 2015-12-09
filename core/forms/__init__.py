@@ -19,4 +19,5 @@ from .process import (
     ProcessCreateForm,
     EditProcessTemplateForm,
     WizardBasicInfoForm,
+    ProcessTypeForm,
 )
