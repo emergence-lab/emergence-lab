@@ -27,16 +27,15 @@ class ProcessCreateForm(forms.ModelForm):
         super(ProcessCreateForm, self).__init__(*args, **kwargs)
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
-        self.fields['milestones'].required = False
-        self.fields['milestones'].choices = [
+
+        self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
             for i in user.get_investigations('member') if i.milestones.exists()
-        ]
-        self.fields['investigations'].required = False
-        self.fields['investigations'].choices = [
+        ])
+        self.fields['investigations'] = forms.MultipleChoiceField(required=False, choices=[
             (p.name, [(i.id, i.name) for i in p.investigations.all()])
             for p in user.get_projects('member') if p.investigations.exists()
-        ]
+        ])
         self.fields['pieces'] = forms.MultipleChoiceField(
             choices=zip(pieces, pieces), label='Piece(s) to use')
         if len(pieces) == 1:
@@ -65,16 +64,14 @@ class WizardBasicInfoForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
-        self.fields['milestones'].required = False
-        self.fields['milestones'].choices = [
+        self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
             for i in user.get_investigations('member') if i.milestones.exists()
-        ]
-        self.fields['investigations'].required = False
-        self.fields['investigations'].choices = [
+        ])
+        self.fields['investigations'] = forms.MultipleChoiceField(required=False, choices=[
             (p.name, [(i.id, i.name) for i in p.investigations.all()])
             for p in user.get_projects('member') if p.investigations.exists()
-        ]
+        ])
         self.helper = helper.FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True
