@@ -31,15 +31,15 @@ The easiest way to get Emergence Lab up and running is to build a Docker contain
 
 You can get Docker by navigating `here <http://docs.docker.com/compose/install/>`_. Follow the instructions to install both Docker and docker-compose. Note that users of OS X only need to install the Docker toolkit. For dependencies, install `node.js <http://nodejs.org>`_ and then ```npm install -g bower```.
 
-After installing Docker and Bower, go to your command line and use the following commands:
+After installing Docker and Bower, go to your command line (or Docker shell) and use the following commands:
 
 .. code::
 
     $ git clone https://github.com/emergence-lab/emergence-lab.git
     $ cd emergence-lab
     $ bower install
-    $ cp wbg/settings.docker.json wbg/settings.json
-    $ docker-machine start default
+    $ cp wbg/secrets.docker.json wbg/secrets.json
+    $ docker-machine start default  ## OS X and Windows only
     $ docker-compose build
     $ docker-compose up &
     $ docker exec -it emergencelab_web_1 python /opt/django/manage.py migrate --settings=wbg.settings.docker
