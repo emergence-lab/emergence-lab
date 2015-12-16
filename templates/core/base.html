@@ -40,7 +40,7 @@
                     {% if not user.is_anonymous %}
 
                     <li>
-                        <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="{% url 'users_profile' user.username %}">&nbsp&nbsp{{ user.full_name }}</a>
+                        <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" title="Profile" href="{% url 'users_profile' user.username %}">&nbsp&nbsp{% if user.full_name %}{{ user.full_name }}{% else %}{{ user.username }}{% endif %}</a>
                     </li>
 
                     <li id="create-button" class="dropdown navbar-button">
@@ -103,9 +103,13 @@
                                 Tool Reservations
                             </a></li>
                             {% if user.is_staff %}
+                            <li><a href="{% url 'user_list' %}">
+                              <span class="glyphicon glyphicon-user"></span>
+                              Users
+                            </a></li>
                             <li><a href="{% url 'admin:index' %}">
-                                <span class="glyphicon glyphicon-cog"></span>
-                                Admin
+                              <span class="glyphicon glyphicon-cog"></span>
+                              Admin
                             {% endif %}
                             </a></li>
                             {% if external_links %}

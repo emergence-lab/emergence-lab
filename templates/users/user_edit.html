@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}Edit {{user.full_name}}{% endblock title %}
+
+{% block header %}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
+{% endblock header %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'users_profile' username=user.username %}">Profile</a></li>
+            <li class='active'>Update {{user.full_name}}</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Edit {{user.full_name}}
+            <div class="pull-right">
+                <a href="{% url 'users_profile' username=user.username %}" class="btn btn-default">
+                    {% bootstrap_icon 'arrow-left' %}
+                    Back
+                </a>
+            </div>
+        </h1>
+    </header>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="btn btn-warning" type="submit">Update</button>
+    </form>
+
+</main>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
+{% endblock scripts %}

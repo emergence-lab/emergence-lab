@@ -2,7 +2,7 @@ from .base import *
 
 # Debugging
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = False
 
 
@@ -14,8 +14,13 @@ ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS', [])
 # Authentication
 
 AUTHENTICATION_BACKENDS = (
-    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
+
+
+# Static Files
+
+STATIC_ROOT = '/opt/django/static/'
 
 
 # Media Files

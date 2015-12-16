@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}Users{% endblock title %}
+
+{% block content %}
+
+<main class="container">
+    <nav>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class='active'>Users</li>
+        </ol>
+    </nav>
+
+    <header>
+        <h1 class="page-header">
+            Users
+            <a class="btn btn-success pull-right" href="{% url 'user_create' %}">Create User</a>
+        </h1>
+    </header>
+
+    <section>
+        <ul class="list-group">
+            {% for user_obj in object_list %}
+                <li class="list-group-item">
+                  <div class="clearfix">
+                      {% if user_obj.full_name %}{{user_obj.full_name}}{% else %}{{ user.username }}{% endif %}
+                      <a class="btn btn-warning pull-right" href="{% url 'user_edit' username=user_obj.username %}">Edit</a>
+                  </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if is_paginated %}
+        <nav class="pull-right">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li><a href="?page={{page_obj.previous_page_number}}">
+                        &laquo; Previous
+                        <span class="sr-only">Previous</span>
+                    </a></li>
+                {% endif %}
+                {% for page in paginator.page_range %}
+                    <li{% if page_obj.number == forloop.counter %} class="active"{% endif %}><a href="?page={{forloop.counter}}">
+                        {{forloop.counter}}
+                    </a></li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{page_obj.next_page_number}}">
+                        Next &raquo;
+                        <span class="sr-only">Next</span>
+                    </a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+</main>
+
+{% endblock content %}

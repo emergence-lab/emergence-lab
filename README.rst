@@ -21,11 +21,66 @@ Web-based application written in Django with the following goals:
 #) Provide project management functionality to help organize experiments and samples
 #) Have a clean, consistent user interface to encourage best-practices for use
 
-Development Setup
-=================
+Installation Instructions
+=========================
+
+Node.js
+-------
+
+Emergence uses Node.js for some server-side functionality. Install `Node.js <http://nodejs.org>`_ and then run ``npm install -g bower`` to install Bower.
+
+
+Docker
+------
+
+The easiest way to get Emergence Lab up and running is to build a Docker container. Linux users can install Docker and docker-compose via their package manager. For OS X and Windows users, the `Docker Toolbox <https://docker.com/docker-toolbox/>`_ has everything you need to get started.
+
+Setting up the Container
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+After installing Docker and Bower, go to your command line (or Docker shell) and use the following commands:
+
+.. code::
+
+    $ git clone https://github.com/emergence-lab/emergence-lab.git
+    $ cd emergence-lab
+    $ bower install
+    $ cp wbg/secrets.docker.json wbg/secrets.json
+    $ docker-machine start default  ## OS X and Windows only
+    $ docker-compose build
+    $ docker-compose up &
+    $ docker exec -it emergencelab_web_1 python /opt/django/manage.py migrate --settings=wbg.settings.docker
+    $ docker exec -it emergencelab_web_1 python /opt/django/manage.py collectstatic --noinput --settings=wbg.settings.docker
+
+Create an administrative user by entering:
+
+.. code::
+
+    $ docker exec -it emergencelab_web_1 python /opt/django/manage.py createsuperuser --settings=wbg.settings.docker
+
+Get your docker machine IP address:
+
+.. code::
+
+    $ docker-machine ip default
+
+Then fire up your web browser and go to ``<IP Address>:8000`` and login with the username and password you created. Enjoy!
+
+Shutting down the container
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To shut down Emergence, run ``docker-compose stop``.
+
+Additional Development Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To facilitate development, you can change the ``DEBUG`` and ``TEMPLATE_DEBUG`` settings in ``wbg/settings/docker.py`` to ``True``, and edit ``docker-compose.yml``, line 13 with the path to your git repository.
+
+Manual Install
+--------------
 
 Install Dependencies
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 .. code::
 
@@ -33,7 +88,7 @@ Install Dependencies
     $ bower install
 
 Configure Application
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 Copy the template secrets file and edit with database and ldap configuration.
 
