@@ -24,12 +24,19 @@ Web-based application written in Django with the following goals:
 Installation Instructions
 =========================
 
+Node.js
+-------
+
+Emergence uses Node.js for some server-side functionality. Install `Node.js <http://nodejs.org>`_ and then run ``npm install -g bower`` to install Bower.
+
+
 Docker
 ------
 
-The easiest way to get Emergence Lab up and running is to build a Docker container.
+The easiest way to get Emergence Lab up and running is to build a Docker container. Linux users can install Docker and docker-compose via their package manager. For OS X and Windows users, the `Docker Toolbox <https://docker.com/docker-toolbox/>`_ has everything you need to get started.
 
-You can get Docker by navigating `here <http://docs.docker.com/compose/install/>`_. Follow the instructions to install both Docker and docker-compose. Note that users of OS X only need to install the Docker toolkit. For dependencies, install `node.js <http://nodejs.org>`_ and then ```npm install -g bower```.
+Setting up the Container
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 After installing Docker and Bower, go to your command line (or Docker shell) and use the following commands:
 
@@ -57,17 +64,17 @@ Get your docker machine IP address:
 
     $ docker-machine ip default
 
-Then fire up your web browser and go to ```<IP Address>:8000``` and login with the username and password you created. Enjoy!
+Then fire up your web browser and go to ``<IP Address>:8000`` and login with the username and password you created. Enjoy!
 
 Shutting down the container
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To shut down Emergence, run ```docker-compose stop```.
+To shut down Emergence, run ``docker-compose stop``.
 
 Additional Development Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To facilitate development, you can change the ```DEBUG``` and ```TEMPLATE_DEBUG``` settings in ```wbg/settings/docker.py``` to ```True```, and edit ```docker-compose.yml```, line 13 with the path to your git repository.
+To facilitate development, you can change the ``DEBUG`` and ``TEMPLATE_DEBUG`` settings in ``wbg/settings/docker.py`` to ``True``, and edit ``docker-compose.yml``, line 13 with the path to your git repository.
 
 Manual Install
 --------------
