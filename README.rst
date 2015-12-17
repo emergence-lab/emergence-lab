@@ -53,14 +53,14 @@ After installing Docker and Bower, go to your command line (or Docker shell) and
     $ docker-machine start default  ## OS X and Windows only
     $ docker-compose build
     $ docker-compose up &
-    $ docker exec -it emergencelab_web_1 python /opt/django/manage.py migrate --settings=wbg.settings.docker
-    $ docker exec -it emergencelab_web_1 python /opt/django/manage.py collectstatic --noinput --settings=wbg.settings.docker
+    $ docker exec -it emergencelab_web_1 python manage.py migrate
+    $ docker exec -it emergencelab_web_1 python manage.py collectstatic --noinput
 
 Create an administrative user by entering:
 
 .. code::
 
-    $ docker exec -it emergencelab_web_1 python /opt/django/manage.py createsuperuser --settings=wbg.settings.docker
+    $ docker exec -it emergencelab_web_1 python manage.py createsuperuser
 
 Get your docker machine IP address:
 
@@ -68,7 +68,7 @@ Get your docker machine IP address:
 
     $ docker-machine ip default
 
-Then fire up your web browser and go to ``<IP Address>:8000`` and login with the username and password you created. Enjoy!
+Then fire up your web browser and go to ``<IP Address>:8000`` or ``localhost:8000`` and login with the username and password you created. Enjoy!
 
 Shutting down the container
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,7 +94,7 @@ Install Dependencies
 Configure Application
 ~~~~~~~~~~~~~~~~~~~~~
 
-Copy the template secrets file and edit with database and ldap configuration.
+Copy the template secrets file and edit with database and ldap (optional) configuration.
 
 .. code::
 
@@ -104,8 +104,8 @@ Copy the template secrets file and edit with database and ldap configuration.
 Running Tests
 -------------
 
-Tests are run using tox, environments configured are for python 2.7 and flake8. To run them, invoke tox from the command line.
+Tests are run using tox, environments configured are for python 2.7 and flake8. To run them, invoke ``tox`` from the command line. If you are using Docker, you can invoke it using:
 
 .. code::
 
-    $ tox
+    $ docker exec -it emergencelab_web_1 tox

@@ -22,4 +22,5 @@ RUN (easy_install pip)
 
 ADD . /opt/django
 WORKDIR /opt/django
+ENV DJANGO_SETTINGS_MODULE wbg.settings.docker
 RUN pip install -r /opt/django/requirements/development.txt
