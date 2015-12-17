@@ -14,6 +14,10 @@ Emergence Lab
     :target: https://landscape.io/github/emergence-lab/emergence-lab/master
     :alt: Code Health
 
+.. image:: https://www.versioneye.com/user/projects/5672d2a6107997003e00064d/badge.svg?style=flat
+    :target: https://www.versioneye.com/user/projects/5672d2a6107997003e00064d/
+    :alt: Dependencies
+
 Web-based application written in Django with the following goals:
 
 #) Improve tracking and discoverability of experimental samples and data, both process and characterization data

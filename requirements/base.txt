@@ -13,7 +13,7 @@ Pillow==3.0.0
 django-activity-stream==0.6.0
 django-jsonfield==0.9.15
 django-braces==1.8.1
-django-wysiwyg==0.7.0
+django-wysiwyg==0.7.1
 django-ckeditor-updated==4.4.4
 html2text==2015.11.4
 django-grappelli>=2.7,<2.8
