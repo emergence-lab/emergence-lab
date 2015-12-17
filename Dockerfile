@@ -16,8 +16,10 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     libcairo2-dev \
     libpango1.0-0 \
-    libgdk-pixbuf2.0-0
+    libgdk-pixbuf2.0-0 \
+    libjpeg-dev
 RUN (easy_install pip)
 
 ADD . /opt/django
+WORKDIR /opt/django
 RUN pip install -r /opt/django/requirements/development.txt
