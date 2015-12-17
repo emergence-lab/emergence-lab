@@ -109,3 +109,18 @@ Tests are run using tox, environments configured are for python 2.7 and flake8. 
 .. code::
 
     $ docker exec -it emergencelab_web_1 tox
+
+File Uploads
+------------
+
+File uploads use RQ in order to process files in the background. In order for uploaded files to be saved, an RQ worker on the queue ``default`` needs to be running. To start the worker, run
+
+.. code::
+
+    $ python manage.py rqworker default &
+
+If you are using Docker, use the following command:
+
+.. code::
+
+    $ docker exec -it emergencelab_web_1 python manage.py rqworker default &
