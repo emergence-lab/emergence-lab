@@ -11,8 +11,9 @@ from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
-import django_rq
 from braces.views import LoginRequiredMixin
+import django_rq
+import pandas as pd
 
 from core.forms import (DropzoneForm, ProcessCreateForm,
                         EditProcessTemplateForm, SampleFormSet,
@@ -381,3 +382,16 @@ class ProcessCategoryCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_success_url(self):
         return reverse('processtype_list')
+
+
+class CSVFileView(LoginRequiredMixin, generic.DetailView):
+    model = DataFile
+    template_name = 'core/csv.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CSVFileView, self).get_context_data(**kwargs)
+        data = pd.read_csv(self.object.data.path, index_col=False)
+        context['data'] = data.to_html(
+            index=False,
+            classes=['table', 'table-striped', 'table-bordered', 'table-hover'])
+        return context

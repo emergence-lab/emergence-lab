@@ -65,4 +65,5 @@ from .process import (
     ProcessTypeUpdateView,
     ProcessTypeCreateView,
     ProcessCategoryCreateView,
+    CSVFileView,
 )

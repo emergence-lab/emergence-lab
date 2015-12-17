@@ -32,9 +32,16 @@
                 <td>{{file.modified}}</td>
                 <td>{{file.get_content_type_display}}</td>
                 <td>{{file.get_state_display}}</td>
-                <td><a href="{{MEDIA_URL}}{{file.data}}">
-                    <span class="glyphicon glyphicon-file"></span>
-                </a></td>
+                <td>
+                    <a href="{{MEDIA_URL}}{{file.data}}">
+                        <span class="glyphicon glyphicon-download-alt"></span>
+                    </a>
+                    {% if file.content_type == 'text/csv' %}
+                        <a class="left-spacer-sm" href="{% url 'file_csv' file.id %}">
+                            <span class="glyphicon glyphicon-file"></span>
+                        </a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </table>
