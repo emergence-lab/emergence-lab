@@ -35,3 +35,6 @@ django-crispy-forms==1.5.2
 mendeley==0.3.2
 django-simple-history==1.7.0
 pandas
+elasticsearch
+haystack
+django-haystack

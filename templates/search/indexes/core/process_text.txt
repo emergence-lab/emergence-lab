@@ -1,0 +1,3 @@
+{{ object.comment }}
+{{ object.user.full_name }}
+{{ object.legacy_identifier }}

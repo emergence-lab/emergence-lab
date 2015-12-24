@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'django_rq',
     'crispy_forms',
     'simple_history',
+    'haystack',
     # local apps
     'core',
     'dashboard',
@@ -325,3 +326,13 @@ MENDELEY_ID = get_secret('MENDELEY_ID', '')
 MENDELEY_SECRET = get_secret('MENDELEY_SECRET', '')
 MENDELEY_REDIRECT = get_secret('MENDELEY_REDIRECT', '')
 MENDELEY_SSL_VERIFY = get_secret('MENDELEY_SSL_VERIFY', False)
+
+# Haystack / elasticsearch
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://elasticsearch:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}

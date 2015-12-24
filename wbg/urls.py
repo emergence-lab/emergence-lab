@@ -81,7 +81,11 @@ urlpatterns = [
 
     # project_management
 
-    url(r'^oauth$', project_management.views.MendeleyOAuth.as_view(), name='mendeley_oauth')
+    url(r'^oauth$', project_management.views.MendeleyOAuth.as_view(), name='mendeley_oauth'),
+
+    # haystack
+
+    url(r'^search/', include('haystack.urls')),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
