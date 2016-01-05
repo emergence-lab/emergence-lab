@@ -1,0 +1,35 @@
+{% extends "core/base.html" %}
+{% load bootstrap3 %}
+
+{% block title %}{{object.get_content_type_display}} for {{object.process.uuid}}{% endblock title %}
+
+{% block header %}
+    {% load staticfiles %}
+    <link href="{% static 'bootstrap-table/dist/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock header %}
+
+{% block content %}
+
+<main class="container">
+
+    <div>
+        <a class="btn btn-default" href="{% url 'process_detail' uuid=object.process.uuid %}">
+            <span class="glyphicon glyphicon-arrow-left"></span>
+            Back
+        </a>
+    </div>
+
+    {{data|safe}}
+
+</main>
+
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+        $('.dataframe').attr('data-toggle', 'table')
+                       .attr('data-search', true)
+                       .attr('data-show-columns', true);
+    </script>
+    <script src="{% static 'bootstrap-table/dist/bootstrap-table.min.js' %}"></script>
+{% endblock scripts %}
