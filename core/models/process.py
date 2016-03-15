@@ -52,7 +52,12 @@ class ProcessType(models.Model):
         ('none', 'None'),
         ('simple', 'Simple'),
         ('full', 'Full'),
-        ('external', 'External')
+        ('external', 'External'),
+    )
+
+    CREATION_TYPE = (
+        ('default', 'Default'),
+        ('custom', 'Custom'),
     )
 
     type = models.SlugField(primary_key=True, max_length=100, default='generic-process')
@@ -62,6 +67,8 @@ class ProcessType(models.Model):
     description = models.TextField(blank=True)
     scheduling_type = models.CharField(max_length=10, choices=SCHEDULING_TYPE,
                                        default='none')
+    creation_type = models.CharField(max_length=10, choices=CREATION_TYPE,
+                                     default='default')
     category = models.ForeignKey(ProcessCategory, default='uncategorized',
                                  related_name='processtypes',
                                  related_query_name='processtype')

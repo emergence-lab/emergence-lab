@@ -50,7 +50,7 @@
                 <ul class="dropdown-menu">
                     {% for user_obj in inactive_users %}
                         <li{% if username == user_obj.username %} class="active" {%endif%}>
-                            <a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.username}}</a>
+                            <a href="{% url 'process_list' slug=slug username=user_obj.username %}">{{user_obj.full_name}}</a>
                         </li>
                     {% endfor %}
                 </ul>
@@ -87,13 +87,18 @@
                         </div>
                         <div class="panel-collapse collapse{% if slug in category.processtype_slugs %} in{% endif %}" id="{{category.slug}}">
                             <div class="list-group">
-                                {% for process_type in category.processtypes.all %}
+                                {% for process_type in category.annotated %}
                                     <a class="list-group-item{% if slug == process_type.type %} active{% endif %}"
                                        href="{% url 'process_list' slug=process_type.type username=username %}"
                                        data-toggle="tooltip"
                                        data-placement="right"
                                        title="{{process_type.description}}">
-                                            {{process_type.full_name}}
+                                            {{process_type.name}}
+                                            {% if process_type.number %}
+                                                <span class="badge pull-right">
+                                                    {{process_type.number}}
+                                                </span>
+                                            {% endif %}
                                     </a>
                                 {% endfor %}
                             </div>
@@ -140,13 +145,13 @@
                              href="{% if process.type_id = 'd180-growth' %}{% url 'create_growth_d180_start_template' uuid=process.uuid %}{%else%}{% url 'process_create_from_template' uuid=process.uuid %}{%endif%}">
                               <span class="glyphicon glyphicon-share-alt" style="color:grey"></span>
                             </a>
+                            {% endif %}
                             <a class="btn btn-xs btn-default"
                                data-toggle="tooltip"
                                title="Favorite"
                                href="{% url 'add_process_template' uuid=process.uuid %}">
                                 <span class="glyphicon glyphicon-star" style="color:grey"></span>
                             </a>
-                            {% endif %}
                             <a href="#" class="label label-default">{{process.name}}</a>
                         </div>
                         <span class="pull-right"><small>&emsp; {{process.created.date|date:"SHORT_DATE_FORMAT"}} &emsp; </small></span>

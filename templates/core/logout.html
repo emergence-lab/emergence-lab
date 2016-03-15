@@ -3,8 +3,23 @@
 {% block title %}Logout{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <p>Successfully logged out</p>
-        <a href="{% url 'home' %}">Home</a>
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <div class="center-block">
+            <h4 class="text-center top-spacer-md">Successfully logged out</h4>
+            <p class="text-center top-spacer-sm">
+                <a class="btn btn-default" href="{% url 'home' %}">
+                    Home
+                    <span class="glyphicon glyphicon-home"></span>
+                </a>
+                <a class="btn btn-default" href="{% url 'login' %}">
+                    Login
+                    <span class="glyphicon glyphicon-log-in"></span>
+                </a>
+            </p>
+        </div>
     </div>
+</div>
+
 {% endblock %}

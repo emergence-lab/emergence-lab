@@ -707,6 +707,7 @@ class TestProcessTypeCRUD(TestCase):
             'is_destructive': processtype.is_destructive,
             'category': processtype.category_id,
             'scheduling_type': processtype.scheduling_type,
+            'creation_type': processtype.creation_type,
         }
         response = self.client.post(url, data)
         processtype = ProcessType.objects.get(type=processtype.type)
@@ -739,6 +740,7 @@ class TestProcessTypeCRUD(TestCase):
             'is_destructive': True,
             'category': processcategory.slug,
             'scheduling_type': 'none',
+            'creation_type': 'default',
         }
         response = self.client.post(url, data)
         processtype = ProcessType.objects.last()

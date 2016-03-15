@@ -1,7 +1,8 @@
 {% extends "core/base.html" %}
+
 {% load bootstrap3 %}
 
-{% block title %}Edit {{processtype.full_name}}{% endblock title %}
+{% block title %}Edit {{user.full_name}}{% endblock title %}
 
 {% block header %}
     {% load staticfiles %}
@@ -14,18 +15,16 @@
     <nav>
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'process_list_redirect' %}">Processes</a></li>
-            <li><a href="{% url 'processtype_list' %}">Process Types</a></li>
-            <li><a href="{% url 'processtype_detail' processtype.type %}">{{processtype.name}}</a></li>
-            <li class='active'>Edit</li>
+            <li><a href="{% url 'users_profile' username=user.username %}">Profile</a></li>
+            <li class='active'>Update {{user.full_name}}</li>
         </ol>
     </nav>
 
     <header>
         <h1 class="page-header">
-            Edit {{processtype.full_name}}
+            Edit {{user.full_name}}
             <div class="pull-right">
-                <a href="{% url 'processtype_detail' processtype.type %}" class="btn btn-default">
+                <a href="{% url 'users_profile' username=user.username %}" class="btn btn-default">
                     {% bootstrap_icon 'arrow-left' %}
                     Back
                 </a>
@@ -45,10 +44,4 @@
 
 {% block scripts %}
     <script src="{% static 'jquery-ui/ui/minified/jquery-ui.min.js' %}"></script>
-    <script src="{% static 'rangy/rangy-core.min.js' %}"></script>
-    <script src="{% static 'hallo/dist/hallo.js' %}"></script>
-    <script type="text/javascript" src="{% static 'core/js/process_wizard.js' %}"></script>
-    <script type="text/javascript">
-        process_wizard.enable_rich_text('.hallo', 'form');
-    </script>
 {% endblock scripts %}

@@ -17,7 +17,7 @@ class TestUserAppViews(TestCase):
         Tests user profile view
         """
         url = reverse('users_profile', kwargs={'username': self.user_obj.username})
-        match = resolve('/accounts/users/{}'.format(self.user_obj.username))
+        match = resolve('/accounts/users/detail/{}'.format(self.user_obj.username))
         response = self.client.get(url)
         self.assertEqual(match.url_name, 'users_profile')
         self.assertEqual(response.status_code, 200)

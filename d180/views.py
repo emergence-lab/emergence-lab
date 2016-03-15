@@ -379,6 +379,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
         return get_object_or_404(Process, uuid_full__startswith=uuid)
 
     def get_context_data(self, **kwargs):
+        self.object = None
         context = super(UpdateReadingsView, self).get_context_data(**kwargs)
         self.object = self.get_object()
         context["growth"] = self.object
@@ -390,7 +391,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
             numberofreadings = numberofreadings + 1
             rform = D180ReadingsForm(instance=D180Readings(),
                                      prefix=('reading' + str(numberofreadings)),
-                                  initial={'growth': reading.growth,
+                                     initial={'growth': reading.process,
                 'layer': reading.layer, 'description': reading.description,
                 'pyro_out': reading.pyro_out, 'pyro_in': reading.pyro_in,
                 'ecp_temp': reading.ecp_temp, 'tc_out': reading.tc_out,
@@ -473,7 +474,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
                 newsilane_mix = rform.cleaned_data['silane_mix']
                 newsilane_pressure = rform.cleaned_data['silane_pressure']
                 thisreading = D180Readings.objects.filter(process=newgrowth, layer=newlayer)
-                thisreading.update(growth=newgrowth, layer=newlayer,
+                thisreading.update(process=newgrowth, layer=newlayer,
                                    description=newlayer_desc, pyro_out=newpyro_out,
                                    pyro_in=newpyro_in, ecp_temp=newecp_temp,
                                    tc_out=newtc_out, tc_in=newtc_in, motor_rpm=newmotor_rpm,

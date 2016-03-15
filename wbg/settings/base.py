@@ -166,9 +166,6 @@ AUTH_LDAP_USER_FLAGS_BY_GROUP = get_secret('AUTH_LDAP_USER_FLAGS_BY_GROUP', {})
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_FIND_GROUP_PERMS = True
 
-AUTHENTICATION_BACKENDS = {
-    'django_auth_ldap.backend.LDAPBackend',
-}
 
 
 # Internationalization

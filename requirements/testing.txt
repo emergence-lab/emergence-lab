@@ -6,5 +6,5 @@ pep8
 flake8
 pep8-naming
 tox
-model_mommy==1.2.5
+model_mommy==1.2.6
 django-inmemorystorage

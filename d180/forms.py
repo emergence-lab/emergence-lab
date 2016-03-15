@@ -13,16 +13,14 @@ class WizardBasicProcessForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
-        self.fields['milestones'].required = False
-        self.fields['milestones'].choices = [
+        self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
             for i in user.get_investigations('member') if i.milestones.exists()
-        ]
-        self.fields['investigations'].required = False
-        self.fields['investigations'].choices = [
+        ])
+        self.fields['investigations'] = forms.MultipleChoiceField(required=False, choices=[
             (p.name, [(i.id, i.name) for i in p.investigations.all()])
             for p in user.get_projects('member') if p.investigations.exists()
-        ]
+        ])
 
     class Meta:
         model = Process
@@ -105,7 +103,7 @@ class WizardPrerunChecklistForm(ChecklistForm):
         'Close gate valve, front viewport and shutter',
         'Turn on power supplies, set the motor to Auto, and pressure control to Remote',
         'Verify the system is in IDLE',
-        'Start the Run and k-space',
+        'Set up k-space settings and start run',
     ]
 
 

@@ -77,7 +77,7 @@ urlpatterns = [
     url(r'^sem/', include('sem.urls')),
 
     # print test
-    url(r'^print/', core.views.utility.PrintTemplate.as_view(), name='print_test'),
+    url(r'^print/', core.views.PrintTemplate.as_view(), name='print_test'),
 
     # project_management
 

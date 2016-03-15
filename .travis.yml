@@ -16,6 +16,7 @@ install:
     - pip install coveralls
     - npm install -g bower
     - bower install
+    - travis_wait tox --notest  # install dependencies
 
 before_script:
     - cp wbg/secrets.travis.json wbg/secrets.json
