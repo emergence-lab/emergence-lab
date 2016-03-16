@@ -75,13 +75,14 @@
                 </a>
             </div>
             {% for category in process_categories %}
-                {% if category.number != 0 %}
                     <div class="panel panel-default panel-clickable">
                         <div class="panel-heading" data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}">
                             <span data-toggle="tooltip" data-placement="right" title="{{category.description}}">
                             <h4 class="panel-title">
                                 {{category.name}}
-                                <span class="badge pull-right">{{category.number}}</span>
+                                {% if category.number %}
+                                    <span class="badge pull-right">{{category.number}}</span>
+                                {% endif %}
                             </h4>
                             </span>
                         </div>
@@ -104,7 +105,6 @@
                             </div>
                         </div>
                     </div>
-                {% endif %}
             {% endfor %}
         </div>
 
