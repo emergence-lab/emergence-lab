@@ -238,8 +238,12 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
                             .order_by('slug')
                             .prefetch_related('processtypes')
                             .annotate(number=Count('processtype__process__templates'))))
+
         for category in process_categories:
-            category.annotated = category.processtypes.annotate(number=Count('process__templates'))
+            category.annotated = (category.processtypes
+                                          .order_by('type')
+                                          .annotate(number=Count('process__templates')))
+
         context['process_categories'] = process_categories
         context['slug'] = self.kwargs.get('slug', 'all')
         return context

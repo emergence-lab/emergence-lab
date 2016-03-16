@@ -41,36 +41,34 @@
                 </a>
             </div>
             {% for category in process_categories %}
-                {% if category.number != 0 %}
-                    <div class="panel panel-default panel-clickable">
-                        <div class="panel-heading" data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}">
-                            <span data-toggle="tooltip" data-placement="right" title="{{category.description}}">
-                            <h4 class="panel-title">
-                                {{category.name}}
-                                <span class="badge pull-right">{{category.number}}</span>
-                            </h4>
-                            </span>
-                        </div>
-                        <div class="panel-collapse collapse{% if slug in category.processtype_slugs %} in{% endif %}" id="{{category.slug}}">
-                            <div class="list-group">
-                                {% for process_type in category.annotated %}
-                                    <a class="list-group-item{% if slug == process_type.type %} active{% endif %}"
-                                       href="{% url 'process_templates' slug=process_type.type %}"
-                                       data-toggle="tooltip"
-                                       data-placement="right"
-                                       title="{{process_type.description}}">
-                                            {{process_type.name}}
-                                            {% if process_type.number %}
-                                                <span class="badge pull-right">
-                                                    {{process_type.number}}
-                                                </span>
-                                            {% endif %}
-                                    </a>
-                                {% endfor %}
-                            </div>
+                <div class="panel panel-default panel-clickable">
+                    <div class="panel-heading" data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}">
+                        <span data-toggle="tooltip" data-placement="right" title="{{category.description}}">
+                        <h4 class="panel-title">
+                            {{category.name}}
+                            <span class="badge pull-right">{{category.number}}</span>
+                        </h4>
+                        </span>
+                    </div>
+                    <div class="panel-collapse collapse{% if slug in category.processtype_slugs %} in{% endif %}" id="{{category.slug}}">
+                        <div class="list-group">
+                            {% for process_type in category.annotated %}
+                                <a class="list-group-item{% if slug == process_type.type %} active{% endif %}"
+                                   href="{% url 'process_templates' slug=process_type.type %}"
+                                   data-toggle="tooltip"
+                                   data-placement="right"
+                                   title="{{process_type.description}}">
+                                        {{process_type.name}}
+                                        {% if process_type.number %}
+                                            <span class="badge pull-right">
+                                                {{process_type.number}}
+                                            </span>
+                                        {% endif %}
+                                </a>
+                            {% endfor %}
                         </div>
                     </div>
-                {% endif %}
+                </div>
             {% endfor %}
         </div>
 
