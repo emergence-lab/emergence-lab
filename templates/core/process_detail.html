@@ -27,6 +27,17 @@
             {% endif %}
             <small>{{process.uuid_full}}</small>
             <div class="pull-right">
+                <a class="btn btn-default"
+                   href="{% url 'add_process_template' uuid=process.uuid %}">
+                    {% bootstrap_icon 'star' %}
+                    Favorite
+                </a>
+                <a class="btn btn-success" data-toggle="tooltip" data-placement="bottom"
+                   title="Create new process using this as a template"
+                   href="{% url 'process_create_from_template' uuid=process.uuid %}">
+                    {% bootstrap_icon 'plus' %}
+                    New from Template
+                </a>
                 <a href="{% url 'process_edit' uuid=process.uuid %}" class="btn btn-warning">
                     {% bootstrap_icon 'edit' %}
                     Edit
