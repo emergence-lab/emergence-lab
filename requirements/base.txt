@@ -1,5 +1,5 @@
 Django>=1.8,<1.9
-git+https://github.com/rbarrois/python-ldap@py3
+pyldap>=2.4,<2.5
 django-auth-ldap==1.2.7
 django-filter==0.11.0
 django-datetime-widget==0.9.3
