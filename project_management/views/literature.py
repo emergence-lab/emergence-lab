@@ -219,6 +219,7 @@ class CreateLiteratureObjectView(LoginRequiredMixin, generic.CreateView):
 
 
 class LiteratureDetailRedirector(LoginRequiredMixin, generic.RedirectView):
+    permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
         literature = Literature.objects.get(id=self.kwargs['pk'])
