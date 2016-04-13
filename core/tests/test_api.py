@@ -30,7 +30,7 @@ class TestProcessAPI(TestCase):
         ]
         response = self.client.get('/api/v0/process/')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(processes))
         for process, result in zip(processes, results):
             self.assertEqual(result.get('uuid_full'), process.uuid_full.hex)
@@ -43,7 +43,7 @@ class TestProcessAPI(TestCase):
         response = self.client.get(
             '/api/v0/process/{}/'.format(process.uuid_full.hex))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
 
@@ -54,7 +54,7 @@ class TestProcessAPI(TestCase):
         process = mommy.make(Process)
         response = self.client.get(
             '/api/v0/process/{}/'.format(process.uuid))
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
 
@@ -68,7 +68,7 @@ class TestProcessAPI(TestCase):
         response = self.client.get(
             '/api/v0/process/node/{}/'.format(node.uuid_full.hex))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
         self.assertEqual(results.get('sample'), sample.uuid)
@@ -82,7 +82,7 @@ class TestProcessAPI(TestCase):
         node = sample.leaf_nodes[0]
         response = self.client.get(
             '/api/v0/process/node/{}/'.format(node.uuid))
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
         self.assertIsNotNone(results.get('comment'))
         self.assertEqual(results.get('sample'), sample.uuid)
@@ -95,7 +95,7 @@ class TestProcessAPI(TestCase):
         sample.run_process(process)
         response = self.client.get(
             '/api/v0/process/{}/files/'.format(process.uuid))
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), 1)
         self.assertIsNotNone(results[0].get('id'))
         self.assertEqual(results[0].get('id'), datafile.id)
@@ -114,7 +114,7 @@ class TestSampleAPI(TestCase):
                    for i in range(5)]
         response = self.client.get('/api/v0/sample/')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(samples))
         for sample, result in zip(samples, results):
             self.assertEqual(result.get('uuid'), sample.uuid)
@@ -123,7 +123,7 @@ class TestSampleAPI(TestCase):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         response = self.client.get('/api/v0/sample/{}/'.format(sample.uuid))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid'), sample.uuid)
 
     def test_retrieve_view_tree(self):
@@ -147,7 +147,7 @@ class TestSampleAPI(TestCase):
 
         response = self.client.get('/api/v0/sample/{}/node/tree/'.format(sample.uuid))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         children = results.get('nodes').get('children')
         self.assertEqual(len(children), 1)
@@ -188,7 +188,7 @@ class TestSampleAPI(TestCase):
 
         response = self.client.get('/api/v0/sample/{}/node/leaf/'.format(sample.uuid))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         leaf_nodes = results.get('nodes')
         leaf_uuids = [p.uuid for p in processes['step-2']]
         for node in leaf_nodes:
@@ -205,7 +205,7 @@ class TestUserAPI(TestCase):
     def test_list_view_get(self):
         response = self.client.get('/api/v0/users/')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), 1)
         user = results[0]
         self.assertIsNotNone(user)

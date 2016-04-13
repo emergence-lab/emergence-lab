@@ -33,7 +33,7 @@ class TestProjectAPI(TestCase):
             project.add_user(self.user, 'viewer')
         response = self.client.get('/api/v0/project_management/project/all')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(projects))
         for project, result in zip(projects, results):
             self.assertEqual(result['slug'], project.slug)
@@ -51,7 +51,7 @@ class TestProjectAPI(TestCase):
             ProjectTracking.objects.get_or_create(project=project, user=self.user)
         response = self.client.get('/api/v0/project_management/project/all')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(projects))
         for project, result in zip(projects, results):
             self.assertEqual(result['slug'], project.slug)
@@ -65,7 +65,7 @@ class TestProjectAPI(TestCase):
         response = self.client.get(
             '/api/v0/project_management/project/detail/{}'.format(project.slug))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('slug'), project.slug)
         self.assertIsNotNone(results.get('description'))
 
@@ -76,7 +76,7 @@ class TestProjectAPI(TestCase):
         url = '/api/v0/project_management/project/'
         data = {'name': 'project 1', 'description': 'Test description'}
         response = self.client.post(url, data, format='json')
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         project = Project.objects.first()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(project.description, data['description'])
@@ -94,7 +94,7 @@ class TestProjectAPI(TestCase):
                 'description': 'Test updated description',
                 'is_active': 'true'}
         response = self.client.patch(url, data, format='json')
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         project = Project.objects.first()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(project.description, data['description'])
@@ -146,7 +146,7 @@ class TestInvestigationAPI(TestCase):
         project.add_user(self.user, 'viewer')
         response = self.client.get('/api/v0/project_management/investigation/')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(investigations))
         for investigation, result in zip(investigations, results):
             self.assertEqual(result['slug'], investigation.slug)
@@ -175,7 +175,7 @@ class TestInvestigationAPI(TestCase):
         response = self.client.get(
             '/api/v0/project_management/investigation/detail/{}'.format(investigation.slug))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('slug'), investigation.slug)
         self.assertIsNotNone(results.get('description'))
 
@@ -190,7 +190,7 @@ class TestInvestigationAPI(TestCase):
                 'description': 'Test description',
                 'project': project.id}
         response = self.client.post(url, data, format='json')
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         investigation = Investigation.objects.first()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(investigation.description, data['description'])
@@ -211,7 +211,7 @@ class TestInvestigationAPI(TestCase):
                 'project': project.id,
                 'is_active': 'true'}
         response = self.client.patch(url, data, format='json')
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         investigation = Investigation.objects.first()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(investigation.description, data['description'])
@@ -242,7 +242,7 @@ class TestMilestoneAPI(TestCase):
         project.add_user(self.user, 'viewer')
         response = self.client.get('/api/v0/project_management/milestone/')
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(milestones))
         for milestone, result in zip(milestones, results):
             self.assertEqual(result['slug'], milestone.slug)
@@ -260,7 +260,7 @@ class TestMilestoneAPI(TestCase):
         response = self.client.get(
             '/api/v0/project_management/milestone/detail/{}'.format(milestone.slug))
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('slug'), milestone.slug)
         self.assertIsNotNone(results.get('description'))
 
@@ -278,7 +278,7 @@ class TestMilestoneAPI(TestCase):
                 'investigation': investigation.id,
                 'due_date': str(datetime.date.today())}
         response = self.client.post(url, data, format='json')
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         milestone = Milestone.objects.first()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(milestone.description, data['description'])
@@ -317,7 +317,7 @@ class TestMilestoneAPI(TestCase):
                 'investigation': investigation.id,
                 'due_date': str(datetime.date.today())}
         response = self.client.patch(url, data, format='json')
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
         milestone = Milestone.objects.first()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(milestone.description, data['description'])
