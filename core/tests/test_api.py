@@ -33,7 +33,7 @@ class TestProcessAPI(TestCase):
         results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(results), len(processes))
         for process, result in zip(processes, results):
-            self.assertEqual(result.get('uuid_full'), process.uuid_full.hex)
+            self.assertEqual(result.get('uuid_full'), str(process.uuid_full))
 
     def test_retrieve_view_get_full_uuid(self):
         """
@@ -44,7 +44,7 @@ class TestProcessAPI(TestCase):
             '/api/v0/process/{}/'.format(process.uuid_full.hex))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
+        self.assertEqual(results.get('uuid_full'), str(process.uuid_full))
         self.assertIsNotNone(results.get('comment'))
 
     def test_retrieve_view_get_short_uuid(self):
@@ -55,7 +55,7 @@ class TestProcessAPI(TestCase):
         response = self.client.get(
             '/api/v0/process/{}/'.format(process.uuid))
         results = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(results.get('uuid_full'), process.uuid_full.hex)
+        self.assertEqual(results.get('uuid_full'), str(process.uuid_full))
         self.assertIsNotNone(results.get('comment'))
 
     def test_retrieve_node_view_get_full_uuid(self):
@@ -69,7 +69,7 @@ class TestProcessAPI(TestCase):
             '/api/v0/process/node/{}/'.format(node.uuid_full.hex))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
+        self.assertEqual(results.get('uuid_full'), str(node.uuid_full))
         self.assertIsNotNone(results.get('comment'))
         self.assertEqual(results.get('sample'), sample.uuid)
 
@@ -83,7 +83,7 @@ class TestProcessAPI(TestCase):
         response = self.client.get(
             '/api/v0/process/node/{}/'.format(node.uuid))
         results = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(results.get('uuid_full'), node.uuid_full.hex)
+        self.assertEqual(results.get('uuid_full'), str(node.uuid_full))
         self.assertIsNotNone(results.get('comment'))
         self.assertEqual(results.get('sample'), sample.uuid)
 

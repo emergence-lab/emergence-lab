@@ -23,7 +23,7 @@ git+https://github.com/wbg-optronix-lab/aws-support@0.11.0#egg=aws_support
 django-storages-redux==1.2.3
 django-ace==1.0.2
 django-polymorphic==0.7.1
-django-uuidfield==0.5.0
+git+https://github.com/dcramer/django-uuidfield@9bd27e9
 redis==2.10.5
 django-sendfile==0.3.10
 django-betterforms==1.1.2
