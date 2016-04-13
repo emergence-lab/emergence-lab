@@ -28,7 +28,7 @@ redis==2.10.5
 django-sendfile==0.3.10
 django-betterforms==1.1.4
 ExifRead==2.1.2
-git+https://github.com/jmarini/nanoscope@0.10.1#egg=nanoscope
+nanoscope==0.10.2
 WeasyPrint==0.27
 django-weasyprint==0.1
 django-rq==0.9.0
