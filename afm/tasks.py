@@ -123,7 +123,7 @@ def _create_scan_png(scan, filename, scan_number):
             (20 + image.size[0] - calibri.getsize(type_str)[0], 50 + image.size[1]),
             type_str, 'black', calibri)
 
-    tempio = six.StringIO()
+    tempio = six.BytesIO()
     processed_image.save(tempio, format='PNG')
     if scan.type == 'Amplitude':
         filename += 'a'
@@ -131,4 +131,4 @@ def _create_scan_png(scan, filename, scan_number):
         filename += 'p'
     return InMemoryUploadedFile(
         tempio, field_name=None, name=filename + '.png',
-        content_type='image/png', size=tempio.len, charset=None)
+        content_type='image/png', size=len(tempio.getvalue()), charset=None)

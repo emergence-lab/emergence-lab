@@ -52,7 +52,7 @@ REDIS_DB = 1
 
 # Logging
 
-logging.disable(logging.critical)
+logging.disable(logging.CRITICAL)
 
 # File storages
 

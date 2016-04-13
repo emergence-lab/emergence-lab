@@ -349,7 +349,7 @@ class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
             readings.insert(29, round(viii_ratio, 2))
             readings.insert(29, round(nh3_molar * 10 ** 3, 2))
 
-        context['readings_table'] = zip(
+        context['readings_table'] = list(zip(
             ['ID', 'Growth ID', 'Layer', 'Description', 'Pyro Out', 'Pyro In', 'ECP Temp',
              'Thermocouple Out', 'Thermocouple In', 'Motor RPM', 'GC Pressure',
              'GC Position', 'Voltage In', 'Voltage Out', 'Current In',
@@ -363,7 +363,7 @@ class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
              'TMIn1 Flow', 'TMIn1 Pressure', 'TMIn Molar Flow',
              'TMAl1 Flow', 'TMAl1 Pressure', 'TMAl Molar Flow',
              'Cp2Mg Flow', 'Cp2Mg Pressure', 'Cp2Mg Dilution',
-             'SiH4 Flow', 'SiH4 Dilution', 'SiH4 Mix', 'SiH4 Pressure'], *converted_readings)[2:]
+             'SiH4 Flow', 'SiH4 Dilution', 'SiH4 Mix', 'SiH4 Pressure'], *converted_readings))[2:]
 
         return context
 
