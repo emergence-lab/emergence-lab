@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 import six
-
-from . import fields
 
 
 class ActiveStateManager(models.Manager):
@@ -107,7 +107,7 @@ class UUIDMixin(models.Model):
     short_length = 7
     prefix = ''
 
-    uuid_full = fields.UUIDField(version=4, auto=True, hyphenate=False)
+    uuid_full = models.UUIDField(default=uuid.uuid4, editable=False)
 
     class Meta:
         abstract = True
