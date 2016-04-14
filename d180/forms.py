@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from core.forms import ChecklistForm
 from core.models import Process
-from d180.models import D180Readings, D180Source, D180GrowthInfo
+from d180.models import D180Readings, D180Source, D180GrowthInfo, Platter
 
 
 class WizardBasicProcessForm(forms.ModelForm):
@@ -31,6 +31,9 @@ class WizardBasicProcessForm(forms.ModelForm):
 
 
 class WizardGrowthInfoForm(forms.ModelForm):
+
+    platter = forms.ModelChoiceField(required=True,
+                                     queryset=Platter.active_objects.all())
 
     class Meta:
         model = D180GrowthInfo
@@ -65,13 +68,20 @@ class WizardGrowthInfoForm(forms.ModelForm):
         cleaned_data = super(WizardGrowthInfoForm, self).clean()
         material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
         materials = [field for field in material_fields if cleaned_data[field]]
-        if not materials:
-            raise forms.ValidationError('At least one material must be specified')
 
         doping_fields = ['has_n', 'has_p', 'has_u']
         doping = [field for field in doping_fields if cleaned_data[field]]
+
+        # collect validation errors
+        errors = []
+        if not materials:
+            errors.append(forms.ValidationError(_('At least one material must be specified'),
+                                                code='material'))
         if not doping:
-            raise forms.ValidationError('At least one doping type must be specified')
+            errors.append(forms.ValidationError(_('At least one doping type must be specified'),
+                                                code='doping'))
+        if errors:
+            raise forms.ValidationError(errors)
 
         return cleaned_data
 

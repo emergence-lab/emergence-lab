@@ -65,17 +65,45 @@ class ProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        process_categories = list(ProcessCategory.objects
-                                                 .order_by('slug')
-                                                 .prefetch_related('processtypes')
-                                                 .annotate(number=Count('processtype__process')))
+        username = self.kwargs.get('username', 'all')
+
+        process_categories = (ProcessCategory.objects
+                                             .prefetch_related('processtypes')
+                                             .order_by('slug'))
+
+        if username != 'all':
+            process_categories = process_categories.filter(
+                processtype__process__user__username=username)
+        process_categories = list(process_categories.annotate(number=Count('processtype__process')))
+        excluded_categories = list(
+            ProcessCategory.objects
+                           .exclude(pk__in=[o.pk for o in process_categories]))
+
         for category in process_categories:
-            category.annotated = category.processtypes.annotate(number=Count('process'))
+            if username == 'all':
+                category.annotated = (category.processtypes.order_by('type')
+                                                           .annotate(number=Count('process')))
+            else:
+                included_types = (category.processtypes.filter(process__user__username=username)
+                                                           .order_by('type')
+                                                           .annotate(number=Count('process')))
+                excluded_types = (category.processtypes
+                                          .exclude(pk__in=included_types.values_list('pk',
+                                                                                     flat=True)
+                                          .extra(select={'number': 0})))
+
+                category.annotated = sorted(list(included_types) + list(excluded_types),
+                                            key=lambda x: x.type)
+
+        for category in excluded_categories:
+            category.annotated = category.processtypes.order_by('type')
+
+        process_categories.extend(excluded_categories)
         context['process_categories'] = process_categories
         context['active_users'] = get_user_model().active_objects.exclude(id=self.request.user.id)
         context['inactive_users'] = get_user_model().inactive_objects.order_by('-status_changed')
         context['slug'] = self.kwargs.get('slug', 'all')
-        context['username'] = self.kwargs.get('username', 'all')
+        context['username'] = username
         return context
 
     def get_queryset(self):
@@ -210,8 +238,12 @@ class ProcessTemplateListView(LoginRequiredMixin, generic.ListView):
                             .order_by('slug')
                             .prefetch_related('processtypes')
                             .annotate(number=Count('processtype__process__templates'))))
+
         for category in process_categories:
-            category.annotated = category.processtypes.annotate(number=Count('process__templates'))
+            category.annotated = (category.processtypes
+                                          .order_by('type')
+                                          .annotate(number=Count('process__templates')))
+
         context['process_categories'] = process_categories
         context['slug'] = self.kwargs.get('slug', 'all')
         return context
@@ -314,14 +346,19 @@ class TemplateProcessWizardView(ProcessWizardView):
 
     def build_forms(self):
         if 'id' in self.kwargs:
-            comment = ProcessTemplate.objects.get(id=self.kwargs.get('id', None)).comment
+            template = ProcessTemplate.objects.get(id=self.kwargs.get('id', None))
+            comment = template.comment
+            process_type = template.process.type_id
         elif 'uuid' in self.kwargs:
-            comment = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
-                self.kwargs.get('uuid', None))).comment
+            process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
+                self.kwargs.get('uuid', None)))
+            comment = process.comment
+            process_type = process.type_id
         output = super(TemplateProcessWizardView, self).build_forms()
         output['info_form'] = WizardBasicInfoForm(self.request.user,
                                                   initial={'user': self.request.user,
-                                                           'comment': comment},
+                                                           'comment': comment,
+                                                           'type': process_type},
                                                   prefix='process')
         return output
 

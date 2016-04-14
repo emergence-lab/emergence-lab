@@ -285,8 +285,8 @@
 
         // Bootstrap tooltip/popovers
         $('[data-toggle="popover"]').popover();
-        $('[data-toggle="tooltip"]').tooltip();
-        $('[rel="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+        $('[rel="tooltip"]').tooltip({container: 'body'});
     </script>
     {% block scripts %}
     {% endblock %}

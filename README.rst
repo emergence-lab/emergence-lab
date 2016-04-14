@@ -53,14 +53,14 @@ After installing Docker and Bower, go to your command line (or Docker shell) and
     $ docker-machine start default  ## OS X and Windows only
     $ docker-compose build
     $ docker-compose up &
-    $ docker exec -it emergencelab_web_1 python manage.py migrate
-    $ docker exec -it emergencelab_web_1 python manage.py collectstatic --noinput
+    $ docker-compose run web python3 manage.py migrate
+    $ docker-compose run web python3 manage.py collectstatic --noinput
 
 Create an administrative user by entering:
 
 .. code::
 
-    $ docker exec -it emergencelab_web_1 python manage.py createsuperuser
+    $ docker-compose run web python3 manage.py createsuperuser
 
 Get your docker machine IP address:
 

@@ -30,7 +30,7 @@
                 {% bootstrap_icon 'remove' %}
                 Cancel
             </button>
-            <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
+            <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#comment-modal">
                 {% bootstrap_icon 'pencil' %}
                 Comments
             </button>
@@ -255,7 +255,7 @@
     <script type="text/javascript" src="{% static 'growths/js/create_growth.js' %}"></script>
     <script type="text/javascript">
         $(function() {
-            $('select').select2({theme: 'bootstrap'});
+            $('select').select2({theme: 'bootstrap', 'width': '100%'});
             $('#id_process-investigations').select2({
                 placeholder: 'Select associated investigation(s)',
                 theme: 'bootstrap'

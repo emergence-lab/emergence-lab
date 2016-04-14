@@ -4,11 +4,13 @@ from __future__ import absolute_import, unicode_literals
 import operator
 import string
 
+from six.moves import reduce
+
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
-import polymorphic
+from polymorphic.models import PolymorphicModel
 from simple_history import models as simple_history
 
 from .mixins import AutoUUIDMixin, TimestampMixin
@@ -17,7 +19,7 @@ from . import fields
 
 
 @python_2_unicode_compatible
-class Substrate(polymorphic.PolymorphicModel, TimestampMixin):
+class Substrate(PolymorphicModel, TimestampMixin):
     """
     Base class for all substrates.
     """

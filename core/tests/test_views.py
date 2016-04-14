@@ -627,7 +627,7 @@ class TestProcessTemplateCRUD(TestCase):
             'comment': 'test_comment'
         }
         response = self.client.post(url, data)
-        detail_url = 'process/templates/detail/{}/'.format(template.id)
+        detail_url = '/process/templates/detail/{}/'.format(template.id)
         self.assertRedirects(response, detail_url)
         comment = ProcessTemplate.objects.get(id=template.id).comment
         self.assertEqual(comment, data['comment'])

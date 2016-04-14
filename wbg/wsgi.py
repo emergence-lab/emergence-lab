@@ -46,7 +46,9 @@ if _get_secret('PRODUCTION_MODE') == 'production':
     sys.path.append(os.path.join(sys_path, _get_secret('SETTINGS_REL_ROOT')))
 
     activate_env = os.path.expanduser('{}/bin/activate_this.py'.format(venv_path))
-    execfile(activate_env, dict(__file__=activate_env))
+    with open(activate_env) as f:
+        code = compile(f.read(), activate_env, 'exec')
+        exec(code, {'__file__': activate_env})
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE',
         '{0}.settings.{1}'.format(_get_secret('SETTINGS_REL_ROOT'),

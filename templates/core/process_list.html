@@ -75,13 +75,14 @@
                 </a>
             </div>
             {% for category in process_categories %}
-                {% if category.number != 0 %}
                     <div class="panel panel-default panel-clickable">
                         <div class="panel-heading" data-toggle="collapse" data-parent="#categories" data-target="#{{category.slug}}">
                             <span data-toggle="tooltip" data-placement="right" title="{{category.description}}">
                             <h4 class="panel-title">
                                 {{category.name}}
-                                <span class="badge pull-right">{{category.number}}</span>
+                                {% if category.number %}
+                                    <span class="badge pull-right">{{category.number}}</span>
+                                {% endif %}
                             </h4>
                             </span>
                         </div>
@@ -104,7 +105,6 @@
                             </div>
                         </div>
                     </div>
-                {% endif %}
             {% endfor %}
         </div>
 
@@ -138,14 +138,12 @@
                             ({{process.legacy_identifier}})
                         {% endif %}
                         <div class="btn-toolbar pull-right">
-                            {% if process.type_id = 'd180-growth' or process.type_id = 'generic-process' %}
                             <a class="btn btn-xs btn-default"
                              data-toggle="tooltip"
                              title="Use as template"
                              href="{% if process.type_id = 'd180-growth' %}{% url 'create_growth_d180_start_template' uuid=process.uuid %}{%else%}{% url 'process_create_from_template' uuid=process.uuid %}{%endif%}">
                               <span class="glyphicon glyphicon-share-alt" style="color:grey"></span>
                             </a>
-                            {% endif %}
                             <a class="btn btn-xs btn-default"
                                data-toggle="tooltip"
                                title="Favorite"

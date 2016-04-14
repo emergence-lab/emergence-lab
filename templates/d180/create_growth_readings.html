@@ -26,24 +26,32 @@
         <h1 class="page-header">
             Readings for {{growth.uuid}} ({{growth.legacy_identifier}})
             <div class="pull-right">
-                <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
-                    {% bootstrap_icon 'remove' %}
-                    Cancel
-                </button>
+                <span data-toggle="tooltip" data-placement="bottom" title="Cancel Growth">
+                    <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#cancel-modal">
+                        {% bootstrap_icon 'remove' %}
+                    </button>
+                </span>
                 <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#sample-modal">
-                    {% bootstrap_icon 'file' %}
+                    <span class="fa fa-archive"></span>
                     Samples
                 </button>
-                <button class="btn btn-info" type="button" data-toggle="modal" data-target="#comment-modal">
+                <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#comment-modal">
                     {% bootstrap_icon 'pencil' %}
                     Comments
                 </button>
-                <button class="btn btn-success next-tab-main" type="submit" id="submit-button">
-                    Submit
-                    {% bootstrap_icon 'ok' %}
-                </button>
-                <a class="btn btn-warning" href="{% url 'create_growth_d180_postrun' %}">
-                    Finish Readings
+                <span data-toggle="tooltip" data-placement="bottom" title="Refresh">
+                    <button class="btn btn-info" type="submit">
+                        {% bootstrap_icon 'refresh' %}
+                    </button>
+                </span>
+                <span data-toggle="tooltip" data-placement="bottom" title="Submit Changes">
+                    <button class="btn btn-success next-tab-main" type="submit" id="submit-button">
+                        {% bootstrap_icon 'ok' %}
+                        Submit
+                    </button>
+                </span>
+                <a class="btn btn-success" href="{% url 'create_growth_d180_postrun' %}">
+                    Finish Growth
                     {% bootstrap_icon 'chevron-right' %}
                 </a>
             </div>

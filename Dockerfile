@@ -6,6 +6,11 @@ RUN apt-get update && apt-get install -y \
     python \
     python-dev \
     python-setuptools \
+    python-pip \
+    python3 \
+    python3-dev \
+    python3-setuptools \
+    python3-pip \
     supervisor \
     libpq-dev \
     libffi-dev \
@@ -18,9 +23,10 @@ RUN apt-get update && apt-get install -y \
     libpango1.0-0 \
     libgdk-pixbuf2.0-0 \
     libjpeg-dev
-RUN (easy_install pip)
+
+RUN pip install --upgrade pip
 
 ADD . /opt/django
 WORKDIR /opt/django
 ENV DJANGO_SETTINGS_MODULE wbg.settings.docker
-RUN pip install -r /opt/django/requirements/development.txt
+RUN pip3 install -r /opt/django/requirements/development.txt

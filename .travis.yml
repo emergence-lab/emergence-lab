@@ -9,6 +9,8 @@ services:
 
 env:
     - TOXENV=py27
+    - TOXENV=py34
+    - TOXENV=py35
     - TOXENV=flake
 
 install:

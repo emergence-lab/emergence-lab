@@ -24,7 +24,7 @@ class Platter(ActiveStateMixin, models.Model):
         verbose_name_plural = _('platters')
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.serial)
 
 
 class D180GrowthInfo(models.Model):
