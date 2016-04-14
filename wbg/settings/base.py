@@ -59,12 +59,12 @@ LOGOUT_URL = "{}/accounts/logout/".format(SUB_SITE)
 # Templates
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
-TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + (
+TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + [
     'django.core.context_processors.request',
     'core.context_processors.external_links',
     'core.context_processors.feedback',
     'messaging.context_processors.notifications',
-)
+]
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',

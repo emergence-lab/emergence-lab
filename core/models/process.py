@@ -11,7 +11,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 from actstream import action
 from mptt import models as mptt
-import polymorphic
+from polymorphic.models import PolymorphicModel
 from simple_history import models as simple_history
 
 from core.models.mixins import TimestampMixin, UUIDMixin
@@ -147,11 +147,13 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     piece = models.CharField(max_length=5)
     number = models.IntegerField(default=1)
 
+    objects = mptt.TreeManager()
+
     def get_sample(self):
         return self.get_root().sample
 
 
-class DataFile(polymorphic.PolymorphicModel, TimestampMixin):
+class DataFile(PolymorphicModel, TimestampMixin):
     """
     Generic model for files associated with processes
     """

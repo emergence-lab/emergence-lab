@@ -6,7 +6,7 @@ from copy import copy
 
 from django.contrib.contenttypes.models import ContentType
 
-from polymorphic.polymorphic_model import PolymorphicModel
+from polymorphic.models import PolymorphicModel
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_field_kwargs, ClassLookupDict
 from rest_framework.fields import SkipField
