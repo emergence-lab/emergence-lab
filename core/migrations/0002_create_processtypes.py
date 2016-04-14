@@ -5,7 +5,13 @@ from django.db import models, migrations
 
 
 def create_default_process_types(apps, schema_editor):
+    ProcessCategory = apps.get_model('core', 'ProcessCategory')
     ProcessType = apps.get_model('core', 'ProcessType')
+
+    uncategorized, _ = ProcessCategory.objects.get_or_create(
+        slug='uncategorized',
+        name='Uncategorized',
+        description='Uncategorized process types.')
 
     ProcessType.objects.get_or_create(
         type='generic-process',
@@ -13,14 +19,16 @@ def create_default_process_types(apps, schema_editor):
         name='Generic',
         full_name='Generic Process',
         description='A generic process not covered by existing types.',
-        scheduling_type='none')
+        scheduling_type='none',
+        category=uncategorized)
     ProcessType.objects.get_or_create(
         type='split-process',
         is_destructive=False,
         name='Split',
         full_name='Split Sample',
         description='Splitting a sample into multiple pieces.',
-        scheduling_type='none')
+        scheduling_type='none',
+        category=uncategorized)
 
 
 class Migration(migrations.Migration):
