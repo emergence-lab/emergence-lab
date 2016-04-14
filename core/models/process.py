@@ -147,6 +147,8 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     piece = models.CharField(max_length=5)
     number = models.IntegerField(default=1)
 
+    objects = mptt.TreeManager()
+
     def get_sample(self):
         return self.get_root().sample
 
