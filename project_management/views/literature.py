@@ -95,10 +95,8 @@ class MendeleyLibrarySearchView(LoginRequiredMixin, MendeleyMixin, generic.Templ
         projects = [x.project for x in ProjectTracking.objects.all().filter(
             user=self.request.user)]
         context['literature'] = pagination_helper(page, literature.count, literature)
-        context['milestones'] = Milestone.objects.all().filter(
-            user=self.request.user).filter(is_active=True)
-        context['investigations'] = Investigation.objects.all().filter(
-            is_active=True).filter(project__in=projects)
+        context['milestones'] = self.request.user.get_milestones('member').filter(is_active=True)
+        context['investigations'] = Investigation.active_objects.filter(project__in=projects)
         return context
 
 
@@ -137,10 +135,8 @@ class LiteratureLandingView(LoginRequiredMixin, generic.ListView):
         projects = [x.project for x in ProjectTracking.objects.all().filter(
             user=self.request.user)]
         context['mendeley'] = settings.ENABLE_MENDELEY
-        context['milestones'] = Milestone.objects.all().filter(
-            user=self.request.user).filter(is_active=True)
-        context['investigations'] = Investigation.objects.all().filter(
-            is_active=True).filter(project__in=projects)
+        context['milestones'] = self.request.user.get_milestones('member').filter(is_active=True)
+        context['investigations'] = Investigation.active_objects.filter(project__in=projects)
         return context
 
 
@@ -171,7 +167,7 @@ class AddMendeleyObjectView(LoginRequiredMixin, MendeleyMixin, ActionReloadView)
         else:
             document = self.session.documents.get(self.kwargs.get('external_id', None))
             external_id = getattr(document, 'id', None)
-            title = unicode(getattr(document, 'title', None))
+            title = getattr(document, 'title', None)
             journal = getattr(document, 'journal', None)
             year = getattr(document, 'year', None)
             abstract = getattr(document, 'abstract', None)
@@ -213,7 +209,8 @@ class AddLiteratureObjectView(LoginRequiredMixin, ActionReloadView):
 
 
 class CreateLiteratureObjectView(LoginRequiredMixin, generic.CreateView):
-
+    fields = ['title', 'external_id', 'abstract', 'doi_number', 'year',
+              'journal', 'user', 'investigations', 'milestones', ]
     model = Literature
     template_name = 'project_management/create_literature.html'
 
