@@ -32,7 +32,7 @@ class ProcessCreateForm(forms.ModelForm):
 
         self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [
-                (m.id, m.name) for m in i.milestones.order_by('project')])
+                (m.id, m.name) for m in i.milestones.order_by('investigation')])
             for i in user.get_investigations('member') if i.milestones.exists()
         ])
         self.fields['investigations'] = forms.MultipleChoiceField(required=False, choices=[
