@@ -216,6 +216,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'process-investigations': '1',
             'growth-platter': '1',
+            'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
             'source-cp2mg': '0.00',
@@ -264,6 +265,7 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
+            'process-title': 'process title',
             'process-investigations': '1',
             'growth-platter': '1',
             'process-user': self.user.id,
@@ -317,6 +319,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'process-investigations': '1',
             'growth-platter': '1',
+            'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
@@ -369,6 +372,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'process-investigations': '1',
             'growth-platter': '1',
+            'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
@@ -422,6 +426,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'process-investigations': '1',
             'growth-platter': '1',
+            'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
@@ -475,6 +480,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'process-investigations': '1',
             'growth-platter': '1',
+            'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
@@ -530,6 +536,7 @@ class TestD180Wizard(TestCase):
             'growth-orientation': '0001',
             'process-investigations': '1',
             'growth-platter': '1',
+            'process-title': 'process title',
             'process-user': '1',
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
@@ -560,7 +567,6 @@ class TestD180Wizard(TestCase):
         for attr, value in response.context['growth_form'].initial.items():
             self.assertEqual(value, getattr(process.info, attr))
 
-
     def test_readings_empty_data(self):
         """Test a post where no data is sent."""
         process = mommy.make(Process, type_id='d180-growth')
@@ -578,6 +584,7 @@ class TestD180Wizard(TestCase):
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
+            'comment-title': process.title,
             'reading-INITIAL_FORMS': '0',
             'reading-MAX_NUM_FORMS': '',
             'reading-TOTAL_FORMS': '1',
@@ -604,6 +611,7 @@ class TestD180Wizard(TestCase):
         mommy.make(D180GrowthInfo, process=process)
         url = reverse('create_growth_d180_readings')
         data = {
+            'comment-title': process.title,
             'reading-INITIAL_FORMS': '0',
             'reading-MAX_NUM_FORMS': '',
             'reading-TOTAL_FORMS': '1',
@@ -673,6 +681,7 @@ class TestD180Wizard(TestCase):
         process = mommy.make(Process, type_id='d180-growth')
         url = reverse('create_growth_d180_postrun')
         data = {
+            'comment-title': process.title,
             'checklist-field_0': 'on',
             'checklist-field_1': 'on',
             'checklist-field_2': 'on',
