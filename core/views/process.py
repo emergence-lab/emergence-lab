@@ -122,7 +122,7 @@ class ProcessUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Process
     context_object_name = 'process'
     lookup_url_kwarg = 'uuid'
-    fields = ('comment',)
+    fields = ('title', 'comment', )
 
     def get_object(self, queryset=None):
         queryset = queryset or self.get_queryset()
@@ -149,7 +149,7 @@ class RunProcessView(LoginRequiredMixin, generic.CreateView):
         initial['type'] = self.process_type
         return initial
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=ProcessCreateForm):
         try:
             sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
         except Sample.DoesNotExist as e:

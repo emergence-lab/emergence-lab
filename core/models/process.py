@@ -100,6 +100,7 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     """
     prefix = 'p'
 
+    title = models.CharField(max_length=80)
     comment = fields.RichTextField(blank=True)
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -199,6 +200,7 @@ class ProcessTemplate(TimestampMixin, models.Model):
                                 related_name='templates',
                                 related_query_name='templates')
     name = models.CharField(max_length=50, blank=True)
+    title = models.CharField(max_length=80)
     comment = fields.RichTextField(blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                          limit_choices_to={'is_active': True})
