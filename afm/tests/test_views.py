@@ -29,6 +29,7 @@ class TestAFMUpload(TestCase):
         sample = Sample.objects.create(mommy.make(Substrate))
         url = reverse('afm_autocreate', args=[sample.uuid])
         data = {
+            'title': 'process title',
             'pieces': ['a'],
             'type': 'afm',
         }
