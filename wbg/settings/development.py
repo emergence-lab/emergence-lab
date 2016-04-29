@@ -6,7 +6,6 @@ from .base import *
 # Debugging
 
 DEBUG = True
-TEMPLATE_DEBUG = True
 
 
 # Installed Apps

@@ -3,7 +3,6 @@ from .base import *
 # Debugging
 
 DEBUG = True
-TEMPLATE_DEBUG = False
 
 
 # Misc Settings
