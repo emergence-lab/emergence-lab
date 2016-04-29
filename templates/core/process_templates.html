@@ -95,7 +95,7 @@
                                 {% bootstrap_icon 'edit' %}
                             </a>
                             <a class="btn btn-xs btn-default"
-                               href="{% url 'process_create_from_template' id=object.id %}"
+                               href="{% if object.process.type_id = 'd180-growth' %}{% url 'create_growth_d180_start_template' id=object.id %}{% else %}{% url 'process_create_from_template' id=object.id %}{% endif %}"
                                data-toggle="toolip" title="New from template">
                                 {% bootstrap_icon 'share-alt' %}
                             </a>
