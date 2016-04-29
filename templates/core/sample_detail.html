@@ -114,7 +114,7 @@
                                         data-toggle="tooltip"
                                         data-html="true"
                                         data-placement="left"
-                                        title="{{node.process.comment|escape|truncatewords:50}}">
+                                        title="<h5><strong>{{node.process.title}}</strong></h5>{{node.process.comment|escape|truncatewords:50}}">
                                             {{node.process.uuid}}
                                      </a>{% if node.process.legacy_identifier %}, {{node.process.legacy_identifier}}{% endif %}
                                     )
