@@ -258,6 +258,7 @@ class AddProcessTemplateView(LoginRequiredMixin, ActionReloadView):
         process = Process.objects.get(
             uuid_full__startswith=Process.strip_uuid(self.kwargs.get('uuid', None)))
         self.template = ProcessTemplate.objects.create(process=process,
+                                                       title=process.title,
                                                        comment=process.comment,
                                                        user=self.request.user,
                                                        name=process.uuid)
