@@ -41,7 +41,7 @@
       <span class="pull-right"><span class="glyphicon glyphicon-time"></span> {{milestone.due_date}}</span>
     </div>
     <div class="panel-body">
-      {{milestone.description|safe}}
+      {{milestone.description|escape|safe}}
     </div>
   </div>
 

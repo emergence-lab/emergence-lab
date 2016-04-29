@@ -155,7 +155,7 @@
                         <span class="pull-right"><small>&emsp; {{process.created.date|date:"SHORT_DATE_FORMAT"}} &emsp; </small></span>
                     </h4>
                     <p class="list-group-item-text"></p>
-                        {{process.comment|truncatewords_html:50|safe}}
+                        {{process.comment|escape|truncatewords_html:50|safe}}
                     </p>
                 </li>
             {% endfor %}

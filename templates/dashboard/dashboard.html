@@ -107,7 +107,7 @@
 
                 </div>
                 <div class="panel-body">
-                    {{ p.description|safe|truncatewords:50 }}
+                    {{ p.description|escape|safe|truncatewords:50 }}
                 </div>
                 <ul id="invest_list_{{p.id}}" class="list-group">
                     {% for i in p.investigations.all %}

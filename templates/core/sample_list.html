@@ -76,7 +76,7 @@
                             </span>
                         {% endfor %}
 
-                        <p>{{sample.comment|safe|truncatewords:50}}</p>
+                        <p>{{sample.comment|escape|safe|truncatewords:50}}</p>
                     </div>
                 </li>
             {% endfor %}

@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="panel-body">
-      {{investigation.description|safe}}
+      {{investigation.description|escape|safe}}
     </div>
   </div>
 </div>
@@ -82,7 +82,7 @@
                       <span class="pull-right">Due: {{milestone.due_date}}</span>
                     </h4>
                     <p class="list-group-item-text">
-                      {{milestone.description|safe|truncatewords:50}}
+                      {{milestone.description|escape|safe|truncatewords:50}}
                     </p>
                   </div>
 
@@ -100,7 +100,7 @@
                       <span class="pull-right">Due: {{milestone.due_date}}</span>
                     </h4>
                     <p class="list-group-item-text">
-                      {{milestone.description|safe|truncatewords:50}}
+                      {{milestone.description|escape|safe|truncatewords:50}}
                     </p>
                   </div>
 
@@ -117,7 +117,7 @@
     <div class="list-group">
       {% for update in processes %}
         <div class="list-group-item">
-          <h4 class="list-group-item-heading">{{update.action_object.type}} <a data-toggle="tooltip" title="{{update.action_object.comment|safe}}" href="{% url 'process_detail' update.action_object.uuid %}">({{update.action_object.uuid}}{% if update.action_object.legacy_identifier %}, {{update.action_object.legacy_identifier}}{%endif%})</a></h4>
+          <h4 class="list-group-item-heading">{{update.action_object.type}} <a data-toggle="tooltip" title="{{update.action_object.comment|escape|safe}}" href="{% url 'process_detail' update.action_object.uuid %}">({{update.action_object.uuid}}{% if update.action_object.legacy_identifier %}, {{update.action_object.legacy_identifier}}{%endif%})</a></h4>
           <p class="list-group-item-text">
             {{update.timestamp}}
 

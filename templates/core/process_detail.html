@@ -68,7 +68,7 @@
             <p>Run using {{process.info.platter.name}}</p>
         {% endif %}
         {% if process.comment %}
-            <p>{{process.comment|safe}}</p>
+            <p>{{process.comment|escape|safe}}</p>
         {% else %}
             <div class="alert alert-warning">
                 <h3>This process doesn't have a comment</h3>

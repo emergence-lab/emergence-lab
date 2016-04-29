@@ -68,7 +68,7 @@
         <p>Created on {{sample.created}}</p>
         <p>Last modified on {{sample.modified}}</p>
         {% if sample.comment %}
-            <p>{{sample.comment|safe}}</p>
+            <p>{{sample.comment|escape|safe}}</p>
         {% else %}
             <div class="alert alert-warning">
                 <h3>This sample doesn't have a comment</h3>
@@ -87,7 +87,7 @@
                 <small>{{sample.substrate.serial}}</small>
             </h3>
             <p>Source: {{sample.substrate.source}}</p>
-            <p>Comment: {{sample.substrate.comment|safe}}</p>
+            <p>Comment: {{sample.substrate.comment|escape|safe}}</p>
             <p>Created on {{sample.substrate.created}}</p>
             <p>Last modified on {{sample.substrate.modified}}</p>
         </div>

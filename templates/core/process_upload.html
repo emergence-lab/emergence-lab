@@ -76,9 +76,9 @@
                                     <td>
                                         {{sample.uuid}}{% if sample.pieces|length > 1 %}{{node.piece}}{% endif %}
                                     </td>
-                                    <td>{{sample.substrate.comment|safe}}</td>
+                                    <td>{{sample.substrate.comment|escape|safe}}</td>
                                     <td>{{sample.substrate.serial}}</td>
-                                    <td>{{sample.comment|safe}}</td>
+                                    <td>{{sample.comment|escape|safe}}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
