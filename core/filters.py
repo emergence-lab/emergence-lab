@@ -73,9 +73,7 @@ class SampleFilterSet(django_filters.FilterSet):
         widget=DateWidget(
             attrs={'class': 'datetime'},
             bootstrap_version=3,
-            options={'minView': '2',
-                     'startView': '2',
-                     'todayBtn': 'true',
+            options={'todayBtn': 'true',
                      'todayHighlight': 'true',
                      'clearBtn': 'true',
                      'format': 'yyyy-mm-dd'}))
@@ -84,9 +82,7 @@ class SampleFilterSet(django_filters.FilterSet):
         widget=DateWidget(
             attrs={'class': 'datetime'},
             bootstrap_version=3,
-            options={'minView': '2',
-                     'startView': '2',
-                     'todayBtn': 'true',
+            options={'todayBtn': 'true',
                      'todayHighlight': 'true',
                      'clearBtn': 'true',
                      'format': 'yyyy-mm-dd'}))
