@@ -34,3 +34,4 @@ django-crispy-forms==1.6.0
 mendeley==0.3.2
 django-simple-history==1.8.1
 pandas>=0.18,<0.19
+django-jsonfield

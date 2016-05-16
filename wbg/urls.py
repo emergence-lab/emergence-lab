@@ -11,7 +11,7 @@ import project_management.views
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^ckeditor/', include('ckeditor.urls')),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^django-rq/', include('django_rq.urls')),
 
