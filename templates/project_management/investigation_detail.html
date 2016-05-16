@@ -121,7 +121,7 @@
                         {{update.action_object.type.name}}
                         <a href="{% url 'process_detail' update.action_object.uuid %}"
                            data-html="True" data-toggle="tooltip" data-placement="right"
-                           title="{{update.action_object.comment|escape|truncatewords_html:50|safe}}">
+                           title="{{update.action_object.comment|escape|truncatewords_html:50}}">
                             ({{update.action_object.uuid}}{% if update.action_object.legacy_identifier %}, {{update.action_object.legacy_identifier}}{%endif%})
                         </a>
                         <strong>{{update.action_object.title}}</strong>
