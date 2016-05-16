@@ -183,7 +183,8 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
 
     def build_forms(self, **kwargs):
         comment_form = CommentsForm(prefix='comment',
-                                    initial={'comment': self.object.comment})
+                                    initial={'title': self.object.title,
+                                             'comment': self.object.comment})
         readings = self.object.readings.get_queryset()
         readings_formset = D180ReadingsFormSet(queryset=readings,
                                                prefix='reading')
@@ -214,6 +215,7 @@ class WizardReadingsView(LoginRequiredMixin, generic.TemplateView):
         if comment_form.is_valid() and readings_formset.is_valid():
             if comment_form.has_changed():
                 self.object.comment = comment_form.cleaned_data['comment']
+                self.object.title = comment_form.cleaned_data['title']
                 self.object.save()
             for reading_form in readings_formset:
                 if reading_form.has_changed():
@@ -239,8 +241,8 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
             previous_source = None
 
         comment_form = CommentsForm(prefix='comment',
-                                    initial={'comment': self.object.comment})
-
+                                    initial={'title': self.object.title,
+                                             'comment': self.object.comment})
         return {
             'checklist_form': WizardPostrunChecklistForm(prefix='checklist'),
             'source_form': SourcesForm(instance=previous_source,
@@ -270,6 +272,7 @@ class WizardPostrunView(LoginRequiredMixin, generic.TemplateView):
         if all([comment_form.is_valid(), source_form.is_valid(),
                 checklist_form.is_valid()]):
             self.object.comment = comment_form.cleaned_data['comment']
+            self.object.title = comment_form.cleaned_data['title']
             self.object.save()
             source_form.save()
             return HttpResponseRedirect(reverse('process_detail', args=(self.object.uuid,)))

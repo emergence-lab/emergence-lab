@@ -94,8 +94,8 @@ class WizardFullProcessForm(forms.ModelForm):
 
     class Meta:
         model = Process
-        fields = ('user', 'investigations', 'comment', 'legacy_identifier', 'type',
-                    'milestones')
+        fields = ('user', 'investigations', 'title', 'comment',
+                  'legacy_identifier', 'type', 'milestones', )
 
 
 class WizardPrerunChecklistForm(ChecklistForm):
@@ -230,8 +230,9 @@ class WizardPostrunChecklistForm(ChecklistForm):
 
 
 class CommentsForm(forms.Form):
+    title = forms.CharField(label='Short Run Description', required=True)
     comment = forms.CharField(
-        label="Run Comments",
+        label="Additional Run Comments",
         required=False,
         widget=forms.Textarea(attrs={'class': 'hallo'}))
 

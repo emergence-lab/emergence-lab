@@ -46,7 +46,14 @@ class ProcessCreateForm(forms.ModelForm):
 
     class Meta:
         model = Process
-        fields = ('comment', 'type', 'investigations', 'milestones')
+        fields = ('title', 'comment', 'type', 'investigations', 'milestones')
+        labels = {
+            'title': 'Short Process Description',
+            'comment': 'Additional Process Comments',
+            'type': 'Process Type',
+            'investigations': 'Investigation(s)',
+            'milestones': 'Milestone(s)',
+        }
 
 
 class EditProcessTemplateForm(forms.ModelForm):
@@ -60,7 +67,7 @@ class EditProcessTemplateForm(forms.ModelForm):
 
     class Meta:
         model = ProcessTemplate
-        fields = ('name', 'comment',)
+        fields = ('name', 'title', 'comment',)
 
 
 class WizardBasicInfoForm(forms.ModelForm):
@@ -84,6 +91,7 @@ class WizardBasicInfoForm(forms.ModelForm):
         self.helper.layout = layout.Layout(
             layout.Field('user'),
             layout.Field('type'),
+            layout.Field('title'),
             layout.Field('comment', css_class='hallo'),
             layout.Field('investigations'),
             layout.Field('milestones'),
@@ -91,9 +99,10 @@ class WizardBasicInfoForm(forms.ModelForm):
 
     class Meta:
         model = Process
-        fields = ('user', 'type', 'comment', 'investigations', 'milestones')
+        fields = ('user', 'type', 'title', 'comment', 'investigations', 'milestones')
         labels = {
-            'comment': 'Process Comments',
+            'title': 'Short Process Description',
+            'comment': 'Additional Process Comments',
             'type': 'Process Type',
             'user': 'User',
             'investigations': 'Investigation(s)',

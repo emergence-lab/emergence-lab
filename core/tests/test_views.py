@@ -426,16 +426,13 @@ class TestProcessCRUD(TestCase):
         url = '/process/{}/edit/'.format(process.uuid)
         data = {}
         response = self.client.post(url, data)
-        before = process.comment
-        process = Process.objects.get(id=process.id)
-        self.assertEqual(process.comment, before)
-        detail_url =  '/process/{}/'.format(process.uuid)
-        self.assertRedirects(response, detail_url)
+        self.assertFormError(response, 'form', 'title', 'This field is required.')
 
     def test_process_edit_valid_data(self):
         process = mommy.make(Process)
         url = '/process/{}/edit/'.format(process.uuid)
         data = {
+            'title': process.title,
             'comment': 'testing',
         }
         response = self.client.post(url, data)
@@ -464,6 +461,7 @@ class TestProcessCRUD(TestCase):
         sample = Sample.objects.create(mommy.make(Substrate))
         processtype = mommy.make(ProcessType, type='test')
         data = {
+            'process-title': 'title',
             'process-comment': 'testing',
             'process-user': self.user.id,
             'process-type': processtype.type,
@@ -487,6 +485,7 @@ class TestProcessCRUD(TestCase):
         ]
         processtype = mommy.make(ProcessType, type='test')
         data = {
+            'process-title': 'title',
             'process-comment': 'testing',
             'process-user': self.user.id,
             'process-type': processtype.type,
@@ -514,6 +513,7 @@ class TestProcessCRUD(TestCase):
         sample.split(self.user, 2)
         processtype = mommy.make(ProcessType, type='test')
         data = {
+            'process-title': 'title',
             'process-comment': 'testing',
             'process-user': self.user.id,
             'process-type': processtype.type,
@@ -534,6 +534,7 @@ class TestProcessCRUD(TestCase):
         piece = 'b'
         processtype = mommy.make(ProcessType, type='test')
         data = {
+            'process-title': 'title',
             'process-comment': 'testing',
             'process-user': self.user.id,
             'process-type': processtype.type,
@@ -569,6 +570,7 @@ class TestProcessCRUD(TestCase):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         url = reverse('process_autocreate', args=[sample.uuid])
         data = {
+            'title': 'process title',
             'pieces': ['b'],
             'type': 'generic-process',
         }
@@ -577,10 +579,24 @@ class TestProcessCRUD(TestCase):
         msg = 'Select a valid choice. b is not one of the available choices.'
         self.assertFormError(response, 'form', 'pieces', msg)
 
+    def test_process_autocreate_invalid_title(self):
+        sample = Sample.objects.create(substrate=mommy.make(Substrate))
+        url = reverse('process_autocreate', args=[sample.uuid])
+        data = {
+            'title': '',
+            'pieces': ['a'],
+            'type': 'generic-process',
+        }
+        response = self.client.post(url, data)
+
+        msg = 'This field is required.'
+        self.assertFormError(response, 'form', 'title', msg)
+
     def test_process_autocreate_invalid_type(self):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         url = reverse('process_autocreate', args=[sample.uuid])
         data = {
+            'title': 'process title',
             'pieces': ['a'],
             'type': 'nonexistant',
         }
@@ -593,6 +609,7 @@ class TestProcessCRUD(TestCase):
         sample = Sample.objects.create(substrate=mommy.make(Substrate))
         url = reverse('process_autocreate', args=[sample.uuid])
         data = {
+            'title': 'process title',
             'pieces': ['a'],
             'type': 'generic-process',
         }
@@ -624,6 +641,7 @@ class TestProcessTemplateCRUD(TestCase):
         url = '/process/templates/{}/edit/'.format(template.id)
         data = {
             'name': 'test',
+            'title': 'process title',
             'comment': 'test_comment'
         }
         response = self.client.post(url, data)
