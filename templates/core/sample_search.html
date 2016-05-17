@@ -45,7 +45,7 @@
                             <span class="label label-default label-process"
                                   data-toggle="tooltip"
                                   data-html="true"
-                                  title="{{process.created|date}}<p>{{process.comment|escape|truncatewords:50}}</p>">
+                                  title="{{process.created|date}}<h5><strong>{{process.title}}</strong></h5><p>{{process.comment|escape|truncatewords:50}}</p>">
                                 {{process.type.name}}
                             </span>
                         {% endfor %}
@@ -58,7 +58,7 @@
                         {% endif %}
 
                         <p class="list-group-item-text">
-                            {{sample.comment|safe|truncatewords:50}}
+                            {{sample.comment|escape|safe|truncatewords:50}}
                             <div class="pull-right">
                                 <small><strong>Created: </strong>{{sample.created.date}}</small>
                             </div>

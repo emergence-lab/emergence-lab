@@ -18,7 +18,9 @@
         <div class="page-header">
             <h1>
                 Process Template Detail
-            <span class="pull-right label label-default">{{processtemplate.process.name}}</span>
+                <span class="pull-right label label-default">
+                    {{processtemplate.process.name}}
+                </span>
             </h1>
         </div>
         <div class="col-md-2">
@@ -32,14 +34,35 @@
         <div class="col-md-10">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <strong>{% if processtemplate.name%}{{ processtemplate.name }}{%else%}Unnamed Template{%endif%}</strong> ({{processtemplate.process.type.name}})
-                    <span class="pull-right">Based on <a href="{% url 'process_detail' processtemplate.process.uuid %}">{{processtemplate.process.uuid}}{%if processtemplate.process.legacy_identifier%} ({{processtemplate.process.legacy_identifier}}){%endif%}</a></span>
+                    <strong>
+                        {% if processtemplate.name %}
+                            {{processtemplate.name}}
+                        {% else %}
+                            Unnamed Template
+                        {% endif %}
+                    </strong>
+                    ({{processtemplate.process.type.name}})
+                    <span class="pull-right">
+                        Based on
+                        <a href="{% url 'process_detail' processtemplate.process.uuid %}">
+                            {{processtemplate.process.uuid}}
+                            {% if processtemplate.process.legacy_identifier %}
+                                ({{processtemplate.process.legacy_identifier}})
+                            {% endif %}
+                        </a>
+                    </span>
                 </div>
                 <div class="panel-body">
+                    <h3><strong>{{processtemplate.title}}</strong></h3>
                     <p>{{processtemplate.comment|escape|safe}}</p>
                 </div>
                 <div class="panel-footer">
-                    <p><strong>Created: </strong>{{processtemplate.created}}<span style="padding-left:5em" ></span><strong>Modified: </strong>{{processtemplate.modified}}</p>
+                    <p>
+                        <span class="right-spacer-md">
+                            <strong>Created: </strong>{{processtemplate.created}}
+                        </span>
+                        <strong>Modified: </strong>{{processtemplate.modified}}
+                    </p>
                 <p></p>
                 </div>
             </div>

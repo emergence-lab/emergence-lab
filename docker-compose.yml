@@ -8,7 +8,7 @@ redis:
       - "6379:6379"
 web:
   build: .
-  command: python3 /opt/django/manage.py runserver 0.0.0.0:8000 --insecure --settings=wbg.settings.docker
+  command: python3 /opt/django/manage.py runserver 0.0.0.0:8000 --settings=wbg.settings.docker
   volumes:
     - .:/opt/django
   ports:

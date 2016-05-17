@@ -131,6 +131,7 @@
             {% for process in object_list %}
                 <li class="list-group-item">
                     <h4 class="list-group-item-heading">
+                        {{process.type.name}} -
                         <a href="{% url 'process_detail' uuid=process.uuid %}">
                             {{process.uuid}}
                         </a>
@@ -155,7 +156,8 @@
                         <span class="pull-right"><small>&emsp; {{process.created.date|date:"SHORT_DATE_FORMAT"}} &emsp; </small></span>
                     </h4>
                     <p class="list-group-item-text"></p>
-                        {{process.comment|truncatewords_html:50|safe}}
+                        <h4 class="page-header top-spacer-sm"><strong>{{process.title}}</strong></h4>
+                        {{process.comment|escape|truncatewords_html:50|safe}}
                     </p>
                 </li>
             {% endfor %}

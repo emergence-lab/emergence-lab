@@ -41,7 +41,7 @@
       <span class="pull-right"><span class="glyphicon glyphicon-time"></span> {{milestone.due_date}}</span>
     </div>
     <div class="panel-body">
-      {{milestone.description|safe}}
+      {{milestone.description|escape|safe}}
     </div>
   </div>
 
@@ -98,6 +98,7 @@
             <div class="list-group-item" href="#">
               <h4 class="list-group-item-heading">
                 {{process.type}} <a href="{% url 'process_detail' process.uuid %}" data-toggle="tooltip" data-html="true" title="{{process.comment|escape|truncatewords:50}}">({{process.uuid}}{% if process.legacy_identifier %}, {{process.legacy_identifier}}{% endif %})</a>
+                <strong>{{process.title}}</strong>
               </h4>
               <p class="list-group-item-text">
                 <small>{{process.created}}</small>

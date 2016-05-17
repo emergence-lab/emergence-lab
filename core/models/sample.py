@@ -184,7 +184,8 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
         if comment is None:
             comment = 'Split sample into {0} pieces'.format(number)
 
-        process = Process.objects.create(comment=comment,
+        process = Process.objects.create(title='Split Sample',
+                                         comment=comment,
                                          user=user,
                                          type_id='split-process')
         nodes = []

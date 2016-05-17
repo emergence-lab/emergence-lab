@@ -23,7 +23,7 @@
         <p>{{entry.author}}</p>
     </header>
     <section>
-        {{entry.entry|safe}}
+        {{entry.entry|escape|safe}}
     </section>
 </article>
 

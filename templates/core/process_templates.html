@@ -1,6 +1,8 @@
 {% extends 'core/base.html' %}
 {% load bootstrap3 %}
 
+{% block title %}Favorite Processes{% endblock title %}
+
 {% block content %}
 <main class="container">
 
@@ -79,10 +81,13 @@
             {% for object in object_list %}
                 <li href="#" class="list-group-item">
                     <h4 class="list-group-item-heading">
+                        {{object.process.type.name}} -
                         <a href="{% url 'process_template_detail' pk=object.id %}">
-                            {{object.name}}
-                            <small>{{object.process.uuid}}{% if object.process.legacy_identifier %} ({{object.process.legacy_identifier}}){%endif%}</small>
+                            {{object.process.uuid}}
                         </a>
+                        {% if object.process.legacy_identifier %}
+                            ({{object.process.legacy_identifier}})
+                        {% endif %}
                         <div class="btn-toolbar pull-right">
                             <a class="btn btn-xs btn-default"
                                href="{% url 'process_template_detail' pk=object.id %}"
@@ -95,7 +100,7 @@
                                 {% bootstrap_icon 'edit' %}
                             </a>
                             <a class="btn btn-xs btn-default"
-                               href="{% url 'process_create_from_template' id=object.id %}"
+                               href="{% if object.process.type_id = 'd180-growth' %}{% url 'create_growth_d180_start_template' id=object.id %}{% else %}{% url 'process_create_from_template' id=object.id %}{% endif %}"
                                data-toggle="toolip" title="New from template">
                                 {% bootstrap_icon 'share-alt' %}
                             </a>
@@ -106,7 +111,10 @@
                             </a>
                         </div>
                     </h4>
-                    <p class="list-group-item-text">{{object.comment|escape|safe|truncatewords_html:50}}</p>
+                    <p class="list-group-item-text">
+                        <h4 class="page-header top-spacer-sm"><strong>{{object.title}}</strong></h4>
+                        {{object.comment|escape|safe|truncatewords_html:50}}
+                    </p>
                 </li>
             {% endfor %}
         </div>

@@ -34,7 +34,7 @@
         <h2>
             Sample: &emsp; <span class="label label-default">{{sample.uuid}}</span>
         </h2>
-        {{ sample.comment|safe }}
+        {{ sample.comment|escape|safe }}
     </div>
     <div>
         <h3 class="page-header">
@@ -45,7 +45,7 @@
         <p>Created on {{sample.substrate.created}}</p>
         <p>Last modified on {{sample.substrate.modified}}</p>
         {% if sample.substrate.comment %}
-            <p>Comment: {{sample.substrate.comment|safe}}</p>
+            <p>Comment: {{sample.substrate.comment|escape|safe}}</p>
         {% endif %}
     </div>
         {% if sample.nodes.count <= 1 %}

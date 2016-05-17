@@ -75,7 +75,7 @@
             </div>
             <div class="panel-body" id="project_panel_body_{{p.id}}">
                 <p><span class="glyphicon glyphicon-ok-circle"></span> You follow this project.</p>
-                <p>{{ p.description|safe|truncatewords:50 }}</p>
+                <p>{{ p.description|escape|safe|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigations.all %}
@@ -88,7 +88,7 @@
                           {% endif %}
                         </h4>
                         <p class="list-group-item-text">
-                          {{i.description|safe|truncatewords:50}}
+                          {{i.description|escape|safe|truncatewords:50}}
                         </p>
                         <p class="list-group-item-text">
                           <strong>Milestones: &emsp;</strong>
@@ -112,7 +112,7 @@
                           {%endif%}
                         </h4>
                         <p class="list-group-item-text">
-                          {{i.description|safe|truncatewords:50}}
+                          {{i.description|escape|safe|truncatewords:50}}
                         </p>
                     </li>
                   {% endif %}
@@ -142,7 +142,7 @@
             </div>
             <div class="panel-body" id="project_panel_body_{{p.id}}">
                 <p><span class="glyphicon glyphicon-ban-circle"></span> You do not follow this project.</p>
-                <p>{{ p.description|safe|truncatewords:50 }}</p>
+                <p>{{ p.description|escape|safe|truncatewords:50 }}</p>
             </div>
             <ul id="invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigations.all %}
@@ -151,7 +151,7 @@
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
                   </h4>
                   <p class="list-group-item-text">
-                    {{i.description|safe|truncatewords:50}}
+                    {{i.description|escape|safe|truncatewords:50}}
                   </p>
                 </li>
                 {% endfor %}
@@ -170,7 +170,7 @@
             </div>
             <div class="panel-body">
                 <p><span class="glyphicon glyphicon-remove-circle"></span> This project is inactive. {% if user in p.owner_group.custom_users.all %}<a href="{% url 'project_activate' p.slug %}"><strong>Click here to resume work.</strong></a></p>{% endif %}
-                <p>{{ p.description|safe|truncatewords:50 }}<p>
+                <p>{{ p.description|escape|safe|truncatewords:50 }}<p>
             </div>
             <ul id="_invest_list_{{p.id}}" class="list-group">
                 {% for i in p.investigations.all %}
@@ -179,7 +179,7 @@
                     <a href="{% url 'pm_investigation_detail' slug=i.slug %}"> {{ i }}</a>
                   </h4>
                   <p class="list-group-item-text">
-                    {{i.description|safe|truncatewords:50}}
+                    {{i.description|escape|safe|truncatewords:50}}
                   </p>
                 </li>
                 {% endfor %}

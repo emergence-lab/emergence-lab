@@ -58,17 +58,30 @@ LOGOUT_URL = "{}/accounts/logout/".format(SUB_SITE)
 
 # Templates
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, os.pardir, 'templates'), )
-TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_TEMPLATE_CONTEXT_PROCESSORS + [
-    'django.core.context_processors.request',
-    'core.context_processors.external_links',
-    'core.context_processors.feedback',
-    'messaging.context_processors.notifications',
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, os.pardir, 'templates'), ],
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+                'core.context_processors.external_links',
+                'core.context_processors.feedback',
+                'messaging.context_processors.notifications',
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
+        },
+    },
 ]
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
 
 
 # Installed Apps

@@ -34,7 +34,7 @@ Recent Entries
                 </h1>
             </header>
             <section class="panel-body">
-                {{entry.entry|safe}}
+                {{entry.entry|escape|safe}}
             </section>
         </article>
     {% endfor %}

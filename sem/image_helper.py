@@ -51,8 +51,8 @@ def convert_tiff(image):
         return image
 
     img = Image.open(image)
-    tempio = six.StringIO()
+    tempio = six.BytesIO()
     img.save(tempio, format='PNG')
     return InMemoryUploadedFile(
         tempio, field_name=None, name=(_process_name(image) + '.png'),
-        content_type='image/png', size=tempio.len, charset=None)
+        content_type='image/png', size=len(tempio.getvalue()), charset=None)

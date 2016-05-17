@@ -71,12 +71,12 @@
                             <span class="label label-default label-process"
                                   data-toggle="tooltip"
                                   data-html="true"
-                                  title="{{process.created|date}}<p>{{process.comment|escape|truncatewords:50}}</p>">
+                                  title="{{process.created|date}}<h5><strong>{{process.title}}</strong></h5><p>{{process.comment|escape|truncatewords:50}}</p>">
                                 {{process.type.name}}
                             </span>
                         {% endfor %}
 
-                        <p>{{sample.comment|safe|truncatewords:50}}</p>
+                        <p>{{sample.comment|escape|safe|truncatewords:50}}</p>
                     </div>
                 </li>
             {% endfor %}
