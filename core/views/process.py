@@ -349,16 +349,19 @@ class TemplateProcessWizardView(ProcessWizardView):
         if 'id' in self.kwargs:
             template = ProcessTemplate.objects.get(id=self.kwargs.get('id', None))
             comment = template.comment
+            title = template.title
             process_type = template.process.type_id
         elif 'uuid' in self.kwargs:
             process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
                 self.kwargs.get('uuid', None)))
             comment = process.comment
+            title = process.title
             process_type = process.type_id
         output = super(TemplateProcessWizardView, self).build_forms()
         output['info_form'] = WizardBasicInfoForm(self.request.user,
                                                   initial={'user': self.request.user,
                                                            'comment': comment,
+                                                           'title': title,
                                                            'type': process_type},
                                                   prefix='process')
         return output
