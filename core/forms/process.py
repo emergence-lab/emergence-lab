@@ -112,9 +112,10 @@ class WizardBasicInfoForm(forms.ModelForm):
 
 class ProcessTypeForm(forms.ModelForm):
 
-    type = forms.RegexField(
-        regex='[a-z\-]+', label='Unique Identifier',
-        widget=forms.TextInput(attrs={'placeholder': 'Use lowercase letters and hyphens only'}))
+    type = forms.RegexField(regex=r'[a-z\-]+',
+                            label='Unique Identifier',
+                            widget=forms.TextInput(
+                                attrs={'placeholder': 'Use lowercase letters and hyphens only'}))
 
     class Meta:
         model = ProcessType
