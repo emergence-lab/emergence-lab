@@ -22,13 +22,13 @@ with open(os.path.join(_BASE_DIR, 'secrets.json')) as f:
     secrets = json.loads(f.read())
 
 
-def _get_secret(setting, secrets=secrets):
+def _get_secret(setting, secrets_dict=secrets):
     """
     Get the secret variable or return exception.
     via Two Scoops of Django 1.6 pg 49
     """
     try:
-        return secrets[setting]
+        return secrets_dict[setting]
     except KeyError:
         error_msg = ('Setting {0} is missing from the '
                      'secrets file'.format(setting))

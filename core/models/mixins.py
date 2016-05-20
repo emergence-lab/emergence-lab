@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import uuid
+from uuid import uuid4
 
 from django.db import models
 from django.utils import timezone
@@ -107,7 +107,7 @@ class UUIDMixin(models.Model):
     short_length = 7
     prefix = ''
 
-    uuid_full = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid_full = models.UUIDField(default=uuid4, editable=False)
 
     class Meta:
         abstract = True
@@ -121,12 +121,12 @@ class UUIDMixin(models.Model):
             prefix=self.prefix, uuid=self.uuid_full.hex[:self.short_length])
 
     @classmethod
-    def strip_uuid(cls, uuid):
-        if not isinstance(uuid, six.string_types):
-            return uuid.hex
-        elif len(uuid) == len(cls.prefix) + cls.short_length:
-            return uuid[len(cls.prefix):]
-        return uuid
+    def strip_uuid(cls, full_uuid):
+        if not isinstance(full_uuid, six.string_types):
+            return full_uuid.hex
+        elif len(full_uuid) == len(cls.prefix) + cls.short_length:
+            return full_uuid[len(cls.prefix):]
+        return full_uuid
 
 
 class AccessControlShortcutMixin(object):

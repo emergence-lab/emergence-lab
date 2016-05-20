@@ -122,7 +122,7 @@ class SampleSelectOrCreateForm(forms.Form):
                     self.add_error(
                         'sample_uuid',
                         'This field is required when existing sample is selected')
-                pk, piece = Sample.strip_uuid(uuid)
+                _, piece = Sample.strip_uuid(uuid)
                 sample = Sample.objects.get_by_uuid(uuid)
                 if piece is None:  # piece not specified
                     piece = 'a'
@@ -220,5 +220,5 @@ class SampleSizeForm(forms.Form):
         samples = kwargs.pop('samples', [])
         super(SampleSizeForm, self).__init__(*args, **kwargs)
 
-        for i, sample in enumerate(samples):
+        for sample in samples:
             self.fields['{}'.format(sample)] = forms.ChoiceField(choices=self.SIZE_CHOICES)

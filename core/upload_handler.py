@@ -56,6 +56,7 @@ class RQTemporaryFileUploadHandler(FileUploadHandler):
 
     def __init__(self, *args, **kwargs):
         super(RQTemporaryFileUploadHandler, self).__init__(*args, **kwargs)
+        self.file = None
 
     def new_file(self, *args, **kwargs):
         super(RQTemporaryFileUploadHandler, self).new_file(*args, **kwargs)

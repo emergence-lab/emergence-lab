@@ -23,7 +23,7 @@ from project_management.models import Literature
 def pagination_helper(page, count, queryset):
     if page and int(page) > 1 and int(page) <= count / 10:
         number = int(page) - 1
-        for i in range(0, number):
+        for _ in range(0, number):
             queryset = queryset.next_page
     return queryset
 

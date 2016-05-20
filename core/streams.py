@@ -30,4 +30,4 @@ def user_investigation_stream(user, investigation):
     Filters the activity stream to return items the user has done
     for the specified investigation.
     """
-    []
+    return []

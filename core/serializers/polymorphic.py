@@ -25,6 +25,7 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
     """
     def __init__(self, *args, **kwargs):
         super(PolymorphicModelSerializer, self).__init__(*args, **kwargs)
+        self._polymorphic_fields = None
         self._build_polymorphic_field_mapping()
         self.fields['polymorphic_type'] = PolymorphicTypeField()
 
@@ -33,7 +34,7 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         """
         A dictionary of {field_name: field_instance} for polymorphic fields.
         """
-        if not hasattr(self, '_polymorphic_fields'):
+        if self._polymorphic_fields is None:
             self._polymorphic_fields = {}
             for key, value in six.iteritems(self.get_polymorphic_fields()):
                 self._polymorphic_fields[key] = value
@@ -53,7 +54,7 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
         except AttributeError:
             field_mapping = ClassLookupDict(self.serializer_field_mapping)
 
-        for name, subclass in six.iteritems(self.polymorphic_class_mapping):
+        for _, subclass in six.iteritems(self.polymorphic_class_mapping):
             for field in subclass.fields:
                 rest_field = field_mapping[field]
                 kwargs = get_field_kwargs(field.name, field)

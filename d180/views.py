@@ -330,7 +330,7 @@ class ReadingsDetailView(LoginRequiredMixin, generic.ListView):
 
         converted_readings = [list(l) for l in readings_list]
 
-        for n, readings in enumerate(converted_readings):
+        for readings in converted_readings:
             tmga_molar = molar_flow(0, float(readings[29]), float(readings[30]), 8.07, 1703)
             tmga2_molar = molar_flow(0, float(readings[31]), float(readings[32]), 8.07, 1703)
             tega_molar = molar_flow(18, float(readings[33]), float(readings[34]), 8.083, 2152)
@@ -377,7 +377,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
     queryset = Process.objects.filter(type_id='d180-growth')
     template_name = 'd180/update_readings.html'
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         uuid = Process.strip_uuid(self.kwargs['uuid'])
         return get_object_or_404(Process, uuid_full__startswith=uuid)
 
