@@ -17,11 +17,11 @@ AUTHENTICATION_BACKENDS = (
 
 # Database
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#     }
+# }
 
 
 # Password hashing
