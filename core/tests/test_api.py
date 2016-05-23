@@ -41,7 +41,7 @@ class TestProcessAPI(TestCase):
         """
         process = mommy.make(Process)
         response = self.client.get(
-            '/api/v0/process/{}/'.format(process.uuid_full.hex))
+            '/api/v0/process/{}/'.format(str(process.uuid_full)))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid_full'), str(process.uuid_full))
@@ -66,7 +66,7 @@ class TestProcessAPI(TestCase):
         sample.run_process(mommy.make(Process))
         node = sample.leaf_nodes[0]
         response = self.client.get(
-            '/api/v0/process/node/{}/'.format(node.uuid_full.hex))
+            '/api/v0/process/node/{}/'.format(str(node.uuid_full)))
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content.decode('utf-8'))
         self.assertEqual(results.get('uuid_full'), str(node.uuid_full))

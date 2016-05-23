@@ -15,15 +15,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-# Database
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#     }
-# }
-
-
 # Password hashing
 
 PASSWORD_MANAGER = ('django.contrib.auth.hashers.MD5PasswordHasher',)

@@ -190,8 +190,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where one sample form is valid and one is not.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '0',
@@ -214,8 +214,8 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
@@ -241,8 +241,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where the form is valid, creating a new sample.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         url = reverse('create_growth_d180_start')
         data = {
             'sample-INITIAL_FORMS': '1',
@@ -266,8 +266,8 @@ class TestD180Wizard(TestCase):
             'growth-has_u': 'on',
             'growth-orientation': '0001',
             'process-title': 'process title',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-user': self.user.id,
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
@@ -292,8 +292,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where the form is valid, using an existing sample.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
         url = reverse('create_growth_d180_start')
         data = {
@@ -317,8 +317,8 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
@@ -343,8 +343,8 @@ class TestD180Wizard(TestCase):
         Test a post where the form is valid, using an existing sample specifying
         the piece.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
         sample.split(self.user, 2)
         piece = 'b'
@@ -370,8 +370,8 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
@@ -398,8 +398,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where the specified sample is ambiguous.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         sample = Sample.objects.create(substrate=mommy.make('Substrate'))
         sample.split(self.user, 2)
         url = reverse('create_growth_d180_start')
@@ -424,8 +424,8 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
@@ -450,8 +450,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where the form is valid, selecting to hold the reservation.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         user = get_user_model().objects.first()
         d180 = ProcessType.objects.get(type='d180-growth')
         reservation = mommy.make('schedule_queue.Reservation',
@@ -478,8 +478,8 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-title': 'process title',
             'process-user': self.user.id,
             'process-type': 'd180-growth',
@@ -506,8 +506,8 @@ class TestD180Wizard(TestCase):
         """
         Test a post where the form is valid, without holding the reservation.
         """
-        mommy.make(Investigation)
-        mommy.make(Platter)
+        investigation = mommy.make(Investigation)
+        platter = mommy.make(Platter)
         user = get_user_model().objects.first()
         d180 = ProcessType.objects.get(type='d180-growth')
         reservation = mommy.make('schedule_queue.Reservation',
@@ -534,10 +534,10 @@ class TestD180Wizard(TestCase):
             'growth-has_gan': 'on',
             'growth-has_u': 'on',
             'growth-orientation': '0001',
-            'process-investigations': '1',
-            'growth-platter': '1',
+            'process-investigations': investigation.id,
+            'growth-platter': platter.id,
             'process-title': 'process title',
-            'process-user': '1',
+            'process-user': self.user.id,
             'process-type': 'd180-growth',
             'process-legacy_identifier': 'g2000',
             'source-cp2mg': '0.00',

@@ -128,8 +128,10 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         elif followed is True:
             return self.projects.filter(permission_filters)
         else:
+            project_ids = self.projects.values_list('id', flat=True)
             return (Project.objects.filter(permission_filters)
-                    .exclude(id__in=self.projects.values_list('id', flat=True)))
+                                   .exclude(id__in=project_ids)
+                                   .order_by('id'))
 
     def get_investigations(self, permission, followed=None):
         """
@@ -141,7 +143,8 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         """
         project_ids = self.get_projects(permission,
                                         followed).values_list('id', flat=True)
-        return Investigation.objects.filter(project_id__in=project_ids)
+        return (Investigation.objects.filter(project_id__in=project_ids)
+                                     .order_by('id'))
 
     def get_milestones(self, permission, followed=None):
         """
@@ -153,7 +156,8 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         """
         investigation_ids = self.get_investigations(permission,
                                                     followed).values_list('id', flat=True)
-        return Milestone.objects.filter(investigation_id__in=investigation_ids)
+        return (Milestone.objects.filter(investigation_id__in=investigation_ids)
+                                 .order_by('id'))
 
     def get_tasks(self, permission, followed=None):
         """
@@ -165,7 +169,8 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         """
         milestone_ids = self.get_milestones(permission,
                                             followed).values_list('id', flat=True)
-        return Task.objects.filter(milestone_id__in=milestone_ids)
+        return (Task.objects.filter(milestone_id__in=milestone_ids)
+                            .order_by('id'))
 
     def get_group_permissions(self, obj=None):
         """

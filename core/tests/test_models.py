@@ -234,13 +234,13 @@ class TestSample(TestCase):
                 node = self.sample._insert_node(None, piece, 1, node)
                 node_uuids.append(node.uuid)
         for uuid in node_uuids:
-            node = self.sample.get_node(uuid)
+            node = self.sample.get_node(str(uuid))
             self.assertEqual(node.uuid, uuid)
 
     def test_get_node_long_uuid(self):
         """
         Test that you can retrieve individual nodes in a complex tree using the
-        short uuid.
+        long uuid.
         """
         root = self.sample.process_tree
         pieces = 'abcdefg'
@@ -252,7 +252,7 @@ class TestSample(TestCase):
                 node = self.sample._insert_node(None, piece, 1, node)
                 node_uuids.append(node.uuid_full)
         for uuid in node_uuids:
-            node = self.sample.get_node(uuid)
+            node = self.sample.get_node(str(uuid))
             self.assertEqual(node.uuid_full, uuid)
 
     def test_pieces(self):
@@ -469,7 +469,7 @@ class TestProcess(TestCase):
         process = Process.objects.create(comment='test', user=self.user)
         for s in samples[:-1]:
             s.run_process(process)
-        sample_list = process.samples
+        sample_list = process.samples.order_by('pk')
         self.assertListEqual(list(sample_list), samples[:-1])
 
     def test_get_samples_with_repeat(self):
@@ -482,7 +482,7 @@ class TestProcess(TestCase):
         for s in samples[:-1]:
             s.run_process(process)
         samples[0].run_process(process) # run process twice so it repeats
-        sample_list = process.samples
+        sample_list = process.samples.order_by('pk')
         self.assertListEqual(list(sample_list), samples[:-1])
 
     def test_get_nodes(self):
