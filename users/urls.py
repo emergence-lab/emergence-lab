@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from users import views
 from django.contrib.auth.decorators import login_required
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^users/(?P<username>[\w-]+)/add_git_token$',
         login_required(views._GetGitLabToken.as_view()),
         name='git_token_form'),
@@ -18,4 +18,4 @@ urlpatterns = patterns('',
     url(r'^users/create$',
         login_required(views.UserCreateView.as_view()),
         name='user_create')
-)
+]
