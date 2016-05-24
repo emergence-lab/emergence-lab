@@ -6,6 +6,8 @@ from django.db import connection
 from django.db.migrations.state import ProjectState
 from django.test import TestCase
 
+import six
+
 from core.migration_operations import PublishAppConfiguration
 from core.models import AppConfigurationDefault
 
@@ -69,3 +71,27 @@ class TestAppConfigurationMigrationOperations(TestCase):
         self.assertEqual(config.key, 'test.test')
         self.assertEqual(config.default_value, 'value')
         self.assertEqual(config.choices, ['value', 'alternate'])
+
+    def test_deconstruct(self):
+        kwargs = {
+            'key': 'test',
+            'default_value': 'value',
+            'choices': ['value', 'alternative'],
+        }
+        migration = PublishAppConfiguration(**kwargs)
+        result = migration.deconstruct()
+        self.assertEqual(result[0], 'PublishAppConfiguration')
+        self.assertEqual(result[1], [])
+        self.assertEqual(result[2], kwargs)
+
+    def test_database_backwards(self):
+        migration = PublishAppConfiguration(key='test')
+        old_state = ProjectState(real_apps=['core'])
+        new_state = old_state.clone()
+        with connection.schema_editor() as editor:
+            with self.assertRaises(NotImplementedError):
+                migration.database_backwards('test', editor, old_state, new_state)
+
+    def test_describe(self):
+        migration = PublishAppConfiguration(key='test')
+        self.assertIsInstance(migration.describe(), six.string_types)

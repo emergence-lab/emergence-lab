@@ -8,7 +8,8 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
-from core.models import Sample, Process, Project, Investigation, Milestone
+from core.models import (Sample, Process, Project, Investigation, Milestone,
+                         AppConfigurationDefault)
 
 
 class TestSampleManager(TestCase):
@@ -648,3 +649,13 @@ class TestUser(TestCase):
         self.assertTrue(self.user.get_milestones('owner').exists())
         self.assertTrue(self.user.get_milestones('member').exists())
         self.assertTrue(self.user.get_milestones('viewer').exists())
+
+
+class TestAppConfigurationDefault(TestCase):
+
+    def test_str(self):
+        choices = ['a', 'b', 'c']
+        config = mommy.make(AppConfigurationDefault, key='test.key',
+                                                     default_value='value',
+                                                     choices=choices)
+        self.assertEqual(str(config), 'test.key: value {}'.format(choices))
