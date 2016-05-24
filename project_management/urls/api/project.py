@@ -7,7 +7,7 @@ import project_management.api
 
 
 urlpatterns = [
-    url(r'^$', project_management.api.ProjectListAPIView.as_view()),
+    url(r'^$', project_management.api.ProjectListFollowedAPIView.as_view()),
     url(r'^all$', project_management.api.ProjectListAllAPIView.as_view()),
     url(r'^detail/(?P<slug>[\w-]+)$', project_management.api.ProjectRetrieveAPIView.as_view()),
     url(r'^edit/(?P<slug>[\w-]+)$', project_management.api.ProjectUpdateAPIView.as_view()),

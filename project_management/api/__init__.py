@@ -1,10 +1,10 @@
-from .project import (ProjectListAPIView,
+from .project import (ProjectListFollowedAPIView,
                       ProjectListAllAPIView,
                       ProjectRetrieveAPIView,
                       ProjectUpdateAPIView,
                       ProjectTrackAPIView,
                       ProjectUntrackAPIView,
-)
+                      )
 
 from .investigation import (InvestigationListAPIView,
                             InvestigationRetrieveAPIView,

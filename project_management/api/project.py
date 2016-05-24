@@ -23,7 +23,7 @@ class ProjectListAllAPIView(generics.ListCreateAPIView):
         self.request.user.groups.add(obj.owner_group)
 
 
-class ProjectListAPIView(generics.ListCreateAPIView):
+class ProjectListFollowedAPIView(generics.ListCreateAPIView):
 
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ProjectSerializer
