@@ -5,6 +5,8 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+import six
+
 
 @python_2_unicode_compatible
 class AppConfigurationDefault(models.Model):
@@ -22,11 +24,21 @@ class AppConfigurationDefault(models.Model):
 
 
 def get_configuration_default(key):
+    if not isinstance(key, six.string_types):
+        raise TypeError('key must be a string')
+    if not key:
+        raise ValueError('key must not be an empty string')
+
     config = AppConfigurationDefault.objects.get(key=key)
     return config.default_value
 
 
 def get_configuration_choices(key):
+    if not isinstance(key, six.string_types):
+        raise TypeError('key must be a string')
+    if not key:
+        raise ValueError('key must not be an empty string')
+
     config = AppConfigurationDefault.objects.get(key=key)
     return config.choices
 
