@@ -5,7 +5,10 @@ python:
 
 services:
     - redis-server
-    - sqlite3
+    - postgresql
+
+addons:
+    postgresql: "9.4"
 
 env:
     - TOXENV=py27
@@ -22,6 +25,7 @@ install:
 
 before_script:
     - cp wbg/secrets.travis.json wbg/secrets.json
+    - psql -c 'create database travisci;' -U postgres
 
 script:
     - tox
