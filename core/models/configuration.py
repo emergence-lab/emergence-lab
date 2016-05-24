@@ -45,7 +45,7 @@ class InstanceConfiguration(models.Model):
     def __str__(self):
         return str(self.configuration)
 
-    def __contains__(self):
+    def __contains__(self, key):
         return key in self.configuration or key in list_configuration_keys()
 
     def __getitem__(self, key):

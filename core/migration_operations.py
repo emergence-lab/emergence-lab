@@ -33,8 +33,8 @@ class PublishAppConfiguration(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if router.allow_migrate(schema_editor.connection.alias, app_label):
             full_key = '{}.{}'.format(app_label, self.key)
-            AppConfigurationDefault = from_state.apps.get_model('core', 'AppConfigurationDefault')
-            config, _ = AppConfigurationDefault.objects.get_or_create(key=full_key)
+            default_config_model = from_state.apps.get_model('core', 'AppConfigurationDefault')
+            config, _ = default_config_model.objects.get_or_create(key=full_key)
             if self.default_value is not None:
                 config.default_value = self.default_value
             if self.choices is not None:
