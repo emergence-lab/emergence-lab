@@ -124,9 +124,9 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
             raise ValueError('Permission {} is not valid. Should be one of '
                              'owner, member, or viewer'.format(permission))
         if followed is None:
-            return Project.objects.filter(permission_filters)
+            return Project.objects.filter(permission_filters).order_by('id')
         elif followed is True:
-            return self.projects.filter(permission_filters)
+            return self.projects.filter(permission_filters).order_by('id')
         else:
             project_ids = self.projects.values_list('id', flat=True)
             return (Project.objects.filter(permission_filters)

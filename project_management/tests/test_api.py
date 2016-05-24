@@ -38,22 +38,28 @@ class TestProjectAPI(TestCase):
         for project, result in zip(projects, results):
             self.assertEqual(result['slug'], project.slug)
 
-    def test_list_view__followed_get(self):
+    def test_list_view_followed_get(self):
         """
-        Test that the list api returns correct items .
+        Test that the followed list api returns correct items .
         """
         projects = [
             mommy.make(Project, name='project 1', slug='project-1', is_active=True),
             mommy.make(Project, name='project 2', slug='project-2', is_active=False),
+            mommy.make(Project, name='project 3', slug='project-3', is_active=True),
+            mommy.make(Project, name='project 4', slug='project-4', is_active=False),
         ]
+        # user is viewer on all projects
         for project in projects:
             project.add_user(self.user, 'viewer')
-            ProjectTracking.objects.get_or_create(project=project, user=self.user)
-        response = self.client.get('/api/v0/project_management/project/all')
+        # but is only tracking first two
+        ProjectTracking.objects.get_or_create(project=projects[0], user=self.user)
+        ProjectTracking.objects.get_or_create(project=projects[1], user=self.user)
+
+        response = self.client.get('/api/v0/project_management/project/')
         self.assertEqual(response.status_code, 200)
         results = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(len(results), len(projects))
-        for project, result in zip(projects, results):
+        self.assertEqual(len(results), 2)
+        for project, result in zip(projects[:2], results):
             self.assertEqual(result['slug'], project.slug)
 
     def test_retrieve_view_get(self):
