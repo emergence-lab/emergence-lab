@@ -25,10 +25,14 @@ pep8:
     options:
         max-line-length: 100
     disable:
-        - E123
-        - E127
-        - E128
-        - E133
+        - E123  # closing brakcet does not match indentation of opening bracket
+        - E127  # continuation line over-indented
+        - E128  # continuation line under-indented
+        - E133  # closing bracket missing indentation
+
+pep257:
+    disable:
+        - D100   # missing docstring in public module
 
 pylint:
     disable:  # disable several warnings due to use of Django class-based views
@@ -38,6 +42,5 @@ pylint:
         - R0903  # too few public methods
         - R0901  # too many ancestors
         - E1002  # super on old style class - disabled due to issue #151
-        - D100   # missing docstring in public module
     options:
         max-line-length: 100
