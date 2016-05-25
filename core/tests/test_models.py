@@ -9,8 +9,9 @@ from django.utils import timezone
 from model_mommy import mommy
 
 from core.models import (Sample, Process, Project, Investigation, Milestone,
-                         AppConfigurationDefault, get_configuration_default,
-                         get_configuration_choices, list_configuration_keys)
+                         AppConfigurationDefault, InstanceConfiguration,
+                         get_configuration_default, get_configuration_choices,
+                         list_configuration_keys)
 
 
 class TestSampleManager(TestCase):
@@ -654,7 +655,7 @@ class TestUser(TestCase):
 
 class TestAppConfiguration(TestCase):
 
-    def test_str(self):
+    def test_app_config_str(self):
         choices = ['a', 'b', 'c']
         config = mommy.make(AppConfigurationDefault, key='test.key',
                                                      default_value='a',
@@ -676,6 +677,11 @@ class TestAppConfiguration(TestCase):
     def test_get_configuration_default_invalid_key(self):
         with self.assertRaises(AppConfigurationDefault.DoesNotExist):
             get_configuration_default('app.key')
+
+    def test_get_configuration_default_none_defined(self):
+        config = mommy.make(AppConfigurationDefault, key='test.key')
+        value = get_configuration_default('test.key')
+        self.assertEqual(config.default_value, '')
 
     def test_get_configuration_default_valid(self):
         config = mommy.make(AppConfigurationDefault, key='test.key',
@@ -705,6 +711,11 @@ class TestAppConfiguration(TestCase):
                                                      choices=['a', 'b'])
         choices = get_configuration_choices('test.key')
         self.assertEqual(config.choices, choices)
+
+    def test_get_configuration_choices_none_defined(self):
+        config = mommy.make(AppConfigurationDefault, key='test.key')
+        choices = get_configuration_choices('test.key')
+        self.assertEqual(config.choices, [])
 
     def test_list_configuration_keys_invalid_type(self):
         with self.assertRaises(TypeError):
@@ -737,3 +748,140 @@ class TestAppConfiguration(TestCase):
         ]
         keys = list_configuration_keys('test')
         self.assertListEqual([c.key for c in config if 'test' in c.key], keys)
+
+    def test_instance_config_str(self):
+        config = mommy.make(InstanceConfiguration,
+                            configuration={'test.key1': 'value1',
+                                           'test.key2': 'value2'})
+        self.assertEqual(str(config.configuration), str(config))
+
+    def test_instance_config_contains_not_defined(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertFalse('test.key4' in instance)
+
+    def test_instance_config_contains_in_instance(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertTrue('test.key2' in instance)
+
+    def test_instance_config_contains_in_app(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertTrue('test.key3' in instance)
+
+    def test_instance_config_contains_in_both(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertTrue('test.key1' in instance)
+
+    def test_instance_config_getitem_not_defined(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        with self.assertRaises(KeyError):
+            instance['test.key4']
+
+    def test_instance_config_getitem_in_instance(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertEqual(instance['test.key2'], 'value2')
+
+    def test_instance_config_getitem_in_app(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertEqual(instance['test.key3'], 'default_value3')
+
+    def test_instance_config_getitem_in_both(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertEqual(instance['test.key1'], 'value1')
+
+    def test_instance_config_setitem_not_defined(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        with self.assertRaises(KeyError):
+            instance['test.key4'] = 'value4'
+
+    def test_instance_config_setitem_no_choices(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1')
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3')
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertEqual(instance['test.key3'], 'default_value3')
+        instance['test.key3'] = 'value3'
+        self.assertEqual(instance['test.key3'], 'value3')
+
+    def test_instance_config_setitem_invalid_choice(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1',
+                                choices=['default_value1', 'value1'])
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3',
+                                choices=['default_value3', 'value3'])
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        with self.assertRaises(ValueError):
+            instance['test.key3'] = 'invalid'
+
+    def test_instance_config_setitem_valid_choice(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1',
+                                choices=['default_value1', 'value1'])
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3',
+                                choices=['default_value3', 'value3'])
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1',
+                                             'test.key2': 'value2'})
+        self.assertEqual(instance['test.key3'], 'default_value3')
+        instance['test.key3'] = 'value3'
+        self.assertEqual(instance['test.key3'], 'value3')
