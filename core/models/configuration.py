@@ -145,3 +145,15 @@ class InstanceConfiguration(models.Model):
                 'Valid options include {}.'.format(value, key, choices))
         self.configuration[key] = value
         self.save()
+
+    def reset(self, key):
+        """Reset the instance value to default for the specified configuration key.
+
+        :param key: The key to reset the value for - should be formatted as 'appname.keyname'.
+        :raises KeyError: If the configuration key is not defined.
+        """
+        if key not in list_configuration_keys():
+            raise KeyError('Configuration key "{}" is not defined'.format(key))
+        if key in self.configuration:
+            del self.configuration[key]
+            self.save()

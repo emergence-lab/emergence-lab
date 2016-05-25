@@ -885,3 +885,41 @@ class TestAppConfiguration(TestCase):
         self.assertEqual(instance['test.key3'], 'default_value3')
         instance['test.key3'] = 'value3'
         self.assertEqual(instance['test.key3'], 'value3')
+
+    def test_instance_config_reset_not_defined(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1',
+                                choices=['default_value1', 'value1'])
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3',
+                                choices=['default_value3', 'value3'])
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1'})
+        with self.assertRaises(KeyError):
+            instance.reset('test.key4')
+
+    def test_instance_config_reset_in_instance(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1',
+                                choices=['default_value1', 'value1'])
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3',
+                                choices=['default_value3', 'value3'])
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1'})
+        self.assertEqual(instance['test.key1'], 'value1')
+        instance.reset('test.key1')
+        self.assertEqual(instance['test.key1'], 'default_value1')
+
+    def test_instance_config_reset_in_app(self):
+        app_config = mommy.make(AppConfigurationDefault, key='test.key1',
+                                default_value='default_value1',
+                                choices=['default_value1', 'value1'])
+        app_config = mommy.make(AppConfigurationDefault, key='test.key3',
+                                default_value='default_value3',
+                                choices=['default_value3', 'value3'])
+        instance = mommy.make(InstanceConfiguration,
+                              configuration={'test.key1': 'value1'})
+        self.assertEqual(instance['test.key3'], 'default_value3')
+        instance.reset('test.key3')
+        self.assertEqual(instance['test.key3'], 'default_value3')
