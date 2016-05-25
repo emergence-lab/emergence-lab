@@ -5,8 +5,6 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-import six
-
 
 @python_2_unicode_compatible
 class AppConfigurationDefault(models.Model):
@@ -31,17 +29,7 @@ def get_configuration_default(key):
     :param key: The key to lookup - must be formatted as 'appname.keyname'.
     :returns: The default value for the specified key. If no default was
               provided then returns an empty string.
-    :raises TypeError: If the key is not a string type
-    :raises ValueError: If the key is an empty string
-    :raises ValueError: If the key is not properly formatted
     """
-    if not isinstance(key, six.string_types):
-        raise TypeError('key must be a string')
-    if not key:
-        raise ValueError('key must not be an empty string')
-    if '.' not in key:
-        raise ValueError('key must be formatted as appname.keyname')
-
     config = AppConfigurationDefault.objects.get(key=key)
     return config.default_value
 
@@ -52,17 +40,7 @@ def get_configuration_choices(key):
     :param key: The key to lookup - must be formatted as 'appname.keyname'.
     :returns: The possible choices for values for the specified key. If no
               choices were provided then returns an empty list.
-    :raises TypeError: If the key is not a string type
-    :raises ValueError: If the key is an empty string
-    :raises ValueError: If the key is not properly formatted
     """
-    if not isinstance(key, six.string_types):
-        raise TypeError('key must be a string')
-    if not key:
-        raise ValueError('key must not be an empty string')
-    if '.' not in key:
-        raise ValueError('key must be formatted as appname.keyname')
-
     config = AppConfigurationDefault.objects.get(key=key)
     return config.choices
 
@@ -74,15 +52,8 @@ def list_configuration_keys(app_name=None):
                      specified application. Set to None by default.
     :returns: The list of defined configuration keys. If app_name is specified
               then only returns configuration keys defined by that application.
-    :raises TypeError: If the application name is defined and not a string type
-    :raises ValueError: If the application name is an empty string
     """
     if app_name is not None:
-        if not isinstance(app_name, six.string_types):
-            raise TypeError('app_name must be a string')
-        if not app_name:
-            raise ValueError('app_name must not be an empty string')
-
         return list(AppConfigurationDefault.objects.filter(key__startswith=app_name + '.')
                                                    .values_list('key', flat=True))
     return list(AppConfigurationDefault.objects.all().values_list('key', flat=True))

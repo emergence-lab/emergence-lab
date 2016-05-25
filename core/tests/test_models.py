@@ -663,16 +663,12 @@ class TestAppConfiguration(TestCase):
         self.assertEqual(str(config), 'test.key: a {}'.format(choices))
 
     def test_get_configuration_default_invalid_type(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(AppConfigurationDefault.DoesNotExist):
             get_configuration_default(1)
 
     def test_get_configuration_default_invalid_empty_string(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AppConfigurationDefault.DoesNotExist):
             get_configuration_default('')
-
-    def test_get_configuration_default_invalid_no_dot(self):
-        with self.assertRaises(ValueError):
-            get_configuration_default('key')
 
     def test_get_configuration_default_invalid_key(self):
         with self.assertRaises(AppConfigurationDefault.DoesNotExist):
@@ -690,16 +686,12 @@ class TestAppConfiguration(TestCase):
         self.assertEqual(config.default_value, value)
 
     def test_get_configuration_choices_invalid_type(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(AppConfigurationDefault.DoesNotExist):
             get_configuration_choices(1)
 
     def test_get_configuration_choices_invalid_empty_string(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AppConfigurationDefault.DoesNotExist):
             get_configuration_choices('')
-
-    def test_get_configuration_choices_invalid_no_dot(self):
-        with self.assertRaises(ValueError):
-            get_configuration_choices('key')
 
     def test_get_configuration_choices_invalid_key(self):
         with self.assertRaises(AppConfigurationDefault.DoesNotExist):
@@ -722,8 +714,7 @@ class TestAppConfiguration(TestCase):
             list_configuration_keys(1)
 
     def test_list_configuration_keys_invalid_empty_string(self):
-        with self.assertRaises(ValueError):
-            list_configuration_keys('')
+        self.assertListEqual(list_configuration_keys(''), [])
 
     def test_list_configuration_keys_no_app(self):
         AppConfigurationDefault.objects.all().delete()

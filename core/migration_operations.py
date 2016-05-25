@@ -6,8 +6,6 @@ import re
 from django.db import router
 from django.db.migrations.operations.base import Operation
 
-import six
-
 
 class PublishAppConfiguration(Operation):
 
@@ -33,39 +31,25 @@ class PublishAppConfiguration(Operation):
         :param choices: Optional. The possible valid choices for values. Defaults
                         to empty list if parameter is None, which means any value
                         is valid.
-        :raises TypeError: If the key is not a string type
         :raises ValueError: If the key is an empty string or contains a '.'
-        :raises TypeError: If the default_value is not a string type or None
         :raises TypeError: If choices is not a list, tuple, or None
         :raises TypeError: If the items in choices are not strings
         :raises ValueError: If default_value is not a valid choice
         """
-        self._check_init_args(key, default_value, choices)
-
-        self.key = key
-        self.default_value = default_value
-        self.choices = choices
-
-    def _check_init_args(self, key, default_value, choices):
-        if not isinstance(key, six.string_types):
-            raise TypeError('key must be a string')
         if re.match(r'^((?![\.\\])[\w\d\-])+$', key) is None:
             raise ValueError('invalid key "{}"'.format(key))
-
-        if default_value is not None:
-            if not isinstance(default_value, six.string_types):
-                raise TypeError('default_value must be a string')
 
         if choices is not None:
             if not isinstance(choices, (list, tuple)):
                 raise TypeError('choices must be a list or tuple')
-            for choice in choices:
-                if not isinstance(choice, six.string_types):
-                    raise TypeError('choices must be strings')
 
         if choices is not None and default_value is not None:
             if default_value not in choices:
                 raise ValueError('default_value must be a valid choice')
+
+        self.key = key
+        self.default_value = default_value
+        self.choices = choices
 
     def deconstruct(self):
         """Default migration deconstruct method"""
