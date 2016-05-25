@@ -35,15 +35,20 @@ class TestAppConfigurationMigrationOperations(TestCase):
 
     def test_publish_invalid_value_type(self):
         with self.assertRaises(TypeError):
-            PublishAppConfiguration(key='test', default_value=1)
+            PublishAppConfiguration(key='test', default_value={'a': (2, 3)})
 
-    def test_publish_invalid_choices_type(self):
+    def test_publish_invalid_choices_type_iterable(self):
         with self.assertRaises(TypeError):
             PublishAppConfiguration(key='test', choices='single_choice')
 
+    def test_publish_invalid_choices_type_noniterable(self):
+        with self.assertRaises(TypeError):
+            PublishAppConfiguration(key='test', choices=123)
+
     def test_publish_invalid_choices_subtype(self):
         with self.assertRaises(TypeError):
-            PublishAppConfiguration(key='test', choices=[1, 2])
+            PublishAppConfiguration(key='test', choices=[{'a': 'b'}, 2, ('a', 1)])
+
 
     def test_publish_invalid_default_is_not_choice(self):
         with self.assertRaises(ValueError):
