@@ -13,6 +13,7 @@ import six
 
 
 class ConfigurationDict(dict):
+
     """Dictionary wrapper object for defined configuration keys.
 
     Limits keys to defined configuration keys. Pulls values from instance with
@@ -85,6 +86,7 @@ class ConfigurationDict(dict):
 
 
 class ConfigurationField(JSONField):
+
     """Wrapper field for JSONField that uses ConfigurationDict in python."""
 
     def __init__(self, *args, **kwargs):
@@ -97,7 +99,7 @@ class ConfigurationField(JSONField):
         """Convert value to ConfigurationDict."""
         try:
             value = ConfigurationDict(value)
-        except:
+        except TypeError:
             value = ConfigurationDict()
         return value
 

@@ -53,6 +53,7 @@ def _get_configuration_choices_form(key):
 
 
 def build_configuration_choices(key):
+    """Build list of tuples of configuration keys for use in ChoiceField."""
     return functools.partial(_get_configuration_choices_form, key)
 
 
