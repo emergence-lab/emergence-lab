@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'simple_history',
     # local apps
     'core',
+    'core.configuration',
     'dashboard',
     'journal',
     'd180',

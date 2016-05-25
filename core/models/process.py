@@ -16,6 +16,7 @@ from simple_history import models as simple_history
 
 from core.models.mixins import TimestampMixin, UUIDMixin
 from core.models import fields, Investigation, Milestone
+from core.configuration.fields import ConfigurationField
 
 
 def get_file_path(instance, filename):
@@ -72,6 +73,7 @@ class ProcessType(models.Model):
     category = models.ForeignKey(ProcessCategory, default='uncategorized',
                                  related_name='processtypes',
                                  related_query_name='processtype')
+    # configuration = ConfigurationField()
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)
