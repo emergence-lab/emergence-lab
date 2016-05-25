@@ -42,5 +42,6 @@ pylint:
         - R0903  # too few public methods
         - R0901  # too many ancestors
         - E1002  # super on old style class - disabled due to issue #151
+        - C0111  # missing module docstring
     options:
         max-line-length: 100
