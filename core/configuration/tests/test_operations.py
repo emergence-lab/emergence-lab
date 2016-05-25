@@ -8,14 +8,14 @@ from django.test import TestCase
 
 import six
 
-from core.migration_operations import PublishAppConfiguration
-from core.models import AppConfigurationDefault
+from core.configuration.operations import PublishAppConfiguration
+from core.configuration.models import AppConfigurationDefault
 
 
 class TestAppConfigurationMigrationOperations(TestCase):
 
     def _migrate(self, migration):
-        old_state = ProjectState(real_apps=['core'])
+        old_state = ProjectState(real_apps=['configuration'])
         new_state = old_state.clone()
         with connection.schema_editor() as editor:
             migration.database_forwards('test', editor, old_state, new_state)

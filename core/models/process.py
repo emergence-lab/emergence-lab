@@ -73,7 +73,7 @@ class ProcessType(models.Model):
     category = models.ForeignKey(ProcessCategory, default='uncategorized',
                                  related_name='processtypes',
                                  related_query_name='processtype')
-    # configuration = ConfigurationField()
+    configuration = ConfigurationField()
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)

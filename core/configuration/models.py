@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import functools
 
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 

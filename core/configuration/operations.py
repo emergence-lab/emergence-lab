@@ -80,7 +80,8 @@ class PublishAppConfiguration(Operation):
         """Create an AppConfigurationDefault instance with the provided data."""
         if router.allow_migrate(schema_editor.connection.alias, app_label):
             full_key = '{}.{}'.format(app_label, self.key)
-            default_config_model = from_state.apps.get_model('core', 'AppConfigurationDefault')
+            default_config_model = from_state.apps.get_model('configuration',
+                                                             'AppConfigurationDefault')
             config, _ = default_config_model.objects.get_or_create(key=full_key)
             config.default_value = self.default_value
             config.choices = self.choices
