@@ -24,7 +24,7 @@
                     {% bootstrap_icon 'edit' %}
                     Edit
                 </a>
-                {% if processtype.scheduling_type == 'simple' %}
+                {% if processtype.configuration.core_scheduling_type == 'simple' %}
                     <a href="{% url 'reservation_create' %}" class="btn btn-success">
                         {% bootstrap_icon 'bookmark' %}
                         Create Reservation
