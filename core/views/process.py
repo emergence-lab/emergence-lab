@@ -399,8 +399,7 @@ class ProcessTypeUpdateView(LoginRequiredMixin, generic.UpdateView):
     template_name = 'core/processtype_edit.html'
     context_object_name = 'processtype'
     slug_field = 'type'
-    fields = ('name', 'full_name', 'description', 'category', 'scheduling_type',
-              'creation_type')
+    form_class = ProcessTypeForm
 
     def get_success_url(self):
         return reverse('processtype_detail', args=(self.object.type,))

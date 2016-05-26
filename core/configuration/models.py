@@ -47,16 +47,6 @@ def get_configuration_choices(key):
     return config.choices
 
 
-def _get_configuration_choices_form(key):
-    choices = get_configuration_choices(key)
-    return [(c, c.title()) for c in choices]
-
-
-def build_configuration_choices(key):
-    """Build list of tuples of configuration keys for use in ChoiceField."""
-    return functools.partial(_get_configuration_choices_form, key)
-
-
 def list_configuration_keys(app_name=None):
     """Return a list of defined configuration keys.
 
