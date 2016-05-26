@@ -23,7 +23,7 @@ class ConfigurationDict(dict):
     def __contains__(self, key):
         """Return if the key is a defined configuration key.
 
-        :param key: The key to lookup - should be formatted as 'appname.keyname'.
+        :param key: The key to lookup - should be formatted as 'appname_keyname'.
         :returns: True if the key is defined, else False.
         """
         return key in list_configuration_keys()
@@ -33,7 +33,7 @@ class ConfigurationDict(dict):
 
         Returns the per-instance value if defined, otherwise returns the default.
 
-        :param key: The key to lookup - should be formatted as 'appname.keyname'.
+        :param key: The key to lookup - should be formatted as 'appname_keyname'.
         :returns: The value (or default value) for the configuration key
         :raises TypeError: If the configuration key is not a string.
         :raises KeyError: If the configuration key is not defined.
@@ -53,7 +53,7 @@ class ConfigurationDict(dict):
 
         If choices were specified, then value should be a valid choice.
 
-        :param key: The key to set the value for - should be formatted as 'appname.keyname'.
+        :param key: The key to set the value for - should be formatted as 'appname_keyname'.
         :param value: The value to set for the configuration key
         :raises KeyError: If the configuration key is not defined.
         :raises ValueError: If the configuration key is not a valid choice.
@@ -72,7 +72,7 @@ class ConfigurationDict(dict):
     def __delitem__(self, key):
         """Reset the instance value to default for the pecified configuration key.
 
-        :param key: The key to reset the value for - should be formatted as 'appname.keyname'.
+        :param key: The key to reset the value for - should be formatted as 'appname_keyname'.
         :raises TypeError: If the configuration key is not a string.
         :raises KeyError: If the configuration key is not defined.
         """

@@ -28,7 +28,7 @@ class AppConfigurationDefault(models.Model):
 def get_configuration_default(key):
     """Return the default value for the provided configuration key.
 
-    :param key: The key to lookup - must be formatted as 'appname.keyname'.
+    :param key: The key to lookup - must be formatted as 'appname_keyname'.
     :returns: The default value for the specified key. If no default was
               provided then returns an empty string.
     """
@@ -39,7 +39,7 @@ def get_configuration_default(key):
 def get_configuration_choices(key):
     """Return a list of possible values for the provided configuration key.
 
-    :param key: The key to lookup - must be formatted as 'appname.keyname'.
+    :param key: The key to lookup - must be formatted as 'appname_keyname'.
     :returns: The possible choices for values for the specified key. If no
               choices were provided then returns an empty list.
     """
@@ -56,6 +56,6 @@ def list_configuration_keys(app_name=None):
               then only returns configuration keys defined by that application.
     """
     if app_name is not None:
-        return list(AppConfigurationDefault.objects.filter(key__startswith=app_name + '.')
+        return list(AppConfigurationDefault.objects.filter(key__startswith=app_name + '_')
                                                    .values_list('key', flat=True))
     return list(AppConfigurationDefault.objects.all().values_list('key', flat=True))

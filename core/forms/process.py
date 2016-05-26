@@ -118,10 +118,10 @@ class ProcessTypeForm(forms.ModelForm):
                             widget=forms.TextInput(
                                 attrs={'placeholder': 'Use lowercase letters and hyphens only'}))
     scheduling_type = ConfigurationChoiceField(
-        key='core.scheduling_type',
+        key='core_scheduling_type',
         label='How is this process scheduled?',)
     creation_type = ConfigurationChoiceField(
-        key='core.creation_type',
+        key='core_creation_type',
         label='Does this process need custom handling for creation?',)
 
     class Meta:

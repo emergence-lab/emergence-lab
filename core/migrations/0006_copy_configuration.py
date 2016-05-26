@@ -11,8 +11,8 @@ def copy_configuration_forward(apps, schema_editor):
     ProcessType = apps.get_model('core', 'ProcessType')
 
     for process_type in ProcessType.objects.all():
-        process_type.configuration['core.scheduling_type'] = process_type.scheduling_type
-        process_type.configuration['core.creation_type'] = process_type.creation_type
+        process_type.configuration['core_scheduling_type'] = process_type.scheduling_type
+        process_type.configuration['core_creation_type'] = process_type.creation_type
         process_type.save()
 
 
@@ -21,13 +21,13 @@ def copy_configuration_backward(apps, schema_editor):
 
     for process_type in ProcessType.objects.all():
         try:
-            process_type.scheduling_type = process_type.configuration['core.scheduling_type']
+            process_type.scheduling_type = process_type.configuration['core_scheduling_type']
         except KeyError:
-            process_type.scheduling_type = get_configuration_default('core.scheduling_type')
+            process_type.scheduling_type = get_configuration_default('core_scheduling_type')
         try:
-            process_type.creation_type = process_type.configuration['core.creation_type']
+            process_type.creation_type = process_type.configuration['core_creation_type']
         except KeyError:
-            process_type.creation_type = get_configuration_default('core.creation_type')
+            process_type.creation_type = get_configuration_default('core_creation_type')
         process_type.save()
 
 

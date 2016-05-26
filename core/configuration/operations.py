@@ -14,8 +14,8 @@ class PublishAppConfiguration(Operation):
     """Migration to publish configuration key for an application.
 
     Creates a AppConfigurationDefault object. Configuration keys once published
-    can be accessed anywhere and can be overridden on a per-instance basis
-    via InstanceConfiguration.
+    can be accessed anywhere by 'appname_keyname' and can be overridden on a
+    per-instance basis.
     """
 
     reversible = False
@@ -26,14 +26,13 @@ class PublishAppConfiguration(Operation):
     def __init__(self, key, default_value=None, choices=None):
         """Create app configuration object.
 
-        :param key: The name of the configuration key - must be a string that
-                    does not contain a '.' character
+        :param key: The name of the configuration key
         :param default_value: Optional. The default value for the key. Defaults
                               to empty string if parameter is None.
         :param choices: Optional. The possible valid choices for values. Defaults
                         to empty list if parameter is None, which means any value
                         is valid.
-        :raises ValueError: If the key is an empty string or contains a '.'
+        :raises ValueError: If the key is an empty or invalid string
         :raises TypeError: If the default_value is not a string or None
         :raises TypeError: If choices is not a list, tuple, or None
         :raises TypeError: If the items in choices are not strings
@@ -42,11 +41,11 @@ class PublishAppConfiguration(Operation):
         default_value = default_value or ''
         choices = choices or []
 
-        if re.match(r'^((?![\.\\])[\w\d\-])+$', key) is None:
+        if re.match(r'^[a-zA-Z0-9_]+$', key) is None:
             raise ValueError('invalid key "{}"'.format(key))
 
         if not isinstance(default_value, six.string_types):
-            raise TypeError('default_value mist be a string')
+            raise TypeError('default_value must be a string')
 
         if not isinstance(choices, (list, tuple)):
             raise TypeError('choices must be a list or tuple')
@@ -79,7 +78,7 @@ class PublishAppConfiguration(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         """Create an AppConfigurationDefault instance with the provided data."""
         if router.allow_migrate(schema_editor.connection.alias, app_label):
-            full_key = '{}.{}'.format(app_label, self.key)
+            full_key = '{}_{}'.format(app_label, self.key)
             default_config_model = from_state.apps.get_model('configuration',
                                                              'AppConfigurationDefault')
             config, _ = default_config_model.objects.get_or_create(key=full_key)
