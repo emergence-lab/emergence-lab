@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 from core.configuration.models import get_configuration_default
+from core.configuration.operations import ConfigurationSubscribe
 
 
 def copy_configuration_forward(apps, schema_editor):
@@ -35,12 +36,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0005_processtype_configuration'),
-        ('afm', '0002_create_processtype'),
-        ('d180', '0002_create_processtype'),
-        ('hall', '0002_create_processtype'),
-        ('sem', '0002_create_processtype'),
     ]
 
     operations = [
+        ConfigurationSubscribe(
+            model_name='processtype',
+            field_name='configuration',
+        ),
         migrations.RunPython(copy_configuration_forward, copy_configuration_backward),
     ]

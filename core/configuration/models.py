@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import functools
-
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -23,6 +22,15 @@ class AppConfigurationDefault(models.Model):
 
     def __str__(self):
         return '{}: {} {}'.format(self.key, self.default_value, self.choices)
+
+
+@python_2_unicode_compatible
+class AppConfigurationSubscription(models.Model):
+
+    model = models.ForeignKey(ContentType)
+
+    def __str__(self):
+        return str(self.model)
 
 
 def get_configuration_default(key):

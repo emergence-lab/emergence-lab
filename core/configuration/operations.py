@@ -9,7 +9,7 @@ from django.db.migrations.operations.base import Operation
 import six
 
 
-class PublishAppConfiguration(Operation):
+class PublishConfiguration(Operation):
 
     """Migration to publish configuration key for an application.
 
@@ -79,12 +79,20 @@ class PublishAppConfiguration(Operation):
         """Create an AppConfigurationDefault instance with the provided data."""
         if router.allow_migrate(schema_editor.connection.alias, app_label):
             full_key = '{}_{}'.format(app_label, self.key)
-            default_config_model = from_state.apps.get_model('configuration',
-                                                             'AppConfigurationDefault')
+            default_config_model = from_state.apps.get_model(
+                'configuration', 'AppConfigurationDefault')
             config, _ = default_config_model.objects.get_or_create(key=full_key)
             config.default_value = self.default_value
             config.choices = self.choices
             config.save()
+
+            # add this configuration key to all subscribers
+            subscription = from_state.apps.get_model(
+                'configuration', 'AppConfigurationSubscription')
+            for obj in subscription.objects.all():
+                subscriber = from_state.apps.get_model(obj.model.app_label, obj.model.model)
+                subscriber.configuration[full_key] = self.default_value
+                subscriber.save()
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         """Raise exception since migration cannot be reversed."""
@@ -93,3 +101,70 @@ class PublishAppConfiguration(Operation):
     def describe(self):
         """Describe the migration."""
         return 'Creates or updates the default configuration value for an application.'
+
+
+class ConfigurationSubscribe(Operation):
+
+    """Operation to subscribe a model for to configuration."""
+
+    reversible = True
+    reduces_to_sql = False
+    atomic = False
+    elidable = False
+
+    def __init__(self, model_name, field_name):
+        self.model_name = model_name
+        self.field_name = field_name
+
+    def deconstruct(self):
+        """Default migration deconstruct method."""
+        return (
+            self.__class__.__name__,
+            [],
+            {
+                'model_name': self.model_name,
+                'field_name': self.field_name,
+            }
+        )
+
+    def state_forwards(self, app_label, state):
+        """Make no changes to the state."""
+        pass
+
+    def state_backwards(self, app_label, state):
+        """Make no changes to the state."""
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        """Create subscription object and copy all existing configuration over."""
+        if router.allow_migrate(schema_editor.connection.alias, app_label):
+            # create AppConfigurationSubscription object
+            subscription = from_state.apps.get_model(
+                'configuration', 'AppConfigurationSubscription')
+            contenttypes = from_state.apps.get_model('contenttypes', 'ContentType')
+            subscriber = contenttypes.objects.get(model=self.model_name)
+
+            subscription.objects.create(model=subscriber)
+
+            # for each object of the subscriber model, add all existing configuration
+            subscriber_model = from_state.apps.get_model(app_label, self.model_name)
+            configuration = from_state.apps.get_model(
+                'configuration', 'AppConfigurationDefault')
+            self._add_existing_configuration(subscriber_model, configuration)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        """Remove model as a subscriber."""
+        if router.allow_migrate(schema_editor.connection.alias, app_label):
+            subscription = from_state.apps.get_model(
+                'configuration', 'AppConfigurationSubscription')
+            contenttypes = from_state.apps.get_model('contenttypes', 'ContentType')
+            subscriber = contenttypes.objects.get(model=self.model_name)
+
+            subscription.objects.get(model=subscriber).delete()
+
+    def _add_existing_configuration(self, subscriber, configuration):
+        """Add all existing configuration to all instances of subscriber model."""
+        for obj in subscriber.objects.all():
+            for config in configuration.objects.all():
+                getattr(obj, self.field_name)[config.key] = config.default_value
+            obj.save()

@@ -3,7 +3,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-from core.configuration.operations import PublishAppConfiguration
+
+from core.configuration.operations import PublishConfiguration
 
 
 class Migration(migrations.Migration):
@@ -14,13 +15,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        PublishAppConfiguration('scheduling_type', 'none', choices=[
+        PublishConfiguration('scheduling_type', 'none', choices=[
             'none',
             'simple',
             'full',
             'external',
         ]),
-        PublishAppConfiguration('creation_type', 'default', choices=[
+        PublishConfiguration('creation_type', 'default', choices=[
             'default',
             'custom',
         ]),
