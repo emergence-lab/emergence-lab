@@ -27,10 +27,11 @@ class AppConfigurationDefault(models.Model):
 @python_2_unicode_compatible
 class AppConfigurationSubscription(models.Model):
 
-    model = models.ForeignKey(ContentType)
+    app_label = models.CharField(max_length=100)
+    model_name = models.CharField(max_length=100)
 
     def __str__(self):
-        return str(self.model)
+        return str('{}.{}'.format(app_label, model_name))
 
 
 def get_configuration_default(key):

@@ -141,26 +141,22 @@ class ConfigurationSubscribe(Operation):
             # create AppConfigurationSubscription object
             subscription = from_state.apps.get_model(
                 'configuration', 'AppConfigurationSubscription')
-            contenttypes = from_state.apps.get_model('contenttypes', 'ContentType')
-            subscriber = contenttypes.objects.get(model=self.model_name)
-
-            subscription.objects.create(model=subscriber)
+            obj = subscription.objects.create(app_label=app_label, model_name=self.model_name)
 
             # for each object of the subscriber model, add all existing configuration
-            subscriber_model = from_state.apps.get_model(app_label, self.model_name)
+            subscriber = from_state.apps.get_model(app_label, self.model_name)
             configuration = from_state.apps.get_model(
                 'configuration', 'AppConfigurationDefault')
-            self._add_existing_configuration(subscriber_model, configuration)
+            self._add_existing_configuration(subscriber, configuration)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         """Remove model as a subscriber."""
         if router.allow_migrate(schema_editor.connection.alias, app_label):
             subscription = from_state.apps.get_model(
                 'configuration', 'AppConfigurationSubscription')
-            contenttypes = from_state.apps.get_model('contenttypes', 'ContentType')
-            subscriber = contenttypes.objects.get(model=self.model_name)
-
-            subscription.objects.get(model=subscriber).delete()
+            subscriber = subscription.objects.get(app_label=app_label,
+                                                  model_name=self.model_name)
+            subscriber.delete()
 
     def _add_existing_configuration(self, subscriber, configuration):
         """Add all existing configuration to all instances of subscriber model."""

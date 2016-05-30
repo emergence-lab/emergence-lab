@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='processtype',
             name='configuration',
-            field=core.configuration.fields.ConfigurationField(default=dict),
+            field=core.configuration.fields.ConfigurationField(default=core.configuration.fields.build_configuration_default),
         ),
     ]
