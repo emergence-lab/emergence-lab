@@ -34,6 +34,19 @@ class AppConfigurationSubscription(models.Model):
         return str('{}.{}'.format(app_label, model_name))
 
 
+
+class ConfigurationManager(models.Manager):
+
+    def create(self, *args, **kwargs):
+        configuration = kwargs.pop('configuration', {})
+        obj = super(ConfigurationManager, self).create(*args, **kwargs)
+        for key, value in configuration.items():
+            obj.configuration[key] = value
+        obj.save()
+
+        return obj
+
+
 def get_configuration_default(key):
     """Return the default value for the provided configuration key.
 

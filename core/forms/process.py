@@ -29,7 +29,8 @@ class ProcessCreateForm(forms.ModelForm):
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
         else:
-            self.fields['type'].queryset = ProcessType.objects.exclude(configuration__creation_type='custom')
+            self.fields['type'].queryset = ProcessType.objects.exclude(
+                configuration__core_creation_type='custom')
 
         self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [
@@ -83,7 +84,8 @@ class WizardBasicInfoForm(forms.ModelForm):
             (p.name, [(i.id, i.name) for i in p.investigations.all()])
             for p in user.get_projects('member') if p.investigations.exists()
         ])
-        self.fields['type'].queryset = ProcessType.objects.exclude(configuration__creation_type='custom')
+        self.fields['type'].queryset = ProcessType.objects.exclude(
+            configuration__core_creation_type='custom')
         self.helper = helper.FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True

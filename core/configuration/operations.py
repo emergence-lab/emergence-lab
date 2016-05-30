@@ -90,9 +90,10 @@ class PublishConfiguration(Operation):
             subscription = from_state.apps.get_model(
                 'configuration', 'AppConfigurationSubscription')
             for obj in subscription.objects.all():
-                subscriber = from_state.apps.get_model(obj.model.app_label, obj.model.model)
-                subscriber.configuration[full_key] = self.default_value
-                subscriber.save()
+                subscriber_model = from_state.apps.get_model(obj.app_label, obj.model_name)
+                for subscriber in subscriber_model.objects.all():
+                    subscriber.configuration[full_key] = self.default_value
+                    subscriber.save()
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         """Raise exception since migration cannot be reversed."""

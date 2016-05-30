@@ -23,7 +23,10 @@ class TestReservationCRUD(TestCase):
         self.client.login(username='default', password='')
 
     def test_reservation_edit_resolution_template(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservation = mommy.make(Reservation,
                                  tool=process_type,
                                  user=self.user)
@@ -39,7 +42,10 @@ class TestReservationCRUD(TestCase):
             template_file='schedule_queue/reservation_form.html')
 
     def test_create_reservation_valid_data(self):
-        process_type = mommy.make(ProcessType, type='test-process')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         url = reverse('reservation_create')
         data =  {
             'tool': process_type.type,
@@ -55,8 +61,10 @@ class TestReservationCRUD(TestCase):
         self.assertEqual(Reservation.objects.first().comment, 'testing')
 
     def test_reservation_edit_valid_data(self):
-        process_type = mommy.make(ProcessType, type='test-process',
-                                  scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservation = mommy.make(Reservation,
                              tool=process_type,
                              user=self.user)
@@ -74,7 +82,10 @@ class TestReservationCRUD(TestCase):
         self.assertEqual(Reservation.objects.first().comment, 'testing')
 
     def test_increase_priority_resolution(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type,
                        user=self.user, priority=10),
@@ -85,7 +96,10 @@ class TestReservationCRUD(TestCase):
         self.assertEqual(match.url_name, 'increase_priority')
 
     def test_decrease_priority_resolution(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type,
                        user=self.user, priority=10),
@@ -96,7 +110,10 @@ class TestReservationCRUD(TestCase):
         self.assertEqual(match.url_name, 'decrease_priority')
 
     def test_increase_priority(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type,
                        user=self.user, priority=10, comment='a'),
@@ -110,7 +127,10 @@ class TestReservationCRUD(TestCase):
         self.assertEqual(reservations[1].priority, 10)
 
     def test_decrease_priority(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type,
                        user=self.user, priority=10),
@@ -124,14 +144,20 @@ class TestReservationCRUD(TestCase):
         self.assertEqual(reservations[1].priority, 10)
 
     def test_deactivate_reservation_resolution(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservation = mommy.make(Reservation,
                                  tool=process_type, user=self.user)
         match = resolve('/scheduling/cancel/{}/'.format(reservation.id))
         self.assertEqual(match.url_name, 'cancel_reservation')
 
     def test_deactivate_reservation(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         res_obj = mommy.make(Reservation,
                              tool=process_type,
                              user=self.user,
@@ -144,7 +170,10 @@ class TestReservationCRUD(TestCase):
         self.assertFalse(res_act_field, msg=None)
 
     def test_list_view(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user),
             mommy.make(Reservation, tool=process_type, user=self.user),
@@ -155,7 +184,10 @@ class TestReservationCRUD(TestCase):
                          len(Reservation.objects.all().filter(tool=process_type)))
 
     def test_reservation_list_resolution_template(self):
-        process_type = mommy.make(ProcessType, type='test-process', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user),
             mommy.make(Reservation, tool=process_type, user=self.user),
@@ -166,7 +198,10 @@ class TestReservationCRUD(TestCase):
             template_file='schedule_queue/reservation_list.html')
 
     def test_reservation_landing_resolution_template(self):
-        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
             mommy.make(Reservation, tool=process_type, user=self.user),
@@ -177,7 +212,10 @@ class TestReservationCRUD(TestCase):
             template_file='schedule_queue/reservation_landing.html')
 
     def test_reservation_landing_content(self):
-        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
             mommy.make(Reservation, tool=process_type, user=self.user),
@@ -187,7 +225,10 @@ class TestReservationCRUD(TestCase):
         self.assertContains(response, process_type.name)
 
     def test_reservation_landing_count_open_only(self):
-        process_type = mommy.make(ProcessType, type='test', scheduling_type='simple')
+        process_type = mommy.make(
+            ProcessType,
+            type='test',
+            configuration={'core_scheduling_type': 'simple'})
         reservations = [
             mommy.make(Reservation, tool=process_type, user=self.user, is_active=False),
             mommy.make(Reservation, tool=process_type, user=self.user),
