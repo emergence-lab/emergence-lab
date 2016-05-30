@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -31,8 +30,7 @@ class AppConfigurationSubscription(models.Model):
     model_name = models.CharField(max_length=100)
 
     def __str__(self):
-        return str('{}.{}'.format(app_label, model_name))
-
+        return str('{}.{}'.format(self.app_label, self.model_name))
 
 
 class ConfigurationManager(models.Manager):

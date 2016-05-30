@@ -142,7 +142,7 @@ class ConfigurationSubscribe(Operation):
             # create AppConfigurationSubscription object
             subscription = from_state.apps.get_model(
                 'configuration', 'AppConfigurationSubscription')
-            obj = subscription.objects.create(app_label=app_label, model_name=self.model_name)
+            subscription.objects.create(app_label=app_label, model_name=self.model_name)
 
             # for each object of the subscriber model, add all existing configuration
             subscriber = from_state.apps.get_model(app_label, self.model_name)
