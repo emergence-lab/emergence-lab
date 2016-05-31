@@ -14,6 +14,9 @@ from core.configuration.models import (
     list_configuration_keys,
 )
 
+from core.configuration.tests.models import ConfigurationTestModel
+
+
 class TestAppConfiguration(TestCase):
 
     def setUp(self):
@@ -109,10 +112,10 @@ class TestAppConfiguration(TestCase):
 
     def test_subscription_manager_create_no_configuration(self):
         config = mommy.make(AppConfigurationDefault, key='test_key', default_value='value')
-        process_type = mommy.make('core.ProcessType')
-        self.assertEqual(process_type.configuration[config.key], config.default_value)
+        test = ConfigurationTestModel.objects.create()
+        self.assertEqual(test.configuration[config.key], config.default_value)
 
     def test_subscription_manager_create_with_configuration(self):
         config = mommy.make(AppConfigurationDefault, key='test_key', default_value='value')
-        process_type = mommy.make('core.ProcessType', configuration={'test_key': 'edited'})
-        self.assertEqual(process_type.configuration[config.key], 'edited')
+        test = ConfigurationTestModel.objects.create(configuration={'test_key': 'edited'})
+        self.assertEqual(test.configuration[config.key], 'edited')

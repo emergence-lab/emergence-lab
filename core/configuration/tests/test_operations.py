@@ -6,6 +6,8 @@ from django.db import connection
 from django.db.migrations.state import ProjectState
 from django.test import TestCase
 
+from model_mommy import mommy
+
 import six
 
 from core.configuration.operations import PublishConfiguration, ConfigurationSubscribe
@@ -131,9 +133,35 @@ class TestConfigurationSubscribeOperation(TestCase):
 
     def test_database_forwards_no_configuration_keys(self):
         AppConfigurationDefault.objects.all().delete()
+        AppConfigurationSubscription.objects.all().delete()
 
         migration = ConfigurationSubscribe('ConfigurationTestModel', 'configuration')
         old_state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
         new_state = old_state.clone()
         with connection.schema_editor() as editor:
             migration.database_forwards('configuration_tests', editor, old_state, new_state)
+        test = mommy.make(ConfigurationTestModel)
+        self.assertDictEqual(test.configuration, {})
+
+    def test_database_forwards_with_configuration_keys(self):
+        AppConfigurationDefault.objects.exclude(key__startswith='configuration_tests').delete()
+        AppConfigurationSubscription.objects.all().delete()
+
+        migration = ConfigurationSubscribe('ConfigurationTestModel', 'configuration')
+        old_state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
+        new_state = old_state.clone()
+        with connection.schema_editor() as editor:
+            migration.database_forwards('configuration_tests', editor, old_state, new_state)
+        test = mommy.make(ConfigurationTestModel)
+        self.assertDictEqual(test.configuration, {'configuration_tests_existing_key': 'default'})
+
+    def test_database_backwards(self):
+        AppConfigurationSubscription.objects.exclude(app_label__startswith='configuration_tests').delete()
+
+        self.assertTrue(AppConfigurationSubscription.objects.all().exists())
+        migration = ConfigurationSubscribe('ConfigurationTestModel', 'configuration')
+        old_state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
+        new_state = old_state.clone()
+        with connection.schema_editor() as editor:
+            migration.database_backwards('configuration_tests', editor, old_state, new_state)
+        self.assertFalse(AppConfigurationSubscription.objects.all().exists())

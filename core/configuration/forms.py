@@ -17,6 +17,7 @@ def _get_configuration_choices_form(key):
 
 
 def build_configuration_choices(key):
+    """Return function to build list of tuples of configuration keys."""
     return functools.partial(_get_configuration_choices_form, key)
 
 
@@ -25,6 +26,7 @@ class ConfigurationChoiceField(forms.ChoiceField):
     """ChoiceField that build choices based on those for a configuration key."""
 
     def __init__(self, key, *args, **kwargs):
+        """Set choices appropriately for the passed configuration key."""
         self.key = key
-        kwargs['choices'] = functools.partial(_get_configuration_choices_form, key)
+        kwargs['choices'] = build_configuration_choices(key)
         super(ConfigurationChoiceField, self).__init__(*args, **kwargs)

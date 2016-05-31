@@ -7,6 +7,7 @@ from .models import AppConfigurationDefault
 
 
 def build_configuration_default():
+    """Return dictionary with existing configuration keys and default values."""
     default = {}
     for config in AppConfigurationDefault.objects.all():
         default[config.key] = config.default_value

@@ -26,6 +26,8 @@ class AppConfigurationDefault(models.Model):
 @python_2_unicode_compatible
 class AppConfigurationSubscription(models.Model):
 
+    """Model that tracks which models have instances that can be configured."""
+
     app_label = models.CharField(max_length=100)
     model_name = models.CharField(max_length=100)
 
@@ -35,7 +37,10 @@ class AppConfigurationSubscription(models.Model):
 
 class ConfigurationManager(models.Manager):
 
+    """Manager that ensures configuration is always filled with existing values."""
+
     def create(self, *args, **kwargs):
+        """Create configuration dictionary with default values and passed overrides."""
         configuration = kwargs.pop('configuration', {})
         obj = super(ConfigurationManager, self).create(*args, **kwargs)
         for key, value in configuration.items():

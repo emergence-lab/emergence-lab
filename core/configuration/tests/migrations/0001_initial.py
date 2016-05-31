@@ -24,7 +24,10 @@ class Migration(migrations.Migration):
                 ('configuration', core.configuration.fields.ConfigurationField(default=core.configuration.fields.build_configuration_default)),
             ],
         ),
-        PublishConfiguration('existing_key', 'default'),
+        PublishConfiguration(
+            key='existing_key',
+            default_value='default'
+        ),
         ConfigurationSubscribe(
             model_name='ConfigurationTestModel',
             field_name='configuration',
