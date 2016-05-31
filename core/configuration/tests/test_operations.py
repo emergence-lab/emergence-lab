@@ -8,14 +8,15 @@ from django.test import TestCase
 
 import six
 
-from core.configuration.operations import PublishConfiguration
-from core.configuration.models import AppConfigurationDefault
+from core.configuration.operations import PublishConfiguration, ConfigurationSubscribe
+from core.configuration.models import AppConfigurationDefault, AppConfigurationSubscription
+from core.configuration.tests.models import ConfigurationTestModel
 
 
-class TestAppConfigurationMigrationOperations(TestCase):
+class TestPublishConfigurationOperation(TestCase):
 
     def _migrate(self, migration):
-        old_state = ProjectState(real_apps=['configuration', 'core'])
+        old_state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
         new_state = old_state.clone()
         with connection.schema_editor() as editor:
             migration.database_forwards('test', editor, old_state, new_state)
@@ -100,3 +101,39 @@ class TestAppConfigurationMigrationOperations(TestCase):
     def test_describe(self):
         migration = PublishConfiguration(key='test')
         self.assertIsInstance(migration.describe(), six.string_types)
+
+class TestConfigurationSubscribeOperation(TestCase):
+
+    def test_describe(self):
+        migration = ConfigurationSubscribe('model', 'field')
+        self.assertIsInstance(migration.describe(), six.string_types)
+
+    def test_deconstruct(self):
+        kwargs = {
+            'model_name': 'model',
+            'field_name': 'field'
+        }
+        migration = ConfigurationSubscribe(**kwargs)
+        result = migration.deconstruct()
+        self.assertEqual(result[0], 'ConfigurationSubscribe')
+        self.assertEqual(result[1], [])
+        self.assertEqual(result[2], kwargs)
+
+    def test_state_forwards(self):
+        migration = ConfigurationSubscribe('model', 'field')
+        state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
+        migration.state_forwards('test', state)
+
+    def test_state_backwards(self):
+        migration = ConfigurationSubscribe('model', 'field')
+        state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
+        migration.state_backwards('test', state)
+
+    def test_database_forwards_no_configuration_keys(self):
+        AppConfigurationDefault.objects.all().delete()
+
+        migration = ConfigurationSubscribe('ConfigurationTestModel', 'configuration')
+        old_state = ProjectState(real_apps=['configuration', 'configuration_tests', 'core'])
+        new_state = old_state.clone()
+        with connection.schema_editor() as editor:
+            migration.database_forwards('configuration_tests', editor, old_state, new_state)

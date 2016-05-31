@@ -36,6 +36,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, os.pardir, 'media')
 # Test-only models
 INSTALLED_APPS += (
     'core.tests',
+    'core.configuration.tests',
 )
 
 REDIS_DB = 1
