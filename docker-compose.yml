@@ -7,12 +7,24 @@ redis:
   ports:
       - "6379:6379"
 web:
-  build: .
-  command: python3 /opt/django/manage.py runserver 0.0.0.0:8000 --settings=wbg.settings.docker
+  image: emergence/emergence:latest
+  command: python3 /opt/django/manage.py runserver 0.0.0.0:8000
   volumes:
     - .:/opt/django
   ports:
     - "8000:8000"
+  environment:
+    - DJANGO_SETTINGS_MODULE=wbg.settings.docker
+  links:
+    - db
+    - redis
+worker:
+  image: emergence/emergence:latest
+  command: python3 manage.py rqworker default
+  volumes:
+    - .:/opt/django
+  environment:
+    - DJANGO_SETTINGS_MODULE=wbg.settings.docker
   links:
     - db
     - redis

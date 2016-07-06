@@ -22,11 +22,26 @@ RUN apt-get update && apt-get install -y \
     libcairo2-dev \
     libpango1.0-0 \
     libgdk-pixbuf2.0-0 \
-    libjpeg-dev
+    libjpeg-dev \
+    curl \
+    apt-transport-https
 
 RUN pip install --upgrade pip
 
+# Install Node
+RUN curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+RUN echo "deb https://deb.nodesource.com/node_5.x trusty main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN echo "deb-src https://deb.nodesource.com/node_5.x trusty main" | tee -a /etc/apt/sources.list.d/nodesource.list
+RUN apt-get update && apt-get install -y nodejs
+
+# Install Python reqs now for caching
+ADD ./requirements /opt/django/requirements
+RUN pip3 install -r /opt/django/requirements/development.txt
+
+# Install bower reqs now for caching
+RUN npm install -g bower
+ADD ./bower.json /opt/django/bower.json
+RUN cd /opt/django && bower install --allow-root
+
 ADD . /opt/django
 WORKDIR /opt/django
-ENV DJANGO_SETTINGS_MODULE wbg.settings.docker
-RUN pip3 install -r /opt/django/requirements/development.txt

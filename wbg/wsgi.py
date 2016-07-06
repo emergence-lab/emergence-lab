@@ -63,7 +63,8 @@ elif _get_secret('PRODUCTION_MODE') == 'docker':
 
     import django.core.handlers.wsgi
 
-    application = django.core.handlers.wsgi.WSGIHandler()
+    application = get_wsgi_application()
+    # application = django.core.handlers.wsgi.WSGIHandler()
 else:
     sys.path.append('/var/wsgi')
     sys.path.append('/var/wsgi/wbg')
