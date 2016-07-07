@@ -1,0 +1,9 @@
+# Directories
+bower_components
+media
+static
+.git
+.tox
+
+# Files
+**/*.pyc
