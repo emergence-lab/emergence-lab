@@ -73,6 +73,9 @@ urlpatterns = [
     # schedule_queue urls
     url(r'^scheduling/', include('schedule_queue.urls')),
 
+    # search urls
+    url(r'^search/', include('search.urls')),
+
     # sem urls
     url(r'^sem/', include('sem.urls')),
 

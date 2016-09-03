@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <div class="col-md-12">
+    <ul>
+      {% for item in search_query %}
+        <li>{{ item.uuid_full }}, {{ item.title }}</li>
+      {% endfor %}
+    </ul>
+
+  </div>
+
+</div>
+
+{% endblock %}

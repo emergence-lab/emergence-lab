@@ -36,3 +36,4 @@ django-simple-history==1.8.1
 pandas>=0.18,<0.19
 django-jsonfield
 gunicorn==19.6.0
+elasticsearch-dsl>=2.0.0,<3.0.0

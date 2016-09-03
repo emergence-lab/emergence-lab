@@ -1,30 +1,43 @@
-db:
-  image: postgres
-  ports:
+version: '2'
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
       - "5432:5432"
-redis:
-  image: redis
-  ports:
+  redis:
+    image: redis
+    ports:
       - "6379:6379"
-web:
-  image: emergence/emergence:latest
-  command: python3 /opt/django/manage.py runserver 0.0.0.0:8000
-  volumes:
-    - .:/opt/django
-  ports:
-    - "8000:8000"
-  environment:
-    - DJANGO_SETTINGS_MODULE=wbg.settings.docker
-  links:
-    - db
-    - redis
-worker:
-  image: emergence/emergence:latest
-  command: python3 manage.py rqworker default
-  volumes:
-    - .:/opt/django
-  environment:
-    - DJANGO_SETTINGS_MODULE=wbg.settings.docker
-  links:
-    - db
-    - redis
+  elasticsearch:
+    image: elasticsearch:2
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data/
+  web:
+    image: emergence/emergence:feature-elasticsearch
+    command: python3 /opt/django/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/opt/django
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=wbg.settings.docker
+    links:
+      - db
+      - redis
+  worker:
+    image: emergence/emergence:feature-elasticsearch
+    command: python3 manage.py rqworker default
+    volumes:
+      - .:/opt/django
+    environment:
+      - DJANGO_SETTINGS_MODULE=wbg.settings.docker
+    links:
+      - db
+      - redis
+volumes:
+  postgres_data: {}
+  elasticsearch_data: {}

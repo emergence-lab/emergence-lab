@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'simulations',
     'schedule_queue',
     'sem',
+    'search',
     # misc
     'actstream',
 )
@@ -323,6 +324,12 @@ EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS', [])
 # Feedback
 
 ENABLE_FEEDBACK = get_secret('ENABLE_FEEDBACK', False)
+
+
+# Elasticsearch
+
+ELASTICSEARCH_HOST = get_secret('ELASTICSEARCH_HOST', 'localhost')
+ELASTICSEARCH_PORT = get_secret('ELASTICSEARCH_PORT', 9200)
 
 
 # Crispy Forms
