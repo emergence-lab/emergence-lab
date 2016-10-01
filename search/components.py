@@ -50,7 +50,7 @@ class ProcessComponent(SearchComponent):
             comment=process.comment,
             process_type=process.type.name,
             legacy_identifier=process.legacy_identifier,
-            uuid_full=process.uuid_full,
+            uuid=process.uuid,
             created=process.created,
             meta=process_meta
         )
@@ -69,7 +69,7 @@ class SampleComponent(SearchComponent):
 
         process_document = Sample(
             comment=process.comment,
-            uuid_full=process.uuid_full,
+            uuid=process.uuid_full,
             created=process.created,
             meta=process_meta
         )

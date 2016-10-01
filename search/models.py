@@ -16,7 +16,7 @@ class Process(Document):
     comment = String(analyzer=html_strip, fields={'raw': String(index='not_analyzed')})
     process_type = String(analyzer='snowball')
     legacy_identifier = String(index='not_analyzed')
-    uuid_full = String(index='not_analyzed')
+    uuid = String(index='not_analyzed')
 
     class Meta:
         index = 'processes'
@@ -24,7 +24,7 @@ class Process(Document):
 
 class Sample(Document):
     comment = String(analyzer=html_strip, fields={'raw': String(index='not_analyzed')})
-    uuid_full = String(index='not_analyzed')
+    uuid = String(index='not_analyzed')
 
     class Meta:
         index = 'samples'

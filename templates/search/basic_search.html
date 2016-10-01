@@ -7,13 +7,22 @@
 {% block content %}
 
 <div class="container">
-
-  <div class="col-md-12">
-    <ul>
+  <h2 class="page-header">Search Results</h2>
+  <div class="col-md-3"></div>
+  <div class="col-md-9">
+    <div class="list-group">
       {% for item in search_query %}
-        <li>{{ item.uuid_full }}, {{ item.title }}</li>
+        <a class="list-group-item" href="{% url 'process_detail' uuid=item.uuid %}">
+          <h4 class="list-group-item-heading">
+            {{ item.uuid }}{% if item.legacy_identifier %} ({{ item.legacy_identifier }}){% endif %}
+          </h4>
+          <p class="list-group-item-text">
+            <strong>{{ item.title }}</strong>
+            {{ item.comment|safe }}
+          </p>
+        </a>
       {% endfor %}
-    </ul>
+    </div>
 
   </div>
 
