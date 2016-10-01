@@ -1,7 +1,4 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
-from django.utils.cache import add_never_cache_headers
 from django.views import generic
 
 from elasticsearch import Elasticsearch
@@ -20,7 +17,7 @@ class ElasticSearchView(LoginRequiredMixin, generic.TemplateView):
     def build_query(self, search_query):
         search_type = self.request.GET.get('type')
 
-        if not search_type in ['processes', 'samples']:
+        if search_type not in ['processes', 'samples']:
             search_type = "processes"
 
         search_bool_shoulds = [

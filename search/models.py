@@ -1,5 +1,4 @@
-from datetime import datetime
-from elasticsearch_dsl import DocType, String, Date, Integer
+from elasticsearch_dsl import DocType, String, Date
 
 from .utils import html_strip
 
