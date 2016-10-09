@@ -16,13 +16,18 @@ class SearchComponent(object):
 
     search_model = None
     object_model = None
+    index_name = None
 
     def create_index(self):
         self.search_model.init()
 
     def delete_index(self):
-        index = Index(self.search_model.get_index_name())
+        index = Index(self.index_name)
         index.delete(ignore=404)
+
+    def close_index(self):
+        index = Index(self.index_name)
+        index.close(ignore=404)
 
     def index_all(self):
         items = self.object_model.objects.all()
@@ -35,11 +40,16 @@ class SearchComponent(object):
         self.create_index()
         self.index_all()
 
+    def delete_item(self, id):
+        item = self.search_model.get(id)
+        item.delete()
 
-class ProcessComponent(SearchComponent):
+
+class ProcessSearchComponent(SearchComponent):
 
     search_model = Process()
     object_model = ProcessModel
+    index_name = "{}processes".format(settings.ELASTICSEARCH_PREFIX)
 
     def index_item(self, process):
 
@@ -58,10 +68,11 @@ class ProcessComponent(SearchComponent):
         process_document.save()
 
 
-class SampleComponent(SearchComponent):
+class SampleSearchComponent(SearchComponent):
 
     search_model = Sample()
     object_model = SampleModel
+    index_name = "{}samples".format(settings.ELASTICSEARCH_PREFIX)
 
     def index_item(self, process):
 

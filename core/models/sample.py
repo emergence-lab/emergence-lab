@@ -7,6 +7,7 @@ import string
 from six.moves import reduce
 
 from django.db import models
+from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 
 from mptt import models as mptt
@@ -416,3 +417,18 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
             raise ValueError('{} is not a valid process type'.format(process_type))
 
         return self._get_tree_queryset().filter(process__type_id=process_type)
+
+
+@receiver(models.signals.post_save, sender=Sample)
+def index_process(sender, instance=None, created=False, **kwargs):
+    """
+    Creates documents in elasticsearch for a created or updated instance.
+    """
+    from search.components import SampleSearchComponent
+    if created:
+        SampleSearchComponent().index_item(instance)
+    else:
+        # Delete the previous process document in elasticsearch
+        # then reindex just that one item
+        SampleSearchComponent().delete_item(instance.id)
+        SampleSearchComponent().index_item(instance)

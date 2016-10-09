@@ -30,7 +30,9 @@ class ElasticSearchView(LoginRequiredMixin, generic.TemplateView):
             search_bool_shoulds.append(Q("match",
                                          legacy_identifier=search_query))
 
-        return search_type, search_bool_shoulds
+        index = "{}{}".format(settings.ELASTICSEARCH_PREFIX, search_type)
+
+        return index, search_bool_shoulds
 
     def get_context_data(self, **kwargs):
         context = super(ElasticSearchView, self).get_context_data(**kwargs)

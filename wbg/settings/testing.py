@@ -53,6 +53,10 @@ REDIS_DB = 1
 
 logging.disable(logging.CRITICAL)
 
+# Elasticsearch
+
+ELASTICSEARCH_PREFIX = 'test_'
+
 # File storages
 
 DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'

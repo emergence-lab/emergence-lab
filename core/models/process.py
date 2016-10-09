@@ -213,3 +213,18 @@ def process_actstream(sender, instance=None, created=False, **kwargs):
                     verb='created',
                     action_object=instance,
                     target=investigation)
+
+
+@receiver(models.signals.post_save, sender=Process)
+def index_process(sender, instance=None, created=False, **kwargs):
+    """
+    Creates documents in elasticsearch for a created or updated instance.
+    """
+    from search.components import ProcessSearchComponent
+    if created:
+        ProcessSearchComponent().index_item(instance)
+    else:
+        # Delete the previous process document in elasticsearch
+        # then reindex just that one item
+        ProcessSearchComponent().delete_item(instance.id)
+        ProcessSearchComponent().index_item(instance)

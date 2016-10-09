@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand
 
-from search.components import ProcessComponent, SampleComponent
+from search.components import ProcessSearchComponent, SampleSearchComponent
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        ProcessComponent().reindex_all()
-        SampleComponent().reindex_all()
+        ProcessSearchComponent().reindex_all()
+        SampleSearchComponent().reindex_all()
