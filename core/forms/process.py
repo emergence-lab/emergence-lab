@@ -101,12 +101,15 @@ class WizardBasicInfoForm(forms.ModelForm):
         model = Process
         fields = ('user', 'type', 'title', 'comment', 'investigations', 'milestones')
         labels = {
-            'title': 'Short Process Description',
-            'comment': 'Additional Process Comments',
+            'title': 'Short Description',
+            'comment': 'Additional Comments',
             'type': 'Process Type',
             'user': 'User',
             'investigations': 'Investigation(s)',
             'milestones': 'Milestone(s)',
+        }
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Short process description'})
         }
 
 
