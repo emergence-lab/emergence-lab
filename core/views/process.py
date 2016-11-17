@@ -323,7 +323,7 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
         info_form = WizardBasicInfoForm(self.request.user, request.POST, prefix='process')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
 
-        if sample_formset.is_valid():
+        if sample_formset.is_valid() and info_form.is_valid():
             logger.debug('Creating new process')
             self.object = info_form.save()
             logger.debug('Created process {} ({}) for {} samples'.format(
