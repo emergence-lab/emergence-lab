@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import datetime
 import os
 
 from django.core.files.storage import default_storage as labshare
@@ -105,6 +106,7 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
+    run_date = models.DateField(default=datetime.date.today, blank=True)
     type = models.ForeignKey(ProcessType, default='generic-process')
 
     investigations = models.ManyToManyField(Investigation,

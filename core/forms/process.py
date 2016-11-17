@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import datetime
 import string
 
 from django import forms
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms import helper, layout
+from datetimewidget.widgets import DateWidget
 
 from core.models import DataFile, Process, ProcessTemplate, ProcessType
 
@@ -74,6 +78,8 @@ class WizardBasicInfoForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicInfoForm, self).__init__(*args, **kwargs)
+        self.fields['run_date'].required = True
+
         self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
             for i in user.get_investigations('member') if i.milestones.exists()
@@ -91,25 +97,40 @@ class WizardBasicInfoForm(forms.ModelForm):
         self.helper.layout = layout.Layout(
             layout.Field('user'),
             layout.Field('type'),
+            layout.Field('run_date'),
             layout.Field('title'),
             layout.Field('comment', css_class='hallo'),
             layout.Field('investigations'),
             layout.Field('milestones'),
         )
 
+    def clean_run_date(self):
+        run_date = self.cleaned_data['run_date']
+        if run_date > datetime.date.today():
+            raise ValidationError(_('Run date cannot be in the future'), code='invalid')
+        return run_date
+
     class Meta:
         model = Process
-        fields = ('user', 'type', 'title', 'comment', 'investigations', 'milestones')
+        fields = ('user', 'type', 'run_date', 'title', 'comment', 'investigations', 'milestones')
         labels = {
-            'title': 'Short Description',
-            'comment': 'Additional Comments',
-            'type': 'Process Type',
-            'user': 'User',
-            'investigations': 'Investigation(s)',
-            'milestones': 'Milestone(s)',
+            'title': _('Short Description'),
+            'comment': _('Additional Comments'),
+            'run_date': _('Process Run Date'),
+            'type': _('Process Type'),
+            'user': _('User'),
+            'investigations': _('Investigation(s)'),
+            'milestones': _('Milestone(s)'),
         }
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Short process description'})
+            'run_date': DateWidget(attrs={'class': 'date'},
+                                   bootstrap_version=3,
+                                   usel10n=True,
+                                   options={'todayBtn': 'true',
+                                            'todayHighlight': 'true',
+                                            'clear_Btn': 'true',
+                                            'format': 'yyyy-mm-dd'}),
+            'title': forms.TextInput(attrs={'placeholder': _('Short process description')})
         }
 
 
