@@ -34,6 +34,10 @@ class ProcessCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name = 'process category'
+        verbose_name_plural = 'process categories'
+
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.slug)
 
@@ -73,6 +77,9 @@ class ProcessType(models.Model):
     category = models.ForeignKey(ProcessCategory, default='uncategorized',
                                  related_name='processtypes',
                                  related_query_name='processtype')
+
+    def get_absolute_url(self):
+        return '/process/type/{}'.format(self.type)
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)
@@ -119,6 +126,13 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     objects = models.Manager()
     generic = ProcessTypeManager(process_type='generic-process')
     split = ProcessTypeManager(process_type='split-process')
+
+    class Meta:
+        verbose_name = 'process'
+        verbose_name_plural = 'processes'
+
+    def get_absolute_url(self):
+        return '/process/{}'.format(self.uuid)
 
     @property
     def samples(self):
