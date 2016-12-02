@@ -286,7 +286,7 @@
         // Bootstrap tooltip/popovers
         $('[data-toggle="popover"]').popover();
         $('[data-toggle="tooltip"]').tooltip({container: 'body'});
-        $('[rel="tooltip"]').tooltip({container: 'body'});
+        $('[rel="tooltip"]').tooltip({container: 'body', trigger: 'hover'});
     </script>
     {% block scripts %}
     {% endblock %}
