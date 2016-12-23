@@ -1,7 +1,7 @@
 Django>=1.9,<1.10
 pyldap>=2.4,<2.5
 django-auth-ldap==1.2.8
-django-filter==0.13.0
+django-filter==1.0.1
 django-datetime-widget==0.9.3
 boto>=2,<3
 paramiko>=2.0,<2.1
