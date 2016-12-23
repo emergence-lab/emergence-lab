@@ -27,7 +27,7 @@ django-sendfile==0.3.10
 django-betterforms==1.1.4
 ExifRead==2.1.2
 nanoscope==0.10.2
-WeasyPrint==0.28
+WeasyPrint==0.34
 django-weasyprint==0.1
 django-rq==0.9.1
 django-crispy-forms==1.6.0
