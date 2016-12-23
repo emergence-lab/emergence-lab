@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+import datetime
 import unittest
 
 from django.contrib.auth import get_user_model
@@ -11,8 +12,8 @@ from model_mommy import mommy
 import six
 
 from core.forms import (ChecklistForm, SampleForm, SampleSelectOrCreateForm,
-                        SubstrateForm, TrackProjectForm)
-from core.models import Project, Sample, Substrate
+                        SubstrateForm, TrackProjectForm, WizardBasicInfoForm)
+from core.models import Project, Sample, Substrate, ProcessType
 
 
 class TestSubstrateForm(unittest.TestCase):
@@ -142,3 +143,41 @@ class TestChecklistForm(unittest.TestCase):
             self.assertEqual(field.label, label)
             self.assertTrue(field.required)
             self.assertEqual(field.__class__, forms.BooleanField)
+
+
+class TestWizardBasicInfoForm(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('username1',
+                                                         password='')
+        self.processtype = mommy.make(ProcessType, type='test')
+
+    def test_run_date_validation_today(self):
+        date = datetime.date.today()
+        form = WizardBasicInfoForm(user=self.user, data={
+            'user': self.user,
+            'type': self.processtype,
+            'run_date': date,
+            'title': 'title',
+        })
+        valid = form.is_valid()
+
+    def test_run_date_validation_future(self):
+        date = datetime.date.today() + datetime.timedelta(days=2)
+        form = WizardBasicInfoForm(user=self.user, data={
+            'user': self.user,
+            'type': self.processtype,
+            'run_date': date,
+            'title': 'title',
+        })
+        valid = form.is_valid()
+
+    def test_run_date_validation_past(self):
+        date = datetime.date.today() - datetime.timedelta(days=2)
+        form = WizardBasicInfoForm(user=self.user, data={
+            'user': self.user,
+            'type': self.processtype,
+            'run_date': date,
+            'title': 'title',
+        })
+        valid = form.is_valid()

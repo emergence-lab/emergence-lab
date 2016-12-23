@@ -7,6 +7,7 @@
 
 {% block header %}
     {% load staticfiles %}
+    {{info_form.media}}
     <link rel="stylesheet" href="{% static 'jquery-ui/themes/base/minified/jquery-ui.min.css' %}">
     <link rel="stylesheet" href="{% static 'select2/dist/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'select2-bootstrap-theme/dist/select2-bootstrap.min.css' %}">
@@ -62,10 +63,8 @@
             {# Basic Information Tab #}
             <div class="tab-pane fade active in" id='info'>
                 <h2>Basic Information</h2>
-                <div class="row">
-                    <div class="col-xs-5">
-                        {% bootstrap_form info_form %}
-                    </div>
+                <div class="form-horizontal">
+                    {% crispy info_form %}
                 </div>
             </div>
 
@@ -73,10 +72,8 @@
             {# Growth Information Tab #}
             <div class="tab-pane fade" id="growth">
                 <h2>Growth Information</h2>
-                <div class="row">
-                    <div class="col-xs-5">
-                        {% bootstrap_form growth_form %}
-                    </div>
+                <div class="form-horizontal">
+                    {% crispy growth_form %}
                 </div>
             </div>
 

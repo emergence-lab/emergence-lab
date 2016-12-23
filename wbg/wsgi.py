@@ -34,7 +34,6 @@ def _get_secret(setting, secrets_dict=secrets):
                      'secrets file'.format(setting))
         raise ImproperlyConfigured(error_msg)
 
-# End secrets
 
 if _get_secret('PRODUCTION_MODE') == 'production':
     venv_path = _get_secret('VIRTUAL_ENV_PATH')
