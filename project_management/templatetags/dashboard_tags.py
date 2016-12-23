@@ -51,5 +51,6 @@ def convert_to_links(update):
 
     return mark_safe(update)
 
+
 convert_to_links.is_safe = True
 register.filter('convert_to_links', convert_to_links)
