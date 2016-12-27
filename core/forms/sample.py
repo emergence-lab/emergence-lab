@@ -114,54 +114,10 @@ class SampleSelectOrCreateForm(forms.Form):
         if not existing_or_new:
             raise ValidationError({'existing_or_new', 'This field is required.'})
 
-        # Use existing sample
         if existing_or_new == 'existing-sample':
-            try:
-                uuid = cleaned_data.get('sample_uuid')
-                if not uuid:
-                    self.add_error(
-                        'sample_uuid',
-                        'This field is required when existing sample is selected')
-                _, piece = Sample.strip_uuid(uuid)
-                sample = Sample.objects.get_by_uuid(uuid)
-                if piece is None:  # piece not specified
-                    piece = 'a'
-                    if sample.pieces.count() > 1:
-                        self.add_error('sample_uuid',
-                            'Sample {} is ambiguous, '
-                            'piece needs to be specified'.format(sample.uuid))
-                elif piece not in sample.pieces:  # piece specified, doesn't exist
-                    self.add_error(
-                        'sample_uuid',
-                        'Sample {} does not have a piece {}'.format(sample.uuid,
-                                                                    piece))
-                cleaned_data['sample'] = sample
-                cleaned_data['piece'] = piece
-            except Sample.DoesNotExist:
-                self.add_error('sample_uuid', 'Sample {} not found'.format(uuid))
-                cleaned_data['sample'] = None
-                cleaned_data['piece'] = 'a'
-            except ValueError:
-                self.add_error('sample_uuid', 'Sample UUID is not in the correct format')
-                cleaned_data['sample'] = None
-                cleaned_data['piece'] = 'a'
-
-        # Create new sample
+            self._update_existing_sample(cleaned_data)
         elif existing_or_new == 'new-sample':
-            cleaned_data['sample'] = None
-            cleaned_data['piece'] = 'a'
-            substrate_data = {
-                'comment': cleaned_data.get('substrate_comment'),
-                'serial': cleaned_data.get('substrate_serial'),
-                'source': cleaned_data.get('substrate_source'),
-            }
-            substrate_form = SubstrateForm(data=substrate_data)
-            if not substrate_form.is_valid():
-                for field, error in substrate_form.errors.items():
-                    if field == '__all__':
-                        self.add_error(None, error)
-                    else:
-                        self.add_error('substrate_{}'.format(field), error)
+            self._create_new_sample(cleaned_data)
 
     def save(self, commit=True):
         if self.cleaned_data['sample'] is None:
@@ -180,6 +136,53 @@ class SampleSelectOrCreateForm(forms.Form):
         else:
             self.instance = self.cleaned_data['sample']
         return self.instance
+
+    def _update_existing_sample(self, cleaned_data):
+        try:
+            uuid = cleaned_data.get('sample_uuid')
+            if not uuid:
+                self.add_error(
+                    'sample_uuid',
+                    'This field is required when existing sample is selected')
+            _, piece = Sample.strip_uuid(uuid)
+            sample = Sample.objects.get_by_uuid(uuid)
+            if piece is None:  # piece not specified
+                piece = 'a'
+                if sample.pieces.count() > 1:
+                    self.add_error('sample_uuid',
+                        'Sample {} is ambiguous, '
+                        'piece needs to be specified'.format(sample.uuid))
+            elif piece not in sample.pieces:  # piece specified, doesn't exist
+                self.add_error(
+                    'sample_uuid',
+                    'Sample {} does not have a piece {}'.format(sample.uuid,
+                                                                piece))
+            cleaned_data['sample'] = sample
+            cleaned_data['piece'] = piece
+        except Sample.DoesNotExist:
+            self.add_error('sample_uuid', 'Sample {} not found'.format(uuid))
+            cleaned_data['sample'] = None
+            cleaned_data['piece'] = 'a'
+        except ValueError:
+            self.add_error('sample_uuid', 'Sample UUID is not in the correct format')
+            cleaned_data['sample'] = None
+            cleaned_data['piece'] = 'a'
+
+    def _create_new_sample(self, cleaned_data):
+        cleaned_data['sample'] = None
+        cleaned_data['piece'] = 'a'
+        substrate_data = {
+            'comment': cleaned_data.get('substrate_comment'),
+            'serial': cleaned_data.get('substrate_serial'),
+            'source': cleaned_data.get('substrate_source'),
+        }
+        substrate_form = SubstrateForm(data=substrate_data)
+        if not substrate_form.is_valid():
+            for field, error in substrate_form.errors.items():
+                if field == '__all__':
+                    self.add_error(None, error)
+                else:
+                    self.add_error('substrate_{}'.format(field), error)
 
 
 SampleFormSet = forms.formsets.formset_factory(

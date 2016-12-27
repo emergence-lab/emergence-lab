@@ -63,8 +63,7 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
             request.session['token'] = mendeley_session.token
         except Exception as e:
             print(self.auth.get_login_url())
-            print(e)
-            pass
+            raise e
 
     def get_redirect_url(self, *args, **kwargs):
         if 'token' not in self.request.session:

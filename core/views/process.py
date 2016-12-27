@@ -45,9 +45,8 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
         nodes = self.object.nodes.order_by('number')
         context['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
-        context['datafiles'] = {k: list(g)
-                                for k, g in groupby(self.object.datafiles.all(),
-                                             lambda x: type(x))}
+        context['datafiles'] = {k: list(g) for k, g in
+                                   groupby(self.object.datafiles.all(), type)}
         return context
 
 
