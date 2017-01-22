@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import datetime
 import os
 
 from django.core.files.storage import default_storage as labshare
@@ -32,6 +33,10 @@ class ProcessCategory(models.Model):
     slug = models.SlugField(primary_key=True, max_length=100, default='uncategorized')
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = 'process category'
+        verbose_name_plural = 'process categories'
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.slug)
@@ -73,6 +78,9 @@ class ProcessType(models.Model):
                                  related_name='processtypes',
                                  related_query_name='processtype')
 
+    def get_absolute_url(self):
+        return '/process/type/{}'.format(self.type)
+
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.type)
 
@@ -105,6 +113,7 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              limit_choices_to={'is_active': True})
+    run_date = models.DateField(default=datetime.date.today, blank=True)
     type = models.ForeignKey(ProcessType, default='generic-process')
 
     investigations = models.ManyToManyField(Investigation,
@@ -117,6 +126,13 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     objects = models.Manager()
     generic = ProcessTypeManager(process_type='generic-process')
     split = ProcessTypeManager(process_type='split-process')
+
+    class Meta:
+        verbose_name = 'process'
+        verbose_name_plural = 'processes'
+
+    def get_absolute_url(self):
+        return '/process/{}'.format(self.uuid)
 
     @property
     def samples(self):

@@ -1,5 +1,3 @@
-import logging
-
 from .base import *
 
 
@@ -12,7 +10,6 @@ DEBUG = True
 
 INSTALLED_APPS += (
     'debug_toolbar',
-    'nplusone.ext.django',
 )
 
 
@@ -21,19 +18,6 @@ INSTALLED_APPS += (
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
-
-
-# Middleware
-
-MIDDLEWARE_CLASSES += (
-    'nplusone.ext.django.NPlusOneMiddleware',
-)
-
-
-# Logging
-
-NPLUSONE_LOGGER = logging.getLogger('nplusone')
-NPLUSONE_LOG_LEVEL = logging.WARN
 
 
 # Media Files

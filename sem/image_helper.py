@@ -22,8 +22,7 @@ def get_image_source(image):
             if i in tags.keys():
                 image_obj.seek(0)
                 return allowed_sources[i]
-        else:
-            raise Exception('Unrecognizable')
+        raise Exception('Unrecognizable')
     except Exception:
         raise Exception('Unable to process')
 

@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import operator
 import string
 
-from six.moves import reduce
+import six
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -113,7 +113,7 @@ class SampleQuerySet(models.query.QuerySet):
         q_filters = (models.Q(process_tree__tree_id__in=tree) for tree in trees)
         op = operator.and_ if combine_and else operator.or_
 
-        return self.filter(reduce(op, q_filters))
+        return self.filter(six.moves.reduce(op, q_filters))
 
 
 class Sample(TimestampMixin, AutoUUIDMixin, models.Model):

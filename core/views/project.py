@@ -157,6 +157,6 @@ class TrackProjectView(LoginRequiredMixin, generic.CreateView):
                                                       project_id=project_id)
             self.object.is_owner = form.cleaned_data['is_owner']
             self.object.save()
-        except:
+        except Exception:
             self.object = form.save(user=self.request.user)
         return HttpResponseRedirect(reverse('dashboard'))

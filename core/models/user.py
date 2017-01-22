@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import models
 from django.contrib.auth import models as auth
+from django.contrib.auth import get_backends
 from django.core.mail import send_mail
 from django.core import validators
 from django.dispatch import receiver
@@ -18,14 +19,14 @@ from .project import Project, Milestone, Investigation, ProjectTracking, Task
 
 def _user_get_all_permissions(user, obj):
     permissions = set()
-    for backend in auth.get_backends():
+    for backend in get_backends():
         if hasattr(backend, "get_all_permissions"):
             permissions.update(backend.get_all_permissions(user, obj))
     return permissions
 
 
 def _user_has_perm(user, perm, obj):
-    for backend in auth.get_backends():
+    for backend in get_backends():
         if hasattr(backend, "has_perm"):
             if backend.has_perm(user, perm, obj):
                 return True
@@ -33,7 +34,7 @@ def _user_has_perm(user, perm, obj):
 
 
 def _user_has_module_perms(user, app_label):
-    for backend in auth.get_backends():
+    for backend in get_backends():
         if hasattr(backend, "has_module_perms"):
             if backend.has_module_perms(user, app_label):
                 return True

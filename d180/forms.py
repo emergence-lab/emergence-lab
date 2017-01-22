@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import datetime
+
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+
+from crispy_forms import helper, layout
+from datetimewidget.widgets import DateWidget
 
 from core.forms import ChecklistForm
 from core.models import Process
@@ -13,6 +19,8 @@ class WizardBasicProcessForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(WizardBasicProcessForm, self).__init__(*args, **kwargs)
+        self.fields['run_date'].required = True
+
         self.fields['milestones'] = forms.MultipleChoiceField(required=False, choices=[
             ('{} - {}'.format(i.project.name, i.name), [(m.id, m.name) for m in i.milestones.all()])
             for i in user.get_investigations('member') if i.milestones.exists()
@@ -22,10 +30,44 @@ class WizardBasicProcessForm(forms.ModelForm):
             for p in user.get_projects('member') if p.investigations.exists()
         ])
 
+        self.helper = helper.FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-md-2'
+        self.helper.field_class = 'col-md-6'
+        self.helper.layout = layout.Layout(
+            layout.Field('user'),
+            layout.Field('type'),
+            layout.Field('run_date'),
+            layout.Field('legacy_identifier'),
+            layout.Field('investigations'),
+            layout.Field('milestones'),
+        )
+
+    def clean_run_date(self):
+        run_date = self.cleaned_data['run_date']
+        if run_date > datetime.date.today():
+            raise ValidationError(_('Run date cannot be in the future'), code='invalid')
+        return run_date
+
     class Meta:
         model = Process
-        fields = ('user', 'type', 'legacy_identifier', 'investigations', 'milestones')
+        fields = ('user', 'type', 'run_date', 'legacy_identifier', 'investigations', 'milestones')
+        labels = {
+            'run_date': 'Process Run Date',
+            'user': 'User',
+            'investigations': 'Investigation(s)',
+            'milestones': 'Milestone(s)',
+            'legacy_identifier': 'Legacy Growth Number',
+        }
         widgets = {
+            'run_date': DateWidget(attrs={'class': 'date'},
+                                   bootstrap_version=3,
+                                   usel10n=True,
+                                   options={'todayBtn': 'true',
+                                            'todayHighlight': 'true',
+                                            'clear_Btn': 'true',
+                                            'format': 'yyyy-mm-dd'}),
             'type': forms.HiddenInput(),
         }
 
@@ -34,6 +76,58 @@ class WizardGrowthInfoForm(forms.ModelForm):
 
     platter = forms.ModelChoiceField(required=True,
                                      queryset=Platter.active_objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super(WizardGrowthInfoForm, self).__init__(*args, **kwargs)
+
+        self.helper = helper.FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.label_class = 'col-md-2'
+        self.helper.field_class = 'col-md-6'
+        self.helper.layout = layout.Layout(
+            layout.Field('platter'),
+            layout.Field('orientation'),
+            layout.Fieldset('Material Specification (select one or more)',
+                'has_gan',
+                'has_aln',
+                'has_inn',
+                'has_algan',
+                'has_ingan',
+                'other_material',),
+            layout.Fieldset('Doping Specification (select one or more)',
+                'has_u',
+                'has_n',
+                'has_p',),
+            layout.Fieldset('Growth Tags',
+                'is_template',
+                'is_buffer',
+                'has_pulsed',
+                'has_superlattice',
+                'has_mqw',
+                'has_graded',),
+        )
+
+    def clean(self):
+        cleaned_data = super(WizardGrowthInfoForm, self).clean()
+        material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
+        materials = [field for field in material_fields if cleaned_data[field]]
+
+        doping_fields = ['has_n', 'has_p', 'has_u']
+        doping = [field for field in doping_fields if cleaned_data[field]]
+
+        # collect validation errors
+        errors = []
+        if not materials:
+            errors.append(forms.ValidationError(_('At least one material must be specified'),
+                                                code='material'))
+        if not doping:
+            errors.append(forms.ValidationError(_('At least one doping type must be specified'),
+                                                code='doping'))
+        if errors:
+            raise forms.ValidationError(errors)
+
+        return cleaned_data
 
     class Meta:
         model = D180GrowthInfo
@@ -63,27 +157,12 @@ class WizardGrowthInfoForm(forms.ModelForm):
                        'unintentionally-doped layer(s)?'),
             'has_p': _('Does the growth include p-doped layer(s)?'),
         }
-
-    def clean(self):
-        cleaned_data = super(WizardGrowthInfoForm, self).clean()
-        material_fields = ['has_gan', 'has_aln', 'has_algan', 'other_material']
-        materials = [field for field in material_fields if cleaned_data[field]]
-
-        doping_fields = ['has_n', 'has_p', 'has_u']
-        doping = [field for field in doping_fields if cleaned_data[field]]
-
-        # collect validation errors
-        errors = []
-        if not materials:
-            errors.append(forms.ValidationError(_('At least one material must be specified'),
-                                                code='material'))
-        if not doping:
-            errors.append(forms.ValidationError(_('At least one doping type must be specified'),
-                                                code='doping'))
-        if errors:
-            raise forms.ValidationError(errors)
-
-        return cleaned_data
+        widgets = {
+            'other_material': forms.TextInput(
+                attrs={'placeholder': _('Other materials not listed above')}),
+            'orientation': forms.TextInput(
+                attrs={'placeholder': _('Crystal orientation (miller indices)')}),
+        }
 
 
 class WizardFullProcessForm(forms.ModelForm):

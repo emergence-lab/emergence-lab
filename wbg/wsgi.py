@@ -22,19 +22,18 @@ with open(os.path.join(_BASE_DIR, 'secrets.json')) as f:
     secrets = json.loads(f.read())
 
 
-def _get_secret(setting, secrets=secrets):
+def _get_secret(setting, secrets_dict=secrets):
     """
     Get the secret variable or return exception.
     via Two Scoops of Django 1.6 pg 49
     """
     try:
-        return secrets[setting]
+        return secrets_dict[setting]
     except KeyError:
         error_msg = ('Setting {0} is missing from the '
                      'secrets file'.format(setting))
         raise ImproperlyConfigured(error_msg)
 
-# End secrets
 
 if _get_secret('PRODUCTION_MODE') == 'production':
     venv_path = _get_secret('VIRTUAL_ENV_PATH')
@@ -63,7 +62,8 @@ elif _get_secret('PRODUCTION_MODE') == 'docker':
 
     import django.core.handlers.wsgi
 
-    application = django.core.handlers.wsgi.WSGIHandler()
+    application = get_wsgi_application()
+    # application = django.core.handlers.wsgi.WSGIHandler()
 else:
     sys.path.append('/var/wsgi')
     sys.path.append('/var/wsgi/wbg')

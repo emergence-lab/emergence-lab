@@ -45,9 +45,8 @@ class ProcessDetailView(LoginRequiredMixin, generic.DetailView):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
         nodes = self.object.nodes.order_by('number')
         context['sample_info'] = zip([n.get_sample() for n in nodes], nodes)
-        context['datafiles'] = {k: list(g)
-                                for k, g in groupby(self.object.datafiles.all(),
-                                             lambda x: type(x))}
+        context['datafiles'] = {k: list(g) for k, g in
+                                   groupby(self.object.datafiles.all(), type)}
         return context
 
 
@@ -323,7 +322,7 @@ class ProcessWizardView(LoginRequiredMixin, generic.TemplateView):
         info_form = WizardBasicInfoForm(self.request.user, request.POST, prefix='process')
         sample_formset = SampleFormSet(request.POST, prefix='sample')
 
-        if sample_formset.is_valid():
+        if sample_formset.is_valid() and info_form.is_valid():
             logger.debug('Creating new process')
             self.object = info_form.save()
             logger.debug('Created process {} ({}) for {} samples'.format(
@@ -349,16 +348,19 @@ class TemplateProcessWizardView(ProcessWizardView):
         if 'id' in self.kwargs:
             template = ProcessTemplate.objects.get(id=self.kwargs.get('id', None))
             comment = template.comment
+            title = template.title
             process_type = template.process.type_id
         elif 'uuid' in self.kwargs:
             process = Process.objects.get(uuid_full__startswith=Process.strip_uuid(
                 self.kwargs.get('uuid', None)))
             comment = process.comment
+            title = process.title
             process_type = process.type_id
         output = super(TemplateProcessWizardView, self).build_forms()
         output['info_form'] = WizardBasicInfoForm(self.request.user,
                                                   initial={'user': self.request.user,
                                                            'comment': comment,
+                                                           'title': title,
                                                            'type': process_type},
                                                   prefix='process')
         return output

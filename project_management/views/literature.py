@@ -23,7 +23,7 @@ from project_management.models import Literature
 def pagination_helper(page, count, queryset):
     if page and int(page) > 1 and int(page) <= count / 10:
         number = int(page) - 1
-        for i in range(0, number):
+        for _ in range(0, number):
             queryset = queryset.next_page
     return queryset
 
@@ -63,8 +63,7 @@ class MendeleyOAuth(LoginRequiredMixin, ActionReloadView):
             request.session['token'] = mendeley_session.token
         except Exception as e:
             print(self.auth.get_login_url())
-            print(e)
-            pass
+            raise e
 
     def get_redirect_url(self, *args, **kwargs):
         if 'token' not in self.request.session:

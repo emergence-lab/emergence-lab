@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('afm', '0001_initial'),
+        ('core', '0002_create_processtypes'),
     ]
 
     operations = [

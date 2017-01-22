@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import resolve, reverse
 from django.http import Http404
@@ -463,6 +465,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-title': 'title',
             'process-comment': 'testing',
+            'process-run_date': datetime.date.today(),
             'process-user': self.user.id,
             'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
@@ -487,6 +490,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-title': 'title',
             'process-comment': 'testing',
+            'process-run_date': datetime.date.today(),
             'process-user': self.user.id,
             'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
@@ -515,6 +519,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-title': 'title',
             'process-comment': 'testing',
+            'process-run_date': datetime.date.today(),
             'process-user': self.user.id,
             'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',
@@ -536,6 +541,7 @@ class TestProcessCRUD(TestCase):
         data = {
             'process-title': 'title',
             'process-comment': 'testing',
+            'process-run_date': datetime.date.today(),
             'process-user': self.user.id,
             'process-type': processtype.type,
             'sample-0-existing_or_new': 'existing-sample',

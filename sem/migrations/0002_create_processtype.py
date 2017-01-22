@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sem', '0001_initial'),
+        ('core', '0002_create_processtypes'),
     ]
 
     operations = [

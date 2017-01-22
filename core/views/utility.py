@@ -148,7 +148,6 @@ class AboutView(generic.TemplateView):
                 ['git', 'describe', '--tags', '--always'],
                 cwd=settings.BASE_DIR).strip()
         except subprocess.CalledProcessError as e:
-            raise e
             context['error'] = '{0}: {1}'.format(e.returncode,
                                                  e.output)
             return context

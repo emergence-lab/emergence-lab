@@ -1,11 +1,10 @@
 import json
 import os
 
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as DEFAULT_TEMPLATE_CONTEXT_PROCESSORS
 from django.core.exceptions import ImproperlyConfigured
 
 import ldap
-from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, PosixGroupType
+from django_auth_ldap.config import LDAPSearch, PosixGroupType
 
 
 # Filesystem Directories
@@ -19,13 +18,13 @@ with open(os.path.join(BASE_DIR, 'secrets.json')) as f:
     secrets = json.loads(f.read())
 
 
-def get_secret(setting, default=None, secrets=secrets):
+def get_secret(setting, default=None, secrets_dict=secrets):
     """
     Get the secret variable or return exception.
     via Two Scoops of Django 1.6 pg 49
     """
     try:
-        return secrets[setting]
+        return secrets_dict[setting]
     except KeyError:
         if default is None:
             error_msg = 'Setting {0} is missing from the secrets file'.format(setting)
