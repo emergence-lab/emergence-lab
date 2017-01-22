@@ -13,6 +13,8 @@ from rq import SimpleWorker
 from afm import tasks
 from afm.models import AFMFile
 
+from nanoscope import error
+
 
 class TestProcessFiles(TestCase):
 
@@ -98,5 +100,5 @@ class TestProcessFiles(TestCase):
                                        content_type='text/plain')
 
         queue = get_queue('default', async=False)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(error.InvalidParameter):
             queue.enqueue(tasks.process_nanoscope_file, scan_file)
