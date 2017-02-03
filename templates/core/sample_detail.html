@@ -20,10 +20,6 @@
         <h1 class="page-header">
             {{sample}}
             <div class="pull-right">
-                <a href="{% url 'export_sample' uuid=sample.uuid %}" class="btn btn-info">
-                    {% bootstrap_icon 'file' %}
-                    Export
-                </a>
                 {% if sample.pieces|length = 1 %}
                 <button type="button"
                         class="btn btn-warning"

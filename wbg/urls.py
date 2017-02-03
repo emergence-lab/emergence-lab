@@ -76,9 +76,6 @@ urlpatterns = [
     # sem urls
     url(r'^sem/', include('sem.urls')),
 
-    # print test
-    url(r'^print/', core.views.PrintTemplate.as_view(), name='print_test'),
-
     # project_management
 
     url(r'^oauth$', project_management.views.MendeleyOAuth.as_view(), name='mendeley_oauth')

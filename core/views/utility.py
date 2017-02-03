@@ -13,7 +13,6 @@ from django.views import generic
 from braces.views import LoginRequiredMixin
 import gitlab
 from sendfile import sendfile
-from django_weasyprint.views import PDFTemplateView
 
 from core.models import Process, Sample
 
@@ -155,14 +154,3 @@ class AboutView(generic.TemplateView):
         context['commit'] = commit[:7]
         context['branch'] = branch
         return context
-
-
-class PrintTemplate(LoginRequiredMixin, PDFTemplateView):
-    """
-    Base view for printing
-    """
-
-    def render_to_response(self, context, **response_kwargs):
-        response = super(PrintTemplate, self).render_to_response(context, **response_kwargs)
-        response['Content-Disposition'] = 'inline; filename="export.pdf"'
-        return response
