@@ -69,7 +69,7 @@ class SampleFilterSet(django_filters.FilterSet):
     ]
 
     created = django_filters.DateFilter(
-        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        lookup_expr=['exact', 'lt', 'lte', 'gt', 'gte'],
         widget=DateWidget(
             attrs={'class': 'datetime'},
             bootstrap_version=3,
@@ -78,7 +78,7 @@ class SampleFilterSet(django_filters.FilterSet):
                      'clearBtn': 'true',
                      'format': 'yyyy-mm-dd'}))
     modified = django_filters.DateFilter(
-        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        lookup_expr=['exact', 'lt', 'lte', 'gt', 'gte'],
         widget=DateWidget(
             attrs={'class': 'datetime'},
             bootstrap_version=3,
@@ -90,11 +90,11 @@ class SampleFilterSet(django_filters.FilterSet):
         choices=D180_TAGS_CHOICES,
         widget=forms.SelectMultiple(),
         label='D180 Tags',
-        action=_filter_d180_growth_tags
+        method=_filter_d180_growth_tags
         )
     process_comment = django_filters.CharFilter(
         label='Process Comment',
-        action=_filter_process_comment
+        method=_filter_process_comment
         )
 
     def __init__(self, *args, **kwargs):
@@ -102,12 +102,12 @@ class SampleFilterSet(django_filters.FilterSet):
 
         self.filters['process_type'] = django_filters.MultipleChoiceFilter(
             choices=[(p.type, p.name) for p in ProcessType.objects.all()],
-            action=_filter_process_type)
+            method=_filter_process_type)
         users = [(u.id, u.get_full_name())
                  for u in get_user_model().active_objects.all()]
         self.filters['process_user'] = django_filters.ChoiceFilter(
             choices=[('', 'Any User')] + users,
-            action=_filter_process_user)
+            method=_filter_process_user)
 
     class Meta:
         model = Sample

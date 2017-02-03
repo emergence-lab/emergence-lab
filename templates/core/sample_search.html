@@ -31,7 +31,7 @@
         </div>
 
         <div class="list-group col-xs-6">
-            {% for sample in filter %}
+            {% for sample in filter.qs %}
                 <a href="{% url 'sample_detail' uuid=sample.uuid %}" class="list-group-item">
                     <div class="clearfix">
                         <h4 class="list-group-item-heading">
