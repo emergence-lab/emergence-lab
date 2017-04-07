@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import functools
 import operator
 
 from django import forms
@@ -13,31 +14,31 @@ import django_filters
 from core.models import Sample, ProcessType
 
 
-def _filter_process_type(queryset, value):
+def _filter_process_type(queryset, name, value):
     if not value:
         return queryset
 
     return queryset.by_process_types(value, combine_and=False)
 
 
-def _filter_d180_growth_tags(queryset, value):
+def _filter_d180_growth_tags(queryset, name, value):
     if not value:
         return queryset
 
     filter_args = ({'process__info__{}'.format(v): True} for v in value)
     q_filters = (Q(**arg) for arg in filter_args)
 
-    return queryset.filter_process(reduce(operator.and_, q_filters))
+    return queryset.filter_process(functools.reduce(operator.and_, q_filters))
 
 
-def _filter_process_user(queryset, value):
+def _filter_process_user(queryset, name, value):
     if not value:
         return queryset
 
     return queryset.filter_process(user_id=value)
 
 
-def _filter_process_comment(queryset, value):
+def _filter_process_comment(queryset, name, value):
     if not value:
         return queryset
 
@@ -96,6 +97,16 @@ class SampleFilterSet(django_filters.FilterSet):
         label='Process Comment',
         method=_filter_process_comment
         )
+    ordering = django_filters.OrderingFilter(
+        fields=(
+            ('created', 'created'),
+            ('modified', 'modified'),
+            ('id', 'uuid'),
+        ),
+        field_labels={
+            'uuid': 'UUID',
+        },
+    )
 
     def __init__(self, *args, **kwargs):
         super(SampleFilterSet, self).__init__(*args, **kwargs)
@@ -111,5 +122,4 @@ class SampleFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Sample
-        order_by = ('-created', 'created', '-modified', 'modified', 'uuid')
-        fields = ('created', 'modified', 'd180_tags', 'process_comment')
+        fields = ('ordering', 'created', 'modified', 'd180_tags', 'process_comment')
