@@ -29,6 +29,7 @@ class ProcessCreateForm(forms.ModelForm):
         pieces = kwargs.pop('pieces', string.ascii_lowercase)
         process_type = kwargs.pop('process_type', None)
         super(ProcessCreateForm, self).__init__(*args, **kwargs)
+        self.fields['run_date'].required = True
         if process_type != 'generic-process':
             self.fields['type'].widget = forms.HiddenInput()
         else:
@@ -48,15 +49,31 @@ class ProcessCreateForm(forms.ModelForm):
         if len(pieces) == 1:
             self.fields['pieces'].initial = pieces[0]
 
+    def clean_run_date(self):
+        run_date = self.cleaned_data['run_date']
+        if run_date > datetime.date.today():
+            raise ValidationError(_('Run date cannot be in the future'), code='invalid')
+        return run_date
+
     class Meta:
         model = Process
-        fields = ('title', 'comment', 'type', 'investigations', 'milestones')
+        fields = ('title', 'run_date', 'comment', 'type', 'investigations', 'milestones')
         labels = {
             'title': 'Short Process Description',
+            'run_date': 'Process Performed On',
             'comment': 'Additional Process Comments',
             'type': 'Process Type',
             'investigations': 'Investigation(s)',
             'milestones': 'Milestone(s)',
+        }
+        widgets = {
+            'run_date': DateWidget(attrs={'class': 'date'},
+                                   bootstrap_version=3,
+                                   usel10n=True,
+                                   options={'todayBtn': 'true',
+                                            'todayHighlight': 'true',
+                                            'clear_Btn': 'true',
+                                            'format': 'yyyy-mm-dd'}),
         }
 
 

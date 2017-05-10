@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -30,6 +32,7 @@ class TestAFMUpload(TestCase):
         url = reverse('afm_autocreate', args=[sample.uuid])
         data = {
             'title': 'process title',
+            'run_date': datetime.date.today(),
             'pieces': ['a'],
             'type': 'afm',
         }
