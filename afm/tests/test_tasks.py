@@ -57,6 +57,7 @@ class TestProcessFiles(TestCase):
         file_data = ('\\*File list\n'
                      '\\Version: 0x05120130\n'
                      '\\@Sens. Zscan: V 9 nm/V\n'
+                     '\\@Sens. Amplitude: V 1.000000 \n'
                      '\\*Ciao image list\n'
                      '\\Data offset: 362\n'
                      '\\Data length: 12\n'
@@ -81,8 +82,8 @@ class TestProcessFiles(TestCase):
         self.assertEqual(len(job.result), 2)  # raw & extracted file
 
         data = {
-            'rms': 0.50905796786656576,
-            'zrange': 1.58203125,
+            'rms': 0.052038554969772312,
+            'zrange': 0.1875,
             'size': 1.0,
             'scan_number': 1,
             'location': 'r',

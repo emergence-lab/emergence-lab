@@ -10,7 +10,12 @@ def extract_scan_number(filename):
     Extracts the scan number from the filename extension, which should be a
     zero-padded number.
     """
-    return int(os.path.splitext(filename)[-1].replace('.', ''))
+    name, ext = os.path.splitext(filename)
+    if ext == '.spm':
+        number = int(re.split(r'[\._]', name)[-1])
+    else:
+        number = int(ext[1:])
+    return number
 
 
 def extract_scan_location(filename, default_location='c'):
@@ -24,9 +29,9 @@ def extract_scan_location(filename, default_location='c'):
     if re.search(r'[\-_]', filename) is None:
         return default_location
 
-    location = re.split(r'[\-_]', os.path.splitext(filename)[0])[-1]
+    location = re.split(r'[\-_]', os.path.splitext(filename)[0].split('.')[0])[-1]
 
     if len(location) != 1 or location not in 'rRcCfFeE':
         return default_location
 
-    return location
+    return location.lower()

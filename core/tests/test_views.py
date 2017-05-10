@@ -616,6 +616,7 @@ class TestProcessCRUD(TestCase):
         url = reverse('process_autocreate', args=[sample.uuid])
         data = {
             'title': 'process title',
+            'run_date': datetime.date.today(),
             'pieces': ['a'],
             'type': 'generic-process',
         }

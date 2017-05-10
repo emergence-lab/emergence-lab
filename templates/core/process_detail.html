@@ -58,6 +58,7 @@
                 {% endif %}
             </div>
         </h3>
+        <p>Process run on {{process.run_date}}</p>
         <p>Created by {{process.user.get_full_name}} on {{process.created}}</p>
         <p>Last modified {{process.modified}}</p>
         {% if process.type_id == 'd180-growth' %}

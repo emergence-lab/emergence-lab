@@ -29,7 +29,7 @@ def process_nanoscope_file(raw_file):
     # read & parse file
     raw = six.BytesIO(raw_file.read())
     raw.mode = 'b'
-    scan = nanoscope.read(raw, encoding='cp1252')
+    scan = nanoscope.read(raw, encoding='cp1252', check_version=False)
     logger.debug('Read in file {}'.format(raw_file.name))
 
     processed_files = [
@@ -92,16 +92,12 @@ def _create_scan_png(scan, filename, scan_number):
                           30,
                           28 + image.size[0] + scale_image.size[0],
                           30 + scale_image.size[1]))
-    if scan.type == 'Height':
-        unit = 'nm'
-    else:
-        unit = 'V'
     draw.text(
         (28 + image.size[0] + scale_image.size[0] + 7, 25),
-        '{0:.0f} {1}'.format(scan.height_scale, unit), 'black', calibri)
+        '{0:.0f} {1}'.format(scan.height_scale, scan.unit), 'black', calibri)
     draw.text(
         (28 + image.size[0] + scale_image.size[0] + 7, 20 + scale_image.size[1]),
-        '0.0 {}'.format(unit), 'black', calibri)
+        '0.0 {}'.format(scan.unit), 'black', calibri)
 
     zrange_str = 'Z-Range: {0:.2f} nm'.format(scan.zrange)
     rms_str = 'RMS: {0:.2f} nm'.format(scan.rms)
@@ -111,7 +107,7 @@ def _create_scan_png(scan, filename, scan_number):
     draw.text(
         (20 + image.size[0] - calibri.getsize(size_str)[0], 25 + image.size[1]),
         size_str, 'black', calibri)
-    if scan.type == 'Height':
+    if scan.unit == 'nm':
         draw.text(
             (20, 50 + image.size[1]), zrange_str, 'black', calibri)
         draw.text(

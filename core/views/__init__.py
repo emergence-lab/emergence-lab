@@ -12,7 +12,6 @@ from .utility import (
     HomepageView,
     ProtectedMediaView,
     QuickSearchRedirectView,
-    PrintTemplate,
     NeverCacheMixin,
 )
 from .user import (
@@ -44,7 +43,6 @@ from .sample import (
     SampleUpdateView,
     SampleSplitView,
     SampleSearchView,
-    ExportSampleDetail,
 )
 from .process import (
     ProcessDetailView,

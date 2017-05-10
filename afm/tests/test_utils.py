@@ -44,5 +44,5 @@ class TestAFMUtils(TestCase):
         for s, l in product('-_', 'rRcCfFeE'):
             location = utils.extract_scan_location(filename.format(s, l),
                                                    default_location='test')
-            self.assertEqual(location, l)
+            self.assertEqual(location, l.lower())
 
