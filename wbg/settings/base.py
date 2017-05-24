@@ -155,12 +155,14 @@ DATABASES = {
 
 # Authentication
 
+AUTH_LDAP_SERVER_URI = get_secret('AUTH_LDAP_SERVER_URI', 'ldap://localhost')
+
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_X_TLS_REQUIRE_CERT: ldap.OPT_X_TLS_NEVER,
 }
 
-AUTH_LDAP_BIND_DN = ''
-AUTH_LDAP_BIND_PASSWORD = ''
+AUTH_LDAP_BIND_DN = get_secret('AUTH_LDAP_BIND_DN', '')
+AUTH_LDAP_BIND_PASSWORD = ('AUTH_LDAP_BIND_PASSWORD', '')
 
 AUTH_LDAP_USER_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_USER_SEARCH', ''),
                                    ldap.SCOPE_SUBTREE, '(uid=%(user)s)')

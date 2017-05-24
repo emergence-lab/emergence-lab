@@ -2,7 +2,7 @@ from .base import *
 
 # Debugging
 
-DEBUG = True
+DEBUG = get_secret('DEBUG', True)
 
 
 # Misc Settings
@@ -13,7 +13,10 @@ ALLOWED_HOSTS += get_secret('ALLOWED_HOSTS', [])
 # Authentication
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
+    get_secret(
+        'AUTHENTICATION_BACKEND',
+        'django.contrib.auth.backends.ModelBackend'
+    )
 )
 
 
