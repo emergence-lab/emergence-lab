@@ -162,7 +162,7 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 }
 
 AUTH_LDAP_BIND_DN = get_secret('AUTH_LDAP_BIND_DN', '')
-AUTH_LDAP_BIND_PASSWORD = ('AUTH_LDAP_BIND_PASSWORD', '')
+AUTH_LDAP_BIND_PASSWORD = get_secret('AUTH_LDAP_BIND_PASSWORD', '')
 
 AUTH_LDAP_USER_SEARCH = LDAPSearch(get_secret('AUTH_LDAP_USER_SEARCH', ''),
                                    ldap.SCOPE_SUBTREE, '(uid=%(user)s)')

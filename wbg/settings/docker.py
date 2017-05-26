@@ -16,7 +16,7 @@ AUTHENTICATION_BACKENDS = (
     get_secret(
         'AUTHENTICATION_BACKEND',
         'django.contrib.auth.backends.ModelBackend'
-    )
+    ),
 )
 
 
