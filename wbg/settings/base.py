@@ -317,6 +317,12 @@ FILE_UPLOAD_HANDLERS = (
 )
 
 
+# django-sendfile
+
+SENDFILE_ROOT = get_secret('SENDFILE_ROOT', '/opt/emergence/media')
+SENDFILE_URL = '/media'
+
+
 # External Links
 
 EXTERNAL_LINKS = get_secret('EXTERNAL_LINKS', [])
