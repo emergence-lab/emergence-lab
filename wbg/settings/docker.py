@@ -29,4 +29,4 @@ STATIC_ROOT = '/opt/django/static/'
 
 MEDIA_URL = '{}/media/'.format(SUB_SITE)
 MEDIA_ROOT = get_secret('MEDIA_ROOT', os.path.join(BASE_DIR, os.pardir, 'media'))
-SENDFILE_BACKEND = 'sendfile.backends.xsendfile'
+SENDFILE_BACKEND = 'sendfile.backends.nginx'
