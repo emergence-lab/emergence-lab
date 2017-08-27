@@ -169,6 +169,13 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     def get_sample(self):
         return self.get_root().sample
 
+    def swap_processes(self, other):
+        tmp = self.process_id
+        self.process_id = other.process_id
+        other.process_id = tmp
+        self.save()
+        other.save()
+
 
 class DataFile(PolymorphicModel, TimestampMixin):
     """

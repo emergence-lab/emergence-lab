@@ -11,7 +11,7 @@ from django_filters.views import FilterView
 
 from core.filters import SampleFilterSet
 from core.forms import SampleMultiForm
-from core.models import Sample
+from core.models import Sample, Process, ProcessNode
 from core.views import ActionReloadView
 
 
@@ -77,6 +77,74 @@ class SampleUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_success_url(self):
         return reverse('sample_detail', args=(self.object.uuid,))
+
+
+class SampleAdminView(LoginRequiredMixin, generic.DetailView):
+    template_name = 'core/sample_admin.html'
+    model = Sample
+    lookup_url_kwarg = 'uuid'
+
+    def get_object(self, queryset=None):
+        queryset = queryset or self.get_queryset()
+
+        assert self.lookup_url_kwarg in self.kwargs, (
+            'Expected view {} to be called with a URL keyword argument '
+            'named "{}". Fix your URL conf.'.format(self.__class__.__name__,
+                                                    self.lookup_url_kwarg))
+        try:
+            obj = Sample.objects.get_by_uuid(self.kwargs[self.lookup_url_kwarg])
+        except queryset.model.DoesNotExist:
+            raise Http404(_('No {}s found matching the query'.format(
+                queryset.model._meta.verbose_name)))
+        return obj
+
+
+class SampleAdminNodeUpView(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        node = self.sample.get_node(self.kwargs.get('node_uuid'))
+
+        if not node.parent.process: # parent is root node
+            print('Not swapping, {} is root'.format(node.process))
+            return
+        target = node.parent
+        while target.process is not None and target.process.type_id == 'split-process':
+            target = target.parent
+
+        node.swap_processes(target)
+        print('Swapping up {} with {}'.format(node.process, target.process))
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('sample_admin', args=(self.sample.uuid,))
+
+
+class SampleAdminNodeDownView(LoginRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        node = self.sample.get_node(self.kwargs.get('node_uuid'))
+
+        if node.is_leaf_node():
+            print('Not swapping, {} is leaf'.format(node.process))
+            return
+
+        qs = (ProcessNode.objects.filter(tree_id=node.tree_id,
+                                             level__gt=node.level)
+                                      .exclude(process__type_id='split-process')
+                                      .order_by('level', 'piece'))
+        target = qs.filter(piece=node.piece).first()
+        if not target:
+            target = qs.first()
+
+        if not target:
+            print('Not swapping, {} has no matching node'.format(node.process))
+
+        node.swap_processes(target)
+        print('Swapping down {} with {}'.format(node.process, target.process))
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('sample_admin', args=(self.sample.uuid,))
 
 
 class SampleSplitView(LoginRequiredMixin, ActionReloadView):
