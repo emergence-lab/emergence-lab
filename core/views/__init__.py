@@ -46,6 +46,8 @@ from .sample import (
     SampleAdminView,
     SampleAdminNodeUpView,
     SampleAdminNodeDownView,
+    SampleAdminNodeSwapPieceView,
+    SampleAdminNodeSwapSampleView,
 )
 from .process import (
     ProcessDetailView,

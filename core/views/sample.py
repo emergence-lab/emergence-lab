@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
-from braces.views import LoginRequiredMixin
+from braces.views import LoginRequiredMixin, SuperuserRequiredMixin
 from django_filters.views import FilterView
 
 from core.filters import SampleFilterSet
@@ -79,7 +79,7 @@ class SampleUpdateView(LoginRequiredMixin, generic.UpdateView):
         return reverse('sample_detail', args=(self.object.uuid,))
 
 
-class SampleAdminView(LoginRequiredMixin, generic.DetailView):
+class SampleAdminView(LoginRequiredMixin, SuperuserRequiredMixin, generic.DetailView):
     template_name = 'core/sample_admin.html'
     model = Sample
     lookup_url_kwarg = 'uuid'
@@ -99,7 +99,7 @@ class SampleAdminView(LoginRequiredMixin, generic.DetailView):
         return obj
 
 
-class SampleAdminNodeUpView(LoginRequiredMixin, ActionReloadView):
+class SampleAdminNodeUpView(LoginRequiredMixin, SuperuserRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
         self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
@@ -119,7 +119,7 @@ class SampleAdminNodeUpView(LoginRequiredMixin, ActionReloadView):
         return reverse('sample_admin', args=(self.sample.uuid,))
 
 
-class SampleAdminNodeDownView(LoginRequiredMixin, ActionReloadView):
+class SampleAdminNodeDownView(LoginRequiredMixin, SuperuserRequiredMixin, ActionReloadView):
 
     def perform_action(self, request, *args, **kwargs):
         self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
@@ -145,6 +145,57 @@ class SampleAdminNodeDownView(LoginRequiredMixin, ActionReloadView):
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('sample_admin', args=(self.sample.uuid,))
+
+
+class SampleAdminNodeSwapPieceView(LoginRequiredMixin, SuperuserRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        node = self.sample.get_node(self.kwargs.get('node_uuid'))
+
+        piece = request.POST.get('swap_piece')
+        if piece == node.piece:
+            print('Swapping {} with self'.format(node.process))
+            return
+
+        if piece not in self.sample.pieces:
+            raise ValueError(
+                'Invalid piece ({}), '
+                'must be one of {}'.format(piece, self.sample.pieces))
+
+        target = self.sample.leaf_nodes.filter(piece=piece).first()
+
+        node.move_to(target)
+        node.piece = piece
+        node.save()
+        print('Moving {} as child of {}'.format(node.process, target.process))
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('sample_admin', args=(self.sample.uuid,))
+
+
+class SampleAdminNodeSwapSampleView(LoginRequiredMixin, SuperuserRequiredMixin, ActionReloadView):
+
+    def perform_action(self, request, *args, **kwargs):
+        self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
+        node = self.sample.get_node(self.kwargs.get('node_uuid'))
+
+        self.target_sample = Sample.objects.get_by_uuid(request.POST.get('swap_sample'))
+        target = self.target_sample.leaf_nodes.first()
+
+        if self.sample.uuid == self.target_sample.uuid:
+            print('Swapping {} with self'.format(node.process))
+            return
+
+        node.move_to(target)
+        node.piece = target.piece
+        node.save()
+        print('Moving {} as child of {} on sample {}'.format(
+            node.process, target.process, self.target_sample))
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('sample_admin', args=(self.target_sample.uuid,))
+
 
 
 class SampleSplitView(LoginRequiredMixin, ActionReloadView):

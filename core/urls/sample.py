@@ -28,4 +28,10 @@ urlpatterns = [
     url(r'^(?P<uuid>s[0-9]+)/admin/(?P<node_uuid>n[0-9a-f\-]{7,})/down/$',
         core.views.SampleAdminNodeDownView.as_view(),
         name='sample_admin_node_down'),
+    url(r'^(?P<uuid>s[0-9]+)/admin/(?P<node_uuid>n[0-9a-f\-]{7,})/swap_piece/$',
+        core.views.SampleAdminNodeSwapPieceView.as_view(),
+        name='sample_admin_node_swap_piece'),
+    url(r'^(?P<uuid>s[0-9]+)/admin/(?P<node_uuid>n[0-9a-f\-]{7,})/swap_sample/$',
+        core.views.SampleAdminNodeSwapSampleView.as_view(),
+        name='sample_admin_node_swap_sample'),
 ]
