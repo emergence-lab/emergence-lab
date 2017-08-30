@@ -11,7 +11,7 @@ from django_filters.views import FilterView
 
 from core.filters import SampleFilterSet
 from core.forms import SampleMultiForm
-from core.models import Sample, Process, ProcessNode
+from core.models import Sample, ProcessNode
 from core.views import ActionReloadView
 
 
@@ -105,7 +105,7 @@ class SampleAdminNodeUpView(LoginRequiredMixin, SuperuserRequiredMixin, ActionRe
         self.sample = Sample.objects.get_by_uuid(self.kwargs.get('uuid'))
         node = self.sample.get_node(self.kwargs.get('node_uuid'))
 
-        if not node.parent.process: # parent is root node
+        if not node.parent.process:  # parent is root node
             print('Not swapping, {} is root'.format(node.process))
             return
         target = node.parent
@@ -195,7 +195,6 @@ class SampleAdminNodeSwapSampleView(LoginRequiredMixin, SuperuserRequiredMixin, 
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse('sample_admin', args=(self.target_sample.uuid,))
-
 
 
 class SampleSplitView(LoginRequiredMixin, ActionReloadView):
