@@ -17,6 +17,10 @@
         <h1 class="page-header">
             Processes
             <div class="btn-toolbar pull-right">
+                <a href="{% url 'platter_list' %}" class="btn btn-info">
+                    {% bootstrap_icon 'list' %}
+                    Platters
+                </a>
                 <a class="btn btn-info" href="{% url 'process_templates' slug='all'%}">
                     {% bootstrap_icon 'star' %}
                     Favorites

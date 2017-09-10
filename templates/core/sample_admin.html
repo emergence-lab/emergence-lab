@@ -12,7 +12,8 @@
         <ol class="breadcrumb">
             <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li><a href="{% url 'sample_list' %}">Samples</a></li>
-            <li class='active'>{{sample.uuid}}</li>
+            <li><a href="{% url 'sample_detail' uuid=sample.uuid %}">{{sample.uuid}}</a></li>
+            <li class='active'>Admin</li>
         </ol>
     </nav>
 
@@ -20,48 +21,13 @@
         <h1 class="page-header">
             {{sample}}
             <div class="pull-right">
-                {% if sample.pieces|length = 1 %}
-                <button type="button"
-                        class="btn btn-warning"
-                        href="#"
-                        title="<strong>Split this Sample</strong>"
-                        data-placement="left"
-                        data-toggle="popover"
-                        data-html="true"
-                        data-content="{% include 'core/sample_split_original.html' %}">
-                    Split
-                </button>
-                {% endif %}
                 <div class="btn-group">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        {% bootstrap_icon 'plus' %}
-                        Add Process
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="{% url 'process_autocreate' uuid=sample.uuid %}">
-                            Run Process
-                        </a></li>
-                        <li class="divider"></li>
-                        <li><a href="{% url 'sem_autocreate' uuid=sample.uuid %}">
-                            Add SEM Images
-                        </a></li>
-                        <li><a href="{% url 'afm_autocreate' uuid=sample.uuid %}">
-                            Add AFM Scans
-                        </a></li>
-                        <!--<li><a href="#">Separated link</a></li>-->
+                    <a href="{% url 'sample_detail' uuid=sample.uuid %}" class="btn btn-info">
+                        {% bootstrap_icon 'chevron-left' %}
+                        Back
+                    </a>
                     </ul>
                 </div>
-                <a href="{% url 'sample_edit' uuid=sample.uuid %}" class="btn btn-warning">
-                    {% bootstrap_icon 'edit' %}
-                    Edit
-                </a>
-                {% if user.is_staff %}
-                    <a href="{% url 'sample_admin' uuid=sample.uuid %}" class="btn btn-info">
-                        {% bootstrap_icon 'cog' %}
-                        Admin
-                    </a>
-                {% endif %}
             </div>
         </h1>
     </header>
@@ -122,6 +88,27 @@
                                     )
                                     by {{node.process.user.get_full_name}}
                                     on {{node.process.created}}
+
+                                    {% if node.process.type_id != 'split-process' %}
+                                        <a type="button"
+                                                class="btn btn-xs btn-primary"
+                                                href="{% url 'sample_admin_node_up' uuid=sample.uuid node_uuid=node.uuid %}"
+                                                title="Move node up"
+                                                data-placement="right"
+                                                data-html="true">
+                                            Swap
+                                            {% bootstrap_icon 'arrow-up' %}
+                                        </a>
+                                        <a type="button"
+                                                class="btn btn-xs btn-primary"
+                                                href="{% url 'sample_admin_node_down' uuid=sample.uuid node_uuid=node.uuid %}"
+                                                title="Move node down"
+                                                data-placement="right"
+                                                data-html="true">
+                                            Swap
+                                            {% bootstrap_icon 'arrow-down' %}
+                                        </a>
+                                    {% endif %}
                             {% endif %}
                             {% if not node.is_leaf_node %}
                                 {% if node.is_root_node %}
@@ -132,17 +119,33 @@
                                     </ul>
                                 </li>
                                 {% endif %}
-                            {% else %}
+                            {% elif node.process.type_id != 'split-process' %}
                                     <button type="button"
-                                            class="btn btn-xs btn-warning"
+                                            class="btn btn-xs btn-primary"
                                             href="#"
-                                            title="<strong>Split this Sample</strong>"
+                                            title="Move to another piece"
                                             data-placement="right"
                                             data-toggle="popover"
                                             data-html="true"
-                                            data-content="{% include 'core/sample_split.html' %}">
-                                        Split Piece {{node.piece}}
+                                            data-content="{% include 'core/sample_swap_piece.html' %}">
+                                        {% bootstrap_icon 'random' %}
+                                        Move Piece
                                     </button>
+                                    <button type="button"
+                                            class="btn btn-xs btn-primary"
+                                            href="#"
+                                            title="Move to another sample"
+                                            data-placement="right"
+                                            data-toggle="popover"
+                                            data-html="true"
+                                            data-content="{% include 'core/sample_swap_sample.html' %}">
+                                        {% bootstrap_icon 'share-alt' %}
+                                        Move Sample
+                                    </button>
+                                    <span class="badge">Piece {{node.piece}}</span>
+                                </li>
+                            {% else %}
+                                    <span class="badge">Piece {{node.piece}}</span>
                                 </li>
                             {% endif %}
                     {% endrecursetree %}

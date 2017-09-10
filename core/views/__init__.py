@@ -43,6 +43,11 @@ from .sample import (
     SampleUpdateView,
     SampleSplitView,
     SampleSearchView,
+    SampleAdminView,
+    SampleAdminNodeUpView,
+    SampleAdminNodeDownView,
+    SampleAdminNodeSwapPieceView,
+    SampleAdminNodeSwapSampleView,
 )
 from .process import (
     ProcessDetailView,
