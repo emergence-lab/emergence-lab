@@ -1,0 +1,5 @@
+<form method='post' action='{% url 'sample_admin_node_swap_sample' uuid=sample.uuid node_uuid=node.uuid %}'>
+    {% csrf_token %}
+    <p><input id='swap_sample' name='swap_sample' type='text' class='form-control' placeholder='Sample uuid to swap to.'></p>
+    <p><input id='submit_swap_{{node.uuid}}' type='submit' class='form-control btn btn-success'></p>
+</form>
