@@ -1,5 +1,5 @@
 -r base.txt
 
-psycopg2==2.6.1
+psycopg2==2.7.6
 django-debug-toolbar==1.4.0
 tox
