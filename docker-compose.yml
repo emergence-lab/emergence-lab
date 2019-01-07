@@ -22,14 +22,14 @@ worker:
   image: emergence/emergence:develop
   command: python3 manage.py rqworker default
   volumes:
-    - .:/opt/django
+    - .:/opt/emergence
   environment:
     - DJANGO_SETTINGS_MODULE=wbg.settings.docker
   links:
     - db
     - redis
 nginx:
-  image: nnewman/nginx-extras:latest
+  image: nginx:1-alpine
   ports:
     - "80:80"
   volumes:

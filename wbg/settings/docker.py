@@ -22,7 +22,7 @@ AUTHENTICATION_BACKENDS = (
 
 # Static Files
 
-STATIC_ROOT = '/opt/django/static/'
+STATIC_ROOT = '/opt/emergence/static/'
 
 
 # Media Files

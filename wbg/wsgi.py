@@ -55,8 +55,8 @@ if _get_secret('PRODUCTION_MODE') == 'production':
 
     application = get_wsgi_application()
 elif _get_secret('PRODUCTION_MODE') == 'docker':
-    sys.path.append('/opt/django')
-    sys.path.append('/opt/django/wbg')
+    sys.path.append('/opt/emergence')
+    sys.path.append('/opt/emergence/wbg')
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wbg.settings.base')
 

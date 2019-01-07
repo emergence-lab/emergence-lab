@@ -61,4 +61,4 @@ target/
 secrets.json
 *.sh
 /media/
-/bower_components/
+/node_modules/
