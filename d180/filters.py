@@ -3,9 +3,9 @@ from __future__ import absolute_import, unicode_literals
 
 import django_filters as filters
 from django_filters.views import FilterView
-from datetimewidget.widgets import DateTimeWidget
 
 from core.models import User, Project, Investigation, Process
+from core.utils import DateTimeWidget, DATE_LOOKUP_CHOICES, EnhancedDateFilter
 
 
 # TODO: don't hardcode names as <model>__<field>, get name from FilterSet class
@@ -51,8 +51,9 @@ class D180GrowthFilter(filters.FilterSet):
     project = filters.ModelMultipleChoiceFilter(queryset=Project.objects.all())
     investigation = filters.ModelMultipleChoiceFilter(
         queryset=Investigation.objects.all())
-    created = filters.DateFilter(
-        lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+    created = EnhancedDateFilter(
+        # lookup_type=['exact', 'lt', 'lte', 'gt', 'gte'],
+        lookup_choices=DATE_LOOKUP_CHOICES,
         widget=DateTimeWidget(attrs={'class': 'datetime'},
                               options={'minView': '2',
                                        'startView': '3',

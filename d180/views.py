@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.views import generic
 from django.shortcuts import get_object_or_404
@@ -427,7 +427,7 @@ class UpdateReadingsView(LoginRequiredMixin, generic.detail.SingleObjectMixin,
 
     def post(self, request, **kwargs):
         numberofreadings = len(D180Readings.objects.filter(process=self.get_object()))
-        print (numberofreadings)
+        print(numberofreadings)
         for x in range(0, numberofreadings):
             rform = D180ReadingsForm(request.POST, prefix=('reading' + str(x + 1)))
             if rform.is_valid():

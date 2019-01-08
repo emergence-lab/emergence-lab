@@ -5,7 +5,7 @@ import pickle
 import uuid
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
 

@@ -17,7 +17,7 @@ class JournalEntry(TimestampMixin, models.Model):
     """
     title = models.CharField(max_length=100)
     entry = RichTextField(blank=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     slug = AutoSlugField(populate_from='title', unique_with=('author'))
     investigations = models.ManyToManyField(Investigation)
 

@@ -114,11 +114,11 @@ class User(ActiveStateMixin, auth.AbstractBaseUser):
         if permission == 'owner':
             permission_filters = models.Q(owner_group_id__in=group_ids)
         elif permission == 'member':
-            permission_filters = (models.Q(owner_group_id__in=group_ids) |
+            permission_filters = (models.Q(owner_group_id__in=group_ids) |  # noqa: W504
                                   models.Q(member_group_id__in=group_ids))
         elif permission == 'viewer':
-            permission_filters = (models.Q(owner_group_id__in=group_ids) |
-                                  models.Q(member_group_id__in=group_ids) |
+            permission_filters = (models.Q(owner_group_id__in=group_ids) |  # noqa: W504
+                                  models.Q(member_group_id__in=group_ids) |  # noqa: W504
                                   models.Q(viewer_group_id__in=group_ids))
         else:
             raise ValueError('Permission {} is not valid. Should be one of '

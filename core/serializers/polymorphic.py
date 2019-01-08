@@ -62,7 +62,7 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
                     rest_field = serializers.ChoiceField
                 if not issubclass(rest_field, serializers.ModelField):
                     kwargs.pop('model_field', None)
-                if (not issubclass(rest_field, serializers.CharField) and
+                if (not issubclass(rest_field, serializers.CharField) and  # noqa: W504
                         not issubclass(rest_field, serializers.ChoiceField)):
                     kwargs.pop('allow_blank', None)
 
@@ -109,7 +109,8 @@ class PolymorphicModelSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         try:
             return self.polymorphic_class_mapping.get(data).model
-        except:
+        # @TODO: Fix blanket except
+        except:  # noqa: E722
             raise serializers.ValidationError(
                 'Invalid class name given: {} is not a subclass of {}'.format(
                     data, self.polymorphic_base_model.__name__))

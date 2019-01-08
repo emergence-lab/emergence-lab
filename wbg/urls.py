@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth.views import login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -22,12 +22,20 @@ urlpatterns = [
         core.views.QuickSearchRedirectView.as_view(), name='quicksearch'),
     url(r'^exception/',
         core.views.ExceptionHandlerView.as_view(), name='exception'),
-    url(r'^accounts/login/',
-        login, {'template_name': 'core/login.html'}, name='login'),
-    url(r'^accounts/logout/',
-        logout, {'template_name': 'core/logout.html'}, name='logout'),
+    url(
+        r'^accounts/login/',
+        LoginView.as_view(template_name='core/login.html'),
+        # {'template_name': 'core/login.html'},
+        name='login'
+    ),
+    url(
+        r'^accounts/logout/',
+        LogoutView.as_view(),
+        {'template_name': 'core/logout.html'},
+        name='logout'
+    ),
     url(r'^accounts/', include('users.urls')),
-    url(r'^wbg-admin/', include(admin.site.urls)),
+    url(r'^wbg-admin/', admin.site.urls),
     url(r'^about/', core.views.AboutView.as_view(), name='about'),
 
     # core urls

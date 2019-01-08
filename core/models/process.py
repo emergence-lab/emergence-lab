@@ -76,7 +76,8 @@ class ProcessType(models.Model):
                                      default='default')
     category = models.ForeignKey(ProcessCategory, default='uncategorized',
                                  related_name='processtypes',
-                                 related_query_name='processtype')
+                                 related_query_name='processtype',
+                                 on_delete=models.SET_NULL, null=True)
 
     def get_absolute_url(self):
         return '/process/type/{}'.format(self.type)
@@ -112,9 +113,11 @@ class Process(UUIDMixin, TimestampMixin, models.Model):
     comment = fields.RichTextField(blank=True)
     legacy_identifier = models.SlugField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             limit_choices_to={'is_active': True})
+                             limit_choices_to={'is_active': True},
+                             on_delete=models.SET_NULL, null=True)
     run_date = models.DateField(default=datetime.date.today, blank=True)
-    type = models.ForeignKey(ProcessType, default='generic-process')
+    type = models.ForeignKey(ProcessType, default='generic-process',
+                             on_delete=models.CASCADE)
 
     investigations = models.ManyToManyField(Investigation,
         related_name='processes', related_query_name='process',)
@@ -159,8 +162,9 @@ class ProcessNode(mptt.MPTTModel, UUIDMixin, TimestampMixin):
     prefix = 'n'
 
     comment = fields.RichTextField(blank=True)
-    parent = mptt.TreeForeignKey('self', null=True, related_name='children')
-    process = models.ForeignKey(Process, null=True)
+    parent = mptt.TreeForeignKey('self', null=True, related_name='children',
+                                 on_delete=models.SET_NULL)
+    process = models.ForeignKey(Process, null=True, on_delete=models.SET_NULL)
     piece = models.CharField(max_length=5)
     number = models.IntegerField(default=1)
 
@@ -208,7 +212,8 @@ class DataFile(PolymorphicModel, TimestampMixin):
     process = models.ForeignKey(Process,
                                 related_name='datafiles',
                                 related_query_name='datafiles',
-                                null=True)
+                                null=True,
+                                on_delete=models.SET_NULL)
     content_type = models.CharField(max_length=200, blank=True, choices=CONTENT_TYPE, default='')
     data = models.FileField(upload_to=get_file_path, storage=labshare,
                             max_length=200, blank=True, null=True)
@@ -221,12 +226,14 @@ class ProcessTemplate(TimestampMixin, models.Model):
     """
     process = models.ForeignKey(Process,
                                 related_name='templates',
-                                related_query_name='templates')
+                                related_query_name='templates',
+                                on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=True)
     title = models.CharField(max_length=80)
     comment = fields.RichTextField(blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                         limit_choices_to={'is_active': True})
+                             limit_choices_to={'is_active': True},
+                             on_delete=models.SET_NULL, null=True)
 
 
 @receiver(models.signals.m2m_changed, sender=Process.investigations.through)

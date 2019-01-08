@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 from django.test import TestCase
 
 from datetime import datetime

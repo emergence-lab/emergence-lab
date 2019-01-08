@@ -126,8 +126,9 @@ class Sample(TimestampMixin, AutoUUIDMixin, models.Model):
     padding = 4
 
     comment = fields.RichTextField(blank=True)
-    substrate = models.OneToOneField(Substrate)
-    process_tree = mptt.TreeOneToOneField(ProcessNode, null=True)
+    substrate = models.OneToOneField(Substrate, on_delete=models.CASCADE)
+    process_tree = mptt.TreeOneToOneField(ProcessNode, null=True,
+                                          on_delete=models.SET_NULL)
 
     objects = SampleManager.from_queryset(SampleQuerySet)()
 

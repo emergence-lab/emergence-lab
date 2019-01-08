@@ -5,7 +5,7 @@ import os
 import subprocess
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.utils.cache import add_never_cache_headers
 from django.views import generic

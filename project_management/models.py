@@ -18,7 +18,8 @@ class Literature(TimestampMixin, models.Model):
     doi_number = models.CharField(max_length=100, blank=True, null=True)
     year = models.CharField(max_length=4, blank=True, null=True)
     journal = models.CharField(max_length=200, blank=True, null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.SET_NULL, null=True)
     investigations = models.ManyToManyField(Investigation,
                                         related_name='literature',
                                         related_query_name='literature')

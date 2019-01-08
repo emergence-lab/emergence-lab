@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import time
 
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth import get_user_model

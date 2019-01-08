@@ -3,9 +3,8 @@ from __future__ import absolute_import, unicode_literals
 
 from django import forms
 
-from datetimewidget.widgets import DateWidget
-
 from core.models import Investigation, Project, Milestone, Task, MilestoneNote
+from core.utils import DateWidget
 
 
 class MilestoneForm(forms.ModelForm):

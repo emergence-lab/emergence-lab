@@ -28,6 +28,8 @@ def get_polymorphic_field_mapping(cls):
         subclass.__name__: PolymorphicClassInfo(
             model=subclass,
             fields=[field for field in subclass._meta.local_fields
-                    if field.serialize and not field.rel])
+                    if field.serialize and not (
+                        hasattr(field, 'rel') and getattr(field, 'rel', None)
+                    )])
         for subclass in get_subclasses(cls) + [cls]
     }

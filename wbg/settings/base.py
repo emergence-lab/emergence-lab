@@ -103,7 +103,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'ckeditor',
-    'django_wysiwyg',
+    # 'django_wysiwyg',
     'mptt',
     'storages',
     'django_ace',
@@ -137,6 +137,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
 )
+
+MIDDLEWARE = MIDDLEWARE_CLASSES
 
 
 # Database
@@ -211,7 +213,9 @@ STATICFILES_FINDERS = (
 REST_FRAMEWORK = {
     # 'PAGINATE_BY': 25,
     'UPLOADED_FILES_USE_URL': False,
-    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',

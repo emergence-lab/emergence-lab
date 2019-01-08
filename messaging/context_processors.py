@@ -9,5 +9,7 @@ def notifications(request):
     Add notifications to context for all views.
     """
     helper = Helper()
-    notification_objects = helper.get_notifications(request.user.id)
+    notification_objects = []
+    if hasattr(request, 'user') and request.user:
+        notification_objects = helper.get_notifications(request.user.id)
     return {'notifications': notification_objects}

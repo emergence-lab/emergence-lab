@@ -8,10 +8,10 @@ from django import forms
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
-from datetimewidget.widgets import DateWidget
 import django_filters
 
 from core.models import Sample, ProcessType
+from core.utils import DateWidget, DATE_LOOKUP_CHOICES, EnhancedDateFilter
 
 
 def _filter_process_type(queryset, name, value):
@@ -69,8 +69,9 @@ class SampleFilterSet(django_filters.FilterSet):
         )),
     ]
 
-    created = django_filters.DateFilter(
-        lookup_expr=['exact', 'lt', 'lte', 'gt', 'gte'],
+    created = EnhancedDateFilter(
+        # lookup_expr=['exact', 'lt', 'lte', 'gt', 'gte'],
+        lookup_choices=DATE_LOOKUP_CHOICES,
         widget=DateWidget(
             attrs={'class': 'datetime'},
             bootstrap_version=3,
@@ -78,8 +79,9 @@ class SampleFilterSet(django_filters.FilterSet):
                      'todayHighlight': 'true',
                      'clearBtn': 'true',
                      'format': 'yyyy-mm-dd'}))
-    modified = django_filters.DateFilter(
-        lookup_expr=['exact', 'lt', 'lte', 'gt', 'gte'],
+    modified = EnhancedDateFilter(
+        # lookup_expr=['exact', 'lt', 'lte', 'gt', 'gte'],
+        lookup_choices=DATE_LOOKUP_CHOICES,
         widget=DateWidget(
             attrs={'class': 'datetime'},
             bootstrap_version=3,

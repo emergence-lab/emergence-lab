@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 
 
 def test_resolution_template(testcase, url, url_name, template_file,

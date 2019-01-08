@@ -8,10 +8,10 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms import helper, layout
-from datetimewidget.widgets import DateWidget
 
 from core.forms import ChecklistForm
 from core.models import Process
+from core.utils import DateWidget
 from d180.models import D180Readings, D180Source, D180GrowthInfo, Platter
 
 

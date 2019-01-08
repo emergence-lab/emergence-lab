@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views import generic
 
 from braces.views import LoginRequiredMixin, StaffuserRequiredMixin, UserPassesTestMixin

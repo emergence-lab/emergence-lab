@@ -32,9 +32,11 @@ class D180GrowthInfo(models.Model):
     Stores information related to a growth on the d180 including tagging for
     material and device properties.
     """
-    process = models.OneToOneField(Process, related_name='info')
+    process = models.OneToOneField(Process, related_name='info',
+                                   on_delete=models.CASCADE)
     platter = models.ForeignKey(Platter,
-                                limit_choices_to={'is_active': True})
+                                limit_choices_to={'is_active': True},
+                                on_delete=models.CASCADE)
 
     # layer materials
     has_gan = models.BooleanField(default=False)
@@ -100,7 +102,8 @@ class D180Readings(models.Model):
     Stores readings (i.e. temperature) from a d180 growth.
     """
     # growth and layer info
-    process = models.ForeignKey(Process, related_name='readings')
+    process = models.ForeignKey(Process, related_name='readings',
+                                on_delete=models.CASCADE)
     layer = models.IntegerField()
     description = models.CharField(max_length=100, blank=True)
 
@@ -161,7 +164,8 @@ class D180RecipeLayer(models.Model):
     """
     Stores layers used in the recipes for a d180 growth.
     """
-    process = models.ForeignKey(Process, related_name='recipe')
+    process = models.ForeignKey(Process, related_name='recipe',
+                                on_delete=models.SET_NULL, null=True)
 
     layer_num = models.IntegerField()
     loop_num = models.IntegerField()

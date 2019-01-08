@@ -9,9 +9,9 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms import helper, layout
-from datetimewidget.widgets import DateWidget
 
 from core.models import DataFile, Process, ProcessTemplate, ProcessType
+from core.utils import DateWidget
 
 
 class DropzoneForm(forms.ModelForm):

@@ -17,7 +17,7 @@
             <p class="text-center">Please login to continue</p>
             {% endif %}
         </div>
-        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+        <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
             {% bootstrap_form form %}
             {% buttons %}

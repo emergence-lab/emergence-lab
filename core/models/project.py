@@ -24,11 +24,14 @@ class Project(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mode
     slug = autoslug.AutoSlugField(_('slug'), populate_from='name')
     description = fields.RichTextField(_('description'), blank=True)
     owner_group = models.ForeignKey(Group, verbose_name=_('owner_group'),
-                                    related_name='+', blank=True, null=True)
+                                    related_name='+', blank=True, null=True,
+                                    on_delete=models.SET_NULL)
     member_group = models.ForeignKey(Group, verbose_name=_('member_group'),
-                                    related_name='+', blank=True, null=True)
+                                     related_name='+', blank=True, null=True,
+                                     on_delete=models.SET_NULL)
     viewer_group = models.ForeignKey(Group, verbose_name=_('viewer_group'),
-                                    related_name='+', blank=True, null=True)
+                                     related_name='+', blank=True, null=True,
+                                     on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = _('project')
@@ -53,7 +56,8 @@ class Investigation(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin
     description = fields.RichTextField(_('description'), blank=True)
     project = models.ForeignKey(Project, verbose_name=_('project'),
                                 related_name='investigations',
-                                related_query_name='investigation')
+                                related_query_name='investigation',
+                                on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('investigation')
@@ -87,7 +91,8 @@ class Milestone(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, mo
     investigation = models.ForeignKey(Investigation,
                                 related_name='milestones',
                                 related_query_name='milestone',
-                                null=True)
+                                null=True,
+                                on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('milestone')
@@ -117,7 +122,8 @@ class MilestoneNote(AccessControlShortcutMixin, TimestampMixin, models.Model):
     milestone = models.ForeignKey(Milestone,
                                 related_name='note',
                                 related_query_name='note',
-                                null=True)
+                                null=True,
+                                on_delete=models.CASCADE)
 
     @property
     def owner_group(self):
@@ -139,11 +145,13 @@ class Task(AccessControlShortcutMixin, ActiveStateMixin, TimestampMixin, models.
     description = fields.RichTextField(_('description'), blank=True)
     due_date = models.DateField()
     milestone = models.ForeignKey(Milestone,
-                                related_name='task',
-                                related_query_name='task',
-                                null=True)
+                                  related_name='task',
+                                  related_query_name='task',
+                                  null=True,
+                                  on_delete=models.SET_NULL)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                limit_choices_to={'is_active': True})
+                             limit_choices_to={'is_active': True},
+                             on_delete=models.SET_NULL, null=True)
 
     @property
     def owner_group(self):
@@ -162,8 +170,8 @@ class ProjectTracking(models.Model):
     """
     Stores ownership and tracking information for projects.
     """
-    project = models.ForeignKey(Project)
-    user = models.ForeignKey('User')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
     is_owner = models.BooleanField(default=False)
 
 

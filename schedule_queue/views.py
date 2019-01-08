@@ -5,7 +5,7 @@ import time
 
 from django.db.models import Count
 from django.shortcuts import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from schedule_queue.models import Reservation
 from django.views import generic
 

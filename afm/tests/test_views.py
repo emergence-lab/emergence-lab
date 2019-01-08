@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import datetime
 
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from model_mommy import mommy

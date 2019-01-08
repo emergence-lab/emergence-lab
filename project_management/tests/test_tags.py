@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import re
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from project_management.templatetags.dashboard_tags import (

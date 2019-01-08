@@ -12,9 +12,11 @@ class Reservation(ActiveStateMixin, TimestampMixin, models.Model):
     MAX_PRIORITY = 9223372036854775807
 
     tool = models.ForeignKey(ProcessType, related_name='reservations',
-                             related_query_name='reservation')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    platter = models.ForeignKey(Platter)
+                             related_query_name='reservation',
+                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.SET_NULL, null=True)
+    platter = models.ForeignKey(Platter, on_delete=models.SET_NULL, null=True)
     reservation_date = models.DateTimeField(auto_now_add=True)
     growth_length = models.DecimalField(max_digits=2, decimal_places=1)
     comment = models.CharField(max_length=500, blank=True)
